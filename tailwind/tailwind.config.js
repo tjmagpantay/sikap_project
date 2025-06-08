@@ -1,0 +1,36 @@
+module.exports = {
+  content: [
+    './public/**/*.{html,js,php}',
+    '!./public/assets/css/output.css',
+    './resources/**/*.php',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+      },
+      colors: {
+        primary: '#092C4C',
+        secondary: '#F3AF0E',
+        info: '#2F80ED',
+        success: '#27AE60',
+        warning: '#E2B93B',
+        error: '#EB5757',
+        black1: '#000000',
+        black2: '#1D1D1D',
+        black3: '#282828',
+        gray1: '#333333',
+        gray2: '#4F4F4F',
+        gray3: '#828282',
+        gray4: '#BDBDBD',
+        gray5: '#E0E0E0',
+        gray6: '#5E6670',
+        lightBlue: '#CEE0F5'
+      },
+      borderRadius: {
+        md: '0.5rem',
+      },
+    },
+  },
+  plugins: [],
+};

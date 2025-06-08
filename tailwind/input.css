@@ -1,0 +1,102 @@
+/* Tailwind CSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*-------COMPONENTS-------*/
+@layer components {
+  /* FONT */
+
+  /* BUTTON BASE STYLES */
+  .btn {
+    @apply px-4 py-2 text-sm font-semibold transition-all rounded-md font-inter;
+  }
+
+  /* NORMAL BUTTONS */
+  .btn-primary {
+    @apply px-4 py-2 font-semibold text-white rounded bg-primary;
+  }
+
+  .btn-primary:hover {
+    @apply text-secondary; 
+  }
+
+  .btn-primary:active {
+    @apply bg-[#526B87];
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed bg-gray5 text-gray3;
+  }
+
+  /* OUTLINE BUTTONS */
+  .btn-outline {
+    @apply px-4 py-2 text-sm font-semibold transition-all bg-white border rounded-sm border-lightBlue text-primary font-inter;
+  }
+
+  .btn-outline:hover {
+    @apply bg-lightBlue;
+  }
+
+  .btn-outline:active {
+    @apply bg-[#A5B2BE] border-[#A5B2BE];
+  }
+
+  .btn-outline:disabled {
+    @apply bg-white cursor-not-allowed text-gray3 border-gray5;
+  }
+
+  /* ICON BUTTONS */
+  .btn-icon {
+    @apply flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition-all rounded-md bg-primary font-inter;
+  }
+
+  .btn-icon:hover {
+    @apply bg-[#001F3F];
+  }
+
+  .btn-icon:active {
+    @apply bg-[#526B87];
+  }
+
+  .btn-icon:disabled {
+    @apply cursor-not-allowed bg-gray5 text-gray3;
+  }
+
+  /* ICON STYLES */
+  .btn-icon svg {
+    @apply w-4 h-4;
+  }
+
+  /* NAVBAR TEXT */
+  .nav-brand {
+    @apply     mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-semibold;
+  }
+  
+  .nav-link-top {
+    @apply flex items-center p-1 text-xs text-gray6
+  }
+
+  .nav-link {
+    @apply text-sm font-normal transition text-black3 hover:text-primary;
+  }
+
+  .nav-link-active {
+    @apply font-semibold text-primary;
+  }
+}
+
+/*-------UTILITIES-------*/
+@layer utilities {
+  .text-heading {
+    @apply text-lg font-bold text-primary;
+  }
+
+  .bg-light-blue {
+    @apply bg-lightBlue;
+  }
+
+  .card {
+    @apply p-4 bg-white rounded-md shadow;
+  }
+}

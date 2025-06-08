@@ -1,0 +1,26 @@
+# PHP
+/vendor/
+composer.lock
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Tailwind output
+/public/assets/css/output.css
+
+# Environment/config
+.env
+config.php
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML model
+/ml_service/model.pkl 

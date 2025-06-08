@@ -1,0 +1,11 @@
+{
+    "name": "yourname/sikap",
+    "description": "A modular PHP web application with ML microservice integration.",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+} 
