@@ -25,7 +25,7 @@ module.exports = {
         gray4: '#BDBDBD',
         gray5: '#E0E0E0',
         gray6: '#5E6670',
-        lightBlue: '#CEE0F5'
+        lightBlue: '#EFF7FD'
       },
       borderRadius: {
         md: '0.5rem',

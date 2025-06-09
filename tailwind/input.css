@@ -84,12 +84,51 @@
   .nav-link:hover::after {
     @apply w-full;
   }
-
-
-    .nav-link-active {
+  .nav-link-active {
       @apply font-semibold text-primary;
-    }
   }
+
+  /* CARD */
+  .company-card {
+    @apply card;
+  }
+
+  .company-header {
+    @apply flex items-center gap-2 mb-2;
+  }
+
+  .company-badge {
+    @apply text-xs text-pink-600 bg-pink-100 px-2 py-0.5 rounded;
+  }
+
+  .company-name {
+    @apply text-base font-semibold mb-1;
+  }
+
+  .company-location {
+    @apply text-xs text-gray-500 mb-2;
+  }
+
+  .company-description {
+    @apply text-sm text-gray-600 mb-3;
+  }
+
+  .company-link {
+    @apply text-sm text-blue-500 underline mb-3 block;
+  }
+
+  .company-button {
+    @apply btn-primary w-full;
+  }
+  
+  .job-card {
+    @apply bg-white rounded-lg shadow-md p-4 border border-gray-100 hover:shadow-lg transition;
+  }
+
+  .job-type {
+    @apply inline-block text-xs font-semibold px-2 py-0.5 rounded;
+  }
+}
 
 /*-------UTILITIES-------*/
 @layer utilities {
