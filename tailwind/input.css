@@ -7,14 +7,9 @@
 @layer components {
   /* FONT */
 
-  /* BUTTON BASE STYLES */
-  .btn {
-    @apply px-4 py-2 text-sm font-semibold transition-all rounded-md font-inter;
-  }
-
   /* NORMAL BUTTONS */
   .btn-primary {
-    @apply px-4 py-2 font-semibold text-white rounded bg-primary;
+    @apply px-4 py-2 text-sm font-semibold text-white transition-all rounded-sm font-inter bg-primary;
   }
 
   .btn-primary:hover {
@@ -31,7 +26,7 @@
 
   /* OUTLINE BUTTONS */
   .btn-outline {
-    @apply px-4 py-2 text-sm font-semibold transition-all bg-white border rounded-sm border-lightBlue text-primary font-inter;
+    @apply px-4 py-2 text-sm font-semibold transition-all bg-white border rounded-sm font-inter border-lightBlue text-primary;
   }
 
   .btn-outline:hover {
@@ -70,7 +65,7 @@
 
   /* NAVBAR TEXT */
   .nav-brand {
-    @apply     mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-semibold;
+    @apply mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-semibold;
   }
   
   .nav-link-top {
@@ -78,13 +73,23 @@
   }
 
   .nav-link {
-    @apply text-sm font-normal transition text-black3 hover:text-primary;
+    @apply relative inline-block text-sm font-normal transition text-black3 hover:text-primary;
   }
 
-  .nav-link-active {
-    @apply font-semibold text-primary;
+  .nav-link::after {
+    content: '';
+    @apply block h-[2px] bg-primary w-0 transition-all duration-200;
   }
-}
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+
+    .nav-link-active {
+      @apply font-semibold text-primary;
+    }
+  }
 
 /*-------UTILITIES-------*/
 @layer utilities {

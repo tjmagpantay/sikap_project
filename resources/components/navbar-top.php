@@ -18,9 +18,10 @@
         <li class="nav-link-top">
           <a href="#" class="flex items-center">Sikap</a>
         </li>
-        <li class="nav-link-top">
+        <li class="sm:block nav-link-top">
           <a href="#" class="flex items-center">Customer Support</a>
         </li>
+
       </ul>
     </div>
 

@@ -52,4 +52,6 @@ A modular PHP web application with a Python ML microservice. This project is str
 
 ---
 
-**Note:** This structure is designed for separation of concerns and easy future expansion. 
+**Note:** This structure is designed for separation of concerns and easy future expansion.
+
+-- npx tailwindcss -c tailwind/tailwind.config.js -i tailwind/input.css -o public/assets/css/output.css --watch
