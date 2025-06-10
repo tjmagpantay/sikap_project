@@ -1,8 +1,8 @@
 <nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
   <div class="flex flex-wrap items-center justify-between">
     <div class="flex items-center gap-3">
-      <img src="./assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
-      <img src="./assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11">
+      <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
+      <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11">
       <a href="#" class="nav-brand">Sikap</a>
     </div>
 
@@ -30,9 +30,9 @@
 
     <!-- Action Buttons (Desktop) -->
     <div class="items-center hidden lg:flex lg:block">
-      <button class="ml-4 btn-outline">
+      <a href="?page=login" class="ml-4 btn-outline">
         Sign In
-      </button>
+      </a>
       <button class="ml-2 btn-primary">
         Post A Job
       </button>
@@ -58,7 +58,7 @@
       <li><a href="#" class="nav-link">Explore Companies</a></li>
       <li><a href="#" class="nav-link">Community</a></li>
       <li class="flex flex-col gap-2 mt-4">
-        <button class="w-full btn-outline">Sign In</button>
+        <a href="?page=login" class="w-full btn-outline">Sign In</a>
         <button class="w-full btn-primary">Post A Job</button>
       </li>
     </ul>

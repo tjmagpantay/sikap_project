@@ -11,7 +11,33 @@
 </head>
 <body class="font-inter">
     <?php
-        include_once __DIR__ . '/../app/views/pages/landing-page.php';
+    session_start();
+
+    $page = $_GET['page'] ?? 'landing';
+
+    switch ($page) {
+        case 'landing':
+            include __DIR__ . '/../app/views/pages/landing-page.php';
+            break;
+        case 'login':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->login();
+            break;
+        case 'signup':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->signup();
+            break;
+        case 'employer-complete-profile':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->completeProfile();
+            break;
+        default:
+            include_once __DIR__ . '/../app/views/pages/landing-page.php';
+            break;
+    }
     ?>
     
 </body>

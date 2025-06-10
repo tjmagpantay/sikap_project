@@ -3,8 +3,8 @@
   <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-6 gap-2 text-sm py-10">
     <div class="md:col-span-2">
       <div class="flex items-center gap-2 mb-4">
-        <img src="./assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
-        <img src="./assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11 ">
+        <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
+        <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11 ">
         <span class="text-xl font-semibold">Sikap</span>
       </div>
       <p class="text-gray-400 mb-2">Call now: <span class="text-white font-semibold">(319) 555-0115</span></p>

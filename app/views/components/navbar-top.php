@@ -29,7 +29,7 @@
     <div class="hidden lg:block">
       <ul class="flex flex-col gap-2 mt-2 mb-4 font-sans lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-2">
         <li class="nav-link-top">
-        <img src="./assets/images/phonecall.png" alt="Phone Icon" class="w-auto h-4">
+        <img src="assets/images/phonecall.png" alt="Phone Icon" class="w-auto h-4">
         <li class="nav-link-top">
           <a href="#" class="flex items-center">+1-202-555-0178</a>
         </li>

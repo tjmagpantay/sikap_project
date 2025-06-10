@@ -8,12 +8,14 @@ A modular PHP web application with a Python ML microservice. This project is str
 /sikap/                     <-- Root folder of your project
 │
 ├── /app/                   <-- Application core (MVC)
-│   ├── /Controllers/       <-- Controllers: handle user requests and routing logic
-│   ├── /Models/            <-- Models: database interaction and data models
-│   └── /Views/             <-- Views: page templates and UI (PHP)
+│   ├── /controllers/       <-- Controllers: handle user requests and routing logic
+│   ├── /models/            <-- Models: database interaction and data models
+│   └── /views/             <-- Views: page templates and UI (PHP)
 │       ├── /components/    <-- Reusable PHP components (header, footer, nav, etc.)
 │       ├── /pages/         <-- Page-specific views (landing-page.php, etc.)
-│
+└── /config/              <-- Configuration file (DB creds, API URLs), kept outside public
+│    └── sikap_db.php       <-- db connection 
+│     
 ├── /public/                <-- Public web root accessible to users
 │   ├── /assets/            <-- Static assets
 │   │   ├── /css/           <-- Tailwind compiled CSS files (e.g., output.css)
@@ -36,7 +38,6 @@ A modular PHP web application with a Python ML microservice. This project is str
 ├── .gitignore
 ├── composer.json           <-- PHP dependency manager config (if used)
 ├── README.md               <-- Project documentation
-└── config.php              <-- Configuration file (DB creds, API URLs), kept outside public
 ```
 
 ## Setup
