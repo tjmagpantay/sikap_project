@@ -1,4 +1,4 @@
-    <?php
+<?php
         include_once __DIR__ . '/../components/navbar-top.php';
         include_once __DIR__ . '/../components/navbar.php';
         include_once __DIR__ . '/../components/hero-page.php';

@@ -11,7 +11,7 @@
 </head>
 <body class="font-inter">
     <?php
-        include_once __DIR__ . '/../resources/layouts/landing-page.php';
+        include_once __DIR__ . '/../app/views/pages/landing-page.php';
     ?>
     
 </body>
