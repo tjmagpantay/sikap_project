@@ -1,0 +1,134 @@
+SIKAP Project - Workspace & MVC Architecture Explanation
+========================================================
+
+## Project Overview
+SIKAP is a web-based job portal system that connects job seekers with employers, 
+built using PHP with MVC (Model-View-Controller) architecture pattern.
+
+## Workspace Structure
+```
+sikap/
+├── app/
+│   ├── controllers/     # Business logic controllers
+│   ├── models/         # Database interaction models
+│   └── views/          # User interface templates
+├── config/             # Database and app configuration
+├── public/             # Entry point and assets
+├── uploads/            # File storage for images/documents
+└── assets/             # CSS, JS, images
+```
+
+## MVC Architecture Implementation
+
+### 1. MODEL Layer (app/models/)
+- **Purpose**: Handles all database operations and data logic
+- **Key Files**:
+  - User.php: Authentication and user management
+  - Jobseeker.php: Job seeker profile and data operations
+  - Employer.php: Employer profile and business operations
+- **Responsibilities**:
+  - Database connections using PDO
+  - CRUD operations (Create, Read, Update, Delete)
+  - Data validation and business rules
+  - Profile completion calculations
+
+### 2. VIEW Layer (app/views/)
+- **Purpose**: Presentation layer for user interfaces
+- **Structure**:
+  - components/: Reusable UI components (navbar, footer)
+  - jobseekers/: Job seeker specific pages
+  - employers/: Employer specific pages
+  - auth/: Authentication pages (login, signup)
+- **Features**:
+  - Responsive design using Tailwind CSS
+  - Multi-step forms for profile completion
+  - Dynamic content rendering with PHP
+  - Component-based architecture for reusability
+
+### 3. CONTROLLER Layer (app/controllers/)
+- **Purpose**: Manages user requests and coordinates between Models and Views
+- **Key Files**:
+  - AuthController.php: Handles login, registration, logout
+  - JobseekerController.php: Manages job seeker operations
+  - EmployerController.php: Manages employer operations
+- **Responsibilities**:
+  - Route handling and request processing
+  - Form validation and error handling
+  - Session management
+  - File uploads and data processing
+  - Redirecting to appropriate views
+
+## Request Flow Process
+
+1. **Entry Point** (public/index.php)
+   - Receives all HTTP requests
+   - Routes requests based on 'page' parameter
+   - Loads appropriate controller and method
+
+2. **Controller Processing**
+   - Validates user input and permissions
+   - Interacts with models for data operations
+   - Handles business logic and form submissions
+   - Prepares data for views
+
+3. **Model Operations**
+   - Connects to MySQL database
+   - Executes SQL queries safely using prepared statements
+   - Returns data to controllers
+   - Handles data relationships (users, profiles, businesses)
+
+4. **View Rendering**
+   - Receives processed data from controllers
+   - Renders HTML with embedded PHP
+   - Includes reusable components
+   - Sends response back to user
+
+## Key Features Implementation
+
+### Multi-Step Profile Completion
+- **Controllers**: Handle step validation and progression
+- **Models**: Save partial data and calculate completion percentage
+- **Views**: Display progress indicators and step-specific forms
+
+### Role-Based Access Control
+- **Session Management**: Tracks user authentication and roles
+- **Route Protection**: Controllers verify permissions before rendering
+- **Dynamic Navigation**: Views adapt based on user role (jobseeker/employer)
+
+### File Upload System
+- **Controllers**: Handle file validation and processing
+- **Models**: Store file paths in database
+- **Views**: Provide upload interfaces and file management
+
+### Database Integration
+- **Configuration**: Database credentials in config/sikap_db.php
+- **Connection Pattern**: PDO with error handling in all models
+- **Data Security**: Prepared statements prevent SQL injection
+
+## Development Workflow
+
+1. **Adding New Features**:
+   - Create/update model for data operations
+   - Add controller method for business logic
+   - Create view template for user interface
+   - Add route in public/index.php
+
+2. **Database Changes**:
+   - Update model methods to reflect schema changes
+   - Modify controller logic if needed
+   - Update views to display new data
+
+3. **UI Updates**:
+   - Modify view templates
+   - Update CSS classes (Tailwind)
+   - Add JavaScript for interactivity
+
+## Technology Stack
+- **Backend**: PHP with PDO for database access
+- **Database**: MySQL with relational design
+- **Frontend**: HTML5, Tailwind CSS, Alpine.js for interactions
+- **Server**: Apache (XAMPP for development)
+- **File Management**: Local file system for uploads
+
+This MVC architecture ensures clean separation of concerns, making the codebase 
+maintainable, scalable, and easy to debug or extend with new features.
