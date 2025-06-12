@@ -1,14 +1,14 @@
 <?php
-require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Employer.php';
+require_once __DIR__ . '/../models/User.php';
 
 class EmployerController {
-    private $userModel;
     private $employerModel;
+    private $userModel;
 
     public function __construct() {
-        $this->userModel = new User();
         $this->employerModel = new Employer();
+        $this->userModel = new User();
     }
 
     public function signup() {
@@ -106,56 +106,347 @@ class EmployerController {
         $error = '';
         $success = '';
         
-        // Check if profile already exists
-        if ($this->userModel->hasCompleteProfile($_SESSION['user_id'], User::ROLE_EMPLOYER)) {
-            $success = 'Your profile is already complete!';
-            // Still show the form for editing
+        // Get existing profile data
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleProfileSubmission($error, $success);
         }
 
+        include __DIR__ . '/../views/employers/complete-profile.php';
+    }
+
+    public function completeBusiness() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        $error = '';
+        $success = '';
+        $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
+        
+        // Validate step range
+        if ($step < 1 || $step > 5) {
+            $step = 1;
+        }
+
+        // Get existing data
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            header('Location: ?page=complete-employer-profile');
+            exit;
+        }
+
+        $business = $this->employerModel->getBusiness($employer['employer_id']);
+        $documents = $this->employerModel->getDocuments($employer['employer_id']);
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = trim($_POST['first_name'] ?? '');
-            $last_name = trim($_POST['last_name'] ?? '');
-            $contact_no = trim($_POST['contact_no'] ?? '');
-            $middle_name = trim($_POST['middle_name'] ?? '');
-            $position = trim($_POST['position'] ?? '');
-            
-            if (empty($first_name) || empty($last_name) || empty($contact_no)) {
-                $error = 'Please fill in all required fields.';
-            } else {
-                // Check if profile exists for update vs create
-                $existingProfile = $this->employerModel->findByUserId($_SESSION['user_id']);
+            $this->handleBusinessStepSubmission($step, $employer['employer_id'], $error, $success);
+        }
+
+        include __DIR__ . "/../views/employers/complete-business-step{$step}.php";
+    }
+
+    private function handleProfileSubmission(&$error, &$success) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'first_name' => trim($_POST['first_name'] ?? ''),
+                'middle_name' => trim($_POST['middle_name'] ?? ''),
+                'last_name' => trim($_POST['last_name'] ?? ''),
+                'position' => trim($_POST['position'] ?? ''),
+                'contact_no' => trim($_POST['contact_no'] ?? ''),
+                'company_name' => trim($_POST['company_name'] ?? ''),
+                'about_us' => trim($_POST['about_us'] ?? '')
+            ];
+
+            // Validate required fields
+            if (empty($data['first_name']) || empty($data['last_name']) || 
+                empty($data['position']) || empty($data['contact_no'])) {
+                $error = "Please fill in all required fields.";
+                return;
+            }
+
+            try {
+                // Update employer profile
+                $result = $this->employerModel->createOrUpdateProfile($_SESSION['user_id'], $data);
                 
-                if ($existingProfile) {
-                    // Update existing profile
-                    $profile_updated = $this->employerModel->updateProfile($_SESSION['user_id'], [
-                        'first_name' => $first_name,
-                        'middle_name' => $middle_name,
-                        'last_name' => $last_name,
-                        'position' => $position,
-                        'contact_no' => $contact_no
-                    ]);
-                    
-                    if ($profile_updated) {
-                        $success = 'Profile updated successfully!';
-                    } else {
-                        $error = 'Failed to update profile. Please try again.';
-                    }
+                if ($result) {
+                    $success = "Profile updated successfully!";
+                    header("Location: ?page=complete-employer-business&step=1");
+                    exit;
                 } else {
-                    // Create new profile
-                    $profile_created = $this->employerModel->create($_SESSION['user_id'], $first_name, $last_name, $contact_no, $middle_name, $position);
-                    
-                    if ($profile_created) {
-                        $success = 'Profile completed successfully!';
-                    } else {
-                        $error = 'Failed to create profile. Please try again.';
-                    }
+                    $error = "Failed to update profile. Please try again.";
+                }
+            } catch (Exception $e) {
+                $error = "An error occurred: " . $e->getMessage();
+            }
+        }
+    }
+
+    private function handleBusinessStepSubmission($step, $employer_id, &$error, &$success) {
+        $data = $_POST;
+        
+        switch ($step) {
+            case 1:
+                $this->handleBusinessStep1($employer_id, $data, $error, $success);
+                break;
+            case 2:
+                $this->handleBusinessStep2($employer_id, $data, $error, $success);
+                break;
+            case 3:
+                $this->handleBusinessStep3($employer_id, $data, $error, $success);
+                break;
+            case 4:
+                $this->handleBusinessStep4($employer_id, $data, $error, $success);
+                break;
+            case 5:
+                $this->handleBusinessStep5($employer_id, $data, $error, $success);
+                break;
+        }
+    }
+
+    private function handleBusinessStep1($employer_id, $data, &$error, &$success) {
+        $required = ['business_name', 'business_desc'];
+        foreach ($required as $field) {
+            if (empty($data[$field])) {
+                $error = 'Please fill in all required fields.';
+                return;
+            }
+        }
+
+        $businessData = [
+            'business_name' => $data['business_name'],
+            'business_desc' => $data['business_desc']
+        ];
+
+        // Handle banner image upload
+        if (isset($_FILES['banner_image']) && $_FILES['banner_image']['error'] === UPLOAD_ERR_OK) {
+            $bannerPath = $this->handleBannerUpload($_FILES['banner_image'], $error);
+            if ($bannerPath) {
+                $businessData['banner_image'] = $bannerPath;
+            }
+        }
+
+        $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
+        header('Location: ?page=complete-employer-business&step=2');
+        exit;
+    }
+
+    private function handleBusinessStep2($employer_id, $data, &$error, &$success) {
+        $required = ['business_type', 'business_industry', 'business_address', 'business_contact', 'business_size', 'business_established_year'];
+        foreach ($required as $field) {
+            if (empty($data[$field])) {
+                $error = 'Please fill in all required fields.';
+                return;
+            }
+        }
+
+        $businessData = [
+            'business_type' => $data['business_type'],
+            'business_industry' => $data['business_industry'],
+            'business_address' => $data['business_address'],
+            'business_contact' => $data['business_contact'],
+            'business_size' => $data['business_size'], // Changed from business_team_size
+            'business_established_year' => $data['business_established_year'],
+            'business_website' => $data['business_website'] ?? '',
+            'business_email' => $data['business_email'] ?? ''
+        ];
+
+        $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
+        header('Location: ?page=complete-employer-business&step=3');
+        exit;
+    }
+
+    private function handleBusinessStep3($employer_id, $data, &$error, &$success) {
+        // Social Media Links
+        $socials = [];
+        if (!empty($data['facebook'])) $socials['facebook'] = $data['facebook'];
+        if (!empty($data['twitter'])) $socials['twitter'] = $data['twitter'];
+        if (!empty($data['instagram'])) $socials['instagram'] = $data['instagram'];
+        if (!empty($data['youtube'])) $socials['youtube'] = $data['youtube'];
+
+        $businessData = [
+            'business_socials' => json_encode($socials)
+        ];
+
+        $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
+        header('Location: ?page=complete-employer-business&step=4');
+        exit;
+    }
+
+    private function handleBusinessStep4($employer_id, $data, &$error, &$success) {
+        // Handle document uploads
+        $documentTypes = [
+            'letter_of_intent' => 'Letter of Intent',
+            'company_profile' => 'Company Profile',
+            'business_permit' => 'Business Permit',
+            'cert_of_no_pending_case' => 'Certificate of No Pending Case',
+            'dole_registration' => 'DOLE Registration',
+            'cert_no_objection' => 'Certificate of No Objection',
+            'poea_reg' => 'POEA Registration',
+            'job_vaccancies_qual' => 'Job Vacancies & Qualifications',
+            'phil_jobnet_reg' => 'PhilJobNet Registration'
+        ];
+
+        foreach ($documentTypes as $type => $label) {
+            if (isset($_FILES[$type]) && $_FILES[$type]['error'] === UPLOAD_ERR_OK) {
+                $filePath = $this->handleDocumentUpload($_FILES[$type], $type, $error);
+                if ($filePath) {
+                    $this->employerModel->saveDocument($employer_id, $type, $filePath);
+                } elseif ($error) {
+                    return;
                 }
             }
         }
+
+        header('Location: ?page=complete-employer-business&step=5');
+        exit;
+    }
+
+    private function handleBusinessStep5($employer_id, $data, &$error, &$success) {
+        // Final review and completion
+        header('Location: ?page=employer-profile-completion-success');
+        exit;
+    }
+
+    private function handleBannerUpload($file, &$error) {
+        $allowedTypes = ['image/jpeg', 'image/png'];
+        $maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!in_array($file['type'], $allowedTypes)) {
+            $error = 'Only JPEG and PNG files are allowed for banner images.';
+            return false;
+        }
+
+        if ($file['size'] > $maxSize) {
+            $error = 'Banner image must be less than 5MB.';
+            return false;
+        }
+
+        $uploadDir = __DIR__ . '/../../uploads/banners/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $fileName = $_SESSION['user_id'] . '_banner_' . time() . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filePath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            return 'uploads/banners/' . $fileName;
+        } else {
+            $error = 'Failed to upload banner image.';
+            return false;
+        }
+    }
+
+    private function handleDocumentUpload($file, $type, &$error) {
+        $allowedTypes = ['application/pdf'];
+        $maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!in_array($file['type'], $allowedTypes)) {
+            $error = 'Only PDF files are allowed for documents.';
+            return false;
+        }
+
+        if ($file['size'] > $maxSize) {
+            $error = 'Document must be less than 5MB.';
+            return false;
+        }
+
+        $uploadDir = __DIR__ . '/../../uploads/documents/employers/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $fileName = $_SESSION['user_id'] . '_' . $type . '_' . time() . '.pdf';
+        $filePath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            return 'uploads/documents/employers/' . $fileName;
+        } else {
+            $error = 'Failed to upload ' . $type . '.';
+            return false;
+        }
+    }
+
+    public function profileCompletionSuccess() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        include __DIR__ . '/../views/employers/profile-completion-success.php';
+    }
+
+    public function showProfile() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        include __DIR__ . '/../views/employers/profile-employer.php';
+    }
+
+    public function uploadProfilePhoto() {
+        header('Content-Type: application/json');
         
-        // Get existing profile data for form
-        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
+            exit;
+        }
+
+        $file = $_FILES['profile_photo'];
         
-        include __DIR__ . '/../views/employers/complete-profile.php';
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, and GIF are allowed.']);
+            exit;
+        }
+
+        // Validate file size (2MB max)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'File size must be less than 2MB.']);
+            exit;
+        }
+
+        // Create upload directory if it doesn't exist
+        $uploadDir = __DIR__ . '/../../uploads/profile_photos/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'employer_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+        $filepath = $uploadDir . $filename;
+
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            // Update database
+            $relativePath = 'uploads/profile_photos/' . $filename;
+            $result = $this->employerModel->updateProfilePhoto($_SESSION['user_id'], $relativePath);
+            
+            if ($result) {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Profile photo updated successfully',
+                    'image_url' => $relativePath
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to update database']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
+        }
+        exit;
     }
 }
+?>

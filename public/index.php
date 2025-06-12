@@ -96,6 +96,24 @@
             $controller->completeProfile();
             break;
 
+        case 'complete-employer-business':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->completeBusiness();
+            break;
+
+        case 'employer-profile-completion-success':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->profileCompletionSuccess();
+            break;
+
+        case 'profile-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->showProfile();
+            break;
+
         case 'complete-jobseeker-profile':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
