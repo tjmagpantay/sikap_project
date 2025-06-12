@@ -2,8 +2,8 @@
   <div class="flex flex-wrap items-center justify-between">
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
-      <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11">
-      <a href="#" class="nav-brand">Sikap</a>
+      <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
+      <a href="?page=landing" class="nav-brand">Sikap</a>
     </div>
 
     <!-- Desktop Menu -->
@@ -30,12 +30,12 @@
 
     <!-- Action Buttons (Desktop) -->
     <div class="items-center hidden lg:flex lg:block">
-      <a href="?page=login" class="ml-4 btn-outline">
+      <a href="?page=login-jobseeker" class="ml-4 btn-outline">
         Sign In
       </a>
-      <button class="ml-2 btn-primary">
+      <a href="?page=login-employer" class="ml-2 btn-primary">
         Post A Job
-      </button>
+      </a>
     </div>
   </div>
 
@@ -58,8 +58,8 @@
       <li><a href="#" class="nav-link">Explore Companies</a></li>
       <li><a href="#" class="nav-link">Community</a></li>
       <li class="flex flex-col gap-2 mt-4">
-        <a href="?page=login" class="w-full btn-outline">Sign In</a>
-        <button class="w-full btn-primary">Post A Job</button>
+        <a href="?page=login-jobseeker" class="w-full text-center btn-outline">Sign In</a>
+        <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
       </li>
     </ul>
   </div>

@@ -11,9 +11,6 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Tailwind output
-/public/assets/css/output.css
-
 # Environment/config
 .env
 config.php

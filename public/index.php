@@ -1,45 +1,125 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-2vWTFzTx5TkQ0CKg5sG3rMd8W2jcJGkX+9L5wz1tCwLmfIu5FgDf0uB/hgsWmPB0wDCaY6FUVuLuqm+ne+0hMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="./assets/css/output.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-2vWTFzTx5TkQ0CKg5sG3rMd8W2jcJGkX+9L5wz1tCwLmfIu5FgDf0uB/hgsWmPB0wDCaY6FUVuLuqm+ne+0hMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="./assets/css/output.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
+
 <body class="font-inter">
     <?php
     session_start();
-
     $page = $_GET['page'] ?? 'landing';
 
     switch ($page) {
         case 'landing':
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
-        case 'login':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
+
+        // Jobseeker Routes
+        case 'login-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
             $controller->login();
             break;
-        case 'signup':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
+        case 'signup-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
             $controller->signup();
             break;
-        case 'employer-complete-profile':
+        case 'jobseeker-dashboard':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->dashboard();
+            break;
+        case 'profile-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->showProfile();
+            break;
+        case 'upload-profile-photo':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->uploadProfilePhoto();
+            break;
+
+        // Admin Routes
+        case 'admin-login':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->login();
+            break;
+
+        case 'admin-signup':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->signup();
+            break;
+
+        // Employer Routes
+        case 'login-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->login();
+            break;
+        case 'signup-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->signup();
+            break;
+        case 'employer-dashboard':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->dashboard();
+            break;
+
+        // Admin Routes
+        case 'admin-login':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->login();
+            break;
+        case 'admin-dashboard':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->dashboard();
+            break;
+
+        // Complete Profile Routes
+        case 'complete-employer-profile':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
             $controller->completeProfile();
             break;
+
+        case 'complete-jobseeker-profile':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->completeProfile();
+            break;
+
+        case 'profile-completion-success':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->profileCompletionSuccess();
+            break;
+
+        // Logout
+        case 'logout':
+            session_destroy();
+            header('Location: ?page=landing');
+            exit;
+            break;
+
         default:
-            include_once __DIR__ . '/../app/views/pages/landing-page.php';
+            include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
     }
     ?>
-    
 </body>
-</html>
 
+</html>
