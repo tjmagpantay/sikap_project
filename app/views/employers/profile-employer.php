@@ -35,6 +35,40 @@ if ($documents) {
         }
     }
 }
+
+// Calculate separate completion percentages
+$personalCompletion = 0;
+$businessCompletion = 0;
+
+// Personal profile completion (out of 100%)
+$personalFields = ['first_name', 'last_name', 'position', 'contact_no'];
+$personalCompleted = 0;
+foreach ($personalFields as $field) {
+    if (!empty($employer[$field])) {
+        $personalCompleted++;
+    }
+}
+$personalCompletion = ($personalCompleted / count($personalFields)) * 100;
+
+// Business completion (out of 100%)
+$businessCompleted = 0;
+$totalBusinessItems = 8; // Adjust based on your business requirements
+
+if ($business) {
+    $businessFields = ['business_name', 'business_type', 'business_industry', 'business_desc'];
+    foreach ($businessFields as $field) {
+        if (!empty($business[$field])) {
+            $businessCompleted++;
+        }
+    }
+    
+    // Check for documents (count as 4 items)
+    if ($uploadedDocs > 0) {
+        $businessCompleted += min($uploadedDocs, 4);
+    }
+}
+
+$businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 ?>
 
 <div class="flex flex-col min-h-screen gap-6 p-6 font-sans bg-gray-100 md:flex-row">
@@ -86,17 +120,64 @@ if ($documents) {
             </div>
 
             <!-- Profile Completion -->
-            <div class="w-full mt-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-gray-700">Profile Completion</span>
-                    <span class="text-sm font-medium text-blue-600"><?php echo $completionPercentage; ?>%</span>
+            <div class="w-full mt-4 space-y-4">
+                <!-- Personal Profile Completion -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Personal Profile</span>
+                        <span class="text-sm font-medium text-blue-600"><?php echo round($personalCompletion); ?>%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full">
+                        <div class="h-2 transition-all duration-300 bg-blue-600 rounded-full" style="width: <?php echo $personalCompletion; ?>%"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                        <p class="text-xs text-gray-500">
+                            <?php echo $personalCompleted; ?>/<?php echo count($personalFields); ?> fields completed
+                        </p>
+                        <?php if ($personalCompletion < 100): ?>
+                            <a href="?page=employer-personal-profile" class="text-xs text-blue-600 hover:text-blue-700">Complete</a>
+                        <?php else: ?>
+                            <span class="text-xs text-green-600">✓ Complete</span>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <div class="w-full h-2 bg-gray-200 rounded-full">
-                    <div class="h-2 transition-all duration-300 bg-blue-600 rounded-full" style="width: <?php echo $completionPercentage; ?>%"></div>
+
+                <!-- Business Setup Completion -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Business Setup</span>
+                        <span class="text-sm font-medium text-orange-600"><?php echo round($businessCompletion); ?>%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full">
+                        <div class="h-2 transition-all duration-300 bg-orange-600 rounded-full" style="width: <?php echo $businessCompletion; ?>%"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                        <p class="text-xs text-gray-500">
+                            <?php echo $businessCompleted; ?>/<?php echo $totalBusinessItems; ?> items completed
+                        </p>
+                        <?php if ($businessCompletion < 100): ?>
+                            <a href="?page=complete-employer-business&step=1" class="text-xs text-orange-600 hover:text-orange-700">Complete</a>
+                        <?php else: ?>
+                            <span class="text-xs text-green-600">✓ Complete</span>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <?php if ($completionPercentage < 100): ?>
-                    <p class="mt-1 text-xs text-gray-500">Complete your profile to unlock all features</p>
-                <?php endif; ?>
+
+                <!-- Overall Progress -->
+                <div class="pt-2 mt-3 border-t border-gray-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-semibold text-gray-800">Overall Progress</span>
+                        <span class="text-sm font-semibold text-green-600"><?php echo round(($personalCompletion + $businessCompletion) / 2); ?>%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full">
+                        <div class="h-2 transition-all duration-300 bg-green-600 rounded-full" style="width: <?php echo ($personalCompletion + $businessCompletion) / 2; ?>%"></div>
+                    </div>
+                    <?php if (($personalCompletion + $businessCompletion) / 2 < 100): ?>
+                        <p class="mt-1 text-xs text-gray-500">Complete both sections to unlock all features</p>
+                    <?php else: ?>
+                        <p class="mt-1 text-xs text-green-600">🎉 Profile fully completed!</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <!-- Contact Information -->
@@ -109,7 +190,7 @@ if ($documents) {
                 </div>
             <?php endif; ?>
 
-            <!-- Quick Actions -->
+            <!-- Quick Actions - Replace the existing section -->
             <div class="w-full mt-4 space-y-2">
                 <?php if ($canPostJobs): ?>
                     <a href="?page=post-job" class="flex items-center justify-center w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
@@ -123,9 +204,20 @@ if ($documents) {
                     </button>
                 <?php endif; ?>
 
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="?page=employer-personal-profile" class="flex items-center justify-center px-3 py-2 text-xs text-blue-700 transition-colors bg-blue-100 rounded-lg hover:bg-blue-200">
+                        <i class="mr-1 fas fa-user"></i>
+                        Personal
+                    </a>
+                    <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center px-3 py-2 text-xs text-orange-700 transition-colors bg-orange-100 rounded-lg hover:bg-orange-200">
+                        <i class="mr-1 fas fa-building"></i>
+                        Business
+                    </a>
+                </div>
+
                 <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-2 text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <i class="mr-2 fas fa-edit"></i>
-                    Edit Profile
+                    <i class="mr-2 fas fa-cog"></i>
+                    Profile Dashboard
                 </a>
             </div>
         </div>
