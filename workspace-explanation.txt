@@ -9,13 +9,12 @@ built using PHP with MVC (Model-View-Controller) architecture pattern.
 ```
 sikap/
 ├── app/
-│   ├── controllers/     # Business logic controllers
+│   ├── controllers/    # Business logic controllers
 │   ├── models/         # Database interaction models
 │   └── views/          # User interface templates
 ├── config/             # Database and app configuration
 ├── public/             # Entry point and assets
-├── uploads/            # File storage for images/documents
-└── assets/             # CSS, JS, images
+└── uploads/            # File storage for images/documents
 ```
 
 ## MVC Architecture Implementation
