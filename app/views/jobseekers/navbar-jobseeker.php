@@ -110,17 +110,17 @@
                 Profile
               </a>
               
-              <a href="?page=saved-jobs" 
+              <a href="?page=jobseeker-documents" 
                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                Saved Jobs
+                Documents
               </a>
               
-              <a href="?page=applied-jobs" 
+              <a href="?page=jobseeker-applications" 
                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Applied Jobs
               </a>
               
-              <a href="?page=jobseeker-settings" 
+              <a href="?page=settings-jobseeker" 
                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Settings
               </a>

@@ -46,6 +46,15 @@
             $controller = new JobseekerController();
             $controller->uploadProfilePhoto();
             break;
+        case 'jobseeker-documents':
+            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
+            break;
+        case 'jobseeker-applications':
+            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
+            break;
+        case 'settings-jobseeker':
+            include __DIR__ . '/../app/views/jobseekers/settings-jobseeker.php';
+            break;
 
         // Admin Routes
         case 'admin-login':
