@@ -151,10 +151,11 @@ $documentTypes = [
                         <i class="mr-2 fas fa-arrow-left"></i>
                         Back
                     </a>
-                    <button type="submit" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    <a href="?page=complete-employer-business&step=5" 
+                        class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        <i class="mr-2 fas fa-plus"></i>
                         Next Step
-                        <i class="ml-2 fas fa-arrow-right"></i>
-                    </button>
+                    </a>
                 </div>
             </form>
         </div>
