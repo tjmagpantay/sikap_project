@@ -1,8 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-business-step1.php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
-?>
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';?>
 
 <div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
@@ -45,7 +42,7 @@ include_once __DIR__ . '/navbar-employer.php';
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=complete-employer-business&step=1" enctype="multipart/form-data">
+            <form class="space-y-6" method="POST" action="?page=complete-employer-profile&step=1" enctype="multipart/form-data">
                 <!-- Banner Image Upload -->
                 <div>
                     <label for="banner_image" class="block text-sm font-medium text-gray-700">
@@ -59,19 +56,19 @@ include_once __DIR__ . '/navbar-employer.php';
                         <div class="mt-2 mb-4">
                             <img src="<?php echo htmlspecialchars($business['banner_image']); ?>" 
                                  alt="Current Banner" 
-                                 class="w-full h-32 object-cover rounded-md border border-gray-300">
-                            <p class="text-xs text-gray-500 mt-1">Current banner image. Upload a new one to replace it.</p>
+                                 class="object-cover w-full h-32 border border-gray-300 rounded-md">
+                            <p class="mt-1 text-xs text-gray-500">Current banner image. Upload a new one to replace it.</p>
                         </div>
                     <?php endif; ?>
                     
                     <div class="mt-2">
-                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                        <div class="flex justify-center px-6 pt-5 pb-6 transition-colors border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400">
                             <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <svg class="w-12 h-12 mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                                 <div class="flex text-sm text-gray-600">
-                                    <label for="banner_image" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                    <label for="banner_image" class="relative font-medium text-blue-600 bg-white rounded-md cursor-pointer hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                         <span><?php echo !empty($business['banner_image']) ? 'Replace banner' : 'Upload banner'; ?></span>
                                         <input id="banner_image" name="banner_image" type="file" class="sr-only" accept="image/jpeg,image/png">
                                     </label>
@@ -109,12 +106,12 @@ include_once __DIR__ . '/navbar-employer.php';
                 </div>
 
                 <div class="flex justify-between">
-                    <a href="?page=complete-employer-profile" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <a href="?page=employer-dashboard" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                         <i class="mr-2 fas fa-arrow-left"></i>
-                        Back
+                        Back to Dashboard
                     </a>
                     <button type="submit" class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        Next Step
+                        Save & Continue to Business Setup
                         <i class="ml-2 fas fa-arrow-right"></i>
                     </button>
                 </div>

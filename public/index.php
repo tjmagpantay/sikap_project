@@ -86,21 +86,22 @@
 
         // Complete Profile Routes
         case 'complete-employer-profile':
+            // This is now the choice page
+            include __DIR__ . '/../app/views/employers/complete-profile.php';
+            break;
+
+        case 'employer-personal-profile':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
-            $controller->completeProfile();
+            $controller->personalProfile();
             break;
 
         case 'complete-employer-business':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->completeBusiness();
-            break;
+            // This goes directly to business step 1 (or whatever step is specified)
+            $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
+            if ($step < 1 || $step > 5) $step = 1;
 
-        case 'employer-profile-completion-success':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->profileCompletionSuccess();
+            include __DIR__ . '/../app/views/employers/profile-completion/complete-business-step' . $step . '.php';
             break;
 
         case 'profile-employer':

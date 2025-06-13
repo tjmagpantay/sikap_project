@@ -1,7 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-business-step3.php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';
 
 // Decode existing social media data
 $socials = [];
@@ -54,7 +52,7 @@ if (!empty($business['business_socials'])) {
             <form class="space-y-6" method="POST" action="?page=complete-employer-business&step=3">
                 <!-- Social Link 1 - Facebook -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
                         Social Link 1
                     </label>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -74,7 +72,7 @@ if (!empty($business['business_socials'])) {
 
                 <!-- Social Link 2 - Twitter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
                         Social Link 2
                     </label>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -94,7 +92,7 @@ if (!empty($business['business_socials'])) {
 
                 <!-- Social Link 3 - Instagram -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
                         Social Link 3
                     </label>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -114,7 +112,7 @@ if (!empty($business['business_socials'])) {
 
                 <!-- Social Link 4 - YouTube -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
                         Social Link 4
                     </label>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">

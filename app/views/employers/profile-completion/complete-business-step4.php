@@ -1,8 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-business-step4.php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
-
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';
 // Document types and their labels
 $documentTypes = [
     'letter_of_intent' => 'Letter of Intent',
@@ -77,7 +74,7 @@ $documentTypes = [
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <?php foreach ($documentTypes as $type => $label): ?>
                         <div class="p-4 border border-gray-200 rounded-lg">
-                            <label for="<?php echo $type; ?>" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="<?php echo $type; ?>" class="block mb-2 text-sm font-medium text-gray-700">
                                 <?php echo $label; ?>
                                 <?php if (in_array($type, ['letter_of_intent', 'company_profile', 'business_permit'])): ?>
                                     <span class="text-red-500">*</span>
@@ -86,10 +83,10 @@ $documentTypes = [
                             
                             <?php if (!empty($documents[$type])): ?>
                                 <!-- Show existing document -->
-                                <div class="mb-3 p-3 border border-green-200 bg-green-50 rounded-md">
+                                <div class="p-3 mb-3 border border-green-200 rounded-md bg-green-50">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <i class="fas fa-file-pdf text-red-500 text-lg mr-2"></i>
+                                            <i class="mr-2 text-lg text-red-500 fas fa-file-pdf"></i>
                                             <div>
                                                 <p class="text-sm font-medium text-green-800">Document uploaded</p>
                                                 <p class="text-xs text-green-600">Click to view or download</p>
@@ -98,25 +95,25 @@ $documentTypes = [
                                         <div class="flex space-x-2">
                                             <a href="<?php echo htmlspecialchars($documents[$type]); ?>" target="_blank" 
                                                class="text-xs text-blue-600 hover:text-blue-700">
-                                                <i class="fas fa-eye mr-1"></i>View
+                                                <i class="mr-1 fas fa-eye"></i>View
                                             </a>
                                             <a href="<?php echo htmlspecialchars($documents[$type]); ?>" download 
                                                class="text-xs text-green-600 hover:text-green-700">
-                                                <i class="fas fa-download mr-1"></i>Download
+                                                <i class="mr-1 fas fa-download"></i>Download
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-500 mb-2">Upload a new file to replace the existing document.</p>
+                                <p class="mb-2 text-xs text-gray-500">Upload a new file to replace the existing document.</p>
                             <?php endif; ?>
                             
-                            <div class="flex justify-center px-4 pt-4 pb-4 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                            <div class="flex justify-center px-4 pt-4 pb-4 transition-colors border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400">
                                 <div class="space-y-1 text-center">
-                                    <svg class="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <svg class="w-8 h-8 mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <div class="flex text-sm text-gray-600">
-                                        <label for="<?php echo $type; ?>" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <label for="<?php echo $type; ?>" class="relative font-medium text-blue-600 bg-white rounded-md cursor-pointer hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                             <span><?php echo !empty($documents[$type]) ? 'Replace' : 'Upload'; ?></span>
                                             <input id="<?php echo $type; ?>" name="<?php echo $type; ?>" type="file" class="sr-only" accept=".pdf">
                                         </label>
@@ -137,7 +134,7 @@ $documentTypes = [
                         <div class="ml-3">
                             <h4 class="text-sm font-medium text-yellow-800">Important Notice</h4>
                             <div class="mt-2 text-sm text-yellow-700">
-                                <ul class="list-disc list-inside space-y-1">
+                                <ul class="space-y-1 list-disc list-inside">
                                     <li>All documents must be in PDF format</li>
                                     <li>Maximum file size: 5MB per document</li>
                                     <li>Documents marked with * are required</li>

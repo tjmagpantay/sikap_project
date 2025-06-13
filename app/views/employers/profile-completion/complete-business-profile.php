@@ -1,6 +1,6 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-profile.php
-require_once __DIR__ . '/../../models/Employer.php';
+// filepath: c:\xampp\htdocs\sikap\app\views\employers\profile-completion\complete-business-profile.php
+require_once __DIR__ . '/../../../models/Employer.php';
 
 $employerModel = new Employer();
 $employer = $employerModel->findByUserId($_SESSION['user_id']);
@@ -10,13 +10,13 @@ $personalCompleted = !empty($employer['first_name']) && !empty($employer['last_n
 $businessCompleted = false; // You can check business completion here when you implement it
 ?>
 
-<?php include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';
 ?>
 
 <div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-4xl">
-        <div class="mb-8 text-center">
+        <div class="text-center mb-8">
             <div class="flex justify-center mb-4">
                 <div class="p-3 bg-blue-600 rounded-full">
                     <i class="text-2xl text-white fas fa-user-cog"></i>
@@ -32,7 +32,7 @@ include_once __DIR__ . '/navbar-employer.php';
 
         <!-- Success Message -->
         <?php if (!empty($_GET['success'])): ?>
-            <div class="max-w-2xl mx-auto mb-6">
+            <div class="mb-6 max-w-2xl mx-auto">
                 <div class="p-4 border border-green-200 rounded-md bg-green-50">
                     <div class="flex">
                         <div class="flex-shrink-0">
@@ -47,20 +47,20 @@ include_once __DIR__ . '/navbar-employer.php';
         <?php endif; ?>
 
         <!-- Profile Setup Options -->
-        <div class="grid max-w-4xl grid-cols-1 gap-6 mx-auto md:grid-cols-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             
             <!-- Personal Profile Setup -->
-            <div class="overflow-hidden bg-white rounded-lg shadow">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="p-6">
                     <div class="flex items-center mb-4">
                         <div class="flex-shrink-0">
                             <?php if ($personalCompleted): ?>
-                                <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
-                                    <i class="text-green-600 fas fa-check"></i>
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600"></i>
                                 </div>
                             <?php else: ?>
-                                <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                                    <i class="text-blue-600 fas fa-user"></i>
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600"></i>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -73,18 +73,18 @@ include_once __DIR__ . '/navbar-employer.php';
                     </div>
                     
                     <div class="mb-4">
-                        <p class="mb-3 text-sm text-gray-600">Includes:</p>
-                        <ul class="space-y-1 text-sm text-gray-500">
+                        <p class="text-sm text-gray-600 mb-3">Includes:</p>
+                        <ul class="text-sm text-gray-500 space-y-1">
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-green-500 fas fa-check"></i>
+                                <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
                                 Personal information
                             </li>
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-green-500 fas fa-check"></i>
+                                <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
                                 Contact details
                             </li>
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-green-500 fas fa-check"></i>
+                                <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
                                 Position & company info
                             </li>
                         </ul>
@@ -92,14 +92,14 @@ include_once __DIR__ . '/navbar-employer.php';
 
                     <div class="mt-6">
                         <?php if ($personalCompleted): ?>
-                            <a href="?page=employer-personal-profile" 
-                               class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                            <a href="?page=complete-employer-profile&step=1" 
+                               class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                                 <i class="mr-2 fas fa-edit"></i>
                                 Edit Profile
                             </a>
                         <?php else: ?>
-                            <a href="?page=employer-personal-profile" 
-                               class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                            <a href="?page=complete-employer-profile&step=1" 
+                               class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
                                 <i class="mr-2 fas fa-plus"></i>
                                 Set Up Profile
                             </a>
@@ -109,12 +109,12 @@ include_once __DIR__ . '/navbar-employer.php';
             </div>
 
             <!-- Business Setup -->
-            <div class="overflow-hidden bg-white rounded-lg shadow">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="p-6">
                     <div class="flex items-center mb-4">
                         <div class="flex-shrink-0">
-                            <div class="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full">
-                                <i class="text-orange-600 fas fa-building"></i>
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-building text-orange-600"></i>
                             </div>
                         </div>
                         <div class="ml-4">
@@ -124,38 +124,46 @@ include_once __DIR__ . '/navbar-employer.php';
                     </div>
                     
                     <div class="mb-4">
-                        <p class="mb-3 text-sm text-gray-600">Includes:</p>
-                        <ul class="space-y-1 text-sm text-gray-500">
+                        <p class="text-sm text-gray-600 mb-3">Includes:</p>
+                        <ul class="text-sm text-gray-500 space-y-1">
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-gray-300 fas fa-circle"></i>
+                                <i class="fas fa-circle text-gray-300 mr-2 text-xs"></i>
                                 Company details
                             </li>
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-gray-300 fas fa-circle"></i>
+                                <i class="fas fa-circle text-gray-300 mr-2 text-xs"></i>
                                 Social media links
                             </li>
                             <li class="flex items-center">
-                                <i class="mr-2 text-xs text-gray-300 fas fa-circle"></i>
+                                <i class="fas fa-circle text-gray-300 mr-2 text-xs"></i>
                                 Business documents
                             </li>
                         </ul>
                     </div>
 
                     <div class="mt-6">
-                        <a href="?page=complete-employer-business&step=1" 
-                           class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-orange-600 border border-transparent rounded-md hover:bg-orange-700">
-                            <i class="mr-2 fas fa-plus"></i>
-                            Set Up Business
-                        </a>
+                        <?php if (!$personalCompleted): ?>
+                            <button disabled 
+                                    class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
+                                <i class="mr-2 fas fa-lock"></i>
+                                Complete Personal Profile First
+                            </button>
+                        <?php else: ?>
+                            <a href="?page=complete-employer-business&step=1" 
+                               class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 transition-colors">
+                                <i class="mr-2 fas fa-plus"></i>
+                                Set Up Business
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex justify-center mt-8 space-x-4">
+        <div class="mt-8 flex justify-center space-x-4">
             <a href="?page=employer-dashboard" 
-               class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+               class="inline-flex items-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                 <i class="mr-2 fas fa-arrow-left"></i>
                 Back to Dashboard
             </a>

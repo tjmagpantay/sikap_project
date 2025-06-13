@@ -188,5 +188,18 @@ class Employer {
             return $stmt->execute([$employer_id, $file_path]);
         }
     }
+
+    public function createProfile($data)
+    {
+        try {
+            $sql = "INSERT INTO employers (user_id, first_name, middle_name, last_name, position, contact_no, company_name, about_us, created_at) 
+                    VALUES (:user_id, :first_name, :middle_name, :last_name, :position, :contact_no, :company_name, :about_us, NOW())";
+            
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($data);
+        } catch (PDOException $e) {
+            error_log('Error creating employer profile: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
-?>

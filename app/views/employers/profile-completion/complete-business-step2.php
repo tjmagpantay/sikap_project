@@ -1,8 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-business-step2.php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
-?>
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';?>
 
 <div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">

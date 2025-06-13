@@ -1,7 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\complete-business-step5.php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php';
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-employer.php';
 
 // Decode social media data
 $socials = [];
@@ -61,12 +59,12 @@ foreach ($documentTypes as $type => $label) {
             <!-- Profile Summary -->
             <div class="space-y-8">
                 <!-- Personal Information -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-user mr-2 text-blue-600"></i>
+                <div class="pb-6 border-b border-gray-200">
+                    <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900">
+                        <i class="mr-2 text-blue-600 fas fa-user"></i>
                         Personal Information
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <div>
                             <p class="text-sm text-gray-600">Name</p>
                             <p class="font-medium"><?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['middle_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?></p>
@@ -89,22 +87,22 @@ foreach ($documentTypes as $type => $label) {
                 </div>
 
                 <!-- Business Information -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-building mr-2 text-blue-600"></i>
+                <div class="pb-6 border-b border-gray-200">
+                    <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900">
+                        <i class="mr-2 text-blue-600 fas fa-building"></i>
                         Business Information
                     </h3>
                     
                     <?php if (!empty($business['banner_image'])): ?>
                         <div class="mb-4">
-                            <p class="text-sm text-gray-600 mb-2">Banner Image</p>
+                            <p class="mb-2 text-sm text-gray-600">Banner Image</p>
                             <img src="<?php echo htmlspecialchars($business['banner_image']); ?>" 
                                  alt="Banner" 
-                                 class="w-full h-32 object-cover rounded-md border border-gray-300">
+                                 class="object-cover w-full h-32 border border-gray-300 rounded-md">
                         </div>
                     <?php endif; ?>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <div>
                             <p class="text-sm text-gray-600">Company Name</p>
                             <p class="font-medium"><?php echo htmlspecialchars($business['business_name'] ?? 'Not specified'); ?></p>
@@ -155,17 +153,17 @@ foreach ($documentTypes as $type => $label) {
 
                 <!-- Social Media -->
                 <?php if (!empty($socials)): ?>
-                    <div class="border-b border-gray-200 pb-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-share-alt mr-2 text-blue-600"></i>
+                    <div class="pb-6 border-b border-gray-200">
+                        <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900">
+                            <i class="mr-2 text-blue-600 fas fa-share-alt"></i>
                             Social Media
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <?php foreach ($socials as $platform => $url): ?>
                                 <?php if (!empty($url)): ?>
                                     <div>
                                         <p class="text-sm text-gray-600"><?php echo ucfirst($platform); ?></p>
-                                        <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="font-medium text-blue-600 hover:text-blue-700 break-all"><?php echo htmlspecialchars($url); ?></a>
+                                        <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="font-medium text-blue-600 break-all hover:text-blue-700"><?php echo htmlspecialchars($url); ?></a>
                                     </div>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -174,12 +172,12 @@ foreach ($documentTypes as $type => $label) {
                 <?php endif; ?>
 
                 <!-- Documents -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-file-alt mr-2 text-blue-600"></i>
+                <div class="pb-6 border-b border-gray-200">
+                    <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900">
+                        <i class="mr-2 text-blue-600 fas fa-file-alt"></i>
                         Documents <span class="text-sm font-normal text-gray-500">(<?php echo $uploadedDocs; ?> of <?php echo count($documentTypes); ?> uploaded)</span>
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <?php foreach ($documentTypes as $type => $label): ?>
                             <div class="flex items-center justify-between p-3 border rounded-md <?php echo !empty($documents[$type]) ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'; ?>">
                                 <div class="flex items-center">
@@ -187,9 +185,9 @@ foreach ($documentTypes as $type => $label) {
                                     <span class="text-sm <?php echo !empty($documents[$type]) ? 'text-green-800' : 'text-gray-600'; ?>"><?php echo $label; ?></span>
                                 </div>
                                 <?php if (!empty($documents[$type])): ?>
-                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    <i class="text-green-600 fas fa-check-circle"></i>
                                 <?php else: ?>
-                                    <i class="fas fa-times-circle text-gray-400"></i>
+                                    <i class="text-gray-400 fas fa-times-circle"></i>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
@@ -197,9 +195,9 @@ foreach ($documentTypes as $type => $label) {
                 </div>
 
                 <!-- Completion Status -->
-                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <h4 class="text-lg font-medium text-blue-900 mb-2">What happens next?</h4>
-                    <ul class="text-sm text-blue-700 space-y-1">
+                <div class="p-4 border border-blue-200 rounded-md bg-blue-50">
+                    <h4 class="mb-2 text-lg font-medium text-blue-900">What happens next?</h4>
+                    <ul class="space-y-1 text-sm text-blue-700">
                         <li>• Your profile will be reviewed by our admin team</li>
                         <li>• You'll receive an email notification once verified</li>
                         <li>• After verification, you can start posting job opportunities</li>
