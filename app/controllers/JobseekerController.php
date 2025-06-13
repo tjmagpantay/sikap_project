@@ -129,12 +129,13 @@ class JobseekerController
         }
 
         // Include the appropriate step view
-        include __DIR__ . "/../views/jobseekers/complete-profile-step{$step}.php";
+        include __DIR__ . '/../views/jobseekers/complete-jobseeker-profile.php';
     }
 
-    private function handleStepSubmission($step, &$error, &$success) {
+    private function handleStepSubmission($step, &$error, &$success)
+    {
         $data = $_POST;
-        
+
         switch ($step) {
             case 1:
                 $this->handleStep1($data, $error, $success);
@@ -391,7 +392,8 @@ class JobseekerController
         }
     }
 
-    private function handleStep8($data, &$error, &$success) {
+    private function handleStep8($data, &$error, &$success)
+    {
         // Mark profile as completed and redirect to success page
         $this->jobseekerModel->markProfileComplete($_SESSION['user_id']);
         header('Location: ?page=profile-completion-success');
@@ -418,58 +420,59 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
     }
 
-    public function uploadProfilePhoto() {
+    public function uploadProfilePhoto()
+    {
         header('Content-Type: application/json');
-        
+
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
-        
+
         if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'message' => 'No file uploaded']);
             exit;
         }
-        
+
         $file = $_FILES['profile_photo'];
-        
+
         // Validate file type
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!in_array($file['type'], $allowedTypes)) {
             echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF and WebP are allowed.']);
             exit;
         }
-        
+
         // Validate file size (2MB max)
         if ($file['size'] > 2 * 1024 * 1024) {
             echo json_encode(['success' => false, 'message' => 'File size too large. Maximum 2MB allowed.']);
             exit;
         }
-        
+
         // Create upload directory
         $uploadDir = __DIR__ . '/../../uploads/profile_photos/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-        
+
         // Generate unique filename
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $fileName = $_SESSION['user_id'] . '_' . time() . '.' . $extension;
         $filePath = $uploadDir . $fileName;
-        
+
         // Move uploaded file
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             // Save to database (optional - you can add a profile_photo field to jobseeker table)
             $relativePath = 'uploads/profile_photos/' . $fileName;
-            
+
             // Update jobseeker record with profile photo path
             $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
             if ($jobseeker) {
                 $this->jobseekerModel->updateProfilePhoto($_SESSION['user_id'], $relativePath);
             }
-            
+
             echo json_encode([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Profile photo updated successfully',
                 'image_url' => $relativePath
             ]);

@@ -56,19 +56,6 @@
             include __DIR__ . '/../app/views/jobseekers/settings-jobseeker.php';
             break;
 
-        // Admin Routes
-        case 'admin-login':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->login();
-            break;
-
-        case 'admin-signup':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->signup();
-            break;
-
         // Employer Routes
         case 'login-employer':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
@@ -85,7 +72,6 @@
             $controller = new EmployerController();
             $controller->dashboard();
             break;
-
         // Admin Routes
         case 'admin-login':
             require_once __DIR__ . '/../app/controllers/AdminController.php';

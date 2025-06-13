@@ -1,5 +1,5 @@
-<?php include_once __DIR__ . '/../components/navbar-top.php'; ?>
-<?php include_once __DIR__ . '/navbar-jobseeker.php'; ?>
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-jobseeker.php';?>
 
 <?php
 // Get existing work experience
@@ -37,9 +37,9 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
 
             <!-- Show existing data if available -->
             <?php if ($currentWork): ?>
-                <div class="mb-6 p-4 border border-blue-200 bg-blue-50 rounded-md">
-                    <h4 class="text-sm font-medium text-blue-800 mb-2">Current Employment Information</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div class="p-4 mb-6 border border-blue-200 rounded-md bg-blue-50">
+                    <h4 class="mb-2 text-sm font-medium text-blue-800">Current Employment Information</h4>
+                    <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
                         <div>
                             <span class="text-blue-600">Job Title:</span>
                             <span class="font-medium"><?php echo htmlspecialchars($currentWork['job_title']); ?></span>
@@ -57,7 +57,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                             <span class="font-medium"><?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Working' : 'Previous Job'; ?></span>
                         </div>
                     </div>
-                    <p class="text-xs text-blue-600 mt-2">You can update this information below.</p>
+                    <p class="mt-2 text-xs text-blue-600">You can update this information below.</p>
                 </div>
             <?php endif; ?>
 
