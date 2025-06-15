@@ -6,6 +6,12 @@ class Employer {
     private $db;
     private $table_name = "employer";
 
+    const STATUS_INCOMPLETE = 'incomplete';
+    const STATUS_PENDING_VERIFICATION = 'pending_verification';
+    const STATUS_VERIFIED = 'verified';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_SUSPENDED = 'suspended';
+
     public function __construct() {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
@@ -103,12 +109,44 @@ class Employer {
     }
 
     public function isVerified($user_id) {
-        $employer = $this->findByUserId($user_id);
-        return $employer && isset($employer['is_verified']) && $employer['is_verified'] == 1;
+        try {
+            $employer = $this->findByUserId($user_id);
+            if (!$employer) {
+                return false;
+            }
+            
+            // Check if employer status is 'verified' 
+            if ($employer['status'] === self::STATUS_VERIFIED) {
+                return true;
+            }
+            
+            // Also check accreditation table for approved status
+            $sql = "SELECT a.status 
+                    FROM accreditation a 
+                    WHERE a.employer_id = ? AND a.status = 'approved'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer['employer_id']]);
+            $accreditation = $stmt->fetch();
+            
+            return $accreditation !== false;
+            
+        } catch (PDOException $e) {
+            error_log('Error checking verification status: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function canPostJobs($user_id) {
-        return $this->isVerified($user_id) && $this->calculateProfileCompletion($user_id) >= 80;
+        $employer = $this->findByUserId($user_id);
+        if (!$employer) {
+            return false;
+        }
+        
+        // Check if employer is verified and profile is completed
+        $isVerified = $this->isVerified($user_id);
+        $profileCompleted = !empty($employer['profile_completed']) && $employer['profile_completed'] == 1;
+        
+        return $isVerified && $profileCompleted;
     }
 
     public function updateProfilePhoto($user_id, $photo_path) {
@@ -273,20 +311,106 @@ class Employer {
         try {
             error_log("DEBUG: Marking profile completed for employer_id: $employer_id");
             
-            $sql = "UPDATE employer SET profile_completed = 1, status = 'pending_verification', updated_at = CURRENT_TIMESTAMP WHERE employer_id = :employer_id";
+            $sql = "UPDATE employer SET 
+                        profile_completed = 1, 
+                        status = :status, 
+                        updated_at = CURRENT_TIMESTAMP 
+                    WHERE employer_id = :employer_id";
+            
             $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute(['employer_id' => $employer_id]);
+            $result = $stmt->execute([
+                'employer_id' => $employer_id,
+                'status' => self::STATUS_PENDING_VERIFICATION
+            ]);
             
             if ($result) {
+                $this->createAccreditationRecord($employer_id);
                 error_log("DEBUG: Profile marked as completed successfully");
-            } else {
-                error_log("DEBUG: Failed to mark profile as completed: " . print_r($stmt->errorInfo(), true));
             }
             
             return $result;
         } catch (PDOException $e) {
             error_log('Error marking profile as completed: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    private function createAccreditationRecord($employer_id)
+    {
+        try {
+            // Check if accreditation record already exists
+            $checkSql = "SELECT accreditation_id FROM accreditation WHERE employer_id = ?";
+            $checkStmt = $this->db->prepare($checkSql);
+            $checkStmt->execute([$employer_id]);
+            
+            if (!$checkStmt->fetch()) {
+                // Create new accreditation record
+                $sql = "INSERT INTO accreditation (employer_id, status, created_at) VALUES (?, 'pending', NOW())";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute([$employer_id]);
+                
+                if ($result) {
+                    error_log("DEBUG: Accreditation record created for employer_id: $employer_id");
+                }
+                
+                return $result;
+            }
+            
+            return true; // Already exists
+        } catch (PDOException $e) {
+            error_log('Error creating accreditation record: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getVerificationStatus($user_id) {
+        try {
+            $employer = $this->findByUserId($user_id);
+            if (!$employer) {
+                return ['status' => 'not_found', 'message' => 'Employer not found'];
+            }
+            
+            // Check accreditation status
+            $sql = "SELECT status, reviewed_at, notes 
+                    FROM accreditation 
+                    WHERE employer_id = ? 
+                    ORDER BY created_at DESC 
+                    LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer['employer_id']]);
+            $accreditation = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$accreditation) {
+                return [
+                    'status' => 'pending_submission',
+                    'message' => 'Complete your profile to submit for verification'
+                ];
+            }
+            
+            switch ($accreditation['status']) {
+                case 'approved':
+                    return [
+                        'status' => 'verified',
+                        'message' => 'Your employer account has been verified',
+                        'verified_at' => $accreditation['reviewed_at']
+                    ];
+                case 'rejected':
+                    return [
+                        'status' => 'rejected',
+                        'message' => 'Your application was rejected',
+                        'reason' => $accreditation['notes']
+                    ];
+                case 'pending':
+                default:
+                    return [
+                        'status' => 'pending',
+                        'message' => 'Your application is under review'
+                    ];
+            }
+            
+        } catch (PDOException $e) {
+            error_log('Error getting verification status: ' . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Unable to check status'];
         }
     }
 }

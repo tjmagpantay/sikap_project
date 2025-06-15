@@ -8,7 +8,8 @@ $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
 $business = $employer ? $this->employerModel->getBusiness($employer['employer_id']) : null;
 $documents = $employer ? $this->employerModel->getDocuments($employer['employer_id']) : null;
 $completionPercentage = $this->employerModel->calculateProfileCompletion($_SESSION['user_id']);
-$isVerified = $this->employerModel->isVerified($_SESSION['user_id']);
+$verificationStatus = $this->employerModel->getVerificationStatus($_SESSION['user_id']);
+$isVerified = $verificationStatus['status'] === 'verified';
 $canPostJobs = $this->employerModel->canPostJobs($_SESSION['user_id']);
 
 // Decode social media data
@@ -111,11 +112,37 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <i class="mr-2 text-green-600 fas fa-check-circle"></i>
                         <span class="text-sm font-medium text-green-800">Verified Employer</span>
                     </div>
-                <?php else: ?>
+                    <?php if (!empty($verificationStatus['verified_at'])): ?>
+                        <p class="mt-1 text-xs text-center text-green-600">
+                            Verified on <?php echo date('M j, Y', strtotime($verificationStatus['verified_at'])); ?>
+                        </p>
+                    <?php endif; ?>
+                <?php elseif ($verificationStatus['status'] === 'rejected'): ?>
+                    <div class="flex items-center justify-center px-3 py-2 bg-red-100 border border-red-200 rounded-lg">
+                        <i class="mr-2 text-red-600 fas fa-times-circle"></i>
+                        <span class="text-sm font-medium text-red-800">Application Rejected</span>
+                    </div>
+                    <?php if (!empty($verificationStatus['reason'])): ?>
+                        <p class="mt-1 text-xs text-center text-red-600">
+                            Reason: <?php echo htmlspecialchars($verificationStatus['reason']); ?>
+                        </p>
+                    <?php endif; ?>
+                <?php elseif ($verificationStatus['status'] === 'pending'): ?>
                     <div class="flex items-center justify-center px-3 py-2 bg-yellow-100 border border-yellow-200 rounded-lg">
                         <i class="mr-2 text-yellow-600 fas fa-clock"></i>
                         <span class="text-sm font-medium text-yellow-800">Pending Verification</span>
                     </div>
+                    <p class="mt-1 text-xs text-center text-yellow-600">
+                        Your application is being reviewed by our team
+                    </p>
+                <?php else: ?>
+                    <div class="flex items-center justify-center px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg">
+                        <i class="mr-2 text-gray-600 fas fa-info-circle"></i>
+                        <span class="text-sm font-medium text-gray-800">Complete Profile</span>
+                    </div>
+                    <p class="mt-1 text-xs text-center text-gray-600">
+                        Complete your profile to submit for verification
+                    </p>
                 <?php endif; ?>
             </div>
 

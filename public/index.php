@@ -83,6 +83,21 @@
             $controller = new AdminController();
             $controller->dashboard();
             break;
+        case 'admin-accreditations':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->viewAccreditations();
+            break;
+        case 'admin-review-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->reviewAccreditation();
+            break;
+        case 'admin-process-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->processAccreditation();
+            break;
 
         // Complete Profile Routes
         case 'complete-employer-profile':
