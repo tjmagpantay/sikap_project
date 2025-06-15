@@ -111,17 +111,17 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                 <!-- Team Size and Year of Establishment -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="business_team_size" class="block text-sm font-medium text-gray-700">
+                        <label for="business_size" class="block text-sm font-medium text-gray-700">
                             Team Size <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
-                            <select id="business_team_size" name="business_team_size" required
+                            <select id="business_size" name="business_size" required
                                     class="block w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select...</option>
-                                <option value="1-10" <?php echo ($business['business_team_size'] ?? $_POST['business_team_size'] ?? '') === '1-10' ? 'selected' : ''; ?>>1-10 employees</option>
-                                <option value="11-50" <?php echo ($business['business_team_size'] ?? $_POST['business_team_size'] ?? '') === '11-50' ? 'selected' : ''; ?>>11-50 employees</option>
-                                <option value="51-100" <?php echo ($business['business_team_size'] ?? $_POST['business_team_size'] ?? '') === '51-100' ? 'selected' : ''; ?>>51-100 employees</option>
-                                <option value="100+" <?php echo ($business['business_team_size'] ?? $_POST['business_team_size'] ?? '') === '100+' ? 'selected' : ''; ?>>100+ employees</option>
+                                <option value="1-10" <?php echo ($business['business_size'] ?? $_POST['business_size'] ?? '') === '1-10' ? 'selected' : ''; ?>>1-10 employees</option>
+                                <option value="11-50" <?php echo ($business['business_size'] ?? $_POST['business_size'] ?? '') === '11-50' ? 'selected' : ''; ?>>11-50 employees</option>
+                                <option value="51-100" <?php echo ($business['business_size'] ?? $_POST['business_size'] ?? '') === '51-100' ? 'selected' : ''; ?>>51-100 employees</option>
+                                <option value="100+" <?php echo ($business['business_size'] ?? $_POST['business_size'] ?? '') === '100+' ? 'selected' : ''; ?>>100+ employees</option>
                             </select>
                         </div>
                     </div>
@@ -151,16 +151,29 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                     </div>
                 </div>
 
+                <!-- Company Email -->
+                <div>
+                    <label for="business_email" class="block text-sm font-medium text-gray-700">
+                        Company Email
+                    </label>
+                    <div class="mt-1">
+                        <input id="business_email" name="business_email" type="email"
+                               value="<?php echo htmlspecialchars($business['business_email'] ?? $_POST['business_email'] ?? ''); ?>"
+                               placeholder="company@example.com"
+                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
                 <div class="flex justify-between">
                     <a href="?page=complete-employer-business&step=1" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                         <i class="mr-2 fas fa-arrow-left"></i>
                         Back
                     </a>
-                    <a href="?page=complete-employer-business&step=3" 
-                        class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        <i class="mr-2 fas fa-plus"></i>
-                        Next Step
-                    </a>
+                <button type="submit" name="submit_step2"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    <i class="mr-2 fas fa-arrow-right"></i>
+                    Next Step
+                </button>
                 </div>
             </form>
         </div>

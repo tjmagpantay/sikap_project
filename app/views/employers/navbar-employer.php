@@ -86,12 +86,7 @@
                 <i class="mr-3 text-gray-400 fas fa-user-tie"></i>
                 Employer Profile
               </a>
-              
-              <a href="?page=business-profile" 
-                 class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
-                <i class="mr-3 text-gray-400 fas fa-building"></i>
-                Business Profile
-              </a>
+            
               
               <a href="?page=employer-settings" 
                  class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
@@ -156,7 +151,6 @@
         <p class="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Business</p>
         <div class="pl-4 space-y-2">
           <a href="?page=profile-employer" class="text-sm nav-link">Employer Profile</a>
-          <a href="?page=business-profile" class="text-sm nav-link">Business Profile</a>
           <a href="?page=employer-settings" class="text-sm nav-link">Settings</a>
           <a href="?page=contact-us" class="text-sm nav-link">Contact Us</a>
         </div>

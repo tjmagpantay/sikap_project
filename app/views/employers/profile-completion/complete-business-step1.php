@@ -42,7 +42,7 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=complete-employer-profile&step=1" enctype="multipart/form-data">
+            <form class="space-y-6" method="POST" action="?page=complete-employer-business&step=1" enctype="multipart/form-data">
                 <!-- Banner Image Upload -->
                 <div>
                     <label for="banner_image" class="block text-sm font-medium text-gray-700">
@@ -110,11 +110,11 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                         <i class="mr-2 fas fa-arrow-left"></i>
                         Back to Dashboard
                     </a>
-                    <a href="?page=complete-employer-business&step=2" 
-                        class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        <i class="mr-2 fas fa-plus"></i>
-                        Next Step
-                    </a>
+                <button type="submit" name="submit_step1"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    <i class="mr-2 fas fa-arrow-right"></i>
+                    Next Step
+                </button>
                 </div>
             </form>
         </div>

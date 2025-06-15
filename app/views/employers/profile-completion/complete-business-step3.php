@@ -149,13 +149,48 @@ if (!empty($business['business_socials'])) {
                         <i class="mr-2 fas fa-arrow-left"></i>
                         Back
                     </a>
-                    <a href="?page=complete-employer-business&step=4" 
-                        class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        <i class="mr-2 fas fa-plus"></i>
-                        Next Step
-                    </a>
+                <button type="submit" name="submit_step3"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    <i class="mr-2 fas fa-arrow-right"></i>
+                    Next Step
+                </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<!-- <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const urlInputs = form.querySelectorAll('input[type="url"]');
+    
+    urlInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && !isValidURL(this.value)) {
+                this.setCustomValidity('Please enter a valid URL (e.g., https://facebook.com/yourpage)');
+                this.reportValidity();
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    });
+    
+    function isValidURL(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    form.addEventListener('submit', function(e) {
+        console.log('Form submitting...');
+        // Optional: Add loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="mr-2 fas fa-spinner fa-spin"></i>Saving...';
+        submitBtn.disabled = true;
+    });
+});
+</script> -->
