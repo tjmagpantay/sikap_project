@@ -407,7 +407,11 @@ class JobseekerController
             exit;
         }
 
-        include __DIR__ . '/../views/jobseekers/profile-completion-success.php';
+        // Get jobseeker data for display
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        $user = $this->userModel->findById($_SESSION['user_id']);
+
+        include __DIR__ . '/../views/jobseekers/profile-completion/profile-completion-success.php';
     }
 
     public function showProfile()

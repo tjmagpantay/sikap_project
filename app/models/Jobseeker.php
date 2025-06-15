@@ -143,13 +143,16 @@ class Jobseeker
         return $stmt->execute([$jobseeker_id, $data['certificate_title'], $data['issuing_organization'], $data['date_issued']]);
     }
 
-    public function markProfileComplete($user_id) {
-        $jobseeker = $this->findByUserId($user_id);
-        if ($jobseeker) {
-            $stmt = $this->db->prepare("UPDATE jobseeker SET profile_completed = 1 WHERE user_id = ?");
-            return $stmt->execute([$user_id]);
+    public function markProfileComplete($user_id)
+    {
+        try {
+            $sql = "UPDATE jobseeker 9SET profile_completed = 1, updated_at = CURRENT_TIMESTAMP WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute(['user_id' => $user_id]);
+        } catch (PDOException $e) {
+            error_log('Error marking profile as complete: ' . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
     public function getEducation($user_id)

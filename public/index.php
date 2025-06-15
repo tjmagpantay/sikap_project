@@ -97,11 +97,9 @@
             break;
 
         case 'complete-employer-business':
-            // This goes directly to business step 1 (or whatever step is specified)
-            $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
-            if ($step < 1 || $step > 5) $step = 1;
-
-            include __DIR__ . '/../app/views/employers/profile-completion/complete-business-step' . $step . '.php';
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->completeBusiness(); // This method should handle both GET and POST
             break;
 
         case 'profile-employer':
@@ -121,12 +119,30 @@
             $controller = new JobseekerController();
             $controller->profileCompletionSuccess();
             break;
+        case 'employer-profile-completion-success':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->profileCompletionSuccess();
+            break;
 
         // Logout
         case 'logout':
             session_destroy();
             header('Location: ?page=landing');
             exit;
+            break;
+
+        // New Employer Routes
+        case 'post-job':
+            require_once __DIR__ . '/../app/views/employers/post-job-main.php';
+            break;
+
+        case 'job-post-success':
+            include __DIR__ . '/../app/views/employers/post-job/job-post-success.php';
+            break;
+
+        case 'manage-jobs':
+            include __DIR__ . '/../app/views/employers/manage-jobs.php';
             break;
 
         default:

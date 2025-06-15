@@ -333,13 +333,6 @@ class EmployerController
         exit;
     }
 
-    private function handleBusinessStep5($employer_id, $data, &$error, &$success)
-    {
-        // Final review and completion
-        header('Location: ?page=employer-profile-completion-success');
-        exit;
-    }
-
     private function handleBannerUpload($file, &$error)
     {
         $allowedTypes = ['image/jpeg', 'image/png'];
@@ -409,7 +402,7 @@ class EmployerController
             exit;
         }
 
-        include __DIR__ . '/../views/employers/profile-completion-success.php';
+        include __DIR__ . '/../views/employers/profile-completion/profile-completion-success.php';
     }
 
     public function showProfile()
@@ -586,5 +579,33 @@ class EmployerController
         // Handle final submission (step 5)
         header('Location: ?page=employer-dashboard&success=' . urlencode('Profile completed successfully!'));
         exit;
+    }
+
+    private function handleBusinessStep5($employer_id, $data, &$error, &$success)
+    {
+        try {
+            // Process any final business data here if needed
+            // For example, save additional business information
+            
+            // Mark the profile as completed
+            $result = $this->employerModel->markProfileCompleted($employer_id);
+            
+            if ($result) {
+                // Set success message
+                $success = "Your business profile has been completed successfully!";
+                
+                // Redirect to success page
+                header('Location: ?page=profile-completion-success');
+                exit;
+            } else {
+                $error = "Failed to complete profile. Please try again.";
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            error_log('Error in handleBusinessStep5: ' . $e->getMessage());
+            $error = "An error occurred while completing your profile.";
+            return false;
+        }
     }
 }

@@ -21,9 +21,15 @@ class Employer {
     }
 
     public function findByUserId($user_id) {
-        $stmt = $this->db->prepare("SELECT * FROM " . $this->table_name . " WHERE user_id = ? LIMIT 1");
-        $stmt->execute([$user_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT * FROM employer WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['user_id' => $user_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding employer by user ID: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function getBusiness($employer_id) {
@@ -199,6 +205,18 @@ class Employer {
             return $stmt->execute($data);
         } catch (PDOException $e) {
             error_log('Error creating employer profile: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function markProfileCompleted($employer_id)
+    {
+        try {
+            $sql = "UPDATE employer SET profile_completed = 1, updated_at = CURRENT_TIMESTAMP WHERE employer_id = :employer_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute(['employer_id' => $employer_id]);
+        } catch (PDOException $e) {
+            error_log('Error marking profile as completed: ' . $e->getMessage());
             return false;
         }
     }

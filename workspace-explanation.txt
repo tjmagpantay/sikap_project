@@ -131,3 +131,28 @@ sikap/
 
 This MVC architecture ensures clean separation of concerns, making the codebase 
 maintainable, scalable, and easy to debug or extend with new features.
+
+
+COMMIT PREFIXES
+
+Prefix	    When to Use It
+feat:	    When you add a new feature (e.g., new UI element, new module)
+fix:	    When you fix a bug (e.g., UI error, logic issue, crash fix)
+refactor:	When you change code structure without changing its behavior
+chore:	    For non-functional tasks (e.g., updating dependencies, config files)
+style:	    When you make formatting/style changes (e.g., indentation, spacing, comments)
+docs:	    When you add or update documentation (e.g., README.md, code comments)
+test:	    When you add or modify tests (e.g., unit tests, integration tests)
+perf:	    When you improve performance (e.g., faster queries, optimized loops)
+ci:	        When you change CI/CD scripts or pipelines
+build:	    When you modify build system or dependencies
+revert:	    When you revert a previous commit
+
+example
+fix: resolve image not loading on jobseeker profile page
+feat: add profile progress bar for jobseeker profile page
+refactor: simplify profile data fetching logic
+style: update spacing and font style on profile page
+chore: update package dependencies
+docs: update README with profile setup instructions
+test: add unit tests for profile completion checker
