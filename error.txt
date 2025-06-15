@@ -1,1 +1,8 @@
-employers business profile
+to fix:
+- employers business profile
+
+to accomplish:
+- admin accredits employer
+- employer post job
+- jobseeker apply on job
+
