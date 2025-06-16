@@ -143,7 +143,8 @@ class Employer {
         }
         
         // Check if employer is verified and profile is completed
-        $isVerified = $this->isVerified($user_id);
+        $verificationStatus = $this->getVerificationStatus($user_id);
+        $isVerified = $verificationStatus['status'] === 'verified';
         $profileCompleted = !empty($employer['profile_completed']) && $employer['profile_completed'] == 1;
         
         return $isVerified && $profileCompleted;

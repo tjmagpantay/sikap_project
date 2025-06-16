@@ -3,8 +3,8 @@ require_once __DIR__ . '/../../models/Employer.php';
 require_once __DIR__ . '/../../models/JobPost.php';
 
 // Check if user is logged in and is an employer
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'employer') {
-    header('Location: ?page=login');
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+    header('Location: ?page=login-employer');
     exit;
 }
 
@@ -15,6 +15,12 @@ $jobPostModel = new JobPost();
 $employer = $employerModel->findByUserId($_SESSION['user_id']);
 if (!$employer) {
     header('Location: ?page=complete-employer-profile&error=' . urlencode('Please complete your profile first.'));
+    exit;
+}
+
+// Check if employer can post jobs (is verified)
+if (!$employerModel->canPostJobs($_SESSION['user_id'])) {
+    header('Location: ?page=profile-employer&error=' . urlencode('You must be verified to post jobs. Please complete your profile and wait for verification.'));
     exit;
 }
 
@@ -92,12 +98,4 @@ switch ($step) {
     default:
         include __DIR__ . '/post-job/post-job-step1.php';
 }
-
-echo "<h1 style='background: red; color: white; padding: 20px;'>POST JOB MAIN TEST FILE</h1>";
-echo "<p>If you see this, the file is loading correctly!</p>";
-echo "<p>Session User ID: " . ($_SESSION['user_id'] ?? 'NOT SET') . "</p>";
-echo "<p>Session Role: " . ($_SESSION['role'] ?? 'NOT SET') . "</p>";
-
-// Stop execution here for testing
-exit("File loaded successfully!");
 ?>

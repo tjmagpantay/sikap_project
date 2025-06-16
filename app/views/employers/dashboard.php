@@ -71,17 +71,25 @@ include_once __DIR__ . '/navbar-employer.php'; ?>
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <i class="text-2xl text-blue-500 fas fa-plus-circle"></i>
+                                <i class="text-2xl <?php echo $canPostJobs ? 'text-blue-500' : 'text-gray-400'; ?> fas fa-plus-circle"></i>
                             </div>
                             <div class="flex-1 w-0 ml-5">
                                 <h3 class="text-lg font-medium text-gray-900">Post a Job</h3>
-                                <p class="mt-1 text-sm text-gray-500">Create new job listings</p>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    <?php echo $canPostJobs ? 'Create new job listings' : 'Complete verification to post jobs'; ?>
+                                </p>
                             </div>
                         </div>
                         <div class="mt-4">
-                            <a href="?page=post-job" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                                Post Job
-                            </a>
+                            <?php if ($canPostJobs): ?>
+                                <a href="?page=post-job" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                    Post Job
+                                </a>
+                            <?php else: ?>
+                                <button disabled class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-300 border border-transparent rounded-md cursor-not-allowed">
+                                    Complete Verification First
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -91,11 +99,11 @@ include_once __DIR__ . '/navbar-employer.php'; ?>
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <i class="text-2xl text-green-500 fas fa-briefcase"></i>
+                                <i class="text-2xl text-green-500 fas fa-list"></i>
                             </div>
                             <div class="flex-1 w-0 ml-5">
                                 <h3 class="text-lg font-medium text-gray-900">Manage Jobs</h3>
-                                <p class="mt-1 text-sm text-gray-500">View and edit listings</p>
+                                <p class="mt-1 text-sm text-gray-500">View and edit your job postings</p>
                             </div>
                         </div>
                         <div class="mt-4">

@@ -88,16 +88,13 @@ class EmployerController
     public function dashboard()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
-            header('Location: ?page=login-employer');
+            header('Location: ?page=login');
             exit;
         }
 
-        // Check if profile exists
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        $hasProfile = ($employer !== false);
-
-        // Get user info for display
-        $user = $this->userModel->findById($_SESSION['user_id']);
+        $hasProfile = $employer && !empty($employer['first_name']);
+        $canPostJobs = $this->employerModel->canPostJobs($_SESSION['user_id']);
 
         include __DIR__ . '/../views/employers/dashboard.php';
     }
@@ -238,11 +235,11 @@ class EmployerController
 
     private function handleBusinessStep1($employer_id, $data, &$error, &$success)
     {
-            // Check if the form was actually submitted
-    if (!isset($data['submit_step1'])) {
-        $error = 'Invalid form submission.';
-        return;
-    }
+        // Check if the form was actually submitted
+        if (!isset($data['submit_step1'])) {
+            $error = 'Invalid form submission.';
+            return;
+        }
         $required = ['business_name', 'business_desc'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -273,13 +270,13 @@ class EmployerController
     {
         // Debug to see what data is being received
         error_log("DEBUG: Step 2 data received: " . print_r($data, true));
-        
+
         // Check if form was submitted
         if (!isset($data['submit_step2'])) {
             $error = 'Invalid form submission.';
             return;
         }
-        
+
         $required = ['business_type', 'business_industry', 'business_address', 'business_contact', 'business_size', 'business_established_year'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -303,7 +300,7 @@ class EmployerController
         error_log("DEBUG: Business data to save: " . print_r($businessData, true));
 
         $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
-        
+
         if ($result) {
             error_log("DEBUG: Step 2 data saved successfully");
             header('Location: ?page=complete-employer-business&step=3&success=' . urlencode('Founding information saved!'));
@@ -319,7 +316,7 @@ class EmployerController
     {
         // Debug to see what data is being received
         error_log("DEBUG: Step 3 data received: " . print_r($data, true));
-        
+
         // Check if form was submitted
         if (!isset($data['submit_step3'])) {
             $error = 'Invalid form submission.';
@@ -356,7 +353,7 @@ class EmployerController
         error_log("DEBUG: Social media data to save: " . print_r($businessData, true));
 
         $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
-        
+
         if ($result) {
             error_log("DEBUG: Step 3 data saved successfully");
             header('Location: ?page=complete-employer-business&step=4&success=' . urlencode('Social media information saved!'));
@@ -374,7 +371,7 @@ class EmployerController
         error_log("DEBUG: Step 4 called with employer_id: $employer_id");
         error_log("DEBUG: POST data: " . print_r($data, true));
         error_log("DEBUG: FILES data: " . print_r($_FILES, true));
-        
+
         // Check if form was submitted
         if (!isset($data['submit_step4'])) {
             $error = 'Invalid form submission.';
@@ -384,7 +381,7 @@ class EmployerController
         // Define allowed document types (must match your database columns exactly)
         $documentTypes = [
             'letter_of_intent' => 'Letter of Intent',
-            'company_profile' => 'Company Profile', 
+            'company_profile' => 'Company Profile',
             'business_permit' => 'Business Permit',
             'cert_of_no_pending_case' => 'Certificate of No Pending Case',
             'dole_registration' => 'DOLE Registration',
@@ -401,16 +398,16 @@ class EmployerController
         foreach ($documentTypes as $type => $label) {
             if (isset($_FILES[$type]) && $_FILES[$type]['error'] === UPLOAD_ERR_OK) {
                 error_log("DEBUG: Processing file for type: $type");
-                
+
                 $uploadError = '';
                 $filePath = $this->handleDocumentUpload($_FILES[$type], $type, $uploadError);
-                
+
                 if ($filePath) {
                     error_log("DEBUG: File uploaded successfully, saving to database...");
-                    
+
                     // Save to database
                     $result = $this->employerModel->saveDocument($employer_id, $type, $filePath);
-                    
+
                     if ($result) {
                         $uploadedFiles[$type] = $filePath;
                         error_log("DEBUG: Successfully uploaded and saved $label");
@@ -437,7 +434,7 @@ class EmployerController
         // Success - redirect to step 5
         $uploadCount = count($uploadedFiles);
         $successMessage = $uploadCount > 0 ? "Successfully uploaded $uploadCount document(s)!" : "No documents uploaded (this is optional)";
-        
+
         error_log("DEBUG: Step 4 completed successfully with $uploadCount uploads");
         header('Location: ?page=complete-employer-business&step=5&success=' . urlencode($successMessage));
         exit;
@@ -464,24 +461,24 @@ class EmployerController
     {
         try {
             error_log("DEBUG: handleDocumentUpload called for type: $type");
-            
+
             // Validate file
             $allowedTypes = ['pdf'];  // Only PDF for documents
             $maxSize = 5 * 1024 * 1024; // 5MB
-            
+
             $fileInfo = pathinfo($file['name']);
             $extension = strtolower($fileInfo['extension'] ?? '');
-            
+
             if (!in_array($extension, $allowedTypes)) {
                 $error = 'Invalid file type. Only PDF files are allowed for documents.';
                 return false;
             }
-            
+
             if ($file['size'] > $maxSize) {
                 $error = 'File too large. Maximum size: 5MB';
                 return false;
             }
-            
+
             // Create upload directory if it doesn't exist
             $uploadDir = __DIR__ . '/../../public/uploads/documents/';
             if (!is_dir($uploadDir)) {
@@ -490,13 +487,13 @@ class EmployerController
                     return false;
                 }
             }
-            
+
             // Generate unique filename
             $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
-            
+
             error_log("DEBUG: Attempting to move file to: $filePath");
-            
+
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
                 error_log("DEBUG: File moved successfully");
@@ -507,7 +504,6 @@ class EmployerController
                 error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
                 return false;
             }
-            
         } catch (Exception $e) {
             error_log('Error in handleDocumentUpload: ' . $e->getMessage());
             $error = 'Upload processing error';
@@ -521,27 +517,27 @@ class EmployerController
             // Validate file
             $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             $maxSize = 2 * 1024 * 1024; // 2MB for images
-            
+
             $fileInfo = pathinfo($file['name']);
             $extension = strtolower($fileInfo['extension'] ?? '');
-            
+
             if (!in_array($extension, $allowedTypes)) {
                 $error = 'Invalid image type. Allowed: ' . implode(', ', $allowedTypes);
                 return false;
             }
-            
+
             if ($file['size'] > $maxSize) {
                 $error = 'Image too large. Maximum size: 2MB';
                 return false;
             }
-            
+
             // Validate that it's actually an image
             $imageInfo = getimagesize($file['tmp_name']);
             if ($imageInfo === false) {
                 $error = 'Invalid image file';
                 return false;
             }
-            
+
             // Create upload directory if it doesn't exist
             $uploadDir = __DIR__ . '/../../public/uploads/banners/';
             if (!is_dir($uploadDir)) {
@@ -550,11 +546,11 @@ class EmployerController
                     return false;
                 }
             }
-            
+
             // Generate unique filename
             $filename = 'banner_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
-            
+
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
                 // Return relative path for database storage
@@ -563,7 +559,6 @@ class EmployerController
                 $error = 'Failed to move uploaded file';
                 return false;
             }
-            
         } catch (Exception $e) {
             error_log('Error in handleBannerUpload: ' . $e->getMessage());
             $error = 'Upload processing error: ' . $e->getMessage();
@@ -699,7 +694,7 @@ class EmployerController
 
             // Check if employer profile exists
             $existingEmployer = $this->employerModel->findByUserId($_SESSION['user_id']);
-            
+
             if ($existingEmployer) {
                 // Update existing profile - use consistent parameter name
                 $result = $this->employerModel->updateProfile($_SESSION['user_id'], $data);
@@ -714,7 +709,6 @@ class EmployerController
             } else {
                 header('Location: ?page=employer-personal-profile&error=' . urlencode('Failed to save information. Please try again.'));
             }
-
         } catch (Exception $e) {
             error_log('Error saving employer personal info: ' . $e->getMessage());
             header('Location: ?page=employer-personal-profile&error=' . urlencode('An error occurred. Please try again.'));
@@ -765,13 +759,13 @@ class EmployerController
                 $error = 'Invalid form submission.';
                 return false;
             }
-            
+
             // Mark the profile as completed
             $result = $this->employerModel->markProfileCompleted($employer_id);
-            
+
             if ($result) {
                 error_log("Business profile completed for employer ID: " . $employer_id);
-                
+
                 // Redirect to the CORRECT success page route
                 header('Location: ?page=employer-profile-completion-success');
                 exit;
@@ -779,7 +773,6 @@ class EmployerController
                 $error = "Failed to complete profile. Please try again.";
                 return false;
             }
-            
         } catch (Exception $e) {
             error_log('Error in handleBusinessStep5: ' . $e->getMessage());
             $error = "An error occurred while completing your profile.";

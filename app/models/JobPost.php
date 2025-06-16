@@ -1,6 +1,5 @@
 <?php
 // filepath: c:\xampp\htdocs\sikap\app\models\JobPost.php
-require_once __DIR__ . '/../../config/sikap_db.php';
 
 class JobPost
 {
@@ -8,8 +7,19 @@ class JobPost
 
     public function __construct()
     {
-        global $pdo; // Get the PDO connection from sikap_db.php
-        $this->pdo = $pdo;
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+        try {
+            $this->pdo = new PDO(
+                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                $config['db_user'],
+                $config['db_pass']
+            );
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            error_log("DEBUG: JobPost database connection established successfully");
+        } catch (PDOException $e) {
+            error_log("JobPost database connection failed: " . $e->getMessage());
+            die("Connection failed: " . $e->getMessage());
+        }
     }
 
     public function getJobCategories()
@@ -49,27 +59,45 @@ class JobPost
     public function updateJobPost($job_id, $data)
     {
         try {
-            $sql = "UPDATE job_post SET 
-                job_title = :job_title, 
-                job_category_id = :job_category_id, 
-                job_status = :job_status,
-                job_type = :job_type, 
-                salary = :salary, 
-                location = :location, 
-                workplace_option = :workplace_option,
-                pay_type = :pay_type, 
-                pay_range = :pay_range, 
-                show_pay = :show_pay,
-                job_summary = :job_summary, 
-                full_description = :full_description,
-                application_start = :application_start, 
-                application_deadline = :application_deadline,
-                updated_at = CURRENT_TIMESTAMP
-                WHERE job_id = :job_id";
+            // Build dynamic SQL based on provided data
+            $fields = [];
+            $values = [];
 
-            $data['job_id'] = $job_id;
+            $allowedFields = [
+                'job_title',
+                'job_category_id',
+                'job_status',
+                'job_type',
+                'salary',
+                'location',
+                'workplace_option',
+                'pay_type',
+                'pay_range',
+                'show_pay',
+                'job_summary',
+                'full_description',
+                'application_start',
+                'application_deadline'
+            ];
+
+            foreach ($data as $field => $value) {
+                if (in_array($field, $allowedFields)) {
+                    $fields[] = "$field = :$field";
+                    $values[$field] = $value;
+                }
+            }
+
+            if (empty($fields)) {
+                return false; // No valid fields to update
+            }
+
+            $fields[] = "updated_at = CURRENT_TIMESTAMP";
+
+            $sql = "UPDATE job_post SET " . implode(', ', $fields) . " WHERE job_id = :job_id";
+            $values['job_id'] = $job_id;
+
             $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute($data);
+            return $stmt->execute($values);
         } catch (PDOException $e) {
             error_log('Error updating job post: ' . $e->getMessage());
             return false;
@@ -253,6 +281,88 @@ class JobPost
         } catch (PDOException $e) {
             error_log('Error publishing job: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getJobsByEmployer($employer_id) {
+        try {
+            // First, let's try a simpler query without the application count
+            $sql = "SELECT jp.*, jc.category_name
+                    FROM job_post jp
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    WHERE jp.employer_id = :employer_id
+                    ORDER BY jp.created_at DESC";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['employer_id' => $employer_id]);
+            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Add application count separately (handle if table doesn't exist)
+            foreach ($jobs as &$job) {
+                try {
+                    $countSql = "SELECT COUNT(*) FROM job_application WHERE job_id = :job_id";
+                    $countStmt = $this->pdo->prepare($countSql);
+                    $countStmt->execute(['job_id' => $job['job_id']]);
+                    $job['application_count'] = $countStmt->fetchColumn();
+                } catch (PDOException $e) {
+                    // If job_application table doesn't exist, set count to 0
+                    $job['application_count'] = 0;
+                    error_log('job_application table might not exist: ' . $e->getMessage());
+                }
+            }
+            
+            error_log('DEBUG: Found ' . count($jobs) . ' jobs for employer_id: ' . $employer_id);
+            return $jobs;
+            
+        } catch (PDOException $e) {
+            error_log('Error getting jobs by employer: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function deleteJob($job_id) {
+        try {
+            // Start transaction
+            $this->pdo->beginTransaction();
+            
+            // Delete related records first
+            $tables = [
+                'job_post_skills',
+                'job_post_questions', 
+                'job_post_attachments',
+                'job_post_application_settings'
+            ];
+            
+            foreach ($tables as $table) {
+                $sql = "DELETE FROM $table WHERE job_id = :job_id";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute(['job_id' => $job_id]);
+            }
+            
+            // Delete the job post
+            $sql = "DELETE FROM job_post WHERE job_id = :job_id";
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute(['job_id' => $job_id]);
+            
+            $this->pdo->commit();
+            return $result;
+            
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            error_log('Error deleting job: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getJobSkills($job_id) {
+        try {
+            $sql = "SELECT skill_name FROM job_post_skills WHERE job_id = :job_id ORDER BY job_skill_id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['job_id' => $job_id]);
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (PDOException $e) {
+            error_log('Error getting job skills: ' . $e->getMessage());
+            return [];
         }
     }
 

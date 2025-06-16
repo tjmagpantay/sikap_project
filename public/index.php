@@ -149,7 +149,9 @@
 
         // New Employer Routes
         case 'post-job':
-            require_once __DIR__ . '/../app/views/employers/post-job-main.php';
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->postJob();
             break;
 
         case 'job-post-success':
@@ -157,7 +159,33 @@
             break;
 
         case 'manage-jobs':
-            include __DIR__ . '/../app/views/employers/manage-jobs.php';
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->manageJobs();
+            break;
+
+        case 'view-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->viewJob();
+            break;
+
+        case 'edit-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->editJob();
+            break;
+
+        case 'delete-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->deleteJob();
+            break;
+
+        case 'toggle-job-status':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->toggleJobStatus();
             break;
 
         default:

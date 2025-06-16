@@ -294,4 +294,31 @@ class Jobseeker
         $stmt = $this->db->prepare("UPDATE jobseeker SET profile_photo = ? WHERE user_id = ?");
         return $stmt->execute([$photo_path, $user_id]);
     }
+
+    public function updateProfilePicture($user_id, $profilePicturePath) {
+        try {
+            $sql = "UPDATE jobseeker SET profile_picture = :profile_picture, updated_at = NOW() WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'profile_picture' => $profilePicturePath,
+                'user_id' => $user_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error updating profile picture: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getProfilePicture($user_id) {
+        try {
+            $sql = "SELECT profile_picture FROM jobseeker WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['user_id' => $user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['profile_picture'] : null;
+        } catch (PDOException $e) {
+            error_log('Error getting profile picture: ' . $e->getMessage());
+            return null;
+        }
+    }
 }
