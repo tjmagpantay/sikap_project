@@ -144,7 +144,10 @@ class JobPost
     public function getScreeningQuestions($job_id)
     {
         try {
-            $sql = "SELECT * FROM job_post_questions WHERE job_id = :job_id ORDER BY question_id";
+            $sql = "SELECT * FROM job_post_questions 
+                    WHERE job_id = :job_id 
+                    ORDER BY question_id";
+        
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['job_id' => $job_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -213,21 +216,25 @@ class JobPost
     public function getFullJobData($job_id)
     {
         try {
-            // Get main job data
-            $job = $this->getJobById($job_id);
+            $sql = "SELECT jp.*, jc.category_name, 
+                       e.first_name as employer_first_name, 
+                       e.last_name as employer_last_name,
+                       eb.business_name as company_name
+                FROM job_post jp 
+                LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE jp.job_id = :job_id";
+        
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['job_id' => $job_id]);
+            $job = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Debug: Log what fields are available
             if ($job) {
-                // Get skills
-                $sql = "SELECT skill_name FROM job_post_skills WHERE job_id = :job_id";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute(['job_id' => $job_id]);
-                $job['skills'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-                // Get attachments
-                $job['attachments'] = $this->getJobAttachments($job_id);
-
-                // Get screening questions
-                $job['screening_questions'] = $this->getScreeningQuestions($job_id);
+                error_log('DEBUG: Job data keys: ' . implode(', ', array_keys($job)));
             }
+            
             return $job;
         } catch (PDOException $e) {
             error_log('Error getting full job data: ' . $e->getMessage());
@@ -362,6 +369,71 @@ class JobPost
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
         } catch (PDOException $e) {
             error_log('Error getting job skills: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getOpenJobs()
+    {
+        try {
+            $sql = "SELECT jp.*, jc.category_name, 
+                           e.first_name as employer_first_name, e.last_name as employer_last_name,
+                           eb.business_name as company_name
+                    FROM job_post jp 
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE jp.job_status = 'open'
+                    ORDER BY jp.created_at DESC";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting open jobs: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getJobsByStatus($status)
+    {
+        try {
+            $sql = "SELECT jp.*, jc.category_name, 
+                           e.first_name as employer_first_name, e.last_name as employer_last_name,
+                           eb.business_name as company_name
+                    FROM job_post jp 
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE jp.job_status = :status
+                    ORDER BY jp.created_at DESC";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['status' => $status]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobs by status: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllJobs()
+    {
+        try {
+            $sql = "SELECT jp.*, jc.category_name, 
+                           e.first_name as employer_first_name, e.last_name as employer_last_name,
+                           eb.business_name as company_name
+                    FROM job_post jp 
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    ORDER BY jp.created_at DESC";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting all jobs: ' . $e->getMessage());
             return [];
         }
     }

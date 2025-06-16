@@ -167,7 +167,19 @@
         case 'view-job':
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
-            $controller->viewJob();
+            $controller->viewJobForJobseeker(); // Use the new method name
+            break;
+
+        case 'view-employer-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->viewEmployerJob(); // For employers viewing their own jobs
+            break;
+
+        case 'browse-jobs':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->browseJobs();
             break;
 
         case 'edit-job':
@@ -186,6 +198,37 @@
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
             $controller->toggleJobStatus();
+            break;
+
+        // Job Application Routes
+        case 'apply-job':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->applyForJob();
+            break;
+
+        case 'application-success':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->applicationSuccess();
+            break;
+
+        case 'my-applications':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->myApplications();
+            break;
+
+        case 'view-application':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->viewApplication();
+            break;
+
+        case 'withdraw-application':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->withdrawApplication();
             break;
 
         default:

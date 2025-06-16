@@ -10,7 +10,7 @@
     <div class="hidden lg:block">
       <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
         <li><a href="?page=jobseeker-dashboard" class="nav-link">Home</a></li>
-        <li><a href="#" class="nav-link">Job Search</a></li>
+        <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
         <li><a href="#" class="nav-link">Programs</a></li>
         <li><a href="#" class="nav-link">Explore Companies</a></li>
         <li><a href="#" class="nav-link">Community</a></li>
@@ -115,7 +115,7 @@
                 Documents
               </a>
               
-              <a href="?page=jobseeker-applications" 
+              <a href="?page=my-applications" 
                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Applied Jobs
               </a>

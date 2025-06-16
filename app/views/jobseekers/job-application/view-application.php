@@ -1,0 +1,190 @@
+<?php
+// filepath: app/views/jobseekers/view-application.php
+include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-jobseeker.php';
+?>
+
+<div class="max-w-4xl py-6 mx-auto sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="?page=my-applications" class="text-blue-600 hover:text-blue-800">
+            <i class="mr-1 fas fa-arrow-left"></i> Back to My Applications
+        </a>
+        <h1 class="mt-2 text-3xl font-bold text-gray-900">Application Details</h1>
+        <p class="text-gray-600">Application #<?php echo str_pad($application['application_id'], 6, '0', STR_PAD_LEFT); ?></p>
+    </div>
+
+    <div class="space-y-6">
+        <!-- Application Status -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></h2>
+                    <p class="text-gray-600"><?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?></p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            <?php
+                            switch ($application['application_status']) {
+                                case 'pending':
+                                    echo 'bg-yellow-100 text-yellow-800';
+                                    break;
+                                case 'reviewed':
+                                    echo 'bg-blue-100 text-blue-800';
+                                    break;
+                                case 'shortlisted':
+                                    echo 'bg-purple-100 text-purple-800';
+                                    break;
+                                case 'rejected':
+                                    echo 'bg-red-100 text-red-800';
+                                    break;
+                                case 'hired':
+                                    echo 'bg-green-100 text-green-800';
+                                    break;
+                                default:
+                                    echo 'bg-gray-100 text-gray-800';
+                            }
+                            ?>">
+                        <?php echo ucfirst($application['application_status']); ?>
+                    </span>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Applied on <?php echo date('F j, Y \a\t g:i A', strtotime($application['applied_at'])); ?>
+                    </p>
+                    <?php if ($application['reviewed_at']): ?>
+                        <p class="text-sm text-gray-500">
+                            Reviewed on <?php echo date('F j, Y \a\t g:i A', strtotime($application['reviewed_at'])); ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Information -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="mb-4 text-lg font-medium text-gray-900">Job Information</h3>
+            
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Job Type</label>
+                    <p class="mt-1 text-sm text-gray-900"><?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?></p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Location</label>
+                    <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['location']); ?></p>
+                </div>
+                
+                <?php if ($application['show_pay'] && $application['salary']): ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Salary</label>
+                    <p class="mt-1 text-sm text-gray-900">₱<?php echo number_format($application['salary'], 2); ?></p>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($application['job_summary']): ?>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-500">Job Summary</label>
+                <p class="mt-1 text-sm text-gray-900"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
+            </div>
+            <?php endif; ?>
+
+            <div class="mt-4">
+                <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>" 
+                   class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                    <i class="mr-1 fas fa-external-link-alt"></i>
+                    View full job posting
+                </a>
+            </div>
+        </div>
+
+        <!-- Resume Submitted -->
+        <?php if ($application['resume_path']): ?>
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="mb-4 text-lg font-medium text-gray-900">Resume Submitted</h3>
+            <div class="flex items-center space-x-3">
+                <i class="text-red-500 fas fa-file-pdf"></i>
+                <a href="/<?php echo htmlspecialchars($application['resume_path']); ?>" target="_blank"
+                   class="text-blue-600 hover:text-blue-800">
+                    View Resume
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Cover Letter -->
+        <?php if ($application['cover_letter']): ?>
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="mb-4 text-lg font-medium text-gray-900">Cover Letter</h3>
+            <div class="p-4 rounded bg-gray-50">
+                <p class="text-sm text-gray-900 whitespace-pre-line"><?php echo htmlspecialchars($application['cover_letter']); ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Screening Questions & Answers -->
+        <?php if (!empty($answers)): ?>
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="mb-4 text-lg font-medium text-gray-900">Screening Questions & Answers</h3>
+            <div class="space-y-4">
+                <?php foreach ($answers as $answer): ?>
+                    <div class="pl-4 border-l-4 border-blue-200">
+                        <h4 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($answer['question_text']); ?></h4>
+                        <p class="mt-1 text-sm text-gray-700"><?php echo htmlspecialchars($answer['answer']); ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Additional Attachments -->
+        <?php if (!empty($attachments)): ?>
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="mb-4 text-lg font-medium text-gray-900">Additional Attachments</h3>
+            <div class="space-y-3">
+                <?php foreach ($attachments as $attachment): ?>
+                    <div class="flex items-center justify-between p-3 rounded bg-gray-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="text-gray-400 fas fa-paperclip"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($attachment['file_type']); ?></p>
+                                <p class="text-xs text-gray-500">Uploaded <?php echo date('M j, Y', strtotime($attachment['uploaded_at'])); ?></p>
+                            </div>
+                        </div>
+                        <a href="/<?php echo htmlspecialchars($attachment['file_path']); ?>" target="_blank"
+                           class="text-sm text-blue-600 hover:text-blue-800">
+                            View File
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Actions -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Application Actions</h3>
+                    <p class="text-sm text-gray-600">Manage your application</p>
+                </div>
+                <div class="flex space-x-3">
+                    <?php if ($application['application_status'] === 'pending'): ?>
+                        <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
+                           onclick="return confirm('Are you sure you want to withdraw this application?\n\nThis action cannot be undone.')"
+                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
+                            <i class="mr-2 fas fa-times"></i>
+                            Withdraw Application
+                        </a>
+                    <?php endif; ?>
+                    
+                    <a href="?page=my-applications" 
+                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300">
+                        <i class="mr-2 fas fa-list"></i>
+                        Back to All Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

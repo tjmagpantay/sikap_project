@@ -88,7 +88,7 @@ include_once __DIR__ . '/navbar-employer.php';
 
                             <div class="flex items-center space-x-2">
                                 <!-- View Button -->
-                                <a href="?page=view-job&id=<?php echo $job['job_id']; ?>"
+                                <a href="?page=view-employer-job&id=<?php echo $job['job_id']; ?>"
                                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
                                     title="View Job">
                                     <i class="mr-2 fas fa-eye"></i>

@@ -1,16 +1,19 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Jobseeker.php';
+require_once __DIR__ . '/../models/JobPost.php';
 
 class JobseekerController
 {
     private $userModel;
     private $jobseekerModel;
+    private $jobPostModel;
 
     public function __construct()
     {
         $this->userModel = new User();
         $this->jobseekerModel = new Jobseeker();
+        $this->jobPostModel = new JobPost();
     }
 
     public function signup()
@@ -92,12 +95,55 @@ class JobseekerController
             exit;
         }
 
-        // Check if profile exists
+        // Get jobseeker profile
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $hasProfile = ($jobseeker !== false);
+        $hasProfile = $jobseeker !== null;
 
-        // Get user info for display
-        $user = $this->userModel->findById($_SESSION['user_id']);
+        // Get recent job listings for the dashboard (limit to 5-10 jobs)
+        try {
+            $jobs = $this->jobPostModel->getOpenJobs();
+            // Limit to recent 10 jobs for dashboard
+            $jobs = array_slice($jobs, 0, 10);
+            
+            // If profile exists, check application status for each job
+            if ($hasProfile && !empty($jobs)) {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                $jobApplicationModel = new JobApplication();
+                
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+                }
+            } else {
+                // Set has_applied to false for all jobs if no profile
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = false;
+                }
+            }
+            
+        } catch (Exception $e) {
+            error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
+            $jobs = []; // Fallback to empty array
+        }
+
+        // Get application statistics if profile exists
+        $applicationStats = [];
+        if ($hasProfile) {
+            try {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                $jobApplicationModel = new JobApplication();
+                $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
+                
+                $applicationStats = [
+                    'total' => count($applications),
+                    'pending' => count(array_filter($applications, function($app) { return $app['application_status'] === 'pending'; })),
+                    'shortlisted' => count(array_filter($applications, function($app) { return $app['application_status'] === 'shortlisted'; })),
+                    'hired' => count(array_filter($applications, function($app) { return $app['application_status'] === 'hired'; }))
+                ];
+            } catch (Exception $e) {
+                error_log('Error fetching application stats: ' . $e->getMessage());
+                $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
+            }
+        }
 
         include __DIR__ . '/../views/jobseekers/dashboard.php';
     }

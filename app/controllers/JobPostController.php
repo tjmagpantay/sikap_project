@@ -313,7 +313,8 @@ class JobPostController
         include __DIR__ . '/../views/employers/manage-jobs.php';
     }
 
-    public function viewJob()
+    // This method is for EMPLOYERS to view their own jobs
+    public function viewEmployerJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
             header('Location: ?page=login-employer');
@@ -343,114 +344,106 @@ class JobPostController
         include __DIR__ . '/../views/employers/view-job.php';
     }
 
-    public function editJob()
+    // This method is for JOBSEEKERS to view jobs they want to apply for
+    public function viewJobForJobseeker()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
-            header('Location: ?page=login-employer');
-            exit;
-        }
-
-        $job_id = $_GET['id'] ?? null;
+        $job_id = $_GET['job_id'] ?? null;
         if (!$job_id) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found.'));
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
             exit;
         }
 
-        // Get employer info
-        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        if (!$employer) {
-            header('Location: ?page=complete-employer-profile');
+        // Get job details
+        $job = $this->jobPostModel->getFullJobData($job_id);
+        if (!$job) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
             exit;
         }
 
-        // Verify job ownership
-        $job = $this->jobPostModel->getJobById($job_id);
-        if (!$job || $job['employer_id'] != $employer['employer_id']) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
+        // Only show open jobs to jobseekers
+        if ($job['job_status'] !== 'open') {
+            header('Location: ?page=browse-jobs&error=' . urlencode('This job is no longer available.'));
             exit;
         }
 
-        // Redirect to post-job with job_id for editing
-        header("Location: ?page=post-job&step=1&job_id=$job_id");
-        exit;
+        // Check if user has already applied (if logged in as jobseeker)
+        $hasApplied = false;
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+            try {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                require_once __DIR__ . '/../models/Jobseeker.php';
+                
+                $jobApplicationModel = new JobApplication();
+                $jobseekerModel = new Jobseeker();
+                $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+                
+                if ($jobseeker) {
+                    $hasApplied = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+                }
+            } catch (Exception $e) {
+                error_log('Error checking application status: ' . $e->getMessage());
+                $hasApplied = false;
+            }
+        }
+
+        // Get screening questions if the method exists
+        $screeningQuestions = [];
+        if (method_exists($this->jobPostModel, 'getScreeningQuestions')) {
+            try {
+                $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
+            } catch (Exception $e) {
+                error_log('Error getting screening questions: ' . $e->getMessage());
+                $screeningQuestions = [];
+            }
+        }
+
+        include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
 
-    public function deleteJob()
+    public function browseJobs()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
-            header('Location: ?page=login-employer');
-            exit;
-        }
+        // Get all open jobs
+        $jobs = $this->jobPostModel->getOpenJobs();
 
-        $job_id = $_GET['id'] ?? null;
-        if (!$job_id) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found.'));
-            exit;
-        }
-
-        // Get employer info
-        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        if (!$employer) {
-            header('Location: ?page=complete-employer-profile');
-            exit;
-        }
-
-        // Verify job ownership
-        $job = $this->jobPostModel->getJobById($job_id);
-        if (!$job || $job['employer_id'] != $employer['employer_id']) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
-            exit;
-        }
-
-        // Delete the job
-        $result = $this->jobPostModel->deleteJob($job_id);
-
-        if ($result) {
-            header('Location: ?page=manage-jobs&success=' . urlencode('Job "' . $job['job_title'] . '" deleted successfully.'));
+        // If user is logged in as jobseeker, check application status for each job
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+            try {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                require_once __DIR__ . '/../models/Jobseeker.php';
+                
+                $jobApplicationModel = new JobApplication();
+                $jobseekerModel = new Jobseeker();
+                $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+                
+                if ($jobseeker && !empty($jobs)) {
+                    foreach ($jobs as &$job) {
+                        try {
+                            $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+                        } catch (Exception $e) {
+                            error_log('Error checking application status for job ' . $job['job_id'] . ': ' . $e->getMessage());
+                            $job['has_applied'] = false;
+                        }
+                    }
+                } else {
+                    // Set has_applied to false for all jobs if no jobseeker profile
+                    foreach ($jobs as &$job) {
+                        $job['has_applied'] = false;
+                    }
+                }
+            } catch (Exception $e) {
+                error_log('Error in browseJobs application check: ' . $e->getMessage());
+                // Set has_applied to false for all jobs if error occurs
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = false;
+                }
+            }
         } else {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Failed to delete job.'));
-        }
-        exit;
-    }
-
-    public function toggleJobStatus()
-    {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
-            header('Location: ?page=login-employer');
-            exit;
+            // User not logged in or not a jobseeker - set has_applied to false
+            foreach ($jobs as &$job) {
+                $job['has_applied'] = false;
+            }
         }
 
-        $job_id = $_GET['id'] ?? null;
-        $status = $_GET['status'] ?? null;
-
-        if (!$job_id || !in_array($status, ['open', 'closed', 'paused'])) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Invalid request.'));
-            exit;
-        }
-
-        // Get employer info
-        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        if (!$employer) {
-            header('Location: ?page=complete-employer-profile');
-            exit;
-        }
-
-        // Verify job ownership
-        $job = $this->jobPostModel->getJobById($job_id);
-        if (!$job || $job['employer_id'] != $employer['employer_id']) {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
-            exit;
-        }
-
-        // Update job status
-        $result = $this->jobPostModel->updateJobPost($job_id, ['job_status' => $status]);
-
-        if ($result) {
-            $statusText = ucfirst($status);
-            header("Location: ?page=manage-jobs&success=" . urlencode("Job \"" . $job['job_title'] . "\" status updated to $statusText."));
-        } else {
-            header('Location: ?page=manage-jobs&error=' . urlencode('Failed to update job status.'));
-        }
-        exit;
+        include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
 }
