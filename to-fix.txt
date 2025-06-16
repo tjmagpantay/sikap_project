@@ -1,7 +1,6 @@
 to fix:
-- 
+- employer post job
 
 to accomplish:
-- employer post job
 - jobseeker apply on job
 
