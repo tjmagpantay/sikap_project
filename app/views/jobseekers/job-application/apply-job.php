@@ -97,7 +97,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         <?php endif; ?>
 
         <!-- Screening Questions -->
-        <?php if (!empty($screeningQuestions)): ?>
+        <?php if (!empty($screeningQuestions) && ($job['screening_questions_enabled'] ?? 0) == 1): ?>
         <div class="p-6 bg-white rounded-lg shadow">
             <h3 class="mb-4 text-lg font-medium text-gray-900">Screening Questions</h3>
             <div class="space-y-4">

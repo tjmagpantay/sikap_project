@@ -65,8 +65,13 @@ class JobApplicationController
             exit;
         }
 
-        // Get screening questions
-        $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
+        // Get screening questions only if enabled
+        $screeningQuestions = [];
+        $jobSettings = $this->jobPostModel->getJobById($job_id);
+        
+        if ($jobSettings && ($jobSettings['screening_questions_enabled'] ?? 0) == 1) {
+            $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
+        }
         
         // Get jobseeker documents for resume selection
         $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']);

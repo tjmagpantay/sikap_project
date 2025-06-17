@@ -250,35 +250,34 @@
                                             <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($job['company_name'] ?? ($job['employer_first_name'] . ' ' . $job['employer_last_name'])); ?></p>
                                             <p class="mt-2 text-sm text-gray-700"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 100) . '...'; ?></p>
                                             
-                                            <div class="mt-3 flex flex-wrap gap-2 text-xs text-gray-500">
-                                                <span><i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                                <span><i class="fas fa-briefcase mr-1"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
+                                                <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
+                                                <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
                                                 <?php if ($job['show_pay'] && $job['salary']): ?>
-                                                    <span><i class="fas fa-money-bill mr-1"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
+                                                    <span><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="mt-4 flex space-x-2">
+                                    <div class="flex mt-4 space-x-2">
                                         <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" 
-                                           class="flex-1 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200 text-center">
+                                           class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
                                             View Details
                                         </a>
                                         
                                         <?php if (!$hasProfile): ?>
                                             <a href="?page=complete-jobseeker-profile" 
-                                               class="flex-1 px-3 py-2 text-sm font-medium text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700 text-center">
+                                               class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
                                                 Complete Profile to Apply
                                             </a>
                                         <?php elseif ($job['has_applied']): ?>
-                                            <span class="flex-1 px-3 py-2 text-sm font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-md text-center">
+                                            <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
                                                 <i class="mr-1 fas fa-check-circle"></i>
                                                 Applied
                                             </span>
                                         <?php else: ?>
                                             <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>" 
-                                               class="flex-1 px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 text-center">
+                                               class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
                                                 <i class="mr-1 fas fa-paper-plane"></i>
                                                 Apply
                                             </a>

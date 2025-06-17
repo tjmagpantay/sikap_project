@@ -376,19 +376,26 @@ class JobPost
     public function getOpenJobs()
     {
         try {
-            $sql = "SELECT jp.*, jc.category_name, 
-                           e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name
+            $sql = "SELECT jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
+                        jp.salary, jp.show_pay, jp.job_status, jp.created_at,
+                        jc.category_name, 
+                        e.first_name as employer_first_name, 
+                        e.last_name as employer_last_name,
+                        eb.business_name as company_name
                     FROM job_post jp 
                     LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                     LEFT JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                     WHERE jp.job_status = 'open'
+                    GROUP BY jp.job_id
                     ORDER BY jp.created_at DESC";
             
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            error_log('DEBUG: getOpenJobs found ' . count($jobs) . ' jobs');
+            return $jobs;
         } catch (PDOException $e) {
             error_log('Error getting open jobs: ' . $e->getMessage());
             return [];

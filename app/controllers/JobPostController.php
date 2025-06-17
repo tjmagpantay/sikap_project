@@ -229,16 +229,70 @@ class JobPostController
 
     private function handleJobStep3($job_id, $data)
     {
-        // Handle screening questions (placeholder for now)
-        header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode('Screening questions saved!'));
-        exit;
+        try {
+            // Skip if no questions or skip step is requested
+            if (isset($data['skip_step']) || empty($data['questions'])) {
+                header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode('Screening questions skipped.'));
+                exit;
+            }
+
+            // Delete existing questions first
+            $this->jobPostModel->deleteScreeningQuestions($job_id);
+
+            // Process each question
+            foreach ($data['questions'] as $questionData) {
+                if (!empty($questionData['text'])) {
+                    $questionInfo = [
+                        'job_id' => $job_id,
+                        'question_text' => trim($questionData['text']),
+                        'question_type' => $questionData['type'] ?? 'text',
+                        'question_option' => !empty($questionData['options']) ? trim($questionData['options']) : null
+                    ];
+                    
+                    $this->jobPostModel->addScreeningQuestion($job_id, $questionInfo);
+                }
+            }
+
+            header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode('Screening questions saved!'));
+            exit;
+
+        } catch (Exception $e) {
+            error_log('Error in handleJobStep3: ' . $e->getMessage());
+            header("Location: ?page=post-job&step=3&job_id=$job_id&error=" . urlencode('Failed to save screening questions.'));
+            exit;
+        }
     }
 
     private function handleJobStep4($job_id, $data)
     {
-        // Handle application settings (placeholder for now)
-        header("Location: ?page=post-job&step=5&job_id=$job_id&success=" . urlencode('Application settings saved!'));
-        exit;
+        try {
+            // Check if there are any screening questions
+            $hasQuestions = !empty($this->jobPostModel->getScreeningQuestions($job_id));
+            
+            // Prepare application settings
+            $settings = [
+                'resume_required' => isset($data['resume_required']) ? 1 : 0,
+                'allow_cover_letter' => isset($data['allow_cover_letter']) ? 1 : 0,
+                'screening_questions_enabled' => isset($data['screening_questions_enabled']) && $hasQuestions ? 1 : 0,
+                'max_applicants' => !empty($data['max_applicants']) ? (int)$data['max_applicants'] : null,
+                'notify_on_new_application' => isset($data['notify_on_new_application']) ? 1 : 0,
+                'is_highlighted' => isset($data['is_highlighted']) ? 1 : 0
+            ];
+
+            $result = $this->jobPostModel->saveApplicationSettings($job_id, $settings);
+
+            if ($result) {
+                header("Location: ?page=post-job&step=5&job_id=$job_id&success=" . urlencode('Application settings saved!'));
+            } else {
+                header("Location: ?page=post-job&step=4&job_id=$job_id&error=" . urlencode('Failed to save application settings.'));
+            }
+            exit;
+
+        } catch (Exception $e) {
+            error_log('Error in handleJobStep4: ' . $e->getMessage());
+            header("Location: ?page=post-job&step=4&job_id=$job_id&error=" . urlencode('An error occurred while saving settings.'));
+            exit;
+        }
     }
 
     private function handleJobStep5($job_id, $data)

@@ -85,8 +85,8 @@ include_once __DIR__ . '/../navbar-employer.php';
             <form class="space-y-6" method="POST" action="?page=post-job&step=4&job_id=<?php echo $job_id; ?>">
                 
                 <!-- Application Requirements -->
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Application Requirements</h3>
+                <div class="p-6 bg-white border border-gray-200 rounded-lg">
+                    <h3 class="mb-4 text-lg font-medium text-gray-900">Application Requirements</h3>
                     
                     <div class="space-y-4">
                         <!-- Resume Required -->
@@ -94,7 +94,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <div class="flex items-center h-5">
                                 <input id="resume_required" name="resume_required" type="checkbox" value="1"
                                        <?php echo (($existingSettings['resume_required'] ?? '1') == '1') ? 'checked' : ''; ?>
-                                       class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="resume_required" class="font-medium text-gray-700">
@@ -109,7 +109,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <div class="flex items-center h-5">
                                 <input id="allow_cover_letter" name="allow_cover_letter" type="checkbox" value="1"
                                        <?php echo (($existingSettings['allow_cover_letter'] ?? '1') == '1') ? 'checked' : ''; ?>
-                                       class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="allow_cover_letter" class="font-medium text-gray-700">
@@ -123,22 +123,32 @@ include_once __DIR__ . '/../navbar-employer.php';
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
                                 <input id="screening_questions_enabled" name="screening_questions_enabled" type="checkbox" value="1"
-                                       <?php echo (($existingSettings['screening_questions_enabled'] ?? '0') == '1') ? 'checked' : ''; ?>
-                                       class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                                       <?php 
+                                       $hasQuestions = !empty($this->jobPostModel->getScreeningQuestions($job_id ?? 0));
+                                       echo (($existingSettings['screening_questions_enabled'] ?? '0') == '1' && $hasQuestions) ? 'checked' : ''; 
+                                       echo !$hasQuestions ? 'disabled' : '';
+                                       ?>
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="screening_questions_enabled" class="font-medium text-gray-700">
                                     Enable Screening Questions
                                 </label>
-                                <p class="text-gray-500">Include the screening questions you created in step 3</p>
+                                <p class="text-gray-500">
+                                    <?php if ($hasQuestions): ?>
+                                        Include the screening questions you created in step 3
+                                    <?php else: ?>
+                                        <span class="text-orange-600">No screening questions added in step 3</span>
+                                    <?php endif; ?>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Application Limits -->
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Application Limits</h3>
+                <div class="p-6 bg-white border border-gray-200 rounded-lg">
+                    <h3 class="mb-4 text-lg font-medium text-gray-900">Application Limits</h3>
                     
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <!-- Max Applicants -->
@@ -149,7 +159,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <input id="max_applicants" name="max_applicants" type="number" min="1" max="1000"
                                    value="<?php echo htmlspecialchars($existingSettings['max_applicants'] ?? ''); ?>"
                                    placeholder="Leave blank for no limit"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
+                                   class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
                             <p class="mt-1 text-xs text-gray-500">Automatically close applications when this number is reached</p>
                         </div>
 
@@ -160,7 +170,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             </label>
                             <input id="application_deadline_display" type="text" readonly
                                    value="<?php echo !empty($existingSettings['application_deadline']) ? date('M j, Y g:i A', strtotime($existingSettings['application_deadline'])) : 'No deadline set'; ?>"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                                   class="block w-full px-3 py-2 mt-1 text-gray-600 border border-gray-300 rounded-md bg-gray-50">
                             <p class="mt-1 text-xs text-gray-500">
                                 <a href="?page=post-job&step=1&job_id=<?php echo $job_id; ?>" class="text-green-600 hover:text-green-700">
                                     Edit in Step 1
@@ -171,8 +181,8 @@ include_once __DIR__ . '/../navbar-employer.php';
                 </div>
 
                 <!-- Notifications -->
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Notification Settings</h3>
+                <div class="p-6 bg-white border border-gray-200 rounded-lg">
+                    <h3 class="mb-4 text-lg font-medium text-gray-900">Notification Settings</h3>
                     
                     <div class="space-y-4">
                         <!-- Email Notifications -->
@@ -180,7 +190,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <div class="flex items-center h-5">
                                 <input id="notify_on_new_application" name="notify_on_new_application" type="checkbox" value="1"
                                        <?php echo (($existingSettings['notify_on_new_application'] ?? '1') == '1') ? 'checked' : ''; ?>
-                                       class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="notify_on_new_application" class="font-medium text-gray-700">
@@ -193,8 +203,8 @@ include_once __DIR__ . '/../navbar-employer.php';
                 </div>
 
                 <!-- Job Visibility -->
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Job Visibility</h3>
+                <div class="p-6 bg-white border border-gray-200 rounded-lg">
+                    <h3 class="mb-4 text-lg font-medium text-gray-900">Job Visibility</h3>
                     
                     <div class="space-y-4">
                         <!-- Highlighted Job -->
@@ -202,7 +212,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <div class="flex items-center h-5">
                                 <input id="is_highlighted" name="is_highlighted" type="checkbox" value="1"
                                        <?php echo (($existingSettings['is_highlighted'] ?? '0') == '1') ? 'checked' : ''; ?>
-                                       class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="is_highlighted" class="font-medium text-gray-700">
@@ -218,10 +228,10 @@ include_once __DIR__ . '/../navbar-employer.php';
                 </div>
 
                 <!-- Settings Summary -->
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <i class="fas fa-info-circle text-blue-400"></i>
+                            <i class="text-blue-400 fas fa-info-circle"></i>
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-blue-800">
@@ -265,7 +275,7 @@ include_once __DIR__ . '/../navbar-employer.php';
 document.addEventListener('DOMContentLoaded', function() {
     // Add any JavaScript for dynamic form behavior here
     
-    // Example: Show warning for highlighted jobs
+    // Example: Show premium feature info
     const highlightCheckbox = document.getElementById('is_highlighted');
     highlightCheckbox.addEventListener('change', function() {
         if (this.checked) {
