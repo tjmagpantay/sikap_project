@@ -1,6 +1,8 @@
 to fix:
 - employer post job
+- jobseeker browse job
 
 to accomplish:
 - jobseeker apply on job
+- fix job application (add steps (1/4))
 
