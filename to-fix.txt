@@ -1,5 +1,6 @@
 to fix:
 - jobseeker browse job
+- updating of employer documents
 
 to accomplish:
 - validation of process
