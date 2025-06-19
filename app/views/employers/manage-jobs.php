@@ -81,7 +81,15 @@ include_once __DIR__ . '/navbar-employer.php';
                                     <span><i class="mr-1 fas fa-tag"></i><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></span>
                                     <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
                                     <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                    <span><i class="mr-1 fas fa-users"></i><?php echo $job['application_count'] ?? 0; ?> applicants</span>
+                                    <span>
+                                        <i class="mr-1 fas fa-users"></i>
+                                        <?php echo $job['application_count']; ?> applications
+                                        <?php if ($job['pending_count'] > 0): ?>
+                                            <span class="ml-1 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                                                <?php echo $job['pending_count']; ?> pending
+                                            </span>
+                                        <?php endif; ?>
+                                    </span>
                                     <span><i class="mr-1 fas fa-calendar"></i>Posted <?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
                                 </div>
                             </div>

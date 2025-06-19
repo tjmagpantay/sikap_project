@@ -124,7 +124,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     This job is no longer accepting applications
                 </span>
             <?php else: ?>
-                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>" 
+                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1" 
                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                     <i class="mr-2 fas fa-paper-plane"></i>
                     Apply for this Job

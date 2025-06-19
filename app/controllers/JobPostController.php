@@ -20,53 +20,61 @@ class JobPostController
     {
         // Check if user is logged in and is an employer
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
-            error_log("DEBUG: Access denied - User ID: " . ($_SESSION['user_id'] ?? 'not set') . ", Role: " . ($_SESSION['role'] ?? 'not set'));
             header('Location: ?page=login-employer');
             exit;
         }
 
-        error_log("DEBUG: PostJob called - User ID: " . $_SESSION['user_id'] . ", Role: " . $_SESSION['role']);
-
         // Get employer info
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
         if (!$employer) {
-            error_log("DEBUG: No employer found for user");
             header('Location: ?page=complete-employer-profile&error=' . urlencode('Please complete your profile first.'));
             exit;
         }
 
-        error_log("DEBUG: Employer found: " . $employer['employer_id']);
-
-        // Check if employer can post jobs (is verified)
+        // Check if employer can post jobs
         $canPost = $this->employerModel->canPostJobs($_SESSION['user_id']);
-        error_log("DEBUG: Can post jobs: " . ($canPost ? 'YES' : 'NO'));
-
         if (!$canPost) {
-            header('Location: ?page=profile-employer&error=' . urlencode('You must be verified to post jobs. Please complete your profile and wait for verification.'));
+            header('Location: ?page=profile-employer&error=' . urlencode('You must be verified to post jobs.'));
             exit;
         }
 
         // Get the step from URL parameter
         $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
-
-        // Validate step range
         if ($step < 1 || $step > 5) {
             $step = 1;
         }
-
-        error_log("DEBUG: Current step: $step");
 
         // Get job_id for editing (if exists)
         $job_id = isset($_GET['job_id']) ? (int)$_GET['job_id'] : null;
         $isEditing = $job_id !== null;
 
-        // If editing, get existing job data
+        // If editing, get existing job data for ALL steps
         $jobData = [];
+        $attachments = [];
+        $screeningQuestions = [];
+        
         if ($isEditing) {
+            // Get basic job data
             $jobData = $this->jobPostModel->getJobById($job_id);
             if (!$jobData || $jobData['employer_id'] !== $employer['employer_id']) {
                 header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
                 exit;
+            }
+
+            // Get job skills
+            $jobData['skills'] = $this->jobPostModel->getJobSkills($job_id);
+            
+            // Get attachments for step 2
+            $attachments = $this->jobPostModel->getJobAttachments($job_id);
+            
+            // Get screening questions for step 3
+            $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
+            
+            // For step 5, get full job data including all related data
+            if ($step == 5) {
+                $jobData = $this->jobPostModel->getFullJobDataForReview($job_id);
+                $jobData['attachments'] = $attachments;
+                $jobData['screening_questions'] = $screeningQuestions;
             }
         }
 
@@ -222,9 +230,43 @@ class JobPostController
 
     private function handleJobStep2($job_id, $data)
     {
-        // Handle attachments/documentation (placeholder for now)
-        header("Location: ?page=post-job&step=3&job_id=$job_id&success=" . urlencode('Documentation saved!'));
-        exit;
+        try {
+            // Handle file uploads if any
+            if (!empty($_FILES['attachments']['name'][0])) {
+                $uploadDir = __DIR__ . '/../../uploads/job_attachments/';
+
+                // Create directory if it doesn't exist
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                foreach ($_FILES['attachments']['name'] as $index => $fileName) {
+                    if (!empty($fileName) && $_FILES['attachments']['error'][$index] === UPLOAD_ERR_OK) {
+                        $tempFile = $_FILES['attachments']['tmp_name'][$index];
+                        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+                        $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
+                        $filePath = $uploadDir . $newFileName;
+
+                        if (move_uploaded_file($tempFile, $filePath)) {
+                            // Save file path to database
+                            $this->jobPostModel->addJobAttachment($job_id, 'uploads/job_attachments/' . $newFileName);
+                        }
+                    }
+                }
+            }
+
+            // Check if skip step is requested
+            if (isset($data['skip_step'])) {
+                header("Location: ?page=post-job&step=3&job_id=$job_id&success=" . urlencode('Documentation step skipped.'));
+            } else {
+                header("Location: ?page=post-job&step=3&job_id=$job_id&success=" . urlencode('Documentation saved!'));
+            }
+            exit;
+        } catch (Exception $e) {
+            error_log('Error in handleJobStep2: ' . $e->getMessage());
+            header("Location: ?page=post-job&step=2&job_id=$job_id&error=" . urlencode('Failed to save documentation.'));
+            exit;
+        }
     }
 
     private function handleJobStep3($job_id, $data)
@@ -240,6 +282,7 @@ class JobPostController
             $this->jobPostModel->deleteScreeningQuestions($job_id);
 
             // Process each question
+            $questionsSaved = 0;
             foreach ($data['questions'] as $questionData) {
                 if (!empty($questionData['text'])) {
                     $questionInfo = [
@@ -248,14 +291,19 @@ class JobPostController
                         'question_type' => $questionData['type'] ?? 'text',
                         'question_option' => !empty($questionData['options']) ? trim($questionData['options']) : null
                     ];
-                    
-                    $this->jobPostModel->addScreeningQuestion($job_id, $questionInfo);
+
+                    if ($this->jobPostModel->addScreeningQuestion($job_id, $questionInfo)) {
+                        $questionsSaved++;
+                    }
                 }
             }
 
-            header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode('Screening questions saved!'));
-            exit;
+            $message = $questionsSaved > 0 ? 
+                "Screening questions saved! ($questionsSaved questions)" : 
+                'No valid questions to save.';
 
+            header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode($message));
+            exit;
         } catch (Exception $e) {
             error_log('Error in handleJobStep3: ' . $e->getMessage());
             header("Location: ?page=post-job&step=3&job_id=$job_id&error=" . urlencode('Failed to save screening questions.'));
@@ -268,7 +316,7 @@ class JobPostController
         try {
             // Check if there are any screening questions
             $hasQuestions = !empty($this->jobPostModel->getScreeningQuestions($job_id));
-            
+
             // Prepare application settings
             $settings = [
                 'resume_required' => isset($data['resume_required']) ? 1 : 0,
@@ -287,7 +335,6 @@ class JobPostController
                 header("Location: ?page=post-job&step=4&job_id=$job_id&error=" . urlencode('Failed to save application settings.'));
             }
             exit;
-
         } catch (Exception $e) {
             error_log('Error in handleJobStep4: ' . $e->getMessage());
             header("Location: ?page=post-job&step=4&job_id=$job_id&error=" . urlencode('An error occurred while saving settings.'));
@@ -297,32 +344,39 @@ class JobPostController
 
     private function handleJobStep5($job_id, $data)
     {
-        // Handle final review and publish
-        if (isset($data['publish_job'])) {
-            // Publish the job - use publishJob method
-            $result = $this->jobPostModel->publishJob($job_id);
+        try {
+            if (isset($data['publish_job'])) {
+                // Publish the job
+                $result = $this->jobPostModel->publishJob($job_id);
 
-            if ($result) {
-                header("Location: ?page=job-post-success&job_id=$job_id");
-                exit;
+                if ($result) {
+                    header("Location: ?page=job-post-success&job_id=$job_id");
+                    exit;
+                } else {
+                    header("Location: ?page=post-job&step=5&job_id=$job_id&error=" . urlencode('Failed to publish job.'));
+                    exit;
+                }
+            } elseif (isset($data['save_draft'])) {
+                // Save as draft
+                $draftData = ['job_status' => 'draft'];
+                $result = $this->jobPostModel->updateJobPost($job_id, $draftData);
+
+                if ($result) {
+                    header("Location: ?page=manage-jobs&success=" . urlencode('Job saved as draft!'));
+                    exit;
+                } else {
+                    header("Location: ?page=post-job&step=5&job_id=$job_id&error=" . urlencode('Failed to save draft.'));
+                    exit;
+                }
             } else {
-                header("Location: ?page=post-job&step=5&job_id=$job_id&error=" . urlencode('Failed to publish job.'));
+                // Just viewing/navigating - no action needed
+                header("Location: ?page=post-job&step=5&job_id=$job_id");
                 exit;
             }
-        } elseif (isset($data['save_draft'])) {
-            // Save as draft - create data array for updateJobPost
-            $draftData = [
-                'job_status' => 'draft'
-            ];
-            $result = $this->jobPostModel->updateJobPost($job_id, $draftData);
-
-            if ($result) {
-                header("Location: ?page=post-job&step=5&job_id=$job_id&success=" . urlencode('Job saved as draft!'));
-                exit;
-            } else {
-                header("Location: ?page=post-job&step=5&job_id=$job_id&error=" . urlencode('Failed to save draft.'));
-                exit;
-            }
+        } catch (Exception $e) {
+            error_log('Error in handleJobStep5: ' . $e->getMessage());
+            header("Location: ?page=post-job&step=5&job_id=$job_id&error=" . urlencode('An error occurred.'));
+            exit;
         }
     }
 
@@ -388,9 +442,9 @@ class JobPostController
             exit;
         }
 
-        // Get job details
-        $job = $this->jobPostModel->getFullJobData($job_id);
-        if (!$job || $job['employer_id'] != $employer['employer_id']) {
+        // Get job details with application statistics
+        $job = $this->jobPostModel->getJobWithApplicationStats($job_id, $employer['employer_id']);
+        if (!$job) {
             header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
             exit;
         }
@@ -426,11 +480,11 @@ class JobPostController
             try {
                 require_once __DIR__ . '/../models/JobApplication.php';
                 require_once __DIR__ . '/../models/Jobseeker.php';
-                
+
                 $jobApplicationModel = new JobApplication();
                 $jobseekerModel = new Jobseeker();
                 $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-                
+
                 if ($jobseeker) {
                     $hasApplied = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
                 }
@@ -464,11 +518,11 @@ class JobPostController
             try {
                 require_once __DIR__ . '/../models/JobApplication.php';
                 require_once __DIR__ . '/../models/Jobseeker.php';
-                
+
                 $jobApplicationModel = new JobApplication();
                 $jobseekerModel = new Jobseeker();
                 $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-                
+
                 if ($jobseeker && !empty($jobs)) {
                     foreach ($jobs as &$job) {
                         try {
@@ -499,5 +553,138 @@ class JobPostController
         }
 
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
+    }
+
+    public function editJob()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        $job_id = $_GET['id'] ?? null;
+        if (!$job_id) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Get employer info
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            header('Location: ?page=complete-employer-profile');
+            exit;
+        }
+
+        // Verify job ownership
+        $job = $this->jobPostModel->getJobById($job_id);
+        if (!$job || $job['employer_id'] != $employer['employer_id']) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
+            exit;
+        }
+
+        // Redirect to post-job with edit mode
+        header("Location: ?page=post-job&step=1&job_id=$job_id");
+        exit;
+    }
+
+    public function toggleJobStatus()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        $job_id = $_GET['id'] ?? null;
+        $new_status = $_GET['status'] ?? null;
+
+        if (!$job_id || !$new_status) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Invalid request.'));
+            exit;
+        }
+
+        // Validate status
+        $allowed_statuses = ['open', 'paused', 'closed'];
+        if (!in_array($new_status, $allowed_statuses)) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Invalid status.'));
+            exit;
+        }
+
+        // Get employer info
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            header('Location: ?page=complete-employer-profile');
+            exit;
+        }
+
+        // Verify job ownership
+        $job = $this->jobPostModel->getJobById($job_id);
+        if (!$job || $job['employer_id'] != $employer['employer_id']) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
+            exit;
+        }
+
+        // Update job status
+        $result = $this->jobPostModel->updateJobPost($job_id, ['job_status' => $new_status]);
+
+        if ($result) {
+            $action = $new_status === 'open' ? 'reopened' : $new_status;
+            header('Location: ?page=view-employer-job&id=' . $job_id . '&success=' . urlencode("Job $action successfully!"));
+        } else {
+            header('Location: ?page=view-employer-job&id=' . $job_id . '&error=' . urlencode('Failed to update job status.'));
+        }
+        exit;
+    }
+
+    public function deleteJob()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        $job_id = $_GET['id'] ?? null;
+        if (!$job_id) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Get employer info
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            header('Location: ?page=complete-employer-profile');
+            exit;
+        }
+
+        // Verify job ownership
+        $job = $this->jobPostModel->getJobById($job_id);
+        if (!$job || $job['employer_id'] != $employer['employer_id']) {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
+            exit;
+        }
+
+        // Check if job has applications
+        try {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            $hasApplications = $jobApplicationModel->jobHasApplications($job_id);
+
+            if ($hasApplications) {
+                header('Location: ?page=manage-jobs&error=' . urlencode('Cannot delete job with existing applications. Consider closing it instead.'));
+                exit;
+            }
+        } catch (Exception $e) {
+            error_log('Error checking applications: ' . $e->getMessage());
+            // Continue with deletion if we can't check applications
+        }
+
+        // Delete the job
+        $result = $this->jobPostModel->deleteJob($job_id);
+
+        if ($result) {
+            header('Location: ?page=manage-jobs&success=' . urlencode('Job deleted successfully!'));
+        } else {
+            header('Location: ?page=manage-jobs&error=' . urlencode('Failed to delete job.'));
+        }
+        exit;
     }
 }

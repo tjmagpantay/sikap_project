@@ -178,16 +178,24 @@ include_once __DIR__ . '/navbar-employer.php';
             <!-- Statistics -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Statistics</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Application Statistics</h3>
                 </div>
                 <div class="px-6 py-4 space-y-3">
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Applications:</span>
-                        <span class="font-medium">0</span> <!-- You can add actual count later -->
+                        <span class="text-gray-500">Total Applications:</span>
+                        <span class="font-medium"><?php echo $job['total_applications']; ?></span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Views:</span>
-                        <span class="font-medium">-</span> <!-- You can add view tracking later -->
+                        <span class="text-gray-500">Pending Review:</span>
+                        <span class="font-medium text-yellow-600"><?php echo $job['pending_count']; ?></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Shortlisted:</span>
+                        <span class="font-medium text-purple-600"><?php echo $job['shortlisted_count']; ?></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Hired:</span>
+                        <span class="font-medium text-green-600"><?php echo $job['hired_count']; ?></span>
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500">Posted:</span>
@@ -200,6 +208,17 @@ include_once __DIR__ . '/navbar-employer.php';
                     </div>
                     <?php endif; ?>
                 </div>
+                
+                <!-- Quick Actions -->
+                <?php if ($job['total_applications'] > 0): ?>
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <a href="?page=view-applications&job_id=<?php echo $job['job_id']; ?>" 
+                       class="inline-flex items-center w-full justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        <i class="mr-2 fas fa-users"></i>
+                        View All Applications
+                    </a>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

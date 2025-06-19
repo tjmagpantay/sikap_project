@@ -32,8 +32,8 @@
             $controller->signup();
             break;
         case 'jobseeker-dashboard':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
+            require_once __DIR__ . '/../app/controllers/JobSeekerDashboardController.php';
+            $controller = new JobSeekerDashboardController();
             $controller->dashboard();
             break;
         case 'profile-jobseeker':

@@ -12,16 +12,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     
     <!-- Job Listings -->
     <?php if (empty($jobs)): ?>
-        <div class="text-center py-12">
-            <i class="fas fa-briefcase text-6xl text-gray-400 mb-4"></i>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No jobs available</h3>
+        <div class="py-12 text-center">
+            <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
+            <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs available</h3>
             <p class="text-gray-500">Check back later for new job postings</p>
         </div>
     <?php else: ?>
         <div class="space-y-6">
             <?php foreach ($jobs as $job): ?>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex justify-between items-start">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <div class="flex items-start justify-between">
                         <div class="flex-1">
                             <h3 class="text-xl font-semibold text-gray-900">
                                 <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" class="hover:text-blue-600">
@@ -41,20 +41,20 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 $companyName = 'Company';
                             }
                             ?>
-                            <p class="text-gray-600 mt-1"><?php echo htmlspecialchars($companyName); ?></p>
-                            <p class="text-gray-700 mt-2"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 200) . '...'; ?></p>
+                            <p class="mt-1 text-gray-600"><?php echo htmlspecialchars($companyName); ?></p>
+                            <p class="mt-2 text-gray-700"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 200) . '...'; ?></p>
                             
-                            <div class="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
-                                <span><i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                <span><i class="fas fa-briefcase mr-1"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
+                            <div class="flex flex-wrap gap-4 mt-4 text-sm text-gray-500">
+                                <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
+                                <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
                                 <?php if ($job['show_pay'] && $job['salary']): ?>
-                                    <span><i class="fas fa-money-bill mr-1"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
+                                    <span><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
                                 <?php endif; ?>
-                                <span><i class="fas fa-calendar mr-1"></i><?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
+                                <span><i class="mr-1 fas fa-calendar"></i><?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
                             </div>
                         </div>
                         
-                        <div class="ml-6 flex flex-col space-y-2">
+                        <div class="flex flex-col ml-6 space-y-2">
                             <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" 
                                class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
                                 View Details
@@ -80,7 +80,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     Not accepting applications
                                 </span>
                             <?php else: ?>
-                                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>" 
+                                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1" 
                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
                                     <i class="mr-1 fas fa-paper-plane"></i>
                                     Apply Now

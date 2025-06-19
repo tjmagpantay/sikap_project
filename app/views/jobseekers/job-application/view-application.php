@@ -1,5 +1,5 @@
 <?php
-// filepath: app/views/jobseekers/view-application.php
+// filepath: app/views/jobseekers/job-application/view-application.php
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 ?>
@@ -98,51 +98,47 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             </div>
         </div>
 
-        <!-- Resume Submitted -->
-        <?php if ($application['resume_path']): ?>
+        <!-- Resume & Documents Submitted -->
+        <?php 
+        // Find resume from attachments
+        $resumeAttachment = null;
+        foreach ($attachments as $attachment) {
+            if (strtolower($attachment['file_type']) === 'resume' || strtolower($attachment['file_type']) === 'cv') {
+                $resumeAttachment = $attachment;
+                break;
+            }
+        }
+        ?>
+
+        <?php if ($resumeAttachment): ?>
         <div class="p-6 bg-white rounded-lg shadow">
             <h3 class="mb-4 text-lg font-medium text-gray-900">Resume Submitted</h3>
             <div class="flex items-center space-x-3">
                 <i class="text-red-500 fas fa-file-pdf"></i>
-                <a href="/<?php echo htmlspecialchars($application['resume_path']); ?>" target="_blank"
+                <a href="/<?php echo htmlspecialchars($resumeAttachment['file_path']); ?>" target="_blank"
                    class="text-blue-600 hover:text-blue-800">
                     View Resume
                 </a>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <!-- Cover Letter -->
-        <?php if ($application['cover_letter']): ?>
-        <div class="p-6 bg-white rounded-lg shadow">
-            <h3 class="mb-4 text-lg font-medium text-gray-900">Cover Letter</h3>
-            <div class="p-4 rounded bg-gray-50">
-                <p class="text-sm text-gray-900 whitespace-pre-line"><?php echo htmlspecialchars($application['cover_letter']); ?></p>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <!-- Screening Questions & Answers -->
-        <?php if (!empty($answers)): ?>
-        <div class="p-6 bg-white rounded-lg shadow">
-            <h3 class="mb-4 text-lg font-medium text-gray-900">Screening Questions & Answers</h3>
-            <div class="space-y-4">
-                <?php foreach ($answers as $answer): ?>
-                    <div class="pl-4 border-l-4 border-blue-200">
-                        <h4 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($answer['question_text']); ?></h4>
-                        <p class="mt-1 text-sm text-gray-700"><?php echo htmlspecialchars($answer['answer']); ?></p>
-                    </div>
-                <?php endforeach; ?>
+                <span class="text-xs text-gray-500">
+                    (Uploaded: <?php echo date('M j, Y', strtotime($resumeAttachment['uploaded_at'])); ?>)
+                </span>
             </div>
         </div>
         <?php endif; ?>
 
         <!-- Additional Attachments -->
-        <?php if (!empty($attachments)): ?>
+        <?php 
+        // Filter out resume/CV from other attachments
+        $otherAttachments = array_filter($attachments, function($attachment) {
+            return !in_array(strtolower($attachment['file_type']), ['resume', 'cv']);
+        });
+        ?>
+
+        <?php if (!empty($otherAttachments)): ?>
         <div class="p-6 bg-white rounded-lg shadow">
             <h3 class="mb-4 text-lg font-medium text-gray-900">Additional Attachments</h3>
             <div class="space-y-3">
-                <?php foreach ($attachments as $attachment): ?>
+                <?php foreach ($otherAttachments as $attachment): ?>
                     <div class="flex items-center justify-between p-3 rounded bg-gray-50">
                         <div class="flex items-center space-x-3">
                             <i class="text-gray-400 fas fa-paperclip"></i>

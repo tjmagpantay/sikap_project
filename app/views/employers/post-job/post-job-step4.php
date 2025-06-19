@@ -124,7 +124,8 @@ include_once __DIR__ . '/../navbar-employer.php';
                             <div class="flex items-center h-5">
                                 <input id="screening_questions_enabled" name="screening_questions_enabled" type="checkbox" value="1"
                                        <?php 
-                                       $hasQuestions = !empty($this->jobPostModel->getScreeningQuestions($job_id ?? 0));
+                                       // Check if there are screening questions
+                                       $hasQuestions = !empty($screeningQuestions);
                                        echo (($existingSettings['screening_questions_enabled'] ?? '0') == '1' && $hasQuestions) ? 'checked' : ''; 
                                        echo !$hasQuestions ? 'disabled' : '';
                                        ?>
@@ -136,7 +137,7 @@ include_once __DIR__ . '/../navbar-employer.php';
                                 </label>
                                 <p class="text-gray-500">
                                     <?php if ($hasQuestions): ?>
-                                        Include the screening questions you created in step 3
+                                        Include the screening questions you created in step 3 (<?php echo count($screeningQuestions); ?> questions)
                                     <?php else: ?>
                                         <span class="text-orange-600">No screening questions added in step 3</span>
                                     <?php endif; ?>

@@ -25,9 +25,9 @@ class JobApplication
     {
         try {
             $sql = "INSERT INTO job_application (
-                jobseeker_id, job_id, application_status, resume_path, cover_letter, applied_at
+                jobseeker_id, job_id, application_status, applied_at
             ) VALUES (
-                :jobseeker_id, :job_id, 'pending', :resume_path, :cover_letter, NOW()
+                :jobseeker_id, :job_id, 'pending', NOW()
             )";
 
             $stmt = $this->db->prepare($sql);
@@ -39,11 +39,36 @@ class JobApplication
         }
     }
 
+    public function createDraftApplication($data)
+    {
+        try {
+            $sql = "INSERT INTO job_application (
+                jobseeker_id, job_id, application_status, 
+                current_step, is_finalized, applied_at
+            ) VALUES (
+                :jobseeker_id, :job_id, 'pending', 
+                1, FALSE, NULL
+            )";
+
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([
+                'jobseeker_id' => $data['jobseeker_id'],
+                'job_id' => $data['job_id']
+            ]);
+            
+            return $result ? $this->db->lastInsertId() : false;
+        } catch (PDOException $e) {
+            error_log('Error creating draft application: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function saveApplicationAnswer($application_id, $question_id, $answer)
     {
         try {
             $sql = "INSERT INTO job_application_answers (application_id, question_id, answer) 
-                    VALUES (:application_id, :question_id, :answer)";
+                    VALUES (:application_id, :question_id, :answer)
+                    ON DUPLICATE KEY UPDATE answer = :answer";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'application_id' => $application_id,
@@ -59,8 +84,8 @@ class JobApplication
     public function saveApplicationAttachment($application_id, $file_path, $file_type)
     {
         try {
-            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type, uploaded_at) 
-                    VALUES (:application_id, :file_path, :file_type, NOW())";
+            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type) 
+                    VALUES (:application_id, :file_path, :file_type)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'application_id' => $application_id,
@@ -69,6 +94,35 @@ class JobApplication
             ]);
         } catch (PDOException $e) {
             error_log('Error saving application attachment: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function saveApplicationAttachmentReference($application_id, $profile_document_id, $file_type)
+    {
+        try {
+            // Get the file path from profile document
+            $sql = "SELECT file_path FROM jobseeker_documents WHERE document_id = :document_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['document_id' => $profile_document_id]);
+            $doc = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$doc) {
+                return false;
+            }
+
+            // Insert into application_attachments with reference
+            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type, profile_document_id) 
+                    VALUES (:application_id, :file_path, :file_type, :profile_document_id)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'application_id' => $application_id,
+                'file_path' => $doc['file_path'],
+                'file_type' => $file_type,
+                'profile_document_id' => $profile_document_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error saving application attachment reference: ' . $e->getMessage());
             return false;
         }
     }
@@ -142,9 +196,9 @@ class JobApplication
     public function getApplicationAnswers($application_id)
     {
         try {
-            $sql = "SELECT jaa.*, jpq.question_text, jpq.question_type
+            $sql = "SELECT jaa.*, jpq.question_text, jpq.question_type, jpq.is_required
                     FROM job_application_answers jaa
-                    JOIN job_post_questions jpq ON jaa.question_id = jpq.question_id
+                    LEFT JOIN job_post_questions jpq ON jaa.question_id = jpq.question_id
                     WHERE jaa.application_id = :application_id
                     ORDER BY jpq.question_id";
             
@@ -161,12 +215,11 @@ class JobApplication
     {
         try {
             $sql = "SELECT * FROM application_attachments 
-                    WHERE application_id = :application_id
-                    ORDER BY uploaded_at";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(['application_id' => $application_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                WHERE application_id = :application_id 
+                ORDER BY uploaded_at";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['application_id' => $application_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting application attachments: ' . $e->getMessage());
             return [];
@@ -198,6 +251,42 @@ class JobApplication
         }
     }
 
+    public function updateApplication($application_id, $data)
+    {
+        try {
+            $setParts = [];
+            $params = ['application_id' => $application_id];
+            
+            foreach ($data as $key => $value) {
+                $setParts[] = "$key = :$key";
+                $params[$key] = $value;
+            }
+            
+            $sql = "UPDATE job_application SET " . implode(', ', $setParts) . " WHERE application_id = :application_id";
+            
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            error_log('Error updating application: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getApplicationByJobseekerAndJob($jobseeker_id, $job_id)
+    {
+        try {
+            $sql = "SELECT * FROM job_application 
+                WHERE jobseeker_id = :jobseeker_id AND job_id = :job_id 
+                ORDER BY application_id DESC LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'job_id' => $job_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting application by jobseeker and job: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function withdrawApplication($application_id, $jobseeker_id)
     {
         try {
@@ -214,6 +303,102 @@ class JobApplication
             ]);
         } catch (PDOException $e) {
             error_log('Error withdrawing application: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deleteApplicationAnswers($application_id)
+    {
+        try {
+            $sql = "DELETE FROM job_application_answers WHERE application_id = :application_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute(['application_id' => $application_id]);
+        } catch (PDOException $e) {
+            error_log('Error deleting application answers: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function saveApplicationEligibility($data)
+    {
+        try {
+            // First try to update existing record
+            $sql = "UPDATE job_application_eligibility 
+                SET interested_program = :interested_program, priority_sector = :priority_sector
+                WHERE application_id = :application_id";
+        
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute($data);
+        
+            // If no rows affected, insert new record
+            if ($stmt->rowCount() == 0) {
+                $sql = "INSERT INTO job_application_eligibility (application_id, interested_program, priority_sector) 
+                    VALUES (:application_id, :interested_program, :priority_sector)";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute($data);
+            }
+        
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error saving application eligibility: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getApplicationEligibility($application_id)
+    {
+        try {
+            $sql = "SELECT * FROM job_application_eligibility WHERE application_id = :application_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['application_id' => $application_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting application eligibility: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function logStatusChange($application_id, $status, $changed_by_role, $remarks = null)
+    {
+        try {
+            $sql = "INSERT INTO job_application_status_logs (application_id, status, changed_by_role, remarks) 
+                VALUES (:application_id, :status, :changed_by_role, :remarks)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'application_id' => $application_id,
+                'status' => $status,
+                'changed_by_role' => $changed_by_role,
+                'remarks' => $remarks
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error logging status change: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function clearResumeAttachments($application_id)
+    {
+        try {
+            $sql = "DELETE FROM application_attachments 
+                    WHERE application_id = :application_id 
+                    AND file_type IN ('Resume', 'CV', 'resume', 'cv')";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute(['application_id' => $application_id]);
+        } catch (PDOException $e) {
+            error_log('Error clearing resume attachments: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function jobHasApplications($job_id)
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM job_application WHERE job_id = :job_id AND is_finalized = 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['job_id' => $job_id]);
+            return $stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            error_log('Error checking job applications: ' . $e->getMessage());
             return false;
         }
     }

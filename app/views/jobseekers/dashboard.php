@@ -1,9 +1,9 @@
 <?php
-        include_once __DIR__ . '/../components/navbar-top.php';
-        include_once __DIR__ . '/navbar-jobseeker.php';
+include_once __DIR__ . '/../components/navbar-top.php';
+include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 <div class="min-h-screen bg-gray-50">
-    
+
     <nav class="bg-green-800 shadow">
         <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -28,7 +28,7 @@
                             <div class="flex-shrink-0">
                                 <i class="text-green-400 fas fa-user-edit"></i>
                             </div>
-                            
+
                             <div class="ml-3">
                                 <h1 class="text-lg font-medium text-green-800">Find the Right Job</h1>
                                 <form class="w-full max-w-md mb-4 md:max-w-lg lg:max-w-xl">
@@ -39,8 +39,7 @@
                                             <input
                                                 type="text"
                                                 placeholder="Job title"
-                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0"
-                                            />
+                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
                                         </div>
                                         <!-- Separator -->
                                         <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
@@ -53,8 +52,7 @@
                                             <input
                                                 type="text"
                                                 placeholder="Location"
-                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0"
-                                            />
+                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
                                         </div>
                                         <!-- Search Button -->
                                         <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
@@ -233,7 +231,7 @@
                         View All Jobs <i class="ml-1 fas fa-arrow-right"></i>
                     </a>
                 </div>
-                
+
                 <!-- Check if jobs array exists and is not empty -->
                 <?php if (!empty($jobs)): ?>
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -249,57 +247,57 @@
                                             <h3 class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
                                             <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($job['company_name'] ?? ($job['employer_first_name'] . ' ' . $job['employer_last_name'])); ?></p>
                                             <p class="mt-2 text-sm text-gray-700"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 100) . '...'; ?></p>
-                                            
-                                                <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                                <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
-                                                <?php if ($job['show_pay'] && $job['salary']): ?>
-                                                    <span><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
-                                                <?php endif; ?>
-                                            </div>
+
+                                            <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
+                                            <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
+                                            <?php if ($job['show_pay'] && $job['salary']): ?>
+                                                <span><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
-                                    
-                                    <div class="flex mt-4 space-x-2">
-                                        <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" 
-                                           class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
-                                            View Details
+                                </div>
+
+                                <div class="flex mt-4 space-x-2">
+                                    <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
+                                        class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
+                                        View Details
+                                    </a>
+
+                                    <?php if (!$hasProfile): ?>
+                                        <a href="?page=complete-jobseeker-profile"
+                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
+                                            Complete Profile to Apply
                                         </a>
-                                        
-                                        <?php if (!$hasProfile): ?>
-                                            <a href="?page=complete-jobseeker-profile" 
-                                               class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
-                                                Complete Profile to Apply
-                                            </a>
-                                        <?php elseif ($job['has_applied']): ?>
-                                            <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
-                                                <i class="mr-1 fas fa-check-circle"></i>
-                                                Applied
-                                            </span>
-                                        <?php else: ?>
-                                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>" 
-                                               class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                                                <i class="mr-1 fas fa-paper-plane"></i>
-                                                Apply
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
+                                    <?php elseif ($job['has_applied']): ?>
+                                        <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
+                                            <i class="mr-1 fas fa-check-circle"></i>
+                                            Applied
+                                        </span>
+                                    <?php else: ?>
+                                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
+                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                            <i class="mr-1 fas fa-paper-plane"></i>
+                                            Apply
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
                     </div>
-                <?php else: ?>
-                    <!-- No jobs available -->
-                    <div class="py-12 text-center bg-white rounded-lg shadow">
-                        <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
-                        <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs available</h3>
-                        <p class="mb-4 text-gray-500">Check back later for new job postings</p>
-                        <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                            Browse All Jobs
-                        </a>
-                    </div>
-                <?php endif; ?>
+                <?php endforeach; ?>
             </div>
+        <?php else: ?>
+            <!-- No jobs available -->
+            <div class="py-12 text-center bg-white rounded-lg shadow">
+                <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
+                <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs available</h3>
+                <p class="mb-4 text-gray-500">Check back later for new job postings</p>
+                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    Browse All Jobs
+                </a>
+            </div>
+        <?php endif; ?>
         </div>
     </div>
-    
+</div>
+
 </div>

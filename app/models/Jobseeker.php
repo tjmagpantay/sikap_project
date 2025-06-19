@@ -213,16 +213,23 @@ class Jobseeker
 
     public function getDocuments($user_id)
     {
-        $jobseeker = $this->findByUserId($user_id);
-        if (!$jobseeker) return [];
+        try {
+            // First get the jobseeker_id from user_id
+            $jobseeker = $this->findByUserId($user_id);
+            if (!$jobseeker) {
+                return [];
+            }
 
-        $stmt = $this->db->prepare("
-            SELECT * FROM jobseeker_documents 
-            WHERE jobseeker_id = ? 
-            ORDER BY uploaded_at DESC
-        ");
-        $stmt->execute([$jobseeker['jobseeker_id']]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $sql = "SELECT * FROM jobseeker_documents 
+                    WHERE jobseeker_id = :jobseeker_id 
+                    ORDER BY uploaded_at DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['jobseeker_id' => $jobseeker['jobseeker_id']]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobseeker documents: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public function calculateProfileCompletion($user_id)
