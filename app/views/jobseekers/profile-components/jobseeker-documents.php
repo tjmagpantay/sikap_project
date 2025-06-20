@@ -68,11 +68,11 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     </p>
                                 </div>
                                 <div class="flex flex-col space-y-1">
-                                    <a href="<?php echo htmlspecialchars($doc['file_path'] ?? '#'); ?>" target="_blank"
+                                    <a href="?page=download-document&doc_id=<?php echo htmlspecialchars($doc['document_id'] ?? '#'); ?>" target="_blank"
                                        class="text-xs text-green-600 hover:text-green-700">
                                         <i class="mr-1 fas fa-eye"></i>View
                                     </a>
-                                    <a href="<?php echo htmlspecialchars($doc['file_path'] ?? '#'); ?>" download
+                                    <a href="?page=download-document&doc_id=<?php echo htmlspecialchars($doc['document_id'] ?? '#'); ?>&download=1" 
                                        class="text-xs text-blue-600 hover:text-blue-700">
                                         <i class="mr-1 fas fa-download"></i>Download
                                     </a>

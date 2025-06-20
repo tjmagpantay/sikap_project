@@ -162,6 +162,10 @@ class EmployerController
         $business = $this->employerModel->getBusiness($employer['employer_id']);
         $documents = $this->employerModel->getDocuments($employer['employer_id']);
 
+        // Add error/success from URL parameters
+        $error = $_GET['error'] ?? $error;
+        $success = $_GET['success'] ?? $success;
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleBusinessStepSubmission($step, $employer['employer_id'], $error, $success);
         }
@@ -457,59 +461,76 @@ class EmployerController
         }
     }
 
-    private function handleDocumentUpload($file, $type, &$error)
-    {
-        try {
-            error_log("DEBUG: handleDocumentUpload called for type: $type");
+private function handleDocumentUpload($file, $type, &$error)
+{
+    try {
+        error_log("DEBUG: handleDocumentUpload called for type: $type");
 
-            // Validate file
-            $allowedTypes = ['pdf'];  // Only PDF for documents
-            $maxSize = 5 * 1024 * 1024; // 5MB
+        // Validate file
+        $allowedTypes = ['pdf'];  // Only PDF for documents
+        $maxSize = 5 * 1024 * 1024; // 5MB
 
-            $fileInfo = pathinfo($file['name']);
-            $extension = strtolower($fileInfo['extension'] ?? '');
+        $fileInfo = pathinfo($file['name']);
+        $extension = strtolower($fileInfo['extension'] ?? '');
 
-            if (!in_array($extension, $allowedTypes)) {
-                $error = 'Invalid file type. Only PDF files are allowed for documents.';
-                return false;
-            }
-
-            if ($file['size'] > $maxSize) {
-                $error = 'File too large. Maximum size: 5MB';
-                return false;
-            }
-
-            // Create upload directory if it doesn't exist
-            $uploadDir = __DIR__ . '/../../public/uploads/documents/';
-            if (!is_dir($uploadDir)) {
-                if (!mkdir($uploadDir, 0755, true)) {
-                    $error = 'Failed to create upload directory';
-                    return false;
-                }
-            }
-
-            // Generate unique filename
-            $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-            $filePath = $uploadDir . $filename;
-
-            error_log("DEBUG: Attempting to move file to: $filePath");
-
-            // Move uploaded file
-            if (move_uploaded_file($file['tmp_name'], $filePath)) {
-                error_log("DEBUG: File moved successfully");
-                // Return relative path for database storage (FIXED FORMAT)
-                return 'uploads/documents/' . $filename;  // Removed leading slash
-            } else {
-                $error = 'Failed to move uploaded file';
-                error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
-                return false;
-            }
-        } catch (Exception $e) {
-            error_log('Error in handleDocumentUpload: ' . $e->getMessage());
-            $error = 'Upload processing error';
+        if (!in_array($extension, $allowedTypes)) {
+            $error = 'Invalid file type. Only PDF files are allowed for documents.';
             return false;
         }
+
+        if ($file['size'] > $maxSize) {
+            $error = 'File too large. Maximum size: 5MB';
+            return false;
+        }
+
+        // Get employer info to check for existing file
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            $error = 'Employer not found';
+            return false;
+        }
+
+        // Check for existing document and delete old file
+        $existingDocuments = $this->employerModel->getDocuments($employer['employer_id']);
+        if (!empty($existingDocuments[$type])) {
+            $oldFilePath = __DIR__ . '/../../' . $existingDocuments[$type];
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+                error_log("DEBUG: Deleted old file: $oldFilePath");
+            }
+        }
+
+        // Store documents outside public directory for security
+        $uploadDir = __DIR__ . '/../../uploads/documents/';
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                $error = 'Failed to create upload directory';
+                return false;
+            }
+        }
+
+        // Generate unique filename
+        $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+        $filePath = $uploadDir . $filename;
+
+        error_log("DEBUG: Attempting to move file to: $filePath");
+
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            error_log("DEBUG: File moved successfully");
+            // Return relative path for database storage
+            return 'uploads/documents/' . $filename;
+        } else {
+            $error = 'Failed to move uploaded file';
+            error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log('Error in handleDocumentUpload: ' . $e->getMessage());
+        $error = 'Upload processing error';
+        return false;
     }
+}
 
     private function handleBannerUpload($file, &$error)
     {

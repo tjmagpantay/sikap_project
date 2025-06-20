@@ -446,13 +446,14 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 
                         <div class="flex items-center space-x-2">
                             <?php if (!empty($documents[$type])): ?>
-                                <a href="<?php echo htmlspecialchars($documents[$type]); ?>" target="_blank"
-                                    class="text-green-600 hover:text-green-700">
-                                    <i class="fas fa-eye"></i>
+                                <!-- NEW: Secure document links -->
+                                <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>" target="_blank"
+                                    class="text-green-600 hover:text-green-700" title="View Document">
+                                    View
                                 </a>
-                                <a href="<?php echo htmlspecialchars($documents[$type]); ?>" download
-                                    class="text-blue-600 hover:text-blue-700">
-                                    <i class="fas fa-download"></i>
+                                <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>&download=1"
+                                    class="text-blue-600 hover:text-blue-700" title="Download Document">
+                                    Download
                                 </a>
                             <?php else: ?>
                                 <i class="text-gray-400 fas fa-times-circle"></i>

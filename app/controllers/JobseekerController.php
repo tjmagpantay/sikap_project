@@ -444,9 +444,8 @@ class JobseekerController
             $error = 'File size must be less than 5MB.';
             return false;
         }
-
-        // FIXED: Use consistent path to public/uploads/documents/
-        $uploadDir = __DIR__ . '/../../public/uploads/documents/';
+        // NEW: Store documents outside public directory for security
+        $uploadDir = __DIR__ . '/../../uploads/documents/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }

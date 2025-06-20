@@ -49,6 +49,11 @@
         case 'jobseeker-documents':
             include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
             break;
+        case 'download-document':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadDocument();
+            break;
         case 'jobseeker-applications':
             include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
             break;
@@ -121,6 +126,11 @@
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
             $controller->showProfile();
+            break;
+        case 'download-employer-document':
+            require_once __DIR__ . '/../app/controllers/EmployerDocumentController.php';
+            $controller = new EmployerDocumentController();
+            $controller->downloadDocument();
             break;
 
         case 'complete-jobseeker-profile':

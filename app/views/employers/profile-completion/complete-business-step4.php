@@ -12,6 +12,13 @@ $documentTypes = [
     'job_vaccancies_qual' => 'Job Vacancies & Qualifications',
     'phil_jobnet_reg' => 'PhilJobNet Registration'
 ];
+
+// Get employer data for secure links
+$employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+if (!$employer) {
+    header('Location: ?page=complete-employer-profile');
+    exit;
+}
 ?>
 
 <div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
@@ -93,11 +100,12 @@ $documentTypes = [
                                             </div>
                                         </div>
                                         <div class="flex space-x-2">
-                                            <a href="<?php echo htmlspecialchars($documents[$type]); ?>" target="_blank" 
+                                            <!-- NEW: Secure document links -->
+                                            <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>" target="_blank" 
                                                class="text-xs text-blue-600 hover:text-blue-700">
                                                 <i class="mr-1 fas fa-eye"></i>View
                                             </a>
-                                            <a href="<?php echo htmlspecialchars($documents[$type]); ?>" download 
+                                            <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>&download=1" 
                                                class="text-xs text-green-600 hover:text-green-700">
                                                 <i class="mr-1 fas fa-download"></i>Download
                                             </a>

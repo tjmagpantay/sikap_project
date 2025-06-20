@@ -146,7 +146,7 @@ class Jobseeker
     public function markProfileComplete($user_id)
     {
         try {
-            $sql = "UPDATE jobseeker 9SET profile_completed = 1, updated_at = CURRENT_TIMESTAMP WHERE user_id = :user_id";
+            $sql = "UPDATE jobseeker SET profile_completed = 1, updated_at = CURRENT_TIMESTAMP WHERE user_id = :user_id";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute(['user_id' => $user_id]);
         } catch (PDOException $e) {
@@ -282,19 +282,44 @@ class Jobseeker
         return min(100, $completionScore);
     }
 
-    public function deleteDocumentByType($jobseeker_id, $file_type) {
-        // Get the file path first to delete the physical file
-        $stmt = $this->db->prepare("SELECT file_path FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
-        $stmt->execute([$jobseeker_id, $file_type]);
-        $doc = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($doc && file_exists(__DIR__ . '/../../' . $doc['file_path'])) {
-            unlink(__DIR__ . '/../../' . $doc['file_path']);
+    //NEWWWWWWWWWWWWWWWWWW
+    public function getDocumentById($documentId) 
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents WHERE document_id = :document_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['document_id' => $documentId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting document by ID: ' . $e->getMessage());
+            return false;
         }
-        
-        // Delete from database
-        $stmt = $this->db->prepare("DELETE FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
-        return $stmt->execute([$jobseeker_id, $file_type]);
+    }
+
+    public function deleteDocumentByType($jobseeker_id, $file_type) {
+        try {
+            // Get the file path first to delete the physical file
+            $stmt = $this->db->prepare("SELECT file_path FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
+            $stmt->execute([$jobseeker_id, $file_type]);
+            $doc = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$doc) {
+                return true; // Document doesn't exist
+            }
+            
+            // Delete the physical file
+            if ($doc['file_path'] && file_exists(__DIR__ . '/../../' . $doc['file_path'])) {
+                unlink(__DIR__ . '/../../' . $doc['file_path']);
+            }
+            
+            // Delete from database (CASCADE will handle application_attachments)
+            $stmt = $this->db->prepare("DELETE FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
+            return $stmt->execute([$jobseeker_id, $file_type]);
+            
+        } catch (PDOException $e) {
+            error_log('Error deleting document: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function updateProfilePhoto($user_id, $photo_path) {
