@@ -6,7 +6,7 @@
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
       <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
-      <a href="?page=landing" class="nav-brand">Sikap</a>
+      <a href="?page=landing" class="nav-brand">Sikap <span class="text-secondary">Employer</span></a>
     </div>
 
     <!-- Desktop Menu -->
@@ -16,7 +16,6 @@
         <li><a href="?page=browse-candidates" class="nav-link">Browse Candidates</a></li>
         <li><a href="?page=job-management" class="nav-link">Job Management</a></li>
         <li><a href="?page=employer-programs" class="nav-link">Programs</a></li>
-        <li><a href="?page=employer-community" class="nav-link">Community</a></li>
       </ul>
     </div>
 

@@ -65,7 +65,7 @@
 
   /* NAVBAR TEXT */
   .nav-brand {
-    @apply mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-semibold;
+    @apply mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-medium;
   }
   
   .nav-link-top {
@@ -102,27 +102,27 @@
   }
 
   .company-name {
-    @apply text-base font-semibold mb-1;
+    @apply mb-1 text-base font-semibold;
   }
 
   .company-location {
-    @apply text-xs text-gray-500 mb-2;
+    @apply mb-2 text-xs text-gray-500;
   }
 
   .company-description {
-    @apply text-sm text-gray-600 mb-3;
+    @apply mb-3 text-sm text-gray-600;
   }
 
   .company-link {
-    @apply text-sm text-blue-500 underline mb-3 block;
+    @apply block mb-3 text-sm text-blue-500 underline;
   }
 
   .company-button {
-    @apply btn-primary w-full;
+    @apply w-full btn-primary;
   }
   
   .job-card {
-    @apply bg-white rounded-lg shadow-md p-4 border border-gray-100 hover:shadow-lg transition;
+    @apply p-4 transition bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg;
   }
 
   .job-type {
