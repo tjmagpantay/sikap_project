@@ -414,4 +414,142 @@ class Employer {
             return ['status' => 'error', 'message' => 'Unable to check status'];
         }
     }
+
+    public function getPendingAccreditations() {
+        try {
+            $sql = "SELECT 
+                        ea.accreditation_id,
+                        ea.employer_id,
+                        ea.status,
+                        ea.created_at,
+                        ea.reviewed_at,
+                        ea.notes,
+                        u.email,
+                        e.first_name,
+                        e.last_name,
+                        e.position,
+                        e.contact_no,
+                        eb.business_name,
+                        eb.company_name,
+                        eb.business_type,
+                        eb.business_industry,
+                        eb.business_size,
+                        eb.business_desc,
+                        eb.business_address,
+                        admin.full_name as reviewed_by_name
+                    FROM employer_accreditations ea
+                    JOIN employers e ON ea.employer_id = e.employer_id
+                    JOIN users u ON e.user_id = u.user_id
+                    LEFT JOIN employer_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN admins admin ON ea.reviewed_by = admin.admin_id
+                    WHERE ea.status = 'pending'
+                    ORDER BY ea.created_at ASC";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting pending accreditations: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllAccreditations() {
+        try {
+            $sql = "SELECT 
+                        ea.accreditation_id,
+                        ea.employer_id,
+                        ea.status,
+                        ea.created_at,
+                        ea.reviewed_at,
+                        ea.notes,
+                        u.email,
+                        e.first_name,
+                        e.last_name,
+                        e.position,
+                        e.contact_no,
+                        eb.business_name,
+                        eb.company_name,
+                        eb.business_type,
+                        eb.business_industry,
+                        eb.business_size,
+                        eb.business_desc,
+                        eb.business_address,
+                        admin.full_name as reviewed_by_name
+                    FROM employer_accreditations ea
+                    JOIN employers e ON ea.employer_id = e.employer_id
+                    JOIN users u ON e.user_id = u.user_id
+                    LEFT JOIN employer_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN admins admin ON ea.reviewed_by = admin.admin_id
+                    ORDER BY ea.created_at DESC";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting all accreditations: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAccreditationById($accreditationId) {
+        try {
+            $sql = "SELECT 
+                        ea.accreditation_id,
+                        ea.employer_id,
+                        ea.status,
+                        ea.created_at,
+                        ea.reviewed_at,
+                        ea.notes,
+                        u.email,
+                        e.first_name,
+                        e.last_name,
+                        e.position,
+                        e.contact_no,
+                        eb.business_name,
+                        eb.company_name,
+                        eb.business_type,
+                        eb.business_industry,
+                        eb.business_size,
+                        eb.business_desc,
+                        eb.business_address,
+                        admin.full_name as reviewed_by_name
+                    FROM employer_accreditations ea
+                    JOIN employers e ON ea.employer_id = e.employer_id
+                    JOIN users u ON e.user_id = u.user_id
+                    LEFT JOIN employer_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN admins admin ON ea.reviewed_by = admin.admin_id
+                    WHERE ea.accreditation_id = :accreditation_id";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':accreditation_id', $accreditationId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting accreditation by ID: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateAccreditationStatus($accreditationId, $status, $reviewerId, $notes = '') {
+        try {
+            $sql = "UPDATE employer_accreditations 
+                    SET status = :status, 
+                        reviewed_by = :reviewed_by, 
+                        reviewed_at = NOW(), 
+                        notes = :notes
+                    WHERE accreditation_id = :accreditation_id";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':reviewed_by', $reviewerId, PDO::PARAM_INT);
+            $stmt->bindParam(':notes', $notes);
+            $stmt->bindParam(':accreditation_id', $accreditationId, PDO::PARAM_INT);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error updating accreditation status: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

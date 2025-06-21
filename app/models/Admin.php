@@ -1,12 +1,8 @@
 <?php
-require_once __DIR__ . '/../../config/sikap_db.php';
-
-class Admin
-{
+class Admin {
     private $db;
 
-    public function __construct()
-    {
+    public function __construct() {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
@@ -17,6 +13,46 @@ class Admin
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Connection failed: " . $e->getMessage());
+        }
+    }
+
+    public function authenticate($email, $password) {
+        try {
+            $sql = "SELECT admin_id, email, password, full_name 
+                    FROM admins 
+                    WHERE email = :email";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            
+            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($admin && password_verify($password, $admin['password'])) {
+                return $admin;
+            }
+            
+            return false;
+        } catch (PDOException $e) {
+            error_log('Error authenticating admin: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findById($adminId) {
+        try {
+            $sql = "SELECT admin_id, email, full_name, created_at 
+                    FROM admins 
+                    WHERE admin_id = :admin_id";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':admin_id', $adminId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding admin by ID: ' . $e->getMessage());
+            return false;
         }
     }
 

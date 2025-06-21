@@ -13,7 +13,7 @@ A modular PHP web application with a Python ML microservice. This project is str
 │   └── /views/             <-- Views: page templates and UI (PHP)
 │       ├── /components/    <-- Reusable PHP components (header, footer, nav, etc.)
 │       ├── /pages/         <-- Page-specific views (landing-page.php, etc.)
-└── /config/              <-- Configuration file (DB creds, API URLs), kept outside public
+└── /config/              <-- Configuration file (DB creds, API URLs), kept outside 
 │    └── sikap_db.php       <-- db connection 
 │     
 ├── /public/                <-- Public web root accessible to users
