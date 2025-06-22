@@ -1,3 +1,13 @@
+<?php
+// Debug session
+error_log("Dashboard.php - Current session: " . print_r($_SESSION, true));
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    error_log("Access denied in dashboard.php");
+    header('Location: ?page=admin-login');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

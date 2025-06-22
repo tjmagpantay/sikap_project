@@ -19,14 +19,25 @@ class AdminController {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
 
+            // Debug logging
+            error_log("Login attempt - Email: " . $email);
+
             if (empty($email) || empty($password)) {
                 $error = 'Please fill in all fields.';
             } else {
                 $admin = $this->adminModel->authenticate($email, $password);
+                
+                // Debug logging
+                error_log("Authentication result: " . print_r($admin, true));
+                
                 if ($admin) {
-                    $_SESSION['user_id'] = $admin['admin_id'];
-                    $_SESSION['role'] = User::ROLE_ADMIN;
-                    $_SESSION['admin_name'] = $admin['full_name'];
+                    $_SESSION['user_id'] = $admin['user_id'];
+                    $_SESSION['admin_id'] = $admin['admin_id'];
+                    $_SESSION['role'] = 'admin'; // Hardcode this instead of using $admin['role_name']
+                    $_SESSION['admin_name'] = $admin['admin_name'];
+                    
+                    // Debug logging
+                    error_log("Session variables set: " . print_r($_SESSION, true));
                     
                     header('Location: ?page=admin-dashboard');
                     exit;
@@ -36,11 +47,16 @@ class AdminController {
             }
         }
 
-        include __DIR__ . '/../views/admin/login.php';
-    }
+        include __DIR__ . '/../views/admin/login-admin.php';
+}
 
     public function dashboard() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_ADMIN) {
+        // Debug logging
+        error_log("Dashboard access - Session: " . print_r($_SESSION, true));
+
+        // Changed from User::ROLE_ADMIN to 'admin'
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            error_log("Access denied - redirecting to login");
             header('Location: ?page=admin-login');
             exit;
         }

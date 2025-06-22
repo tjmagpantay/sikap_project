@@ -18,9 +18,16 @@ class Admin {
 
     public function authenticate($email, $password) {
         try {
-            $sql = "SELECT admin_id, email, password, full_name 
-                    FROM admins 
-                    WHERE email = :email";
+            $sql = "SELECT u.user_id, u.email, u.password, u.status, 
+                          a.admin_id, a.admin_name,
+                          r.role_name
+                   FROM users u
+                   JOIN user_roles ur ON u.user_id = ur.user_id
+                   JOIN roles r ON ur.role_id = r.role_id
+                   JOIN admin a ON u.user_id = a.user_id
+                   WHERE u.email = :email 
+                   AND r.role_name = 'admin'
+                   AND u.status = 'active'";
             
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':email', $email);
@@ -29,6 +36,8 @@ class Admin {
             $admin = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($admin && password_verify($password, $admin['password'])) {
+                // Don't return password
+                unset($admin['password']);
                 return $admin;
             }
             
@@ -41,9 +50,15 @@ class Admin {
 
     public function findById($adminId) {
         try {
-            $sql = "SELECT admin_id, email, full_name, created_at 
-                    FROM admins 
-                    WHERE admin_id = :admin_id";
+            $sql = "SELECT u.user_id, u.email, u.status,
+                          a.admin_id, a.admin_name, a.createdAt,
+                          r.role_name
+                   FROM admin a
+                   JOIN users u ON a.user_id = u.user_id
+                   JOIN user_roles ur ON u.user_id = ur.user_id
+                   JOIN roles r ON ur.role_id = r.role_id
+                   WHERE a.admin_id = :admin_id
+                   AND r.role_name = 'admin'";
             
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':admin_id', $adminId, PDO::PARAM_INT);

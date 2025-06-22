@@ -15,15 +15,13 @@
 <!-- Search Bar -->
 <div class="px-6 py-3 border-b border-gray-200">
     <div class="relative">
-        <i class="absolute text-base text-gray-400 -translate-y-1/2 pointer-events-none fas fa-search left-3 top-1/2"></i>
-        <span class=""><input 
+        <!-- <i class="absolute text-base text-gray-400 -translate-y-1/2 pointer-events-none fas fa-search left-3 top-1/2"></i> -->
+        <input 
             type="text" 
             placeholder="Search"
-            class="w-full py-2 pl-10 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
+            class="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
             id="sidebar-search"
-            onkeyup="filterNavigation()"
-        ></span>
-        
+            onkeyup="filterNavigation()">
     </div>
 </div>
     
@@ -138,14 +136,14 @@
         <nav class="flex-1 px-4 py-6 overflow-y-auto">
             <ul class="space-y-1">
                 <li>
-                    <a href="?page=admin-dashboard" class="flex items-center px-4 py-2 text-sm font-medium <?php echo (!isset($_GET['page']) || $_GET['page'] === 'admin-dashboard') ? 'text-secondary bg-orange-50' : 'text-gray-600 hover:bg-gray-50'; ?> rounded-lg transition-colors">
+                    <a href="?page=admin-dashboard" class="flex items-center px-4 py-2 text-sm FONT-NORMAL <?php echo (!isset($_GET['page']) || $_GET['page'] === 'admin-dashboard') ? 'text-secondary bg-orange-50' : 'text-gray-600 hover:bg-gray-50'; ?> rounded-lg transition-colors">
                         <i class="w-5 h-5 mr-3 fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-users" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-users" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-users"></i>
                         <span>User Management</span>
                         <i class="ml-auto text-xs fas fa-chevron-down"></i>
@@ -153,7 +151,7 @@
                 </li>
                 
                 <li>
-                    <a href="?page=admin-jobs" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-jobs" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-briefcase"></i>
                         <span>Job Management</span>
                         <i class="ml-auto text-xs fas fa-chevron-down"></i>
@@ -161,42 +159,42 @@
                 </li>
                 
                 <li>
-                    <a href="?page=admin-accreditations" class="flex items-center px-4 py-2 text-sm font-medium <?php echo (isset($_GET['page']) && $_GET['page'] === 'admin-accreditations') ? 'text-secondary bg-orange-50' : 'text-gray-600 hover:bg-gray-50'; ?> rounded-lg transition-colors">
+                    <a href="?page=admin-accreditations" class="flex items-center px-4 py-2 text-sm FONT-NORMAL <?php echo (isset($_GET['page']) && $_GET['page'] === 'admin-accreditations') ? 'text-secondary bg-orange-50' : 'text-gray-600 hover:bg-gray-50'; ?> rounded-lg transition-colors">
                         <i class="w-5 h-5 mr-3 fas fa-certificate"></i>
                         <span>Accreditation</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-reports" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-reports" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-chart-bar"></i>
                         <span>All Reports</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-applications" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-applications" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-file-alt"></i>
                         <span>Applications</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-announcements" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-announcements" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-bullhorn"></i>
                         <span>Announcements & Notices</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-chatbot" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-chatbot" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-robot"></i>
                         <span>Chatbot / FAQ Manager</span>
                     </a>
                 </li>
                 
                 <li>
-                    <a href="?page=admin-events" class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <a href="?page=admin-events" class="flex items-center px-4 py-2 text-sm text-gray-600 transition-colors rounded-lg FONT-NORMAL hover:bg-gray-50">
                         <i class="w-5 h-5 mr-3 fas fa-calendar-alt"></i>
                         <span>Job Fair / Event Management</span>
                     </a>
