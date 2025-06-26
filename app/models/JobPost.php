@@ -593,6 +593,8 @@ class JobPost
             // Add application check if jobseeker_id is provided
             if ($jobseeker_id) {
                 $sql .= ", CASE WHEN ja.application_id IS NOT NULL THEN 1 ELSE 0 END as has_applied";
+            } else {
+                $sql .= ", 0 as has_applied";
             }
         
             $sql .= " FROM job_post jp
@@ -617,16 +619,7 @@ class JobPost
             }
         
             $stmt->execute($params);
-            $job = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-            // Debug: Log the result
-            if ($job) {
-                error_log('DEBUG: getJobForJobseeker found job ID: ' . $job['job_id'] . ', Title: ' . $job['job_title']);
-            } else {
-                error_log('DEBUG: getJobForJobseeker - No job found for ID: ' . $job_id);
-            }
-        
-            return $job;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         
         } catch (PDOException $e) {
             error_log('Error getting job for jobseeker: ' . $e->getMessage());

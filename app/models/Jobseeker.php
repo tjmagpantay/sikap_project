@@ -82,13 +82,36 @@ class Jobseeker
         }
     }
 
-    public function saveDocument($jobseeker_id, $data)
+    public function saveDocument($jobseeker_id, $file_path, $file_type, $file_name)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO jobseeker_documents (jobseeker_id, file_name, file_path, file_type, uploaded_at) 
-            VALUES (?, ?, ?, ?, NOW())
-        ");
-        return $stmt->execute([$jobseeker_id, $data['file_name'], $data['file_path'], $data['file_type']]);
+        try {
+            $sql = "INSERT INTO jobseeker_documents (jobseeker_id, file_name, file_path, file_type) 
+                    VALUES (:jobseeker_id, :file_name, :file_path, :file_type)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'jobseeker_id' => $jobseeker_id,
+                'file_name' => $file_name,
+                'file_path' => $file_path,
+                'file_type' => $file_type
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error saving document to profile: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findDocumentByPath($jobseeker_id, $file_path)
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents 
+                    WHERE jobseeker_id = :jobseeker_id AND file_path = :file_path";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_path' => $file_path]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding document by path: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function saveEducation($jobseeker_id, $data)

@@ -1,4 +1,4 @@
-<div id="sidebar" class="flex flex-col transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 w-68 lg:translate-x-0 lg:static lg:transform-none">
+<div id="sidebar" class="sticky bottom-0 flex-col h-screen transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 top-0flex w-68 lg:translate-x-0 lg:static lg:transform-none">
     <!-- Logo Section -->
     <div class="flex items-center flex-shrink-0 px-6 py-6 border-b border-gray-200">
         <div class="flex items-center">

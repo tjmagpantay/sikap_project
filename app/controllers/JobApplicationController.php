@@ -10,26 +10,12 @@ class JobApplicationController
     private $jobApplicationModel;
     private $jobPostModel;
     private $jobseekerModel;
-    private $db;
 
     public function __construct()
     {
         $this->jobApplicationModel = new JobApplication();
         $this->jobPostModel = new JobPost();
         $this->jobseekerModel = new Jobseeker();
-        
-        // Initialize database connection
-        $config = require __DIR__ . '/../../config/sikap_db.php';
-        try {
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
-        }
     }
 
     // Main entry point for job application
@@ -207,8 +193,6 @@ class JobApplicationController
     private function handleStep1($job, $jobseeker, $application_id = null)
     {
         try {
-            $this->db->beginTransaction();
-
             // If no application exists, create one
             if (!$application_id) {
                 $applicationData = [
@@ -298,13 +282,10 @@ class JobApplicationController
             // Update step
             $this->jobApplicationModel->updateApplication($application_id, ['current_step' => 2]);
 
-            $this->db->commit();
-
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=2&application_id=' . $application_id . '&success=' . urlencode('Step 1 completed successfully!'));
             exit;
 
         } catch (Exception $e) {
-            $this->db->rollBack();
             error_log('Error in handleStep1: ' . $e->getMessage());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode($e->getMessage()));
             exit;
@@ -496,55 +477,6 @@ class JobApplicationController
         }
     }
 
-    // Helper method to save document to profile
-    private function saveToProfile($jobseeker_id, $file_path, $file_type, $file_name)
-    {
-        try {
-            $sql = "INSERT INTO jobseeker_documents (jobseeker_id, file_name, file_path, file_type) 
-                    VALUES (:jobseeker_id, :file_name, :file_path, :file_type)";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'jobseeker_id' => $jobseeker_id,
-                'file_name' => $file_name,
-                'file_path' => $file_path,
-                'file_type' => $file_type
-            ]);
-        } catch (PDOException $e) {
-            error_log('Error saving to profile: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Helper method to find existing profile document
-    private function findExistingProfileDocument($jobseeker_id, $file_path)
-    {
-        try {
-            $sql = "SELECT * FROM jobseeker_documents 
-                    WHERE jobseeker_id = :jobseeker_id AND file_path = :file_path";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_path' => $file_path]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error finding existing document: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Helper method to find profile document by path
-    private function findProfileDocumentByPath($jobseeker_id, $file_path)
-    {
-        try {
-            $sql = "SELECT * FROM jobseeker_documents 
-                    WHERE jobseeker_id = :jobseeker_id AND file_path = :file_path";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_path' => $file_path]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error finding profile document: ' . $e->getMessage());
-            return false;
-        }
-    }
-
     // Update the browseJobs method:
     public function browseJobs()
     {
@@ -565,83 +497,52 @@ class JobApplicationController
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
 
-    public function viewJob()
+    // public function viewJob()
+    // {
+    //     $job_id = $_GET['job_id'] ?? null;
+    //     if (!$job_id) {
+    //         header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+    //         exit;
+    //     }
+
+    //     // Get jobseeker info to check application status
+    //     $jobseeker = null;
+    //     $jobseeker_id = null;
+    //     $hasApplied = false;
+        
+    //     if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+    //         require_once __DIR__ . '/../models/Jobseeker.php';
+    //         $jobseekerModel = new Jobseeker();
+    //         $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+    //         $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
+    //     }
+
+    //     // Get job details with application status using the new method
+    //     $job = $this->getJobForJobseeker($job_id, $jobseeker_id);
+        
+    //     if (!$job) {
+    //         header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+    //         exit;
+    //     }
+
+    //     // Set hasApplied for backward compatibility
+    //     $hasApplied = isset($job['has_applied']) ? $job['has_applied'] : false;
+
+    //     include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
+    // }
+
+    // Update methods that use direct database calls:
+    
+    private function saveToProfile($jobseeker_id, $file_path, $file_type, $file_name)
     {
-        $job_id = $_GET['job_id'] ?? null;
-        if (!$job_id) {
-            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-            exit;
-        }
-
-        // Get jobseeker info to check application status
-        $jobseeker = null;
-        $jobseeker_id = null;
-        $hasApplied = false;
-        
-        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-            require_once __DIR__ . '/../models/Jobseeker.php';
-            $jobseekerModel = new Jobseeker();
-            $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-            $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
-        }
-
-        // Get job details with application status using the new method
-        $job = $this->getJobForJobseeker($job_id, $jobseeker_id);
-        
-        if (!$job) {
-            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-            exit;
-        }
-
-        // Set hasApplied for backward compatibility
-        $hasApplied = isset($job['has_applied']) ? $job['has_applied'] : false;
-
-        include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
+        // Move this to Jobseeker model
+        return $this->jobseekerModel->saveDocument($jobseeker_id, $file_path, $file_type, $file_name);
     }
 
-    // Add this helper method to JobApplicationController
-    private function getJobForJobseeker($job_id, $jobseeker_id = null) {
-        try {
-            $sql = "SELECT jp.*, jc.category_name,
-                           e.first_name as employer_first_name, 
-                           e.last_name as employer_last_name,
-                           eb.business_name as company_name";
-            
-            // Add application check if jobseeker_id is provided
-            if ($jobseeker_id) {
-                $sql .= ", CASE WHEN ja.application_id IS NOT NULL THEN 1 ELSE 0 END as has_applied";
-            } else {
-                $sql .= ", 0 as has_applied";
-            }
-            
-            $sql .= " FROM job_post jp
-                      LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                      LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                      LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id";
-            
-            // Add application check JOIN if jobseeker_id is provided
-            if ($jobseeker_id) {
-                $sql .= " LEFT JOIN job_application ja ON jp.job_id = ja.job_id 
-                          AND ja.jobseeker_id = :jobseeker_id 
-                          AND ja.is_finalized = 1";
-            }
-            
-            $sql .= " WHERE jp.job_id = :job_id";
-            
-            $stmt = $this->db->prepare($sql);
-            $params = ['job_id' => $job_id];
-            
-            if ($jobseeker_id) {
-                $params['jobseeker_id'] = $jobseeker_id;
-            }
-            
-            $stmt->execute($params);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-            
-        } catch (PDOException $e) {
-            error_log('Error getting job for jobseeker: ' . $e->getMessage());
-            return false;
-        }
+    private function findProfileDocumentByPath($jobseeker_id, $file_path)
+    {
+        // Move this to Jobseeker model
+        return $this->jobseekerModel->findDocumentByPath($jobseeker_id, $file_path);
     }
 
     // Keep existing methods for viewing applications, success page, etc.

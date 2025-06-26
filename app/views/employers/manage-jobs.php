@@ -21,13 +21,13 @@ include_once __DIR__ . '/navbar-employer.php';
     </div>
 
     <!-- Messages -->
-    <?php if ($error): ?>
+    <?php if (!empty($error)): ?>
         <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
             <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
 
-    <?php if ($success): ?>
+    <?php if (!empty($success)): ?>
         <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
             <?php echo htmlspecialchars($success); ?>
         </div>
