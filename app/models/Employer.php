@@ -296,7 +296,7 @@ class Employer {
     public function createProfile($data)
     {
         try {
-            $sql = "INSERT INTO employers (user_id, first_name, middle_name, last_name, position, contact_no, company_name, about_us, created_at) 
+            $sql = "INSERT INTO employer (user_id, first_name, middle_name, last_name, position, contact_no, company_name, about_us, created_at) 
                     VALUES (:user_id, :first_name, :middle_name, :last_name, :position, :contact_no, :company_name, :about_us, NOW())";
             
             $stmt = $this->db->prepare($sql);

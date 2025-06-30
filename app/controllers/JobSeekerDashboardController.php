@@ -32,47 +32,27 @@ class JobSeekerDashboardController
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $hasProfile = !empty($jobseeker['first_name']) && !empty($jobseeker['last_name']);
 
-        // Get recent jobs - using the same method as JobseekerController
+        // Get ALL active jobs using the same method as browse-jobs
         try {
-            $jobs = $this->jobPostModel->getOpenJobs();
+            $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
             
-            // Debug: Log the raw jobs data
-            error_log('DEBUG Dashboard: Total jobs from DB: ' . count($jobs));
+            // Use getAllActiveJobs instead of getOpenJobs (same as browse-jobs)
+            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
             
-            // Remove duplicates if any (based on job_id)
-            $uniqueJobs = [];
+            // Debug: Log the jobs data
+            error_log('=== DASHBOARD DEBUG ===');
+            error_log('Dashboard jobs from getAllActiveJobs: ' . count($jobs));
             foreach ($jobs as $job) {
-                if (!isset($uniqueJobs[$job['job_id']])) {
-                    $uniqueJobs[$job['job_id']] = $job;
-                }
+                error_log("Job ID: {$job['job_id']}, Title: {$job['job_title']}");
             }
-            $jobs = array_values($uniqueJobs);
+            error_log('=== END DASHBOARD DEBUG ===');
             
-            // Limit to recent 6 jobs for dashboard
-            $jobs = array_slice($jobs, 0, 6);
-            
-            error_log('DEBUG Dashboard: Jobs after deduplication and limit: ' . count($jobs));
-            
-            // If profile exists, check application status for each job
-            if ($hasProfile && !empty($jobs)) {
-                foreach ($jobs as &$job) {
-                    try {
-                        $job['has_applied'] = $this->jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
-                    } catch (Exception $e) {
-                        error_log('Error checking application status: ' . $e->getMessage());
-                        $job['has_applied'] = false;
-                    }
-                }
-            } else {
-                // Set has_applied to false for all jobs if no profile
-                foreach ($jobs as &$job) {
-                    $job['has_applied'] = false;
-                }
-            }
+            // No need for manual deduplication since getAllActiveJobs handles it
+            // No need to manually check has_applied since getAllActiveJobs sets it
             
         } catch (Exception $e) {
             error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
-            $jobs = []; // Fallback to empty array
+            $jobs = [];
         }
 
         // Get application statistics if profile exists

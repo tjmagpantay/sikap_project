@@ -5,10 +5,20 @@
 <div class="w-full p-4 bg-white shadow md:w-1/4 rounded-xl">
     <div class="flex flex-col items-center">
         <div class="relative">
-            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode(($jobseeker['first_name'] ?? '') . '+' . ($jobseeker['last_name'] ?? '')); ?>&background=10b981&color=fff&size=96"
-                 class="w-24 h-24 rounded-full" alt="Profile">
+            <img src="<?php 
+                // Priority: Profile picture > Default avatar
+                if (!empty($jobseeker['profile_picture'])) {
+                    echo htmlspecialchars($jobseeker['profile_picture']);
+                } else {
+                    // Default avatar with user's name
+                    $fullName = trim(($jobseeker['first_name'] ?? '') . '+' . ($jobseeker['last_name'] ?? ''));
+                    echo 'https://ui-avatars.com/api/?name=' . urlencode($fullName) . '&background=10b981&color=fff&size=96';
+                }
+            ?>"
+                 class="object-cover w-16 h-16 border-2 " alt="Profile">
             <button class="absolute bottom-0 right-0 flex items-center justify-center w-6 h-6 text-white transition-colors bg-green-600 rounded-full hover:bg-green-700"
-                    onclick="document.getElementById('profile-photo-input').click()">
+                    onclick="document.getElementById('profile-photo-input').click()"
+                    title="Change profile photo">
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
                 </svg>
@@ -49,7 +59,7 @@
         <!-- Temporary placeholder until job application system is built -->
         <div class="p-4 text-center border rounded bg-gray-50">
             <i class="mb-2 text-2xl text-gray-300 fas fa-briefcase"></i>
-            <p class="text-xs text-gray-500 mb-2">Job application system coming soon!</p>
+            <p class="mb-2 text-xs text-gray-500">Job application system coming soon!</p>
             <p class="text-xs text-gray-400">Focus on completing your profile for now.</p>
         </div>
     </div>
@@ -108,6 +118,7 @@ function handleProfilePhotoUpload(input) {
         .then(response => response.json())
         .then((data) => {
             if (data.success) {
+                // Update the profile image with cache busting
                 const profileImg = document.querySelector('img[alt="Profile"]');
                 profileImg.src = data.image_url + '?t=' + new Date().getTime();
                 showNotification('Profile photo updated successfully!', 'success');

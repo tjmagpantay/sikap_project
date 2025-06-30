@@ -244,6 +244,7 @@ class EmployerController
             $error = 'Invalid form submission.';
             return;
         }
+        
         $required = ['business_name', 'business_desc'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -257,17 +258,112 @@ class EmployerController
             'business_desc' => $data['business_desc']
         ];
 
+        // Handle business logo upload
+        if (isset($_FILES['business_logo']) && $_FILES['business_logo']['error'] === UPLOAD_ERR_OK) {
+            $logoPath = $this->handleLogoUpload($_FILES['business_logo'], $error);
+            if ($logoPath) {
+                $businessData['business_logo'] = $logoPath;
+            } else {
+                // If there was an error uploading logo, return early
+                return;
+            }
+        }
+
         // Handle banner image upload
         if (isset($_FILES['banner_image']) && $_FILES['banner_image']['error'] === UPLOAD_ERR_OK) {
             $bannerPath = $this->handleBannerUpload($_FILES['banner_image'], $error);
             if ($bannerPath) {
                 $businessData['banner_image'] = $bannerPath;
+            } else {
+                // If there was an error uploading banner, return early
+                return;
             }
         }
 
-        $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
-        header('Location: ?page=complete-employer-business&step=2');
-        exit;
+        $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
+        
+        if ($result) {
+            header('Location: ?page=complete-employer-business&step=2&success=' . urlencode('Business information saved successfully!'));
+            exit;
+        } else {
+            $error = 'Failed to save business information. Please try again.';
+        }
+    }
+
+    private function handleLogoUpload($file, &$error)
+    {
+        try {
+            // Validate file
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $maxSize = 2 * 1024 * 1024; // 2MB for logos
+
+            $fileInfo = pathinfo($file['name']);
+            $extension = strtolower($fileInfo['extension'] ?? '');
+
+            if (!in_array($extension, $allowedTypes)) {
+                $error = 'Invalid logo type. Allowed: ' . implode(', ', $allowedTypes);
+                return false;
+            }
+
+            if ($file['size'] > $maxSize) {
+                $error = 'Logo too large. Maximum size: 2MB';
+                return false;
+            }
+
+            // Validate that it's actually an image
+            $imageInfo = getimagesize($file['tmp_name']);
+            if ($imageInfo === false) {
+                $error = 'Invalid logo image file';
+                return false;
+            }
+
+            // Get employer info to check for existing logo
+            $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+            if (!$employer) {
+                $error = 'Employer not found';
+                return false;
+            }
+
+            // Check for existing logo and delete old file
+            $business = $this->employerModel->getBusiness($employer['employer_id']);
+            if (!empty($business['business_logo'])) {
+                $oldLogoPath = __DIR__ . '/../../public/' . $business['business_logo'];
+                if (file_exists($oldLogoPath)) {
+                    unlink($oldLogoPath);
+                    error_log("DEBUG: Deleted old logo: $oldLogoPath");
+                }
+            }
+
+            // Create upload directory if it doesn't exist (public/uploads/profile_pictures as requested)
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    $error = 'Failed to create upload directory';
+                    return false;
+                }
+            }
+
+            // Generate unique filename
+            $filename = 'business_logo_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+            $filePath = $uploadDir . $filename;
+
+            error_log("DEBUG: Attempting to upload logo to: $filePath");
+
+            // Move uploaded file
+            if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                error_log("DEBUG: Logo uploaded successfully");
+                // Return relative path for database storage
+                return 'uploads/profile_pictures/' . $filename;
+            } else {
+                $error = 'Failed to move uploaded logo file';
+                error_log("DEBUG: Failed to move logo file from " . $file['tmp_name'] . " to " . $filePath);
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log('Error in handleLogoUpload: ' . $e->getMessage());
+            $error = 'Logo upload processing error: ' . $e->getMessage();
+            return false;
+        }
     }
 
     private function handleBusinessStep2($employer_id, $data, &$error, &$success)
@@ -537,30 +633,47 @@ private function handleDocumentUpload($file, $type, &$error)
         try {
             // Validate file
             $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            $maxSize = 2 * 1024 * 1024; // 2MB for images
+            $maxSize = 5 * 1024 * 1024; // 5MB for banners
 
             $fileInfo = pathinfo($file['name']);
             $extension = strtolower($fileInfo['extension'] ?? '');
 
             if (!in_array($extension, $allowedTypes)) {
-                $error = 'Invalid image type. Allowed: ' . implode(', ', $allowedTypes);
+                $error = 'Invalid banner image type. Allowed: ' . implode(', ', $allowedTypes);
                 return false;
             }
 
             if ($file['size'] > $maxSize) {
-                $error = 'Image too large. Maximum size: 2MB';
+                $error = 'Banner image too large. Maximum size: 5MB';
                 return false;
             }
 
             // Validate that it's actually an image
             $imageInfo = getimagesize($file['tmp_name']);
             if ($imageInfo === false) {
-                $error = 'Invalid image file';
+                $error = 'Invalid banner image file';
                 return false;
             }
 
-            // Create upload directory if it doesn't exist
-            $uploadDir = __DIR__ . '/../../public/uploads/banners/';
+            // Get employer info to check for existing banner
+            $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+            if (!$employer) {
+                $error = 'Employer not found';
+                return false;
+            }
+
+            // Check for existing banner and delete old file
+            $business = $this->employerModel->getBusiness($employer['employer_id']);
+            if (!empty($business['banner_image'])) {
+                $oldBannerPath = __DIR__ . '/../../public/' . $business['banner_image'];
+                if (file_exists($oldBannerPath)) {
+                    unlink($oldBannerPath);
+                    error_log("DEBUG: Deleted old banner: $oldBannerPath");
+                }
+            }
+
+            // Create upload directory if it doesn't exist (use same directory as requested)
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
             if (!is_dir($uploadDir)) {
                 if (!mkdir($uploadDir, 0755, true)) {
                     $error = 'Failed to create upload directory';
@@ -569,20 +682,24 @@ private function handleDocumentUpload($file, $type, &$error)
             }
 
             // Generate unique filename
-            $filename = 'banner_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+            $filename = 'business_banner_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
+
+            error_log("DEBUG: Attempting to upload banner to: $filePath");
 
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                error_log("DEBUG: Banner uploaded successfully");
                 // Return relative path for database storage
-                return 'uploads/banners/' . $filename;
+                return 'uploads/profile_pictures/' . $filename;
             } else {
-                $error = 'Failed to move uploaded file';
+                $error = 'Failed to move uploaded banner file';
+                error_log("DEBUG: Failed to move banner file from " . $file['tmp_name'] . " to " . $filePath);
                 return false;
             }
         } catch (Exception $e) {
             error_log('Error in handleBannerUpload: ' . $e->getMessage());
-            $error = 'Upload processing error: ' . $e->getMessage();
+            $error = 'Banner upload processing error: ' . $e->getMessage();
             return false;
         }
     }
@@ -799,5 +916,91 @@ private function handleDocumentUpload($file, $type, &$error)
             $error = "An error occurred while completing your profile.";
             return false;
         }
+    }
+
+    public function uploadBusinessLogo()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if (!isset($_FILES['business_logo']) || $_FILES['business_logo']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
+            exit;
+        }
+
+        $file = $_FILES['business_logo'];
+
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed.']);
+            exit;
+        }
+
+        // Validate file size (2MB max for logos)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'File size must be less than 2MB.']);
+            exit;
+        }
+
+        // Validate that it's actually an image
+        $imageInfo = getimagesize($file['tmp_name']);
+        if ($imageInfo === false) {
+            echo json_encode(['success' => false, 'message' => 'Invalid image file']);
+            exit;
+        }
+
+        // Get employer info
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            echo json_encode(['success' => false, 'message' => 'Employer not found']);
+            exit;
+        }
+
+        // Check for existing logo and delete old file
+        $business = $this->employerModel->getBusiness($employer['employer_id']);
+        if (!empty($business['business_logo'])) {
+            $oldLogoPath = __DIR__ . '/../../public/' . $business['business_logo'];
+            if (file_exists($oldLogoPath)) {
+                unlink($oldLogoPath);
+            }
+        }
+
+        // Create upload directory if it doesn't exist
+        $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'business_logo_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+        $filepath = $uploadDir . $filename;
+
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            // Update database
+            $relativePath = 'uploads/profile_pictures/' . $filename;
+            $result = $this->employerModel->createOrUpdateBusiness($employer['employer_id'], [
+                'business_logo' => $relativePath
+            ]);
+
+            if ($result) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Business logo updated successfully',
+                    'image_url' => $relativePath
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to update database']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
+        }
+        exit;
     }
 }

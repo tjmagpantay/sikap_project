@@ -350,14 +350,20 @@ class Jobseeker
         return $stmt->execute([$photo_path, $user_id]);
     }
 
-    public function updateProfilePicture($user_id, $profilePicturePath) {
+    public function updateProfilePicture($user_id, $profile_picture_path)
+    {
         try {
-            $sql = "UPDATE jobseeker SET profile_picture = :profile_picture, updated_at = NOW() WHERE user_id = :user_id";
+            $sql = "UPDATE jobseeker SET profile_picture = ?, updated_at = NOW() WHERE user_id = ?";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'profile_picture' => $profilePicturePath,
-                'user_id' => $user_id
-            ]);
+            $result = $stmt->execute([$profile_picture_path, $user_id]);
+            
+            if ($result) {
+                error_log("DEBUG: Profile picture updated in database for user_id: $user_id, path: $profile_picture_path");
+            } else {
+                error_log("DEBUG: Failed to update profile picture in database for user_id: $user_id");
+            }
+            
+            return $result;
         } catch (PDOException $e) {
             error_log('Error updating profile picture: ' . $e->getMessage());
             return false;

@@ -99,50 +99,28 @@ class JobseekerController
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $hasProfile = $jobseeker !== null;
 
-        // Get recent job listings for the dashboard (limit to 6 jobs)
+        // Get recent job listings for the dashboard
         try {
-            $jobs = $this->jobPostModel->getOpenJobs();
+            // Use getAllActiveJobs instead of getOpenJobs for consistency
+            $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
+            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
             
-            // Debug: Log the raw jobs data
-            error_log('DEBUG Dashboard: Total jobs from DB: ' . count($jobs));
-            
-            // Remove duplicates if any (based on job_id)
-            $uniqueJobs = [];
+            error_log('=== DASHBOARD DEBUG ===');
+            error_log('Jobs from getAllActiveJobs: ' . count($jobs));
             foreach ($jobs as $job) {
-                if (!isset($uniqueJobs[$job['job_id']])) {
-                    $uniqueJobs[$job['job_id']] = $job;
-                }
+                error_log("Job ID: {$job['job_id']}, Title: {$job['job_title']}");
             }
-            $jobs = array_values($uniqueJobs);
+            error_log('=== END DASHBOARD DEBUG ===');
             
             // Limit to recent 6 jobs for dashboard
             $jobs = array_slice($jobs, 0, 6);
             
-            error_log('DEBUG Dashboard: Jobs after deduplication and limit: ' . count($jobs));
-            
-            // If profile exists, check application status for each job
-            if ($hasProfile && !empty($jobs)) {
-                require_once __DIR__ . '/../models/JobApplication.php';
-                $jobApplicationModel = new JobApplication();
-                
-                foreach ($jobs as &$job) {
-                    try {
-                        $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
-                    } catch (Exception $e) {
-                        error_log('Error checking application status: ' . $e->getMessage());
-                        $job['has_applied'] = false;
-                    }
-                }
-            } else {
-                // Set has_applied to false for all jobs if no profile
-                foreach ($jobs as &$job) {
-                    $job['has_applied'] = false;
-                }
-            }
+            // The has_applied field is already set by getAllActiveJobs method
+            // No need to check again if jobseeker_id was provided
             
         } catch (Exception $e) {
             error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
-            $jobs = []; // Fallback to empty array
+            $jobs = [];
         }
 
         // Get application statistics if profile exists
@@ -454,11 +432,12 @@ class JobseekerController
         $filePath = $uploadDir . $fileName;
 
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
-            $this->jobseekerModel->saveDocument($jobseeker_id, [
-                'file_name' => $file['name'],
-                'file_path' => 'uploads/documents/' . $fileName,
-                'file_type' => $type
-            ]);
+            $this->jobseekerModel->saveDocument(
+                $jobseeker_id,
+                $file['name'],
+                'uploads/documents/' . $fileName,
+                $type
+            );
             $success = ucfirst($type) . ' uploaded successfully!';
             return true;
         } else {
@@ -501,183 +480,92 @@ class JobseekerController
 
     public function uploadProfilePhoto()
     {
-        error_log("=== UPLOAD PROFILE PHOTO DEBUG START ===");
-        error_log("POST: " . print_r($_POST, true));
-        error_log("FILES: " . print_r($_FILES, true));
-        error_log("SESSION: " . print_r($_SESSION, true));
-        
         header('Content-Type: application/json');
 
-        // Check session
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            error_log("ERROR: Unauthorized - user_id: " . ($_SESSION['user_id'] ?? 'not set') . ", role: " . ($_SESSION['role'] ?? 'not set'));
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
-        error_log("✓ Session check passed");
 
-        // Check file upload
-        if (!isset($_FILES['profile_picture'])) {
-            error_log("ERROR: No profile_picture in FILES array");
-            echo json_encode(['success' => false, 'message' => 'No file uploaded - profile_picture field missing']);
+        if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
             exit;
         }
 
-        if ($_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
-            $errorMessages = [
-                UPLOAD_ERR_INI_SIZE => 'File too large (exceeds upload_max_filesize)',
-                UPLOAD_ERR_FORM_SIZE => 'File too large (exceeds MAX_FILE_SIZE)',
-                UPLOAD_ERR_PARTIAL => 'File only partially uploaded',
-                UPLOAD_ERR_NO_FILE => 'No file uploaded',
-                UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-                UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
-            ];
-            $errorMsg = $errorMessages[$_FILES['profile_picture']['error']] ?? 'Unknown upload error';
-            error_log("ERROR: Upload error - " . $_FILES['profile_picture']['error'] . ": " . $errorMsg);
-            echo json_encode(['success' => false, 'message' => $errorMsg]);
-            exit;
-        }
-        error_log("✓ File upload check passed");
-
-        $file = $_FILES['profile_picture'];
-        error_log("File details: name={$file['name']}, type={$file['type']}, size={$file['size']}, tmp_name={$file['tmp_name']}");
+        $file = $_FILES['profile_photo'];
 
         // Validate file type
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!in_array($file['type'], $allowedTypes)) {
-            error_log("ERROR: Invalid file type: " . $file['type']);
-            echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, and GIF are allowed. Detected: ' . $file['type']]);
+            echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed.']);
             exit;
         }
-        error_log("✓ File type validation passed");
 
-        // Validate file size (5MB max)
-        $maxSize = 5 * 1024 * 1024; // 5MB
-        if ($file['size'] > $maxSize) {
-            error_log("ERROR: File too large: " . $file['size'] . " bytes");
-            echo json_encode(['success' => false, 'message' => 'File too large. Maximum size is 5MB. Your file: ' . round($file['size']/1024/1024, 2) . 'MB']);
+        // Validate file size (2MB max for profile photos)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'File size must be less than 2MB.']);
             exit;
         }
-        error_log("✓ File size validation passed");
 
-        // Check if uploaded file exists
-        if (!file_exists($file['tmp_name'])) {
-            error_log("ERROR: Temporary file doesn't exist: " . $file['tmp_name']);
-            echo json_encode(['success' => false, 'message' => 'Temporary file not found']);
+        // Validate that it's actually an image
+        $imageInfo = getimagesize($file['tmp_name']);
+        if ($imageInfo === false) {
+            echo json_encode(['success' => false, 'message' => 'Invalid image file']);
             exit;
         }
-        error_log("✓ Temporary file exists");
 
-        // Directory setup
+        // Get jobseeker info
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
+            exit;
+        }
+
+        // Check for existing profile picture and delete old file
+        if (!empty($jobseeker['profile_picture'])) {
+            $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
+            if (file_exists($oldPhotoPath)) {
+                unlink($oldPhotoPath);
+                error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
+            }
+        }
+
+        // Create upload directory if it doesn't exist
         $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
-        error_log("Upload directory: " . $uploadDir);
-        error_log("Upload directory exists: " . (file_exists($uploadDir) ? 'YES' : 'NO'));
-        
-        if (!file_exists($uploadDir)) {
-            error_log("Creating upload directory...");
+        if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {
-                error_log("ERROR: Failed to create upload directory");
                 echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
                 exit;
             }
-            error_log("✓ Upload directory created");
         }
 
-        // Check permissions
-        if (!is_writable($uploadDir)) {
-            error_log("ERROR: Upload directory not writable");
-            echo json_encode(['success' => false, 'message' => 'Upload directory not writable']);
-            exit;
-        }
-        error_log("✓ Upload directory is writable");
-
-        // Try to get and delete old profile picture
-        try {
-            error_log("Checking for old profile picture...");
-            $oldPicture = $this->jobseekerModel->getProfilePicture($_SESSION['user_id']);
-            error_log("Old picture from DB: " . ($oldPicture ?? 'null'));
-            
-            if ($oldPicture) {
-                $oldPath = __DIR__ . '/../../public/' . $oldPicture;
-                error_log("Old picture path: " . $oldPath);
-                if (file_exists($oldPath)) {
-                    if (unlink($oldPath)) {
-                        error_log("✓ Old picture deleted");
-                    } else {
-                        error_log("WARNING: Failed to delete old picture");
-                    }
-                } else {
-                    error_log("Old picture file doesn't exist");
-                }
-            } else {
-                error_log("No old picture to delete");
-            }
-        } catch (Exception $e) {
-            error_log("ERROR handling old picture: " . $e->getMessage());
-        }
-
-        // Generate filename and paths
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-        $uploadPath = $uploadDir . $filename;
-        $dbPath = 'uploads/profile_pictures/' . $filename;
+        $filepath = $uploadDir . $filename;
 
-        error_log("Generated filename: " . $filename);
-        error_log("Upload path: " . $uploadPath);
-        error_log("DB path: " . $dbPath);
+        error_log("DEBUG: Attempting to upload profile photo to: $filepath");
 
         // Move uploaded file
-        error_log("Attempting to move file from {$file['tmp_name']} to {$uploadPath}");
-        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-            error_log("✓ File moved successfully");
-            
-            // Verify file was actually created
-            if (!file_exists($uploadPath)) {
-                error_log("ERROR: File was moved but doesn't exist at destination");
-                echo json_encode(['success' => false, 'message' => 'File move reported success but file not found']);
-                exit;
-            }
-            
-            $fileSize = filesize($uploadPath);
-            error_log("✓ File verified at destination, size: " . $fileSize . " bytes");
-            
-            // Update database
-            error_log("Updating database with path: " . $dbPath);
-            try {
-                $success = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $dbPath);
-                error_log("Database update result: " . ($success ? 'SUCCESS' : 'FAILED'));
-                
-                if ($success) {
-                    error_log("✓ SUCCESS: Profile picture uploaded and database updated");
-                    echo json_encode([
-                        'success' => true, 
-                        'message' => 'Profile picture uploaded successfully',
-                        'image_url' => '/' . $dbPath,
-                        'debug' => [
-                            'filename' => $filename,
-                            'file_size' => $fileSize,
-                            'db_path' => $dbPath
-                        ]
-                    ]);
-                } else {
-                    error_log("ERROR: Database update failed - deleting uploaded file");
-                    unlink($uploadPath);
-                    echo json_encode(['success' => false, 'message' => 'Failed to update database']);
-                }
-            } catch (Exception $e) {
-                error_log("ERROR: Database exception: " . $e->getMessage());
-                unlink($uploadPath);
-                echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            // Update database with new profile picture path
+            $relativePath = 'uploads/profile_pictures/' . $filename;
+            $result = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $relativePath);
+
+            if ($result) {
+                error_log("DEBUG: Profile photo uploaded and database updated successfully");
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Profile photo updated successfully',
+                    'image_url' => $relativePath
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to update database']);
             }
         } else {
-            error_log("ERROR: Failed to move uploaded file");
-            $error = error_get_last();
-            error_log("Last error: " . print_r($error, true));
-            echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file to destination']);
+            error_log("DEBUG: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
+            echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
         }
-        
-        error_log("=== UPLOAD PROFILE PHOTO DEBUG END ===");
         exit;
     }
 }

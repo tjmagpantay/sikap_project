@@ -491,8 +491,16 @@ class JobApplicationController
             $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
         }
 
-        // Get all active jobs with application status
+        // Use the working method that gets all active jobs properly
         $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+        
+        // Debug: Check what we got
+        error_log('=== BROWSE JOBS DEBUG ===');
+        error_log('Jobs found: ' . count($jobs));
+        foreach ($jobs as $job) {
+            error_log("Job: ID={$job['job_id']}, Title={$job['job_title']}");
+        }
+        error_log('=== END BROWSE JOBS DEBUG ===');
 
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }

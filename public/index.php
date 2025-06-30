@@ -88,43 +88,43 @@
             $controller = new AdminController();
             $controller->dashboard();
             break;
-            
+
         // case 'admin-users':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->manageUsers();
         //     break;
-            
+
         // case 'admin-jobs':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->manageJobs();
         //     break;
-            
+
         // case 'admin-reports':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->reports();
         //     break;
-            
+
         // case 'admin-applications':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->manageApplications();
         //     break;
-            
+
         // case 'admin-announcements':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->manageAnnouncements();
         //     break;
-            
+
         // case 'admin-chatbot':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
         //     $controller->manageChatbot();
         //     break;
-            
+
         // case 'admin-events':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
@@ -274,17 +274,22 @@
             $controller = new AdminController();
             $controller->accreditations();
             break;
-            
+
         case 'admin-review-accreditation':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
             $controller->reviewAccreditation();
             break;
-            
+
         case 'admin-process-accreditation':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
             $controller->processAccreditation();
+            break;
+        case 'upload-business-logo':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->uploadBusinessLogo();
             break;
 
         default:

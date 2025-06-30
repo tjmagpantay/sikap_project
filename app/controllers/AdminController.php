@@ -65,20 +65,30 @@ class AdminController {
     }
 
     public function accreditations() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_ADMIN) {
+        // Change from User::ROLE_ADMIN to 'admin' to match your login method
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
             exit;
         }
 
-        // Get all accreditations
-        $pendingAccreditations = $this->employerModel->getPendingAccreditations();
-        $allAccreditations = $this->employerModel->getAllAccreditations();
+        // Use adminModel instead of employerModel for accreditation methods
+        $pendingAccreditations = $this->adminModel->getPendingAccreditations();
+        $allAccreditations = $this->adminModel->getAllAccreditations();
+
+        // Debug logging
+        error_log('=== ACCREDITATIONS DEBUG ===');
+        error_log('Pending accreditations count: ' . count($pendingAccreditations));
+        error_log('All accreditations count: ' . count($allAccreditations));
+        error_log('Pending data: ' . print_r($pendingAccreditations, true));
+        error_log('All data: ' . print_r($allAccreditations, true));
+        error_log('=== END DEBUG ===');
 
         include __DIR__ . '/../views/admin/accreditations.php';
     }
 
     public function reviewAccreditation() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_ADMIN) {
+        // Change from User::ROLE_ADMIN to 'admin'
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
             exit;
         }
@@ -89,21 +99,22 @@ class AdminController {
             exit;
         }
 
-        // Get accreditation details
-        $accreditation = $this->employerModel->getAccreditationById($accreditationId);
+        // Use adminModel for accreditation details
+        $accreditation = $this->adminModel->getAccreditationDetails($accreditationId);
         if (!$accreditation) {
             header('Location: ?page=admin-accreditations&error=' . urlencode('Accreditation not found'));
             exit;
         }
 
-        // Get employer's documents
+        // Get employer's documents using employerModel
         $documents = $this->employerModel->getDocuments($accreditation['employer_id']);
 
         include __DIR__ . '/../views/admin/review-accreditation.php';
     }
 
     public function processAccreditation() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_ADMIN) {
+        // Change from User::ROLE_ADMIN to 'admin'
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
             exit;
         }
@@ -122,11 +133,11 @@ class AdminController {
             exit;
         }
 
-        // Process the accreditation
-        $result = $this->employerModel->updateAccreditationStatus(
+        // Use adminModel for updating accreditation status
+        $result = $this->adminModel->updateAccreditationStatus(
             $accreditationId, 
             $status, 
-            $_SESSION['user_id'], 
+            $_SESSION['admin_id'], // Use admin_id instead of user_id
             $notes
         );
 

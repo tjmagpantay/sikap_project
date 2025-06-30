@@ -510,47 +510,32 @@ class JobPostController
 
     public function browseJobs()
     {
-        // Get all open jobs
-        $jobs = $this->jobPostModel->getOpenJobs();
-
-        // If user is logged in as jobseeker, check application status for each job
+        // Get jobseeker info to check application status
+        $jobseeker = null;
+        $jobseeker_id = null;
+        
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             try {
                 require_once __DIR__ . '/../models/JobApplication.php';
                 require_once __DIR__ . '/../models/Jobseeker.php';
 
-                $jobApplicationModel = new JobApplication();
                 $jobseekerModel = new Jobseeker();
                 $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-
-                if ($jobseeker && !empty($jobs)) {
-                    foreach ($jobs as &$job) {
-                        try {
-                            $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
-                        } catch (Exception $e) {
-                            error_log('Error checking application status for job ' . $job['job_id'] . ': ' . $e->getMessage());
-                            $job['has_applied'] = false;
-                        }
-                    }
-                } else {
-                    // Set has_applied to false for all jobs if no jobseeker profile
-                    foreach ($jobs as &$job) {
-                        $job['has_applied'] = false;
-                    }
-                }
+                $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
             } catch (Exception $e) {
-                error_log('Error in browseJobs application check: ' . $e->getMessage());
-                // Set has_applied to false for all jobs if error occurs
-                foreach ($jobs as &$job) {
-                    $job['has_applied'] = false;
-                }
-            }
-        } else {
-            // User not logged in or not a jobseeker - set has_applied to false
-            foreach ($jobs as &$job) {
-                $job['has_applied'] = false;
+                error_log('Error getting jobseeker info: ' . $e->getMessage());
             }
         }
+
+        // Use getAllActiveJobs instead of getOpenJobs for consistency
+        $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+        
+        error_log('=== BROWSE JOBS CONTROLLER DEBUG ===');
+        error_log('Browse jobs found: ' . count($jobs));
+        foreach ($jobs as $job) {
+            error_log("Job: ID={$job['job_id']}, Title={$job['job_title']}");
+        }
+        error_log('=== END BROWSE JOBS CONTROLLER DEBUG ===');
 
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }

@@ -226,9 +226,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Recent Job Listings Section -->
             <div class="mt-8">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-900">Recent Job Opportunities</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900">All Available Jobs</h2>
                     <a href="?page=browse-jobs" class="text-blue-600 hover:text-blue-800">
-                        View All Jobs <i class="ml-1 fas fa-arrow-right"></i>
+                        Browse Jobs <i class="ml-1 fas fa-arrow-right"></i>
                     </a>
                 </div>
 
@@ -299,5 +299,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         </div>
     </div>
 </div>
+
 
 </div>

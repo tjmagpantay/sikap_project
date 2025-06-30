@@ -16,7 +16,7 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                 Step 1/5
             </p>
             <p class="mt-2 text-sm text-center text-gray-500">
-                Basic business information and banner
+                Basic business information, banner and logo
             </p>
         </div>
     </div>
@@ -43,6 +43,45 @@ include_once __DIR__ . '/../navbar-employer.php';?>
             <?php endif; ?>
 
             <form class="space-y-6" method="POST" action="?page=complete-employer-business&step=1" enctype="multipart/form-data">
+                
+                <!-- Business Logo Upload -->
+                <div>
+                    <label for="business_logo" class="block text-sm font-medium text-gray-700">
+                        Business Logo
+                    </label>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Square logo works best. Recommended size: 200x200 pixels. Max file size 2 MB.
+                    </p>
+                    
+                    <?php if (!empty($business['business_logo'])): ?>
+                        <div class="mt-2 mb-4">
+                            <img src="<?php echo htmlspecialchars($business['business_logo']); ?>" 
+                                 alt="Current Logo" 
+                                 class="object-contain w-24 h-24 border border-gray-300 rounded-md">
+                            <p class="mt-1 text-xs text-gray-500">Current logo. Upload a new one to replace it.</p>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="mt-2">
+                        <div class="flex justify-center px-6 pt-5 pb-6 transition-colors border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400">
+                            <div class="space-y-1 text-center">
+                                <svg class="w-8 h-8 mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M8 14s0-2 2-2h28s2 0 2 2v28s0 2-2 2H10s-2 0-2-2V14z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M15 30l10-10 10 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="30" cy="20" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="business_logo" class="relative font-medium text-blue-600 bg-white rounded-md cursor-pointer hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <span><?php echo !empty($business['business_logo']) ? 'Replace logo' : 'Upload logo'; ?></span>
+                                        <input id="business_logo" name="business_logo" type="file" class="sr-only" accept="image/jpeg,image/png,image/gif">
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500">JPEG, PNG, GIF up to 2MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Banner Image Upload -->
                 <div>
                     <label for="banner_image" class="block text-sm font-medium text-gray-700">
@@ -110,11 +149,11 @@ include_once __DIR__ . '/../navbar-employer.php';?>
                         <i class="mr-2 fas fa-arrow-left"></i>
                         Back to Dashboard
                     </a>
-                <button type="submit" name="submit_step1"
-                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                    <i class="mr-2 fas fa-arrow-right"></i>
-                    Next Step
-                </button>
+                    <button type="submit" name="submit_step1"
+                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        <i class="mr-2 fas fa-arrow-right"></i>
+                        Next Step
+                    </button>
                 </div>
             </form>
         </div>
