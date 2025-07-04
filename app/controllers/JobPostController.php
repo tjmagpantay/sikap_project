@@ -510,15 +510,13 @@ class JobPostController
 
     public function browseJobs()
     {
-        // Get jobseeker info to check application status
+        // Get jobseeker info to check application status and saved status
         $jobseeker = null;
         $jobseeker_id = null;
         
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             try {
-                require_once __DIR__ . '/../models/JobApplication.php';
                 require_once __DIR__ . '/../models/Jobseeker.php';
-
                 $jobseekerModel = new Jobseeker();
                 $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
                 $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
@@ -527,13 +525,25 @@ class JobPostController
             }
         }
 
-        // Use getAllActiveJobs instead of getOpenJobs for consistency
+        // Use the SAME logic as dashboard to get jobs
         $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+        
+        // Add saved status to each job if user is logged in
+        if ($jobseeker_id) {
+            require_once __DIR__ . '/../models/SavedJobs.php';
+            $savedJobsModel = new SavedJobs();
+            
+            foreach ($jobs as &$job) {
+                $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+            }
+        }
         
         error_log('=== BROWSE JOBS CONTROLLER DEBUG ===');
         error_log('Browse jobs found: ' . count($jobs));
-        foreach ($jobs as $job) {
-            error_log("Job: ID={$job['job_id']}, Title={$job['job_title']}");
+        error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not logged in'));
+        if (!empty($jobs)) {
+            error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
+            error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
         }
         error_log('=== END BROWSE JOBS CONTROLLER DEBUG ===');
 

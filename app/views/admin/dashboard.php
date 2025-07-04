@@ -8,23 +8,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SIKAP</title>
-    <link href="css/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar - Fixed Left -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
         
         <!-- Main Content Area - Right Side -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex flex-col flex-1 overflow-hidden">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
             
@@ -36,7 +26,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     </div>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden hidden"></div>
+    <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
     <script>
         // Mobile menu toggle

@@ -643,7 +643,7 @@ video {
 
 /* ICON BUTTONS */
 
-/* ICON STYLES */
+/* ICON STYLES */ npx tailwindcss -i ./input.css -o ../public/assets/css/output.css --watch
 
 /* NAVBAR TEXT */
 

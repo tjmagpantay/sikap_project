@@ -534,64 +534,134 @@ public function getOpenJobs()
         }
     }
 
-    public function getAllActiveJobs($jobseeker_id = null) {
-        try {
-            $sql = "SELECT jp.job_id, jp.job_title, jp.job_summary, jp.location, 
-                   jp.job_type, jp.salary, jp.show_pay, jp.created_at, jp.job_status,
-                   jp.application_deadline,
-                   jc.category_name,
-                   e.first_name as employer_first_name, 
-                   e.last_name as employer_last_name,
-                   eb.business_name as company_name";
-    
-            // Add application check if jobseeker_id is provided
-            if ($jobseeker_id) {
-                $sql .= ", CASE WHEN ja.application_id IS NOT NULL THEN 1 ELSE 0 END as has_applied";
-            } else {
-                $sql .= ", 0 as has_applied";
-            }
-    
-            $sql .= " FROM job_post jp
-                      LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                      LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                      LEFT JOIN (
-                          SELECT employer_id, MIN(business_name) as business_name
-                          FROM employers_business
-                          GROUP BY employer_id
-                      ) eb ON e.employer_id = eb.employer_id";
-    
-            // Add application check JOIN if jobseeker_id is provided
-            if ($jobseeker_id) {
-                $sql .= " LEFT JOIN job_application ja ON jp.job_id = ja.job_id 
-                          AND ja.jobseeker_id = :jobseeker_id 
-                          AND ja.is_finalized = 1";
-            }
-    
-            $sql .= " WHERE jp.job_status = 'open' 
-                      AND (jp.application_deadline IS NULL OR jp.application_deadline > NOW())
-                      ORDER BY jp.created_at DESC";
-    
-            $stmt = $this->db->prepare($sql);
-    
-            if ($jobseeker_id) {
-                $stmt->execute(['jobseeker_id' => $jobseeker_id]);
-            } else {
-                $stmt->execute();
-            }
-    
-            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-            // Debug: Log the results
-            error_log('getAllActiveJobs found ' . count($jobs) . ' jobs');
-    
-            return $jobs;
-    
-        } catch (PDOException $e) {
-            error_log('Error getting active jobs: ' . $e->getMessage());
-            return [];
+public function getAllActiveJobs($jobseeker_id = null)
+{
+    try {
+        // Use the same logic as your working API
+        $sql = "SELECT 
+                    jp.job_id,
+                    jp.job_title,
+                    jp.job_summary,
+                    jp.location,
+                    jp.job_type,
+                    jp.salary,
+                    jp.show_pay,
+                    jp.job_status,
+                    jp.created_at,
+                    jp.application_deadline,
+                    jc.category_name,
+                    e.first_name as employer_first_name,
+                    e.last_name as employer_last_name,
+                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name";
+        
+        // Add application status check if jobseeker_id is provided
+        if ($jobseeker_id) {
+            $sql .= ", (SELECT COUNT(*) 
+                        FROM job_application ja 
+                        WHERE ja.job_id = jp.job_id 
+                        AND ja.jobseeker_id = ?
+                        AND ja.is_finalized = 1
+                       ) > 0 as has_applied";
         }
+        
+        $sql .= " FROM job_post jp
+                  LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                  LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                  LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                  WHERE jp.job_status = 'open'
+                  AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
+                  GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
+                           jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                           jc.category_name, e.first_name, e.last_name";
+        
+        // Add has_applied to GROUP BY if needed
+        if ($jobseeker_id) {
+            // For GROUP BY compatibility with has_applied subquery, we'll handle it differently
+            $sql = "SELECT 
+                        jp.job_id,
+                        jp.job_title,
+                        jp.job_summary,
+                        jp.location,
+                        jp.job_type,
+                        jp.salary,
+                        jp.show_pay,
+                        jp.job_status,
+                        jp.created_at,
+                        jp.application_deadline,
+                        jc.category_name,
+                        e.first_name as employer_first_name,
+                        e.last_name as employer_last_name,
+                        COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                        EXISTS(SELECT 1 FROM job_application ja 
+                               WHERE ja.job_id = jp.job_id 
+                               AND ja.jobseeker_id = ?
+                               AND ja.is_finalized = 1) as has_applied
+                    FROM job_post jp
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE jp.job_status = 'open'
+                    AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
+                    GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
+                             jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                             jc.category_name, e.first_name, e.last_name";
+        } else {
+            $sql .= ", COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name
+                     FROM job_post jp
+                     LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                     LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                     WHERE jp.job_status = 'open'
+                     AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
+                     GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
+                              jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                              jc.category_name, e.first_name, e.last_name";
+        }
+        
+        $sql .= " ORDER BY jp.created_at DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        if ($jobseeker_id) {
+            $stmt->execute([$jobseeker_id]);
+        } else {
+            $stmt->execute();
+        }
+        
+        $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Convert has_applied to boolean for consistency
+        if ($jobseeker_id) {
+            foreach ($jobs as &$job) {
+                $job['has_applied'] = (bool)$job['has_applied'];
+            }
+        }
+        
+        error_log('=== JOB POST MODEL DEBUG ===');
+        error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not provided'));
+        error_log('Jobs found: ' . count($jobs));
+        if (!empty($jobs)) {
+            error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
+            error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
+            // Check for duplicates
+            $job_ids = array_column($jobs, 'job_id');
+            $unique_job_ids = array_unique($job_ids);
+            if (count($job_ids) !== count($unique_job_ids)) {
+                error_log('WARNING: Duplicate job IDs found!');
+                error_log('All IDs: ' . implode(', ', $job_ids));
+                error_log('Unique IDs: ' . implode(', ', $unique_job_ids));
+            } else {
+                error_log('SUCCESS: All job IDs are unique');
+            }
+        }
+        error_log('=== END JOB POST MODEL DEBUG ===');
+        
+        return $jobs;
+    } catch (PDOException $e) {
+        error_log('Error getting active jobs: ' . $e->getMessage());
+        return [];
     }
-
+}
     // Also make sure you have this method for getting the PDO connection if needed
     public function getPdo()
     {

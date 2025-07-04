@@ -158,6 +158,18 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     <h3 class="text-lg font-medium text-gray-900 truncate">
                                         <?php echo htmlspecialchars($application['job_title']); ?>
                                     </h3>
+                                    
+                                    <!-- Save/Unsave Button -->
+                                    <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)" 
+                                            class="save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors
+                                                   <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600'; ?>"
+                                            data-job-id="<?php echo $application['job_id']; ?>"
+                                            data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>"
+                                            title="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
+                                        <i class="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?> mr-1"></i>
+                                        <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Saved' : 'Save'; ?></span>
+                                    </button>
+                                    
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                             <?php
                                             switch ($application['application_status']) {
@@ -229,3 +241,83 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+function toggleSaveJob(jobId, button) {
+    const isSaved = button.getAttribute('data-saved') === 'true';
+    const action = isSaved ? 'unsave-job' : 'save-job';
+    
+    // Show loading state
+    const icon = button.querySelector('i');
+    const text = button.querySelector('.save-text');
+    const originalIcon = icon.className;
+    const originalText = text.textContent;
+    
+    icon.className = 'fas fa-spinner fa-spin mr-1';
+    text.textContent = 'Loading...';
+    button.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('job_id', jobId);
+    
+    fetch(`?page=${action}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (isSaved) {
+                // Job was unsaved
+                button.setAttribute('data-saved', 'false');
+                button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600';
+                icon.className = 'far fa-bookmark mr-1';
+                text.textContent = 'Save';
+                button.title = 'Save job for later';
+            } else {
+                // Job was saved
+                button.setAttribute('data-saved', 'true');
+                button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-yellow-700 bg-yellow-100 border border-yellow-300';
+                icon.className = 'fas fa-bookmark mr-1';
+                text.textContent = 'Saved';
+                button.title = 'Remove from saved jobs';
+            }
+            
+            // Show toast notification
+            showToast(data.message, 'success');
+        } else {
+            // Restore original state on error
+            icon.className = originalIcon;
+            text.textContent = originalText;
+            showToast(data.message || 'Error occurred', 'error');
+        }
+    })
+    .catch(error => {
+        // Restore original state on error
+        icon.className = originalIcon;
+        text.textContent = originalText;
+        console.error('Error:', error);
+        showToast('Error occurred while saving job', 'error');
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+</script>

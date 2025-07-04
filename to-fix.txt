@@ -2,14 +2,4 @@ priority:
 - draft of design for admin and employer
 
 to fix:
-- jobseeker browse job
-- updating of employer documents
-
-to accomplish:
-- validation of process
-- manage jobseeker application
-
-laurence task:
-- work on admin side 
-- dashboard 
-- (not posting of programs)
+- duplicate jobs

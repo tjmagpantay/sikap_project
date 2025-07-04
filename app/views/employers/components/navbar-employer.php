@@ -1,7 +1,4 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\navbar-employer.php
-?>
-<nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
+<nav class="block w-full px-4 py-4 mx-4 bg-white border-b-4 border-blue-600 shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
   <div class="flex flex-wrap items-center justify-between">
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
@@ -14,7 +11,7 @@
       <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
         <li><a href="?page=employer-dashboard" class="nav-link">Home</a></li>
         <li><a href="?page=browse-candidates" class="nav-link">Browse Candidates</a></li>
-        <li><a href="?page=job-management" class="nav-link">Job Management</a></li>
+        <li><a href="?page=manage-jobs" class="nav-link">Job Management</a></li>
         <li><a href="?page=employer-programs" class="nav-link">Programs</a></li>
       </ul>
     </div>
@@ -57,7 +54,7 @@
           <button 
             @click="businessOpen = !businessOpen"
             @click.away="businessOpen = false"
-            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-gray-100 rounded-md hover:bg-gray-200 hover:text-blue-600 focus:outline-none">
+            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-gray-100 rounded-sm hover:bg-gray-200 hover:text-blue-600 focus:outline-none">
             <i class="mr-2 fas fa-building"></i>
             Business
             <svg class="w-4 h-4 ml-2 transition-transform duration-200" 
@@ -85,8 +82,18 @@
                 <i class="mr-3 text-gray-400 fas fa-user-tie"></i>
                 Employer Profile
               </a>
-            
-              
+
+              <a href="?page=manage-jobs"  
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
+                <i class="mr-3 text-gray-400 fas fa-user-tie"></i>
+                Manage Jobs
+              </a>
+
+              <a href="?page=profile-employer" 
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
+                <i class="mr-3 text-gray-400 fas fa-user-tie"></i>
+                View Applications
+              </a>              
               <a href="?page=employer-settings" 
                  class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
                 <i class="mr-3 text-gray-400 fas fa-cog"></i>
@@ -113,7 +120,7 @@
         <!-- Post A Job Button -->
         <li>
           <a href="?page=post-job" 
-             class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+             class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             <i class="mr-2 fas fa-plus"></i>
             Post A Job
           </a>

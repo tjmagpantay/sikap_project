@@ -41,7 +41,7 @@ class JobseekerController
 
                 if ($user_id) {
                     $_SESSION['user_id'] = $user_id;
-                    $_SESSION['role'] = User::ROLE_JOBSEEKER;
+                    $_SESSION['role'] = 'jobseeker';
                     $_SESSION['role_name'] = 'jobseeker';
                     $_SESSION['email'] = $email;
 
@@ -72,8 +72,8 @@ class JobseekerController
 
                 if ($user && password_verify($password, $user['password']) && $user['role_id'] == User::ROLE_JOBSEEKER) {
                     $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['role'] = $user['role_id'];
-                    $_SESSION['role_name'] = $user['role_name'];
+                    $_SESSION['role'] = User::ROLE_JOBSEEKER; // Use numeric constant, not string
+                    $_SESSION['role_name'] = 'jobseeker';
                     $_SESSION['email'] = $user['email'];
 
                     // Always redirect to dashboard
@@ -565,6 +565,126 @@ class JobseekerController
         } else {
             error_log("DEBUG: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
             echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
+        }
+        exit;
+    }
+
+    public function savedJobs()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker info
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            header('Location: ?page=jobseeker-dashboard&error=' . urlencode('Please complete your profile first.'));
+            exit;
+        }
+
+        require_once __DIR__ . '/../models/SavedJobs.php';
+        $savedJobsModel = new SavedJobs();
+        
+        $savedJobs = $savedJobsModel->getSavedJobs($jobseeker['jobseeker_id']);
+        
+        // Check application status for each saved job
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+        
+        foreach ($savedJobs as &$job) {
+            $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+        }
+
+        include __DIR__ . '/../views/jobseekers/saved-jobs.php';
+    }
+
+    public function saveJob()
+    {
+        // Ensure clean output
+        ob_clean();
+        header('Content-Type: application/json');
+        
+        try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+                echo json_encode(['success' => false, 'message' => 'Please log in as a jobseeker to save jobs']);
+                exit;
+            }
+            
+            $job_id = $_POST['job_id'] ?? null;
+            if (!$job_id) {
+                echo json_encode(['success' => false, 'message' => 'Job ID is required']);
+                exit;
+            }
+
+            // Get jobseeker info
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                echo json_encode(['success' => false, 'message' => 'Please complete your profile first']);
+                exit;
+            }
+
+            require_once __DIR__ . '/../models/SavedJobs.php';
+            $savedJobsModel = new SavedJobs();
+            
+            // Check if already saved before attempting to save
+            if ($savedJobsModel->isSaved($jobseeker['jobseeker_id'], $job_id)) {
+                echo json_encode(['success' => false, 'message' => 'Job is already saved']);
+                exit;
+            }
+            
+            $result = $savedJobsModel->saveJob($jobseeker['jobseeker_id'], $job_id);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Job saved successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to save job']);
+            }
+        } catch (Exception $e) {
+            error_log('Error in saveJob: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'An error occurred while saving the job']);
+        }
+        exit;
+    }
+
+    public function unsaveJob()
+    {
+        // Ensure clean output
+        ob_clean();
+        header('Content-Type: application/json');
+        
+        try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+                echo json_encode(['success' => false, 'message' => 'Please log in as a jobseeker']);
+                exit;
+            }
+
+            $job_id = $_POST['job_id'] ?? null;
+            if (!$job_id) {
+                echo json_encode(['success' => false, 'message' => 'Job ID is required']);
+                exit;
+            }
+
+            // Get jobseeker info
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
+                exit;
+            }
+
+            require_once __DIR__ . '/../models/SavedJobs.php';
+            $savedJobsModel = new SavedJobs();
+            
+            $result = $savedJobsModel->unsaveJob($jobseeker['jobseeker_id'], $job_id);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Job removed from saved jobs']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error removing job from saved jobs']);
+            }
+        } catch (Exception $e) {
+            error_log('Error in unsaveJob: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'An error occurred while removing the job']);
         }
         exit;
     }

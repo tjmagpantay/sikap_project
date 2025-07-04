@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-2vWTFzTx5TkQ0CKg5sG3rMd8W2jcJGkX+9L5wz1tCwLmfIu5FgDf0uB/hgsWmPB0wDCaY6FUVuLuqm+ne+0hMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="./assets/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./assets/images/sikap-logo.png">
+    <title>Sikap - PESO Rosario Emplyment Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
@@ -60,6 +62,11 @@
         case 'settings-jobseeker':
             include __DIR__ . '/../app/views/jobseekers/settings-jobseeker.php';
             break;
+        case 'saved-jobs':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->savedJobs();
+            break;
 
         // Employer Routes
         case 'login-employer':
@@ -73,8 +80,8 @@
             $controller->signup();
             break;
         case 'employer-dashboard':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
+            require_once __DIR__ . '/../app/controllers/EmployerDashboardController.php';
+            $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
         // Admin Routes
@@ -290,6 +297,17 @@
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
             $controller->uploadBusinessLogo();
+            break;
+        case 'save-job':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->saveJob();
+            break;
+
+        case 'unsave-job':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->unsaveJob();
             break;
 
         default:

@@ -1,40 +1,4 @@
-<?php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '../components/navbar-employer.php';
-?>
-
-<div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <!-- Page Header -->
-    <div class="mb-8">
-        <div class="sm:flex sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Manage Jobs</h1>
-                <p class="mt-2 text-sm text-gray-600">View and manage your job postings</p>
-            </div>
-            <div class="mt-4 sm:mt-0">
-                <a href="?page=post-job" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
-                    <i class="mr-2 fas fa-plus"></i>
-                    Post New Job
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Messages -->
-    <?php if (!empty($error)): ?>
-        <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
-            <?php echo htmlspecialchars($error); ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($success)): ?>
-        <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
-            <?php echo htmlspecialchars($success); ?>
-        </div>
-    <?php endif; ?>
-
-    <!-- Jobs Table -->
-    <div class="overflow-hidden bg-white shadow sm:rounded-md">
+<div class="overflow-hidden bg-white shadow sm:rounded-md">
         <?php if (empty($jobs)): ?>
             <div class="py-12 text-center">
                 <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
@@ -149,5 +113,117 @@ include_once __DIR__ . '../components/navbar-employer.php';
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
-    </div>
-</div>
+
+
+
+                       <!-- Profile Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-user-edit text-2xl <?php echo $hasProfile ? 'text-green-500' : 'text-blue-500'; ?>"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    <?php echo $hasProfile ? 'Update your information' : 'Set up your profile'; ?>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=complete-employer-profile" 
+                               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white transition-colors duration-200 <?php echo $hasProfile ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'; ?>">
+                                <i class="mr-2 fas <?php echo $hasProfile ? 'fa-edit' : 'fa-user-plus'; ?>"></i>
+                                <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post Job Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl <?php echo $canPostJobs ? 'text-blue-500' : 'text-gray-400'; ?> fas fa-plus-circle"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">Post a Job</h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    <?php echo $canPostJobs ? 'Create new job listings' : 'Complete profile to post jobs'; ?>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <?php if ($canPostJobs): ?>
+                                <a href="?page=post-job" 
+                                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                    <i class="mr-2 fas fa-plus"></i>
+                                    Post Job
+                                </a>
+                            <?php else: ?>
+                                <button disabled 
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-300 border border-transparent rounded-md cursor-not-allowed">
+                                    <i class="mr-2 fas fa-lock"></i>
+                                    Complete Profile First
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Jobs Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl text-green-500 fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    Manage Your Jobs
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Edit or remove your existing job listings.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=manage-jobs" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-green-600 border border-transparent rounded-md hover:bg-green-700">
+                                <i class="mr-2 fas fa-tasks"></i>
+                                Manage Jobs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl text-purple-500 fas fa-user-check"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    View Applications
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Review and manage job applications from candidates.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=view-applications" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-purple-600 border border-transparent rounded-md hover:bg-purple-700">
+                                <i class="mr-2 fas fa-eye"></i>
+                                View Applications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

@@ -88,7 +88,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         echo 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=2563eb&color=fff&size=96&format=svg&bold=true';
                     }
                 ?>"
-                    class="w-24 h-24 border-2 border-gray-200 rounded-full shadow-sm object-cover" alt="Business Logo">
+                    class="object-cover w-24 h-24 border-2 border-gray-200 rounded-full shadow-sm" alt="Business Logo">
 
                 <!-- Edit button positioned at top-right of logo -->
                 <button class="absolute flex items-center justify-center text-white transition-all duration-200 bg-blue-600 border-2 border-white rounded-full shadow-lg -top-1 -right-1 w-7 h-7 hover:bg-blue-700 hover:shadow-xl group-hover:scale-110"
@@ -115,7 +115,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                     <p class="text-sm font-medium text-blue-600"><?php echo htmlspecialchars($business['business_type']); ?></p>
                 <?php endif; ?>
                 <!-- Show employer name as subtitle -->
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="mt-1 text-xs text-gray-500">
                     <?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?>
                     <?php if (!empty($employer['position'])): ?>
                         • <?php echo htmlspecialchars($employer['position']); ?>

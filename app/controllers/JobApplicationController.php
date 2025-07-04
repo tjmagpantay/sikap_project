@@ -93,7 +93,7 @@ class JobApplicationController
     {
         // Get jobseeker documents
         $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']);
-        
+
         // Get existing application data if editing
         $applicationData = null;
         if ($application_id) {
@@ -222,11 +222,11 @@ class JobApplicationController
                         if (strtolower($fileType) === 'cv') {
                             $fileType = 'CV';
                         }
-                        
+
                         // Create reference to existing profile document
                         $this->jobApplicationModel->saveApplicationAttachmentReference(
-                            $application_id, 
-                            $profileDoc['document_id'], 
+                            $application_id,
+                            $profileDoc['document_id'],
                             $fileType
                         );
                         $resumeHandled = true;
@@ -241,13 +241,13 @@ class JobApplicationController
                     // Save as application attachment
                     $this->jobApplicationModel->saveApplicationAttachment($application_id, $resumePath, 'Resume');
                     $resumeHandled = true;
-                    
+
                     // Optionally save to profile documents for future use
                     if (isset($_POST['save_to_profile']) && $_POST['save_to_profile'] == '1') {
                         $this->saveToProfile(
-                            $jobseeker['jobseeker_id'], 
-                            $resumePath, 
-                            'resume', 
+                            $jobseeker['jobseeker_id'],
+                            $resumePath,
+                            'resume',
                             $_FILES['new_resume']['name']
                         );
                     }
@@ -269,7 +269,7 @@ class JobApplicationController
                             'error' => $_FILES['attachments']['error'][$index],
                             'size' => $_FILES['attachments']['size'][$index]
                         ];
-                        
+
                         $attachmentPath = $this->handleAttachmentUpload($file, $application_id);
                         if ($attachmentPath) {
                             $file_type = $_POST['attachment_types'][$index] ?? 'Others';
@@ -284,7 +284,6 @@ class JobApplicationController
 
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=2&application_id=' . $application_id . '&success=' . urlencode('Step 1 completed successfully!'));
             exit;
-
         } catch (Exception $e) {
             error_log('Error in handleStep1: ' . $e->getMessage());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode($e->getMessage()));
@@ -322,7 +321,6 @@ class JobApplicationController
             // Redirect to step 3
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=3&application_id=' . $application_id . '&success=' . urlencode('Step 2 completed successfully!'));
             exit;
-
         } catch (Exception $e) {
             error_log('Error in handleStep2: ' . $e->getMessage());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=2&application_id=' . $application_id . '&error=' . urlencode('Failed to save Step 2. Please try again.'));
@@ -351,7 +349,6 @@ class JobApplicationController
             // Redirect to step 4
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&success=' . urlencode('Step 3 completed successfully!'));
             exit;
-
         } catch (Exception $e) {
             error_log('Error in handleStep3: ' . $e->getMessage());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=3&application_id=' . $application_id . '&error=' . urlencode('Failed to save Step 3. Please try again.'));
@@ -380,7 +377,6 @@ class JobApplicationController
             // Redirect to success page
             header('Location: ?page=application-success&application_id=' . $application_id);
             exit;
-
         } catch (Exception $e) {
             error_log('Error in handleStep4: ' . $e->getMessage());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&error=' . urlencode('Failed to submit application. Please try again.'));
@@ -445,7 +441,7 @@ class JobApplicationController
                 'image/png',
                 'image/jpg'
             ];
-            
+
             if (!in_array($file['type'], $allowedTypes)) {
                 return false;
             }
@@ -483,7 +479,7 @@ class JobApplicationController
         // Get jobseeker info to check application status
         $jobseeker = null;
         $jobseeker_id = null;
-        
+
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             require_once __DIR__ . '/../models/Jobseeker.php';
             $jobseekerModel = new Jobseeker();
@@ -493,14 +489,16 @@ class JobApplicationController
 
         // Use the working method that gets all active jobs properly
         $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-        
-        // Debug: Check what we got
-        error_log('=== BROWSE JOBS DEBUG ===');
-        error_log('Jobs found: ' . count($jobs));
-        foreach ($jobs as $job) {
-            error_log("Job: ID={$job['job_id']}, Title={$job['job_title']}");
+
+        // Add saved status to each job
+        if ($jobseeker_id) {
+            require_once __DIR__ . '/../models/SavedJobs.php';
+            $savedJobsModel = new SavedJobs();
+
+            foreach ($jobs as &$job) {
+                $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+            }
         }
-        error_log('=== END BROWSE JOBS DEBUG ===');
 
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
@@ -517,7 +515,7 @@ class JobApplicationController
     //     $jobseeker = null;
     //     $jobseeker_id = null;
     //     $hasApplied = false;
-        
+
     //     if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
     //         require_once __DIR__ . '/../models/Jobseeker.php';
     //         $jobseekerModel = new Jobseeker();
@@ -527,7 +525,7 @@ class JobApplicationController
 
     //     // Get job details with application status using the new method
     //     $job = $this->getJobForJobseeker($job_id, $jobseeker_id);
-        
+
     //     if (!$job) {
     //         header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
     //         exit;
@@ -540,7 +538,7 @@ class JobApplicationController
     // }
 
     // Update methods that use direct database calls:
-    
+
     private function saveToProfile($jobseeker_id, $file_path, $file_type, $file_name)
     {
         // Move this to Jobseeker model
@@ -601,15 +599,20 @@ class JobApplicationController
         // Get jobseeker info
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         if (!$jobseeker) {
-            header('Location: ?page=complete-jobseeker-profile');
+            header('Location: ?page=jobseeker-dashboard&error=' . urlencode('Please complete your profile first.'));
             exit;
         }
 
-        // Get all applications
+        // Get applications
         $applications = $this->jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
 
-        $error = $_GET['error'] ?? '';
-        $success = $_GET['success'] ?? '';
+        // Add saved status to each application
+        require_once __DIR__ . '/../models/SavedJobs.php';
+        $savedJobsModel = new SavedJobs();
+
+        foreach ($applications as &$application) {
+            $application['is_saved'] = $savedJobsModel->isSaved($jobseeker['jobseeker_id'], $application['job_id']);
+        }
 
         include __DIR__ . '/../views/jobseekers/job-application/my-applications.php';
     }
@@ -664,10 +667,10 @@ class JobApplicationController
 
         // Get jobseeker info
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        
+
         // Withdraw application
         $result = $this->jobApplicationModel->withdrawApplication($application_id, $jobseeker['jobseeker_id']);
-        
+
         if ($result) {
             header('Location: ?page=my-applications&success=' . urlencode('Application withdrawn successfully.'));
         } else {
