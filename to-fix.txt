@@ -1,5 +1,1 @@
-priority:
-- draft of design for admin and employer
-
-to fix:
-- duplicate jobs
+- merged the current changes
