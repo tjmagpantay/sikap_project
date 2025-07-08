@@ -25,6 +25,7 @@ class JobseekerController
             $password = $_POST['password'] ?? '';
             $confirm_password = $_POST['confirm_password'] ?? '';
 
+            
             if (empty($email) || empty($password)) {
                 $error = 'Please fill in all required fields.';
             } elseif ($password !== $confirm_password) {
@@ -57,36 +58,126 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/signup-jobseeker.php';
     }
 
+//NEWWWWWWWWWWWWW -----------------------------------------------
+
     public function login()
     {
         $error = '';
-
+        $formData = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $formData = $_POST;
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
-
             if (empty($email) || empty($password)) {
                 $error = 'Please fill in all fields.';
             } else {
                 $user = $this->userModel->findByEmail($email);
-
                 if ($user && password_verify($password, $user['password']) && $user['role_id'] == User::ROLE_JOBSEEKER) {
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['role'] = User::ROLE_JOBSEEKER; // Use numeric constant, not string
-                    $_SESSION['role_name'] = 'jobseeker';
-                    $_SESSION['email'] = $user['email'];
-
-                    // Always redirect to dashboard
-                    header('Location: ?page=jobseeker-dashboard');
+                    // 2FA: Generate OTP
+                    $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                    $_SESSION['login_otp'] = [
+                        'user_id' => $user['user_id'],
+                        'otp' => $otp,
+                        'expires_at' => time() + 300 // 5 minutes
+                    ];
+                    $_SESSION['pending_user'] = $user;
+                    $this->sendOtpEmail($user['email'], $otp);
+                    header('Location: ?page=verify-otp');
                     exit;
                 } else {
                     $error = 'Invalid email or password, or this is not a jobseeker account.';
                 }
             }
         }
-
         include __DIR__ . '/../views/jobseekers/login-jobseeker.php';
     }
+
+    public function sendOtpEmail($to, $otp)
+    {
+        $mailConfig = require __DIR__ . '/../../config/mailer.php';
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        try { 
+            $mail->isSMTP();
+            $mail->Host = $mailConfig['host'];
+            $mail->SMTPAuth = true;
+            $mail->Username = $mailConfig['username'];
+            $mail->Password = $mailConfig['password'];
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = $mailConfig['port'];
+            $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name']);
+            $mail->addAddress($to);
+            $mail->isHTML(false);
+            $mail->Subject = 'Your SIKAP Login OTP';
+            $mail->Body = "Your One-Time Password (OTP) is: $otp\nThis code will expire in 5 minutes.";
+            $mail->send();
+        } catch (\Exception $e) {
+            // Optionally log error
+        }
+    }
+
+    public function verifyLoginOtp()
+    {
+        $error = '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $inputOtp = $_POST['otp'] ?? '';
+            $otpData = $_SESSION['login_otp'] ?? null;
+            if (!$otpData || !is_array($otpData)) {
+                $_SESSION['flash'] = 'No OTP session found. Please login again.';
+                header('Location: ?page=login-jobseeker');
+                exit;
+            } elseif (time() > $otpData['expires_at']) {
+                $error = 'OTP expired. Please request a new one.';
+            } elseif ($inputOtp == $otpData['otp']) {
+                // OTP correct, log in user
+                $user = $_SESSION['pending_user'];
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['role'] = $user['role_id'];
+                $_SESSION['role_name'] = $user['role_name'];
+                $_SESSION['email'] = $user['email'];
+                unset($_SESSION['login_otp'], $_SESSION['pending_user']);
+                header('Location: ?page=jobseeker-dashboard');
+                exit;
+            } else {
+                $error = 'Invalid OTP. Please try again.';
+            }
+        } else {
+            // If not POST, check if OTP session exists
+            $otpData = $_SESSION['login_otp'] ?? null;
+            if (!$otpData || !is_array($otpData)) {
+                $_SESSION['flash'] = 'No OTP session found. Please login again.';
+                header('Location: ?page=login-jobseeker');
+                exit;
+            }
+        }
+        include __DIR__ . '/../views/jobseekers/verify-otp.php';
+    }
+
+    public function resendOtp()
+    {
+        if (isset($_SESSION['pending_user'])) {
+            $user = $_SESSION['pending_user'];
+            // Check if resend is allowed (5 min cooldown)
+            $lastSent = $_SESSION['login_otp']['last_sent'] ?? 0;
+            if (time() - $lastSent < 300) { // 5 minutes
+                header('Location: ?page=verify-otp&resent=0&cooldown=1');
+                exit;
+            }
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $_SESSION['login_otp'] = [
+                'user_id' => $user['user_id'],
+                'otp' => $otp,
+                'expires_at' => time() + 300,
+                'last_sent' => time()
+            ];
+            $this->sendOtpEmail($user['email'], $otp);
+            header('Location: ?page=verify-otp&resent=1');
+            exit;
+        }
+        header('Location: ?page=verify-otp&resent=0');
+        exit;
+    }
+//-----------------------------------------
+
 
     public function dashboard()
     {

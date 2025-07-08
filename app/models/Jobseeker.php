@@ -29,6 +29,18 @@ class Jobseeker
         return $stmt->execute([$user_id, $first_name, $middle_name, $last_name, $suffix, $date_of_birth, $sex, $address, $contact_no]);
     }
 
+//NEWWWWWWWWWWWWWWW
+      public function createMinimal($userId, $name, $email) {
+        try {
+            $stmt = $this->db->prepare("INSERT INTO jobseeker (user_id, first_name, email, created_at) VALUES (?, ?, ?, NOW())");
+            $result = $stmt->execute([$userId, $name, $email]);
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+
     public function findByUserId($user_id)
     {
         $stmt = $this->db->prepare("

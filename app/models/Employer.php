@@ -552,4 +552,16 @@ class Employer {
             return false;
         }
     }
+
+
+    //NEWWWWWWWWWWWWW
+    public function createMinimal($userId, $name, $email) {
+        try {
+            $stmt = $this->db->prepare("INSERT INTO employer (user_id, company_name, email, created_at) VALUES (?, ?, ?, NOW())");
+            $result = $stmt->execute([$userId, $name, $email]);
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }
