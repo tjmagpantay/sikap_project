@@ -1,0 +1,229 @@
+<div class="overflow-hidden bg-white shadow sm:rounded-md">
+        <?php if (empty($jobs)): ?>
+            <div class="py-12 text-center">
+                <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
+                <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs posted yet</h3>
+                <p class="mb-6 text-gray-500">Start by posting your first job to attract candidates</p>
+                <a href="?page=post-job" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+                    <i class="mr-2 fas fa-plus"></i>
+                    Post Your First Job
+                </a>
+            </div>
+        <?php else: ?>
+            <ul class="divide-y divide-gray-200">
+                <?php foreach ($jobs as $job): ?>
+                    <li class="px-6 py-4 hover:bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-3">
+                                    <h3 class="text-lg font-medium text-gray-900 truncate">
+                                        <?php echo htmlspecialchars($job['job_title']); ?>
+                                    </h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            <?php
+                                            switch ($job['job_status']) {
+                                                case 'open':
+                                                    echo 'bg-green-100 text-green-800';
+                                                    break;
+                                                case 'closed':
+                                                    echo 'bg-red-100 text-red-800';
+                                                    break;
+                                                case 'paused':
+                                                    echo 'bg-yellow-100 text-yellow-800';
+                                                    break;
+                                                case 'draft':
+                                                    echo 'bg-gray-100 text-gray-800';
+                                                    break;
+                                                default:
+                                                    echo 'bg-gray-100 text-gray-800';
+                                            }
+                                            ?>">
+                                        <?php echo ucfirst($job['job_status']); ?>
+                                    </span>
+                                </div>
+                                <div class="flex items-center mt-1 space-x-4 text-sm text-gray-500">
+                                    <span><i class="mr-1 fas fa-tag"></i><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></span>
+                                    <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
+                                    <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
+                                    <span>
+                                        <i class="mr-1 fas fa-users"></i>
+                                        <?php echo $job['application_count']; ?> applications
+                                        <?php if ($job['pending_count'] > 0): ?>
+                                            <span class="ml-1 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                                                <?php echo $job['pending_count']; ?> pending
+                                            </span>
+                                        <?php endif; ?>
+                                    </span>
+                                    <span><i class="mr-1 fas fa-calendar"></i>Posted <?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <!-- View Button -->
+                                <a href="?page=view-employer-job&id=<?php echo $job['job_id']; ?>"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                                    title="View Job">
+                                    <i class="mr-2 fas fa-eye"></i>
+                                    View Job
+                                </a>
+
+                                <!-- Edit Button -->
+                                <a href="?page=edit-job&id=<?php echo $job['job_id']; ?>"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700"
+                                    title="Edit Job">
+                                    <i class="mr-2 fas fa-edit"></i>
+                                    Edit
+                                </a>
+
+                                <!-- Status Toggle -->
+                                <?php if ($job['job_status'] == 'open'): ?>
+                                    <a href="?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=paused"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
+                                        title="Pause Job">
+                                        <i class="mr-2 fas fa-pause"></i>
+                                        Pause
+                                    </a>
+                                <?php elseif ($job['job_status'] == 'paused'): ?>
+                                    <a href="?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=open"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700"
+                                        title="Reopen Job">
+                                        <i class="mr-2 fas fa-play"></i>
+                                        Open
+                                    </a>
+                                <?php elseif ($job['job_status'] == 'draft'): ?>
+                                    <a href="?page=edit-job&id=<?php echo $job['job_id']; ?>"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                                        title="Complete & Publish">
+                                        <i class="mr-2 fas fa-paper-plane"></i>
+                                        Publish
+                                    </a>
+                                <?php endif; ?>
+
+                                <!-- Delete Button -->
+                                <a href="?page=delete-job&id=<?php echo $job['job_id']; ?>"
+                                    onclick="return confirm('Are you sure you want to delete \"<?php echo addslashes($job['job_title']); ?>\"?\n\nThis action cannot be undone and will remove:\n- Job posting\n- All job skills\n- Application settings\n- Screening questions\n- Job attachments')"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+                                    title="Delete Job">
+                                    <i class="mr-2 fas fa-trash"></i>
+                                    Delete Job
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+
+
+                       <!-- Profile Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-user-edit text-2xl <?php echo $hasProfile ? 'text-green-500' : 'text-blue-500'; ?>"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    <?php echo $hasProfile ? 'Update your information' : 'Set up your profile'; ?>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=complete-employer-profile" 
+                               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white transition-colors duration-200 <?php echo $hasProfile ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'; ?>">
+                                <i class="mr-2 fas <?php echo $hasProfile ? 'fa-edit' : 'fa-user-plus'; ?>"></i>
+                                <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post Job Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl <?php echo $canPostJobs ? 'text-blue-500' : 'text-gray-400'; ?> fas fa-plus-circle"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">Post a Job</h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    <?php echo $canPostJobs ? 'Create new job listings' : 'Complete profile to post jobs'; ?>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <?php if ($canPostJobs): ?>
+                                <a href="?page=post-job" 
+                                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                    <i class="mr-2 fas fa-plus"></i>
+                                    Post Job
+                                </a>
+                            <?php else: ?>
+                                <button disabled 
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-300 border border-transparent rounded-md cursor-not-allowed">
+                                    <i class="mr-2 fas fa-lock"></i>
+                                    Complete Profile First
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Jobs Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl text-green-500 fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    Manage Your Jobs
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Edit or remove your existing job listings.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=manage-jobs" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-green-600 border border-transparent rounded-md hover:bg-green-700">
+                                <i class="mr-2 fas fa-tasks"></i>
+                                Manage Jobs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Card -->
+                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="text-2xl text-purple-500 fas fa-user-check"></i>
+                            </div>
+                            <div class="flex-1 w-0 ml-5">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    View Applications
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Review and manage job applications from candidates.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="?page=view-applications" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-purple-600 border border-transparent rounded-md hover:bg-purple-700">
+                                <i class="mr-2 fas fa-eye"></i>
+                                View Applications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

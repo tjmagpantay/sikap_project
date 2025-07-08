@@ -226,9 +226,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Recent Job Listings Section -->
             <div class="mt-8">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-900">Recent Job Opportunities</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900">All Available Jobs</h2>
                     <a href="?page=browse-jobs" class="text-blue-600 hover:text-blue-800">
-                        View All Jobs <i class="ml-1 fas fa-arrow-right"></i>
+                        Browse Jobs <i class="ml-1 fas fa-arrow-right"></i>
                     </a>
                 </div>
 
@@ -239,47 +239,66 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             <!-- Job Card -->
                             <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
                                 <div class="p-5">
-                                    <div class="flex items-start">
+                                    <div class="flex items-start justify-between">
                                         <div class="flex-shrink-0">
                                             <i class="text-2xl text-blue-500 fas fa-briefcase"></i>
                                         </div>
                                         <div class="flex-1 w-0 ml-4">
-                                            <h3 class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
+                                                
+                                                <!-- Save/Unsave Button -->
+                                                <?php if ($hasProfile && isset($_SESSION['user_id']) && $_SESSION['role'] == 3): ?>
+                                                    <button onclick="toggleSaveJob(<?php echo $job['job_id']; ?>, this)" 
+                                                            class="save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors
+                                                                   <?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600'; ?>"
+                                                            data-job-id="<?php echo $job['job_id']; ?>"
+                                                            data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
+                                                            title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
+                                                        <i class="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            
                                             <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($job['company_name'] ?? ($job['employer_first_name'] . ' ' . $job['employer_last_name'])); ?></p>
                                             <p class="mt-2 text-sm text-gray-700"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 100) . '...'; ?></p>
 
-                                            <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                            <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
-                                            <?php if ($job['show_pay'] && $job['salary']): ?>
-                                                <span><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
-                                            <?php endif; ?>
+                                            <div class="mt-3 text-xs text-gray-500">
+                                                <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
+                                                <span class="ml-3"><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
+                                                <?php if ($job['show_pay'] && $job['salary']): ?>
+                                                    <span class="ml-3"><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="flex mt-4 space-x-2">
-                                    <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
-                                        class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
-                                        View Details
-                                    </a>
+                                <div class="px-5 pb-5">
+                                    <div class="flex mt-4 space-x-2">
+                                        <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
+                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
+                                            View Details
+                                        </a>
 
-                                    <?php if (!$hasProfile): ?>
-                                        <a href="?page=complete-jobseeker-profile"
-                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
-                                            Complete Profile to Apply
-                                        </a>
-                                    <?php elseif ($job['has_applied']): ?>
-                                        <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
-                                            <i class="mr-1 fas fa-check-circle"></i>
-                                            Applied
-                                        </span>
-                                    <?php else: ?>
-                                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
-                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                                            <i class="mr-1 fas fa-paper-plane"></i>
-                                            Apply
-                                        </a>
-                                    <?php endif; ?>
+                                        <?php if (!$hasProfile): ?>
+                                            <a href="?page=complete-jobseeker-profile"
+                                                class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
+                                                Complete Profile to Apply
+                                            </a>
+                                        <?php elseif (isset($job['has_applied']) && $job['has_applied']): ?>
+                                            <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
+                                                <i class="mr-1 fas fa-check-circle"></i>
+                                                Applied
+                                            </span>
+                                        <?php else: ?>
+                                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
+                                                class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                                <i class="mr-1 fas fa-paper-plane"></i>
+                                                Apply
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                     </div>
@@ -300,4 +319,72 @@ include_once __DIR__ . '/navbar-jobseeker.php';
     </div>
 </div>
 
+
 </div>
+
+<script>
+function toggleSaveJob(jobId, button) {
+    // Same JavaScript code as in browse-jobs.php
+    const isSaved = button.getAttribute('data-saved') === 'true';
+    const action = isSaved ? 'unsave-job' : 'save-job';
+    
+    fetch('ajax/job-actions.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ action: action, job_id: jobId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the button appearance
+            button.classList.toggle('text-yellow-700');
+            button.classList.toggle('bg-yellow-100');
+            button.classList.toggle('border-yellow-300');
+            button.classList.toggle('text-gray-600');
+            button.classList.toggle('bg-gray-100');
+            button.classList.toggle('border-gray-300');
+            
+            // Update the icon
+            const icon = button.querySelector('i');
+            if (isSaved) {
+                icon.classList.remove('fas', 'fa-bookmark');
+                icon.classList.add('far', 'fa-bookmark');
+            } else {
+                icon.classList.remove('far', 'fa-bookmark');
+                icon.classList.add('fas', 'fa-bookmark');
+            }
+            
+            // Update the saved status data attribute
+            button.setAttribute('data-saved', !isSaved);
+            
+            // Show a toast message
+            showToast(isSaved ? 'Job removed from saved jobs' : 'Job saved for later', 'success');
+        } else {
+            showToast('Action failed. Please try again.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', 'error');
+    });
+}
+
+function showToast(message, type) {
+    // Same showToast function as in browse-jobs.php
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded-md shadow-lg text-sm font-medium text-white transition-opacity duration-300 ease-in-out
+                      ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+</script>

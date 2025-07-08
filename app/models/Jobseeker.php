@@ -29,6 +29,18 @@ class Jobseeker
         return $stmt->execute([$user_id, $first_name, $middle_name, $last_name, $suffix, $date_of_birth, $sex, $address, $contact_no]);
     }
 
+//NEWWWWWWWWWWWWWWW
+      public function createMinimal($userId, $name, $email) {
+        try {
+            $stmt = $this->db->prepare("INSERT INTO jobseeker (user_id, first_name, email, created_at) VALUES (?, ?, ?, NOW())");
+            $result = $stmt->execute([$userId, $name, $email]);
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+
     public function findByUserId($user_id)
     {
         $stmt = $this->db->prepare("
@@ -82,13 +94,36 @@ class Jobseeker
         }
     }
 
-    public function saveDocument($jobseeker_id, $data)
+    public function saveDocument($jobseeker_id, $file_path, $file_type, $file_name)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO jobseeker_documents (jobseeker_id, file_name, file_path, file_type, uploaded_at) 
-            VALUES (?, ?, ?, ?, NOW())
-        ");
-        return $stmt->execute([$jobseeker_id, $data['file_name'], $data['file_path'], $data['file_type']]);
+        try {
+            $sql = "INSERT INTO jobseeker_documents (jobseeker_id, file_name, file_path, file_type) 
+                    VALUES (:jobseeker_id, :file_name, :file_path, :file_type)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'jobseeker_id' => $jobseeker_id,
+                'file_name' => $file_name,
+                'file_path' => $file_path,
+                'file_type' => $file_type
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error saving document to profile: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findDocumentByPath($jobseeker_id, $file_path)
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents 
+                    WHERE jobseeker_id = :jobseeker_id AND file_path = :file_path";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_path' => $file_path]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding document by path: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function saveEducation($jobseeker_id, $data)
@@ -327,14 +362,20 @@ class Jobseeker
         return $stmt->execute([$photo_path, $user_id]);
     }
 
-    public function updateProfilePicture($user_id, $profilePicturePath) {
+    public function updateProfilePicture($user_id, $profile_picture_path)
+    {
         try {
-            $sql = "UPDATE jobseeker SET profile_picture = :profile_picture, updated_at = NOW() WHERE user_id = :user_id";
+            $sql = "UPDATE jobseeker SET profile_picture = ?, updated_at = NOW() WHERE user_id = ?";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'profile_picture' => $profilePicturePath,
-                'user_id' => $user_id
-            ]);
+            $result = $stmt->execute([$profile_picture_path, $user_id]);
+            
+            if ($result) {
+                error_log("DEBUG: Profile picture updated in database for user_id: $user_id, path: $profile_picture_path");
+            } else {
+                error_log("DEBUG: Failed to update profile picture in database for user_id: $user_id");
+            }
+            
+            return $result;
         } catch (PDOException $e) {
             error_log('Error updating profile picture: ' . $e->getMessage());
             return false;

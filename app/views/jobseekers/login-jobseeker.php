@@ -3,20 +3,20 @@
     include_once __DIR__ . '/../components/navbar.php';
 ?>
 
-<div class="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+<div class="flex flex-col justify-center py-12 min-h-screen bg-gray-50 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
             <h2 class="text-3xl font-bold text-gray-900">Jobseeker Sign In</h2>
             <p class="mt-2 text-sm text-gray-600">
                 Sign in to your jobseeker account
             </p>
-        </div>
+        </div> 
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
             <?php if (!empty($error)): ?>
-                <div class="px-4 py-3 mb-4 text-red-600 border border-red-200 rounded-md bg-red-50">
+                <div class="px-4 py-3 mb-4 text-red-600 bg-red-50 rounded-md border border-red-200">
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
@@ -26,7 +26,8 @@
                     <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
                     <div class="mt-1">
                         <input id="email" name="email" type="email" required 
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
+                               class="block px-3 py-2 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
                 </div>
 
@@ -34,12 +35,20 @@
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <div class="mt-1">
                         <input id="password" name="password" type="password" required 
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               value="<?php echo htmlspecialchars($formData['password'] ?? ''); ?>"
+                               class="block px-3 py-2 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
+                    
                 </div>
 
+
+            <div class="flex justify-start">
+                <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a>
+            </div>
+
+
                 <div>
-                    <button type="submit" class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <button type="submit" class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white rounded-md border border-transparent shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Sign In
                     </button>
                 </div>
@@ -47,16 +56,25 @@
 
             <div class="mt-6">
                 <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
+                    <div class="flex absolute inset-0 items-center">
                         <div class="w-full border-t border-gray-300"></div>
                     </div>
-                    <div class="relative flex justify-center text-sm">
+                    <div class="flex relative justify-center text-sm">
                         <span class="px-2 text-gray-500 bg-white">Or</span>
                     </div>
                 </div>
 
+                <div class="mt-6">
+                    <a href="?page=google-login&type=jobseeker"
+                        class="flex justify-center items-center px-4 py-2 w-full text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="mr-2 w-5 h-5">
+                        Continue with Google
+                    </a>
+                </div>
+
                 <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
+                   
+                    <p class="mt-2 text-sm text-gray-600">
                         Don't have an account? 
                         <a href="?page=signup-jobseeker" class="font-medium text-primary hover:underline">Sign up as Jobseeker</a>
                     </p>
@@ -66,6 +84,8 @@
                     </p>
                 </div>
             </div>
+
+           
         </div>
     </div>
 </div>

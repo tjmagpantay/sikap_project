@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+?>
 <!DOCTYPE html>
 <html>
 
@@ -7,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-2vWTFzTx5TkQ0CKg5sG3rMd8W2jcJGkX+9L5wz1tCwLmfIu5FgDf0uB/hgsWmPB0wDCaY6FUVuLuqm+ne+0hMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="./assets/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./assets/images/sikap-logo.png">
+    <title>Sikap - PESO Rosario Emplyment Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
@@ -20,6 +25,20 @@
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
+
+        // Google login Jobseeker & Employer
+
+         case 'google-login':
+            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
+            $controller = new GoogleAuthController();
+            $controller->initiateLogin();
+            break;
+        case 'google-callback':
+            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
+            $controller = new GoogleAuthController();
+            $controller->handleCallback();
+            break;
+            
         // Jobseeker Routes
         case 'login-jobseeker':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
@@ -60,6 +79,24 @@
         case 'settings-jobseeker':
             include __DIR__ . '/../app/views/jobseekers/settings-jobseeker.php';
             break;
+        case 'saved-jobs':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->savedJobs();
+            break;         
+
+ // Jobseeker 2FA OTP Routes NEWWWWWWWWWW
+        case 'verify-otp':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->verifyLoginOtp();
+            break;
+        case 'resend-otp':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->resendOtp();
+            break;
+
 
         // Employer Routes
         case 'login-employer':
@@ -73,8 +110,8 @@
             $controller->signup();
             break;
         case 'employer-dashboard':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
+            require_once __DIR__ . '/../app/controllers/EmployerDashboardController.php';
+            $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
         // Admin Routes
@@ -88,21 +125,48 @@
             $controller = new AdminController();
             $controller->dashboard();
             break;
-        case 'admin-accreditations':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->viewAccreditations();
-            break;
-        case 'admin-review-accreditation':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->reviewAccreditation();
-            break;
-        case 'admin-process-accreditation':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->processAccreditation();
-            break;
+
+        // case 'admin-users':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageUsers();
+        //     break;
+
+        // case 'admin-jobs':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageJobs();
+        //     break;
+
+        // case 'admin-reports':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->reports();
+        //     break;
+
+        // case 'admin-applications':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageApplications();
+        //     break;
+
+        // case 'admin-announcements':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageAnnouncements();
+        //     break;
+
+        // case 'admin-chatbot':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageChatbot();
+        //     break;
+
+        // case 'admin-events':
+        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
+        //     $controller = new AdminController();
+        //     $controller->manageEvents();
+        //     break;
 
         // Complete Profile Routes
         case 'complete-employer-profile':
@@ -241,9 +305,76 @@
             $controller->withdrawApplication();
             break;
 
+        // Admin Accreditation Routes
+        case 'admin-accreditations':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->accreditations();
+            break;
+
+        case 'admin-review-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->reviewAccreditation();
+            break;
+
+        case 'admin-process-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->processAccreditation();
+            break;
+        case 'upload-business-logo':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->uploadBusinessLogo();
+            break;
+        case 'save-job':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->saveJob();
+            break;
+
+        case 'unsave-job':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->unsaveJob();
+            break;
+
         default:
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
+
+             // Forgot Password Routes NEWWWWWWWWWWWWWW
+       
+             case 'forgot-password':
+                require_once __DIR__ . '/../app/controllers/UserController.php';
+                $controller = new UserController();
+                $controller->forgotPassword();
+                break;
+
+            case 'forgot-password-request':
+                require_once __DIR__ . '/../app/controllers/UserController.php';
+                $controller = new UserController();
+                $controller->forgotPasswordRequest();
+                break;
+
+            case 'verify-forgotpassword':
+                require_once __DIR__ . '/../app/controllers/UserController.php';
+                $controller = new UserController();
+                $controller->verifyForgotPasswordOtp();
+                break;
+
+            case 'resend-forgotpassword':
+                require_once __DIR__ . '/../app/controllers/UserController.php';
+                $controller = new UserController();
+                $controller->resendOtp();
+                break;
+
+            case 'reset-password':
+                require_once __DIR__ . '/../app/controllers/UserController.php';
+                $controller = new UserController();
+                $controller->resetPassword();
+                break;
     }
     ?>
 </body>

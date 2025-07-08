@@ -76,33 +76,51 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
     <!-- Sidebar -->
     <div class="w-full p-4 bg-white shadow md:w-1/4 rounded-xl">
         <div class="flex flex-col items-center">
-            <!-- Profile Image -->
+            <!-- Business Logo (instead of profile photo) -->
             <div class="relative group">
-                <img src="<?php echo !empty($employer['profile_photo']) ? htmlspecialchars($employer['profile_photo']) : 'https://ui-avatars.com/api/?name=' . urlencode(($employer['first_name'] ?? '') . '+' . ($employer['last_name'] ?? '')) . '&background=2563eb&color=fff&size=96'; ?>"
-                    class="w-24 h-24 border-2 border-gray-200 rounded-full shadow-sm" alt="Profile">
+                <img src="<?php 
+                    // Priority: Business logo > Default company logo
+                    if (!empty($business['business_logo'])) {
+                        echo htmlspecialchars($business['business_logo']);
+                    } else {
+                        // Default business logo with company name or fallback
+                        $companyName = $business['business_name'] ?? $employer['company_name'] ?? 'Company';
+                        echo 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=2563eb&color=fff&size=96&format=svg&bold=true';
+                    }
+                ?>"
+                    class="object-cover w-24 h-24 border-2 border-gray-200 rounded-full shadow-sm" alt="Business Logo">
 
-                <!-- Edit button positioned at top-right of profile image -->
+                <!-- Edit button positioned at top-right of logo -->
                 <button class="absolute flex items-center justify-center text-white transition-all duration-200 bg-blue-600 border-2 border-white rounded-full shadow-lg -top-1 -right-1 w-7 h-7 hover:bg-blue-700 hover:shadow-xl group-hover:scale-110"
-                    onclick="document.getElementById('profile-photo-input').click()"
-                    title="Change profile photo">
+                    onclick="document.getElementById('business-logo-input').click()"
+                    title="Change business logo">
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
                     </svg>
                 </button>
 
-                <!-- Hidden file input for profile photo upload -->
-                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this)">
+                <!-- Hidden file input for business logo upload -->
+                <input type="file" id="business-logo-input" accept="image/*" class="hidden" onchange="handleBusinessLogoUpload(this)">
             </div>
 
-            <!-- Name and Position -->
+            <!-- Company Name and Business Info -->
             <div class="mt-4 text-center">
                 <h2 class="text-xl font-bold text-gray-800">
-                    <?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?>
+                    <?php echo htmlspecialchars($business['business_name'] ?? $employer['company_name'] ?? 'Company Name'); ?>
                 </h2>
-                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($employer['position'] ?? 'Employer'); ?></p>
-                <?php if (!empty($employer['company_name'])): ?>
-                    <p class="text-sm font-medium text-blue-600"><?php echo htmlspecialchars($employer['company_name']); ?></p>
+                <?php if (!empty($business['business_industry'])): ?>
+                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($business['business_industry']); ?></p>
                 <?php endif; ?>
+                <?php if (!empty($business['business_type'])): ?>
+                    <p class="text-sm font-medium text-blue-600"><?php echo htmlspecialchars($business['business_type']); ?></p>
+                <?php endif; ?>
+                <!-- Show employer name as subtitle -->
+                <p class="mt-1 text-xs text-gray-500">
+                    <?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?>
+                    <?php if (!empty($employer['position'])): ?>
+                        • <?php echo htmlspecialchars($employer['position']); ?>
+                    <?php endif; ?>
+                </p>
             </div>
 
             <!-- Verification Status -->
@@ -559,6 +577,63 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 .catch(error => {
                     console.error('Error:', error);
                     showNotification('Failed to upload photo', 'error');
+                })
+                .finally(() => {
+                    // Restore button state
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                    input.value = ''; // Clear the input
+                });
+        }
+    }
+
+    function handleBusinessLogoUpload(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB.');
+                return;
+            }
+
+            // Create FormData for upload
+            const formData = new FormData();
+            formData.append('business_logo', file);
+
+            // Show loading state
+            const button = document.querySelector('.bg-blue-600');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            button.disabled = true;
+
+            // Upload the file
+            fetch('?page=upload-business-logo', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the business logo
+                        const logoImg = document.querySelector('img[alt="Business Logo"]');
+                        logoImg.src = data.image_url + '?t=' + new Date().getTime(); // Add timestamp to force reload
+
+                        // Show success message
+                        showNotification('Business logo updated successfully!', 'success');
+                    } else {
+                        showNotification(data.message || 'Failed to upload logo', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to upload logo', 'error');
                 })
                 .finally(() => {
                     // Restore button state

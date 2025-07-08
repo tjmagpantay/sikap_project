@@ -3,17 +3,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/*-------COMPONENTS-------*/
-@layer components {
-  /* FONT */
+/* FONT */
 
-  /* NORMAL BUTTONS */
+/* NORMAL BUTTONS */
+@layer components {
   .btn-primary {
-    @apply px-4 py-2 text-sm font-semibold text-white transition-all rounded-sm font-inter bg-primary;
+    @apply px-4 py-2 text-sm font-semibold text-white transition-all rounded-sm bg-primary font-inter;
   }
 
   .btn-primary:hover {
-    @apply text-secondary; 
+    @apply text-secondary;
   }
 
   .btn-primary:active {
@@ -21,12 +20,12 @@
   }
 
   .btn-primary:disabled {
-    @apply cursor-not-allowed bg-gray5 text-gray3;
+    @apply text-gray-500 bg-gray-300 cursor-not-allowed;
   }
 
   /* OUTLINE BUTTONS */
   .btn-outline {
-    @apply px-4 py-2 text-sm font-semibold transition-all bg-white border rounded-sm font-inter border-lightBlue text-primary;
+    @apply px-4 py-2 text-sm font-semibold transition-all bg-white border rounded-sm border-lightBlue font-inter text-primary;
   }
 
   .btn-outline:hover {
@@ -38,59 +37,38 @@
   }
 
   .btn-outline:disabled {
-    @apply bg-white cursor-not-allowed text-gray3 border-gray5;
-  }
-
-  /* ICON BUTTONS */
-  .btn-icon {
-    @apply flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition-all rounded-md bg-primary font-inter;
-  }
-
-  .btn-icon:hover {
-    @apply bg-[#001F3F];
-  }
-
-  .btn-icon:active {
-    @apply bg-[#526B87];
-  }
-
-  .btn-icon:disabled {
-    @apply cursor-not-allowed bg-gray5 text-gray3;
-  }
-
-  /* ICON STYLES */
-  .btn-icon svg {
-    @apply w-4 h-4;
+    @apply text-gray-500 bg-white border-gray-300 cursor-not-allowed;
   }
 
   /* NAVBAR TEXT */
   .nav-brand {
-    @apply mr-4 block cursor-pointer py-1.5 text-2xl text-primary font-semibold;
+    @apply mr-4 block cursor-pointer py-1.5 text-2xl font-semibold text-primary;
   }
-  
+
   .nav-link-top {
-    @apply flex items-center p-1 text-xs text-gray6
+    @apply flex items-center p-1 text-xs text-gray6;
   }
 
   .nav-link {
-    @apply relative inline-block text-sm font-normal transition text-black3 hover:text-primary;
+    @apply relative inline-block text-sm font-normal transition-colors duration-150 text-black3;
+  }
+
+  .nav-link:hover {
+    @apply text-primary;
   }
 
   .nav-link::after {
     content: '';
-    @apply block h-[2px] bg-primary w-0 transition-all duration-200;
+    @apply block h-0.5 w-0 bg-primary transition-all duration-200;
   }
 
   .nav-link:hover::after {
     @apply w-full;
   }
-  .nav-link-active {
-      @apply font-semibold text-primary;
-  }
 
   /* CARD */
   .company-card {
-    @apply card;
+    @apply p-4 bg-white rounded-lg shadow;
   }
 
   .company-header {
@@ -98,31 +76,35 @@
   }
 
   .company-badge {
-    @apply text-xs text-pink-600 bg-pink-100 px-2 py-0.5 rounded;
+    @apply rounded bg-pink-100 px-2 py-0.5 text-xs text-pink-600;
   }
 
   .company-name {
-    @apply text-base font-semibold mb-1;
+    @apply mb-1 text-base font-semibold;
   }
 
   .company-location {
-    @apply text-xs text-gray-500 mb-2;
+    @apply mb-2 text-xs text-gray-500;
   }
 
   .company-description {
-    @apply text-sm text-gray-600 mb-3;
+    @apply mb-3 text-sm text-gray-600;
   }
 
   .company-link {
-    @apply text-sm text-blue-500 underline mb-3 block;
+    @apply block mb-3 text-sm text-blue-500 underline;
   }
 
   .company-button {
-    @apply btn-primary w-full;
+    @apply w-full btn-primary;
   }
-  
+
   .job-card {
-    @apply bg-white rounded-lg shadow-md p-4 border border-gray-100 hover:shadow-lg transition;
+    @apply p-4 transition-shadow duration-150 bg-white border border-gray-200 rounded-lg shadow-md;
+  }
+
+  .job-card:hover {
+    @apply shadow-lg;
   }
 
   .job-type {
@@ -142,5 +124,53 @@
 
   .card {
     @apply p-4 bg-white rounded-md shadow;
+  }
+
+  /* Custom gradient utilities */
+  .from-primary {
+    --tw-gradient-from: #092C4C;
+    --tw-gradient-from-position: ;
+    --tw-gradient-to: rgb(9 44 76 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+  }
+
+  .to-secondary {
+    --tw-gradient-to: #F3AF0E var(--tw-gradient-to-position);
+  }
+
+  .text-primary {
+    color: #092C4C;
+  }
+
+  .bg-primary {
+    background-color: #092C4C;
+  }
+
+  .bg-secondary {
+    background-color: #F3AF0E;
+  }
+
+  /* Hero Card Specific Gradients */
+  .hero-gradient {
+    background: linear-gradient(135deg, #092C4C 0%, #F3AF0E 100%);
+  }
+  
+  .hero-overlay {
+    background: linear-gradient(135deg, rgba(9, 44, 76, 0.8) 0%, rgba(243, 175, 14, 0.8) 100%);
+  }
+
+  /* Enhanced rounded corners for hero card */
+  .rounded-2xl {
+    border-radius: 1rem;
+  }
+
+  /* Better shadow for the hero card */
+  .shadow-hero {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Alpine.js utilities */
+  [x-cloak] { 
+    display: none !important; 
   }
 }

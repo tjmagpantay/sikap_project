@@ -1,12 +1,8 @@
 <?php
-require_once __DIR__ . '/../../config/sikap_db.php';
-
-class Admin
-{
+class Admin {
     private $db;
 
-    public function __construct()
-    {
+    public function __construct() {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
@@ -17,6 +13,61 @@ class Admin
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Connection failed: " . $e->getMessage());
+        }
+    }
+
+    public function authenticate($email, $password) {
+        try {
+            $sql = "SELECT u.user_id, u.email, u.password, u.status, 
+                          a.admin_id, a.admin_name,
+                          r.role_name
+                   FROM users u
+                   JOIN user_roles ur ON u.user_id = ur.user_id
+                   JOIN roles r ON ur.role_id = r.role_id
+                   JOIN admin a ON u.user_id = a.user_id
+                   WHERE u.email = :email 
+                   AND r.role_name = 'admin'
+                   AND u.status = 'active'";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            
+            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($admin && password_verify($password, $admin['password'])) {
+                // Don't return password
+                unset($admin['password']);
+                return $admin;
+            }
+            
+            return false;
+        } catch (PDOException $e) {
+            error_log('Error authenticating admin: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findById($adminId) {
+        try {
+            $sql = "SELECT u.user_id, u.email, u.status,
+                          a.admin_id, a.admin_name, a.createdAt,
+                          r.role_name
+                   FROM admin a
+                   JOIN users u ON a.user_id = u.user_id
+                   JOIN user_roles ur ON u.user_id = ur.user_id
+                   JOIN roles r ON ur.role_id = r.role_id
+                   WHERE a.admin_id = :admin_id
+                   AND r.role_name = 'admin'";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':admin_id', $adminId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding admin by ID: ' . $e->getMessage());
+            return false;
         }
     }
 

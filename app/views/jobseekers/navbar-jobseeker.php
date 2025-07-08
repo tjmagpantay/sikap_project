@@ -50,7 +50,7 @@
 
         <!-- Saved Jobs -->
         <li>
-          <a href="/jobseeker/saved-jobs" class="hover:text-blue-600">
+          <a href="?page=saved-jobs" class="hover:text-blue-600">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="w-6 h-6 text-gray-500 transition-colors duration-200">
@@ -115,6 +115,11 @@
                 Documents
               </a>
               
+              <a href="?page=saved-jobs" 
+                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                Saved Jobs
+              </a>
+              
               <a href="?page=my-applications" 
                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Applied Jobs
@@ -156,7 +161,8 @@
       <li><a href="#" class="nav-link">Community</a></li>
       <li><a href="#" class="nav-link">Notifications</a></li>
       <li><a href="#" class="nav-link">Saved Jobs</a></li>
-      <li><a href="#" class="nav-link">Messages</a></li>
+      <li><a href="#" class="nav-link">Applied Jobs</a></li>
+      <li><a href="#" class="nav-link">Settings</a></li>
       <li class="flex flex-col gap-2 mt-4">
         <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
       </li>
