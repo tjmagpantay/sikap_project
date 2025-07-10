@@ -3,7 +3,7 @@
     "description": "A modular PHP web application with ML microservice integration.",
     "type": "project",
     "require": {
-        "google/apiclient": "2.15",
+        "google/apiclient": "2.15.0",
         "phpmailer/phpmailer": "^6.10"
     },
     "autoload": {
@@ -11,4 +11,4 @@
             "App\\": "app/"
         }
     }
-} 
+}

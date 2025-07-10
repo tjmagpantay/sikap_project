@@ -1,7 +1,7 @@
 <?php
 // Create file: app/views/employers/view-job.php
 include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-employer.php'; 
+include_once __DIR__ . '../components/navbar-employer.php'; 
 ?>
 
 <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -62,14 +62,14 @@ include_once __DIR__ . '/navbar-employer.php';
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Main Content -->
         <div class="lg:col-span-2">
-            <div class="bg-white shadow rounded-lg">
+            <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Job Details</h3>
                 </div>
                 <div class="px-6 py-4 space-y-6">
                     <!-- Basic Info -->
                     <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Basic Information</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-900">Basic Information</h4>
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span class="font-medium text-gray-500">Category:</span>
@@ -93,7 +93,7 @@ include_once __DIR__ . '/navbar-employer.php';
                     <!-- Salary Info -->
                     <?php if ($job['show_pay'] && ($job['salary'] || $job['pay_range'])): ?>
                     <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Compensation</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-900">Compensation</h4>
                         <div class="text-sm">
                             <?php if ($job['salary']): ?>
                                 <div>
@@ -116,15 +116,15 @@ include_once __DIR__ . '/navbar-employer.php';
 
                     <!-- Job Summary -->
                     <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Job Summary</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-900">Job Summary</h4>
                         <p class="text-sm text-gray-700"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
                     </div>
 
                     <!-- Full Description -->
                     <?php if ($job['full_description']): ?>
                     <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Full Description</h4>
-                        <div class="text-sm text-gray-700 prose max-w-none">
+                        <h4 class="mb-2 text-sm font-medium text-gray-900">Full Description</h4>
+                        <div class="text-sm prose text-gray-700 max-w-none">
                             <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
                         </div>
                     </div>
@@ -133,7 +133,7 @@ include_once __DIR__ . '/navbar-employer.php';
                     <!-- Skills -->
                     <?php if (!empty($job['skills'])): ?>
                     <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Required Skills</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-900">Required Skills</h4>
                         <div class="flex flex-wrap gap-2">
                             <?php foreach ($job['skills'] as $skill): ?>
                                 <span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -150,7 +150,7 @@ include_once __DIR__ . '/navbar-employer.php';
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Application Dates -->
-            <div class="bg-white shadow rounded-lg">
+            <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Application Period</h3>
                 </div>
@@ -176,7 +176,7 @@ include_once __DIR__ . '/navbar-employer.php';
             </div>
 
             <!-- Statistics -->
-            <div class="bg-white shadow rounded-lg">
+            <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Application Statistics</h3>
                 </div>
@@ -212,8 +212,8 @@ include_once __DIR__ . '/navbar-employer.php';
                 <!-- Quick Actions -->
                 <?php if ($job['total_applications'] > 0): ?>
                 <div class="px-6 py-4 border-t border-gray-200">
-                    <a href="?page=view-applications&job_id=<?php echo $job['job_id']; ?>" 
-                       class="inline-flex items-center w-full justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                    <a href="?page=manage-applications&job_id=<?php echo $job['job_id']; ?>" 
+                       class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
                         <i class="mr-2 fas fa-users"></i>
                         View All Applications
                     </a>

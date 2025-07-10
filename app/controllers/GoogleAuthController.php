@@ -5,18 +5,21 @@ require_once __DIR__ . '/../models/Jobseeker.php';
 
 use Google\Service\Oauth2 as Google_Service_Oauth2;
 
-class GoogleAuthController {
+class GoogleAuthController
+{
     private $userModel;
-    private $jobseekerModel; 
+    private $jobseekerModel;
     private $config;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->userModel = new User();
         $this->jobseekerModel = new Jobseeker();
         $this->config = require __DIR__ . '/../../config/google_oauth.php';
     }
 
-    public function initiateLogin() {
+    public function initiateLogin()
+    {
         $type = $_GET['type'] ?? 'jobseeker';
         $client = new Google_Client();
         $client->setClientId($this->config['client_id']);
@@ -33,7 +36,8 @@ class GoogleAuthController {
         exit;
     }
 
-    public function handleCallback() {
+    public function handleCallback()
+    {
         try {
             $client = new \Google_Client();
             $client->setClientId($this->config['client_id']);
@@ -49,7 +53,10 @@ class GoogleAuthController {
 
                 $email = $google_account_info->email;
                 $googleId = $google_account_info->id;
-                $name = trim(($google_account_info->givenName ?? '') . ' ' . ($google_account_info->familyName ?? ''));
+                $givenName = $google_account_info->givenName ?? '';
+                $familyName = $google_account_info->familyName ?? '';
+                $name = trim($givenName . ' ' . $familyName);
+
                 // Extract user type from state
                 $state = $_GET['state'] ?? '';
                 $type = 'jobseeker';
@@ -62,11 +69,13 @@ class GoogleAuthController {
                 $userType = $type;
                 $roleId = ($userType === 'employer') ? \User::ROLE_EMPLOYER : \User::ROLE_JOBSEEKER;
                 $status = ($userType === 'employer') ? 'pending' : 'active';
+
                 // Check if user exists by google_id or email
                 $user = $this->userModel->findByGoogleId($googleId);
                 if (!$user) {
                     $user = $this->userModel->findByEmail($email);
                 }
+
                 if (!$user) {
                     // Create new user with all required fields
                     try {
@@ -74,14 +83,45 @@ class GoogleAuthController {
                     } catch (\Throwable $ex) {
                         $user_id = false;
                     }
+
                     if ($user_id) {
                         // Create minimal jobseeker or employer profile
                         if ($userType === 'employer') {
                             require_once __DIR__ . '/../models/Employer.php';
                             $employerModel = new \Employer();
-                            $employerModel->createMinimal($user_id, $name, $email);
+
+                            // CREATE EMPLOYER RECORD WITH PROPER DATA
+                            $employerCreated = $employerModel->create(
+                                $user_id,
+                                $givenName,     // first_name
+                                $familyName,    // last_name
+                                'Employee',     // position (default)
+                                null,           // contact_no
+                                null,           // middle_name
+                                null,           // company_name
+                                null            // about_us
+                            );
+
+                            if (!$employerCreated) {
+                                error_log('Failed to create employer profile for user: ' . $user_id);
+                            }
                         } else {
-                            $this->jobseekerModel->createMinimal($user_id, $name, $email);
+                            // CREATE JOBSEEKER RECORD WITH PROPER DATA
+                            $jobseekerCreated = $this->jobseekerModel->create(
+                                $user_id,
+                                $givenName,     // first_name
+                                $familyName,    // last_name
+                                null,           // contact_no
+                                null,           // middle_name
+                                null,           // suffix
+                                null,           // date_of_birth
+                                null,           // sex
+                                null            // address
+                            );
+
+                            if (!$jobseekerCreated) {
+                                error_log('Failed to create jobseeker profile for user: ' . $user_id);
+                            }
                         }
                         $user = $this->userModel->findByEmail($email);
                     }
@@ -89,8 +129,9 @@ class GoogleAuthController {
                     // User exists, check if they have the requested role
                     $user_id = $user['user_id'];
                     $hasRole = ($user['role_id'] == $roleId);
-                    $db = $this->userModel->getDb();
+
                     if (!$hasRole) {
+                        $db = $this->userModel->getDb();
                         // Add role to user_roles
                         $stmt = $db->prepare("SELECT 1 FROM user_roles WHERE user_id = ? AND role_id = ?");
                         $stmt->execute([$user_id, $roleId]);
@@ -98,28 +139,50 @@ class GoogleAuthController {
                             $stmt = $db->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)");
                             $stmt->execute([$user_id, $roleId]);
                         }
+
                         // Create minimal profile if not exists
                         if ($userType === 'employer') {
                             require_once __DIR__ . '/../models/Employer.php';
                             $employerModel = new \Employer();
                             $empProfile = $employerModel->findByUserId($user_id);
                             if (!$empProfile) {
-                                $employerModel->createMinimal($user_id, $name, $email);
+                                $employerModel->create(
+                                    $user_id,
+                                    $givenName,     // first_name
+                                    $familyName,    // last_name
+                                    'Employee',     // position (default)
+                                    null,           // contact_no
+                                    null,           // middle_name
+                                    null,           // company_name
+                                    null            // about_us
+                                );
                             }
                         } else {
                             $jsProfile = $this->jobseekerModel->findByUserId($user_id);
                             if (!$jsProfile) {
-                                $this->jobseekerModel->createMinimal($user_id, $name, $email);
+                                $this->jobseekerModel->create(
+                                    $user_id,
+                                    $givenName,     // first_name
+                                    $familyName,    // last_name
+                                    null,           // contact_no
+                                    null,           // middle_name
+                                    null,           // suffix
+                                    null,           // date_of_birth
+                                    null,           // sex
+                                    null            // address
+                                );
                             }
                         }
                         // Re-fetch user with new role
                         $user = $this->userModel->findByEmail($email);
                     }
+
                     // Always set session to the role/profile the user actually has
                     require_once __DIR__ . '/../models/Employer.php';
                     $employerModel = new \Employer();
                     $empProfile = $employerModel->findByUserId($user_id);
                     $jsProfile = $this->jobseekerModel->findByUserId($user_id);
+
                     if ($empProfile) {
                         $user['role_id'] = \User::ROLE_EMPLOYER;
                         $user['role_name'] = 'employer';

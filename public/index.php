@@ -114,6 +114,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
+
+        case 'manage-applications':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
+        
         // Admin Routes
         case 'admin-login':
             require_once __DIR__ . '/../app/controllers/AdminController.php';

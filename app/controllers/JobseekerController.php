@@ -24,9 +24,11 @@ class JobseekerController
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $confirm_password = $_POST['confirm_password'] ?? '';
+            $first_name = trim($_POST['first_name'] ?? '');
+            $last_name = trim($_POST['last_name'] ?? '');
+            $contact_number = trim($_POST['contact_number'] ?? '');
 
-            
-            if (empty($email) || empty($password)) {
+            if (empty($email) || empty($password) || empty($first_name) || empty($last_name) || empty($contact_number)) {
                 $error = 'Please fill in all required fields.';
             } elseif ($password !== $confirm_password) {
                 $error = 'Passwords do not match.';
@@ -41,14 +43,36 @@ class JobseekerController
                 $user_id = $this->userModel->create($email, $hashed_password, User::ROLE_JOBSEEKER);
 
                 if ($user_id) {
-                    $_SESSION['user_id'] = $user_id;
-                    $_SESSION['role'] = 'jobseeker';
-                    $_SESSION['role_name'] = 'jobseeker';
-                    $_SESSION['email'] = $email;
+                    // CREATE JOBSEEKER RECORD
+                    $jobseeker_created = $this->jobseekerModel->create(
+                        $user_id,
+                        $first_name,
+                        $last_name,
+                        $contact_number,
+                        null, // middle_name
+                        null, // suffix
+                        null, // date_of_birth
+                        null, // sex
+                        null  // address
+                    );
 
-                    // Redirect directly to dashboard
-                    header('Location: ?page=jobseeker-dashboard');
-                    exit;
+                    if ($jobseeker_created) {
+                        $_SESSION['user_id'] = $user_id;
+                        $_SESSION['role'] = User::ROLE_JOBSEEKER;
+                        $_SESSION['role_name'] = 'jobseeker';
+                        $_SESSION['email'] = $email;
+
+                        // Set success message
+                        $_SESSION['registration_success'] = true;
+
+                        // Redirect to dashboard
+                        header('Location: ?page=jobseeker-dashboard');
+                        exit;
+                    } else {
+                        // If jobseeker creation fails, delete the user record
+                        $this->userModel->deleteUser($user_id);
+                        $error = 'Failed to create jobseeker profile. Please try again.';
+                    }
                 } else {
                     $error = 'Failed to create account. Please try again.';
                 }

@@ -27,20 +27,44 @@ class EmployerDashboardController
 
         // Get employer info
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        
+        // REMOVE THIS REDIRECT - Let them access dashboard even without complete profile
+        // if (!$employer) {
+        //     header('Location: ?page=complete-employer-profile');
+        //     exit;
+        // }
+
+        // If no employer profile exists, create a basic one or handle gracefully
         if (!$employer) {
-            header('Location: ?page=complete-employer-profile');
-            exit;
+            $employer = [
+                'employer_id' => null,
+                'first_name' => '',
+                'last_name' => '',
+                'company_name' => ''
+            ];
         }
 
-        // Get employer's job posts
-        $jobPosts = $this->dashboardModel->getEmployerJobPosts($employer['employer_id']);
+        // Get employer's job posts (only if employer exists)
+        $jobPosts = [];
+        if ($employer['employer_id']) {
+            $jobPosts = $this->dashboardModel->getEmployerJobPosts($employer['employer_id']);
+        }
         
         // FIX: Add this line to make $jobs variable available for the view
         $jobs = $jobPosts;
         $totalJobPosts = count($jobs);
         
-        // Calculate statistics
-        $stats = $this->dashboardModel->getEmployerStats($employer['employer_id']);
+        // Calculate statistics (handle null employer_id)
+        $stats = [
+            'total_jobs' => 0,
+            'active_jobs' => 0,
+            'total_applications' => 0,
+            'pending_reviews' => 0
+        ];
+        
+        if ($employer['employer_id']) {
+            $stats = $this->dashboardModel->getEmployerStats($employer['employer_id']);
+        }
         
         // Add calculated fields to job posts
         foreach ($jobPosts as &$job) {
@@ -55,21 +79,15 @@ class EmployerDashboardController
         
         // Profile status for quick actions
         $hasProfile = $employer && !empty($employer['first_name']);
-        $canPostJobs = $this->employerModel->canPostJobs($_SESSION['user_id']);
+        $canPostJobs = $employer['employer_id'] ? $this->employerModel->canPostJobs($_SESSION['user_id']) : false;
 
-        // Debug logging - check what's actually in $jobs
+        // Debug logging
         error_log('=== EMPLOYER DASHBOARD CONTROLLER DEBUG ===');
-        error_log('Employer ID: ' . $employer['employer_id']);
+        error_log('Employer ID: ' . ($employer['employer_id'] ?? 'NULL'));
         error_log('JobPosts count: ' . count($jobPosts));
         error_log('Jobs count: ' . count($jobs));
         error_log('TotalJobPosts: ' . $totalJobPosts);
-        
-        if (!empty($jobs)) {
-            error_log('First job title: ' . $jobs[0]['job_title']);
-            error_log('First job keys: ' . implode(', ', array_keys($jobs[0])));
-        } else {
-            error_log('Jobs array is EMPTY!');
-        }
+        error_log('Has Profile: ' . ($hasProfile ? 'YES' : 'NO'));
         error_log('=== END DEBUG ===');
 
         include __DIR__ . '/../views/employers/dashboard.php';

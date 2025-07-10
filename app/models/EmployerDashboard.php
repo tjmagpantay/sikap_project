@@ -37,12 +37,13 @@ class EmployerDashboard
                     LEFT JOIN job_application ja ON jp.job_id = ja.job_id AND ja.is_finalized = 1
                     WHERE jp.employer_id = ?
                     GROUP BY jp.job_id, jp.job_title, jp.job_type, jp.job_status, jp.application_deadline, jp.created_at
-                    ORDER BY jp.created_at DESC
-                    LIMIT ?";
+                    ORDER BY jp.created_at
+                    LIMIT " . intval($limit);
+                    //bawal ang LIMIT = ?
             
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$employer_id, $limit]);
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([$employer_id]);
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             error_log('EmployerDashboard Model - Job posts found: ' . count($result));
             return $result;

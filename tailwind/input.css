@@ -8,7 +8,7 @@
 /* NORMAL BUTTONS */
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 text-sm font-semibold text-white transition-all rounded-sm bg-primary font-inter;
+    @apply px-4 py-2 text-sm font-semibold text-white transition-all rounded-md bg-primary font-inter;
   }
 
   .btn-primary:hover {
@@ -65,6 +65,27 @@
   .nav-link:hover::after {
     @apply w-full;
   }
+
+    /* PROGRESS STEPPER COMPONENTS
+  .progress-stepper {
+    @apply flex items-center justify-between mb-10;
+  }
+
+  .progress-step {
+    @apply flex flex-col items-center flex-1 min-w-[100px] shrink-0;
+  }
+
+  .progress-step-label {
+    @apply mt-2 text-xs text-center font-inter;
+  }
+
+  .progress-step-label.active {
+    @apply font-normal text-primary;
+  }
+
+  .progress-step-label.inactive {
+    @apply text-gray-400;
+  } */
 
   /* CARD */
   .company-card {

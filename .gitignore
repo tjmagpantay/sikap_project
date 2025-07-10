@@ -1,5 +1,5 @@
 # PHP
-/vendor/
+vendor/
 composer.lock
 
 # Node
@@ -14,6 +14,7 @@ __pycache__/
 # Environment/config
 .env
 # Sikap DB config (do not commit secrets)
+config/
 config/db_structure_viewer.php
 config/sikap_db.php
 
@@ -23,3 +24,5 @@ Thumbs.db
 
 # ML model
 /ml_service/model.pkl 
+
+git rm -r --cached vendor/

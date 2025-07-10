@@ -37,14 +37,32 @@ class EmployerController
                 $user_id = $this->userModel->create($email, $hashed_password, User::ROLE_EMPLOYER, 'pending');
 
                 if ($user_id) {
-                    $_SESSION['user_id'] = $user_id;
-                    $_SESSION['role'] = User::ROLE_EMPLOYER;
-                    $_SESSION['role_name'] = 'employer';
-                    $_SESSION['email'] = $email;
+                    // CREATE EMPLOYER RECORD HERE!
+                    $employerCreated = $this->employerModel->create(
+                        $user_id,
+                        'User',        // first_name (default)
+                        'Profile',     // last_name (default) 
+                        'Employee',    // position (default)
+                        null,          // contact_no
+                        null,          // middle_name
+                        null,          // company_name
+                        null           // about_us
+                    );
 
-                    // Redirect directly to dashboard
-                    header('Location: ?page=employer-dashboard');
-                    exit;
+                    if ($employerCreated) {
+                        $_SESSION['user_id'] = $user_id;
+                        $_SESSION['role'] = User::ROLE_EMPLOYER;
+                        $_SESSION['role_name'] = 'employer';
+                        $_SESSION['email'] = $email;
+
+                        // Redirect to dashboard
+                        header('Location: ?page=employer-dashboard');
+                        exit;
+                    } else {
+                        // If employer creation fails, delete the user record
+                        $this->userModel->deleteUser($user_id);
+                        $error = 'Failed to create employer profile. Please try again.';
+                    }
                 } else {
                     $error = 'Failed to create account. Please try again.';
                 }

@@ -1,7 +1,4 @@
 <?php
-require_once __DIR__ . '/../../models/Employer.php';
-require_once __DIR__ . '/../../models/JobPost.php';
-
 // Check if user is logged in and is an employer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
     header('Location: ?page=login-employer');

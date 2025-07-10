@@ -29,13 +29,17 @@ class Jobseeker
         return $stmt->execute([$user_id, $first_name, $middle_name, $last_name, $suffix, $date_of_birth, $sex, $address, $contact_no]);
     }
 
-//NEWWWWWWWWWWWWWWW
-      public function createMinimal($userId, $name, $email) {
+    public function createMinimal($userId, $firstName, $lastName, $email, $contactNumber = null)
+    {
         try {
-            $stmt = $this->db->prepare("INSERT INTO jobseeker (user_id, first_name, email, created_at) VALUES (?, ?, ?, NOW())");
-            $result = $stmt->execute([$userId, $name, $email]);
+            $stmt = $this->db->prepare("
+                INSERT INTO jobseeker (user_id, first_name, last_name, contact_no, created_at, updated_at) 
+                VALUES (?, ?, ?, ?, NOW(), NOW())
+            ");
+            $result = $stmt->execute([$userId, $firstName, $lastName, $contactNumber]);
             return $result;
         } catch (Exception $e) {
+            error_log('Error creating minimal jobseeker profile: ' . $e->getMessage());
             return false;
         }
     }
@@ -317,8 +321,7 @@ class Jobseeker
         return min(100, $completionScore);
     }
 
-    //NEWWWWWWWWWWWWWWWWWW
-    public function getDocumentById($documentId) 
+    public function getDocumentById($documentId)
     {
         try {
             $sql = "SELECT * FROM jobseeker_documents WHERE document_id = :document_id";
@@ -331,33 +334,34 @@ class Jobseeker
         }
     }
 
-    public function deleteDocumentByType($jobseeker_id, $file_type) {
+    public function deleteDocumentByType($jobseeker_id, $file_type)
+    {
         try {
             // Get the file path first to delete the physical file
             $stmt = $this->db->prepare("SELECT file_path FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
             $stmt->execute([$jobseeker_id, $file_type]);
             $doc = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$doc) {
                 return true; // Document doesn't exist
             }
-            
+
             // Delete the physical file
             if ($doc['file_path'] && file_exists(__DIR__ . '/../../' . $doc['file_path'])) {
                 unlink(__DIR__ . '/../../' . $doc['file_path']);
             }
-            
+
             // Delete from database (CASCADE will handle application_attachments)
             $stmt = $this->db->prepare("DELETE FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
             return $stmt->execute([$jobseeker_id, $file_type]);
-            
         } catch (PDOException $e) {
             error_log('Error deleting document: ' . $e->getMessage());
             return false;
         }
     }
 
-    public function updateProfilePhoto($user_id, $photo_path) {
+    public function updateProfilePhoto($user_id, $photo_path)
+    {
         $stmt = $this->db->prepare("UPDATE jobseeker SET profile_photo = ? WHERE user_id = ?");
         return $stmt->execute([$photo_path, $user_id]);
     }
@@ -368,13 +372,13 @@ class Jobseeker
             $sql = "UPDATE jobseeker SET profile_picture = ?, updated_at = NOW() WHERE user_id = ?";
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$profile_picture_path, $user_id]);
-            
+
             if ($result) {
                 error_log("DEBUG: Profile picture updated in database for user_id: $user_id, path: $profile_picture_path");
             } else {
                 error_log("DEBUG: Failed to update profile picture in database for user_id: $user_id");
             }
-            
+
             return $result;
         } catch (PDOException $e) {
             error_log('Error updating profile picture: ' . $e->getMessage());
@@ -382,7 +386,8 @@ class Jobseeker
         }
     }
 
-    public function getProfilePicture($user_id) {
+    public function getProfilePicture($user_id)
+    {
         try {
             $sql = "SELECT profile_picture FROM jobseeker WHERE user_id = :user_id";
             $stmt = $this->db->prepare($sql);
