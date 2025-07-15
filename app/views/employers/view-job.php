@@ -9,9 +9,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <a href="?page=manage-jobs" class="text-blue-600 hover:text-blue-800">
+                <!-- <a href="?page=manage-jobs" class="text-blue-600 hover:text-blue-800">
                     <i class="mr-1 fas fa-arrow-left"></i> Back to Manage Jobs
-                </a>
+                </a> -->
                 <h1 class="mt-2 text-3xl font-bold text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h1>
                 <div class="flex items-center mt-2 space-x-4">
                     <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full

@@ -17,4 +17,9 @@ class JobApplicantsController
             $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id);
             include __DIR__ . '/../views/employers/manage-applications.php';
         }
+    public function viewAllApplicants()
+        {
+            $applicants = $this->jobApplicantsModel->getAllApplicants();
+            include __DIR__ . '/../views/employers/manage-applications.php';
+        }
 }

@@ -3,7 +3,7 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen px-4 py-8 bg-white sm:px-6 md:px-16 lg:px-24">
+<div class="min-h-screen px-4 py-8 sm:px-6 md:px-16 lg:px-24">
     <div class="max-w-5xl mx-auto">
         <h2 class="mb-8 text-2xl font-bold text-gray-900">Applicants for this Job</h2>
         <div class="bg-white rounded-lg shadow">
@@ -85,9 +85,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <!-- Actions -->
                                     <td class="px-6 py-4 align-top">
                                         <div class="flex items-center space-x-2">
-                                            <a href="?page=view-application&application_id=<?php echo $app['application_id']; ?>"
+                                            <a href="?page=review-application&application_id=<?php echo $app['application_id']; ?>"
                                                 class="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-blue-900 border border-transparent rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                <i class="mr-2 fas fa-eye"></i> View
+                                                <i class="mr-2 fas fa-eye"></i> Review
                                             </a>
                                             <!-- Add more actions here if needed -->
                                         </div>

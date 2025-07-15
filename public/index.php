@@ -114,11 +114,24 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
-
+    
+        case 'view-applicants':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
         case 'manage-applications':
             require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
             $controller = new JobApplicantsController();
             $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
+        case 'review-application':
+            require_once __DIR__ . '/../app/controllers/ReviewApplicationController.php';
+            $controller = new ReviewApplicationController();
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->handlePost($_GET['application_id'] ?? null);
+            }
+            $controller->view($_GET['application_id'] ?? null);
             break;
         
         // Admin Routes

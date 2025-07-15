@@ -55,7 +55,7 @@ class JobApplication
                 'jobseeker_id' => $data['jobseeker_id'],
                 'job_id' => $data['job_id']
             ]);
-            
+
             return $result ? $this->db->lastInsertId() : false;
         } catch (PDOException $e) {
             error_log('Error creating draft application: ' . $e->getMessage());
@@ -106,7 +106,7 @@ class JobApplication
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['document_id' => $profile_document_id]);
             $doc = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$doc) {
                 return false;
             }
@@ -146,14 +146,16 @@ class JobApplication
         try {
             $sql = "SELECT ja.*, jp.job_title, jp.job_type, jp.location, 
                            e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name
+                           eb.business_name as company_name,
+                           jam.interview_date, jam.interview_location, jam.notes
                     FROM job_application ja
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN job_application_management jam ON ja.application_id = jam.application_id
                     WHERE ja.jobseeker_id = :jobseeker_id
                     ORDER BY ja.applied_at DESC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['jobseeker_id' => $jobseeker_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -174,17 +176,17 @@ class JobApplication
                     JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                     WHERE ja.application_id = :application_id";
-            
+
             if ($jobseeker_id) {
                 $sql .= " AND ja.jobseeker_id = :jobseeker_id";
             }
-            
+
             $stmt = $this->db->prepare($sql);
             $params = ['application_id' => $application_id];
             if ($jobseeker_id) {
                 $params['jobseeker_id'] = $jobseeker_id;
             }
-            
+
             $stmt->execute($params);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -201,7 +203,7 @@ class JobApplication
                     LEFT JOIN job_post_questions jpq ON jaa.question_id = jpq.question_id
                     WHERE jaa.application_id = :application_id
                     ORDER BY jpq.question_id";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['application_id' => $application_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -217,9 +219,9 @@ class JobApplication
             $sql = "SELECT * FROM application_attachments 
                 WHERE application_id = :application_id 
                 ORDER BY uploaded_at";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['application_id' => $application_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['application_id' => $application_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting application attachments: ' . $e->getMessage());
             return [];
@@ -233,17 +235,17 @@ class JobApplication
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     SET ja.application_status = :status, ja.reviewed_at = NOW()
                     WHERE ja.application_id = :application_id";
-            
+
             if ($employer_id) {
                 $sql .= " AND jp.employer_id = :employer_id";
             }
-            
+
             $stmt = $this->db->prepare($sql);
             $params = ['application_id' => $application_id, 'status' => $status];
             if ($employer_id) {
                 $params['employer_id'] = $employer_id;
             }
-            
+
             return $stmt->execute($params);
         } catch (PDOException $e) {
             error_log('Error updating application status: ' . $e->getMessage());
@@ -256,14 +258,14 @@ class JobApplication
         try {
             $setParts = [];
             $params = ['application_id' => $application_id];
-            
+
             foreach ($data as $key => $value) {
                 $setParts[] = "$key = :$key";
                 $params[$key] = $value;
             }
-            
+
             $sql = "UPDATE job_application SET " . implode(', ', $setParts) . " WHERE application_id = :application_id";
-            
+
             $stmt = $this->db->prepare($sql);
             return $stmt->execute($params);
         } catch (PDOException $e) {
@@ -295,7 +297,7 @@ class JobApplication
                     WHERE application_id = :application_id 
                     AND jobseeker_id = :jobseeker_id 
                     AND application_status = 'pending'";
-            
+
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
                 'application_id' => $application_id,
@@ -326,10 +328,10 @@ class JobApplication
             $sql = "UPDATE job_application_eligibility 
                 SET interested_program = :interested_program, priority_sector = :priority_sector
                 WHERE application_id = :application_id";
-        
+
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute($data);
-        
+
             // If no rows affected, insert new record
             if ($stmt->rowCount() == 0) {
                 $sql = "INSERT INTO job_application_eligibility (application_id, interested_program, priority_sector) 
@@ -337,7 +339,7 @@ class JobApplication
                 $stmt = $this->db->prepare($sql);
                 $result = $stmt->execute($data);
             }
-        
+
             return $result;
         } catch (PDOException $e) {
             error_log('Error saving application eligibility: ' . $e->getMessage());

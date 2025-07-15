@@ -23,6 +23,25 @@ class JobApplicants
         }
     }
 
+    public function getAllApplicants()
+    {
+        $sql = "SELECT 
+                    ja.application_id,
+                    ja.jobseeker_id,
+                    ja.job_id,
+                    ja.application_status,
+                    ja.applied_at,
+                    js.first_name,
+                    js.last_name,
+                    js.profile_picture
+                FROM job_application ja
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                ORDER BY ja.applied_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getApplicantsByJob($job_id)
     {
         $sql = "SELECT 

@@ -10,7 +10,7 @@
     <div class="hidden lg:block">
       <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
         <li><a href="?page=employer-dashboard" class="nav-link">Home</a></li>
-        <li><a href="?page=browse-candidates" class="nav-link">Browse Candidates</a></li>
+        <li><a href="?page=view-applicants" class="nav-link">Browse Candidates</a></li>
         <li><a href="?page=manage-jobs" class="nav-link">Job Management</a></li>
         <li><a href="?page=employer-programs" class="nav-link">Programs</a></li>
       </ul>
