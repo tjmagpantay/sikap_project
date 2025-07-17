@@ -140,10 +140,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     <div class="overflow-hidden bg-white shadow sm:rounded-md">
         <?php if (empty($applications)): ?>
             <div class="py-12 text-center">
-                <i class="mb-4 text-6xl text-gray-400 fas fa-file-alt"></i>
+                <i class="mb-4 text-6xl text-primary fas fa-file-alt"></i>
                 <h3 class="mb-2 text-lg font-medium text-gray-900">No applications yet</h3>
                 <p class="mb-6 text-gray-500">Start applying for jobs to see your applications here</p>
-                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-secondary">
                     <i class="mr-2 fas fa-search"></i>
                     Browse Jobs
                 </a>
@@ -151,18 +151,18 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         <?php else: ?>
             <ul class="divide-y divide-gray-200">
                 <?php foreach ($applications as $application): ?>
-                    <li class="px-6 py-4 hover:bg-gray-50">
+                    <li class="px-6 py-4 transition hover:bg-primary/10">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center space-x-3">
-                                    <h3 class="text-lg font-medium text-gray-900 truncate">
+                                    <h3 class="text-lg font-bold truncate text-primary">
                                         <?php echo htmlspecialchars($application['job_title']); ?>
                                     </h3>
 
                                     <!-- Save/Unsave Button -->
                                     <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)"
                                         class="save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors
-                                                   <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600'; ?>"
+                                                   <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-secondary bg-secondary/10 border border-secondary hover:bg-yellow-50 hover:text-yellow-600'; ?>"
                                         data-job-id="<?php echo $application['job_id']; ?>"
                                         data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>"
                                         title="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
@@ -177,10 +177,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                     echo 'bg-yellow-100 text-yellow-800';
                                                     break;
                                                 case 'reviewed':
-                                                    echo 'bg-blue-100 text-blue-800';
+                                                    echo 'bg-secondary/10 text-secondary';
                                                     break;
                                                 case 'shortlisted':
-                                                    echo 'bg-purple-100 text-purple-800';
+                                                    echo 'bg-primary/10 text-primary';
                                                     break;
                                                 case 'rejected':
                                                     echo 'bg-red-100 text-red-800';
@@ -196,15 +196,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     </span>
                                 </div>
                                 <div class="flex items-center mt-1 space-x-4 text-sm text-gray-500">
-                                    <span><i class="mr-1 fas fa-building"></i><?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?></span>
-                                    <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?></span>
-                                    <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($application['location']); ?></span>
-                                    <span><i class="mr-1 fas fa-calendar"></i>Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?></span>
+                                    <span><i class="mr-1 fas fa-building text-secondary"></i><?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?></span>
+                                    <span><i class="mr-1 fas fa-briefcase text-primary"></i><?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?></span>
+                                    <span><i class="mr-1 fas fa-map-marker-alt text-secondary"></i><?php echo htmlspecialchars($application['location']); ?></span>
+                                    <span><i class="mr-1 fas fa-calendar text-primary"></i>Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?></span>
                                     <?php if ($application['reviewed_at']): ?>
-                                        <span><i class="mr-1 fas fa-eye"></i>Reviewed <?php echo date('M j, Y', strtotime($application['reviewed_at'])); ?></span>
+                                        <span><i class="mr-1 fas fa-eye text-secondary"></i>Reviewed <?php echo date('M j, Y', strtotime($application['reviewed_at'])); ?></span>
                                     <?php endif; ?>
                                     <?php if (!empty($application['interview_date'])): ?>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">
                                             <i class="mr-1 fas fa-calendar"></i>
                                             Interview: <?php echo date('M j, Y g:i A', strtotime($application['interview_date'])); ?>
                                             <?php if (!empty($application['interview_location'])): ?>
@@ -218,7 +218,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                             <div class="flex items-center space-x-2">
                                 <!-- View Application Button -->
                                 <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition rounded bg-primary hover:bg-secondary"
                                     title="View Application">
                                     <i class="mr-2 fas fa-eye"></i>
                                     View Details
@@ -226,7 +226,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                                 <!-- View Job Button -->
                                 <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium transition rounded text-primary bg-secondary/10 hover:bg-secondary/20"
                                     title="View Job">
                                     <i class="mr-2 fas fa-external-link-alt"></i>
                                     View Job
@@ -236,7 +236,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 <?php if ($application['application_status'] === 'pending'): ?>
                                     <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
                                         onclick="return confirm('Are you sure you want to withdraw your application for \" <?php echo addslashes($application['job_title']); ?>\"?\n\nThis action cannot be undone.')"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition bg-red-600 rounded hover:bg-red-700"
                                         title="Withdraw Application">
                                         <i class="mr-2 fas fa-times"></i>
                                         Withdraw

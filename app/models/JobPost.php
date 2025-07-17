@@ -552,7 +552,10 @@ public function getAllActiveJobs($jobseeker_id = null)
                     jc.category_name,
                     e.first_name as employer_first_name,
                     e.last_name as employer_last_name,
-                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name";
+                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                     eb.business_logo,
+                    e.profile_photo as employer_profile_photo
+                ";
         
         // Add application status check if jobseeker_id is provided
         if ($jobseeker_id) {

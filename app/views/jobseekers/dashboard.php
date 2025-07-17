@@ -2,389 +2,307 @@
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
+
 <div class="min-h-screen bg-gray-50">
-
-    <nav class="bg-green-800 shadow">
-        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-semibold text-white">Jobseeker Dashboard</h1>
-                </div>
-                <div class="flex items-center">
-                    <span class="mr-4 text-gray-300">Welcome, <?php echo htmlspecialchars($jobseeker['first_name'] ?? $_SESSION['email']); ?></span>
-                    <a href="?page=logout" class="text-red-400 hover:underline">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
     <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <!-- Quick Profile Status Alert -->
-            <?php if (!$hasProfile): ?>
-                <div class="p-4 mb-6 border border-green-200 rounded-md bg-green-50">
-                    <div class="flex items-center justify-between">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="text-green-400 fas fa-user-edit"></i>
-                            </div>
-
-                            <div class="ml-3">
-                                <h1 class="text-lg font-medium text-green-800">Find the Right Job</h1>
-                                <form class="w-full max-w-md mb-4 md:max-w-lg lg:max-w-xl">
-                                    <div class="flex flex-col gap-2 p-3 bg-white rounded-sm shadow md:flex-row md:flex-nowrap">
-                                        <!-- Job Title Field -->
-                                        <div class="flex items-center flex-1 min-w-0 px-2 py-1">
-                                            <i class="mr-2 fa-solid fa-magnifying-glass text-primary"></i>
-                                            <input
-                                                type="text"
-                                                placeholder="Job title"
-                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-                                        </div>
-                                        <!-- Separator -->
-                                        <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
-                                        <!-- Location Field -->
-                                        <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
-                                            <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v10" />
-                                            </svg>
+        <!-- Hero Search Section -->
+        <div class="mb-8">
+            <div class="relative overflow-hidden shadow-xl rounded-xl bg-gradient-to-r from-primary to-secondary">
+                <div class="absolute inset-0">
+                    <img src="assets/images/hero-page-bg.png"
+                        alt="Hero Background"
+                        class="object-cover w-full h-full opacity-20"
+                        onerror="this.style.display='none'">
+                </div>
+                <div class="relative px-6 py-6 sm:px-8 sm:py-12 lg:px-12 lg:py-16">
+                    <div class="flex flex-col max-w-5xl gap-6 mx-auto md:flex-row md:items-center md:justify-between">
+                        <!-- Left: Headline -->
+                        <div class="flex-1">
+                            <h1 class="justify-center mb-3 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
+                                Find Your Dream Job Today
+                            </h1>
+                        </div>
+                        <!-- Right: Search Form -->
+                        <div class="flex-1">
+                            <form class="w-full max-w-md ml-auto md:max-w-lg lg:max-w-xl">
+                                <div class="flex flex-col gap-2 p-3 bg-white rounded-sm shadow md:flex-row md:flex-nowrap">
+                                    <!-- Job Title Field -->
+                                    <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
+                                        <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
+                                        <input
+                                            type="text"
+                                            placeholder="Job title"
+                                            class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
+                                    </div>
+                                    <!-- Separator -->
+                                    <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
+                                    <!-- Location Field -->
+                                    <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
+                                        <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
+                                            <img src="assets/icons/location-information-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
                                             <input
                                                 type="text"
                                                 placeholder="Location"
                                                 class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
                                         </div>
-                                        <!-- Search Button -->
-                                        <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
-                                            Search
-                                        </button>
                                     </div>
-                                </form>
-                                <h5 class="mb-6 text-xs text-gray3">Search thousands of jobs and opportunities</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Application Statistics (if profile exists) -->
-            <?php if ($hasProfile && !empty($applicationStats)): ?>
-                <div class="grid grid-cols-1 gap-5 mb-8 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="overflow-hidden bg-white rounded-lg shadow">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <i class="text-2xl text-blue-500 fas fa-file-alt"></i>
+                                    <!-- Search Button -->
+                                    <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
+                                        Search
+                                    </button>
                                 </div>
-                                <div class="flex-1 w-0 ml-5">
-                                    <dl>
-                                        <dt class="text-sm font-medium text-gray-500 truncate">Total Applications</dt>
-                                        <dd class="text-lg font-medium text-gray-900"><?php echo $applicationStats['total']; ?></dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="overflow-hidden bg-white rounded-lg shadow">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <i class="text-2xl text-yellow-500 fas fa-clock"></i>
-                                </div>
-                                <div class="flex-1 w-0 ml-5">
-                                    <dl>
-                                        <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
-                                        <dd class="text-lg font-medium text-gray-900"><?php echo $applicationStats['pending']; ?></dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="overflow-hidden bg-white rounded-lg shadow">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <i class="text-2xl text-purple-500 fas fa-star"></i>
-                                </div>
-                                <div class="flex-1 w-0 ml-5">
-                                    <dl>
-                                        <dt class="text-sm font-medium text-gray-500 truncate">Shortlisted</dt>
-                                        <dd class="text-lg font-medium text-gray-900"><?php echo $applicationStats['shortlisted']; ?></dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="overflow-hidden bg-white rounded-lg shadow">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <i class="text-2xl text-green-500 fas fa-check-circle"></i>
-                                </div>
-                                <div class="flex-1 w-0 ml-5">
-                                    <dl>
-                                        <dt class="text-sm font-medium text-gray-500 truncate">Hired</dt>
-                                        <dd class="text-lg font-medium text-gray-900"><?php echo $applicationStats['hired']; ?></dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Dashboard Cards -->
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
-                <!-- Profile Card -->
-                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-user-edit text-2xl <?php echo $hasProfile ? 'text-green-500' : 'text-blue-500'; ?>"></i>
-                            </div>
-                            <div class="flex-1 w-0 ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
-                                </h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    <?php echo $hasProfile ? 'Update your information' : 'Set up your profile'; ?>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <a href="?page=complete-jobseeker-profile" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white <?php echo $hasProfile ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'; ?>">
-                                <?php echo $hasProfile ? 'Edit Profile' : 'Complete Profile'; ?>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Browse Jobs Card -->
-                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="text-2xl text-blue-500 fas fa-search"></i>
-                            </div>
-                            <div class="flex-1 w-0 ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">Browse Jobs</h3>
-                                <p class="mt-1 text-sm text-gray-500">Find opportunities</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                                Browse Jobs
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- My Applications Card -->
-                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="text-2xl text-green-500 fas fa-file-alt"></i>
-                            </div>
-                            <div class="flex-1 w-0 ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">My Applications</h3>
-                                <p class="mt-1 text-sm text-gray-500">Track applications</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <a href="?page=my-applications" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
-                                View Applications
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resume Builder Card -->
-                <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="text-2xl text-purple-500 fas fa-file-pdf"></i>
-                            </div>
-                            <div class="flex-1 w-0 ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">Resume Builder</h3>
-                                <p class="mt-1 text-sm text-gray-500">Create resume</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <a href="?page=resume-builder" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700">
-                                Build Resume
-                            </a>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Recent Job Listings Section -->
-            <div class="mt-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-900">All Available Jobs</h2>
-                    <a href="?page=browse-jobs" class="text-blue-600 hover:text-blue-800">
-                        Browse Jobs <i class="ml-1 fas fa-arrow-right"></i>
-                    </a>
-                </div>
+        <!-- Main Dashboard Content -->
+        <div class="flex flex-col gap-6 lg:flex-row">
+            <!-- Left Side - Job Cards (Scrollable) -->
+            <div class="w-full lg:w-2/5 xl:w-1/3">
+                <div class="p-4 bg-white border border-gray-200 shadow-sm rounded-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">Available Jobs</h2>
+                        <span class="text-sm text-gray-500"><?php echo count($jobs); ?> jobs</span>
+                    </div>
 
-                <!-- Check if jobs array exists and is not empty -->
-                <?php if (!empty($jobs)): ?>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        <?php foreach ($jobs as $job): ?>
-                            <!-- Job Card -->
-                            <div class="overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg">
-                                <div class="p-5">
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex-shrink-0">
-                                            <i class="text-2xl text-blue-500 fas fa-briefcase"></i>
-                                        </div>
-                                        <div class="flex-1 w-0 ml-4">
-                                            <div class="flex items-center justify-between">
-                                                <h3 class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
-                                                
-                                                <!-- Save/Unsave Button -->
-                                                <?php if ($hasProfile && isset($_SESSION['user_id']) && $_SESSION['role'] == 3): ?>
-                                                    <button onclick="toggleSaveJob(<?php echo $job['job_id']; ?>, this)" 
-                                                            class="save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors
-                                                                   <?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600'; ?>"
-                                                            data-job-id="<?php echo $job['job_id']; ?>"
-                                                            data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
-                                                            title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
-                                                        <i class="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
-                                                    </button>
-                                                <?php endif; ?>
+                    <div class="overflow-y-auto" style="max-height: 600px;">
+                        <?php if (!empty($jobs)): ?>
+                            <div class="space-y-3">
+                                <?php foreach ($jobs as $job): ?>
+                                    <div class="p-4 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
+                                        onclick="window.location.href='?page=jobseeker-dashboard&job_id=<?php echo $job['job_id']; ?>'">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h3 class="font-medium text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
+                                                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?></p>
                                             </div>
-                                            
-                                            <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($job['company_name'] ?? ($job['employer_first_name'] . ' ' . $job['employer_last_name'])); ?></p>
-                                            <p class="mt-2 text-sm text-gray-700"><?php echo substr(htmlspecialchars($job['job_summary']), 0, 100) . '...'; ?></p>
-
-                                            <div class="mt-3 text-xs text-gray-500">
-                                                <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                                                <span class="ml-3"><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
-                                                <?php if ($job['show_pay'] && $job['salary']): ?>
-                                                    <span class="ml-3"><i class="mr-1 fas fa-money-bill"></i>₱<?php echo number_format($job['salary'], 2); ?></span>
-                                                <?php endif; ?>
-                                            </div>
+                                            <?php if ($hasProfile): ?>
+                                                <button onclick="event.stopPropagation(); toggleSaveJob(<?php echo $job['job_id']; ?>, this)"
+                                                    class="p-1 text-gray-400 save-btn hover:text-yellow-500"
+                                                    data-job-id="<?php echo $job['job_id']; ?>"
+                                                    data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
+                                                    title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
+                                                    <i class="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'fas fa-bookmark text-yellow-500' : 'far fa-bookmark'; ?>"></i>
+                                                </button>
+                                            <?php endif; ?>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div class="px-5 pb-5">
-                                    <div class="flex mt-4 space-x-2">
-                                        <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
-                                            class="flex-1 px-3 py-2 text-sm font-medium text-center text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200">
-                                            View Details
-                                        </a>
-
-                                        <?php if (!$hasProfile): ?>
-                                            <a href="?page=complete-jobseeker-profile"
-                                                class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
-                                                Complete Profile to Apply
-                                            </a>
-                                        <?php elseif (isset($job['has_applied']) && $job['has_applied']): ?>
-                                            <span class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
-                                                <i class="mr-1 fas fa-check-circle"></i>
-                                                Applied
+                                        <div class="flex items-center mt-2 space-x-2">
+                                            <span class="px-2 py-1 text-xs rounded <?php echo strtolower($job['job_type']) === 'full-time' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'; ?>">
+                                                <?php echo strtoupper($job['job_type']); ?>
                                             </span>
-                                        <?php else: ?>
-                                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
-                                                class="flex-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                                                <i class="mr-1 fas fa-paper-plane"></i>
-                                                Apply
-                                            </a>
+                                            <span class="text-xs text-gray-500">
+                                                <i class="mr-1 fas fa-map-marker-alt"></i>
+                                                <?php echo htmlspecialchars($job['location']); ?>
+                                            </span>
+                                        </div>
+
+                                        <?php if ($job['show_pay'] && $job['salary']): ?>
+                                            <p class="mt-2 text-sm font-medium text-gray-900">
+                                                ₱<?php echo number_format($job['salary'], 2); ?>
+                                                <span class="text-xs text-gray-500">/ <?php echo $job['pay_type'] ?? 'month'; ?></span>
+                                            </p>
                                         <?php endif; ?>
+
+                                        <!-- Status if applied -->
+                                        <?php if (isset($job['has_applied']) && $job['has_applied']): ?>
+                                            <span class="inline-flex items-center px-2 py-1 mt-2 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded">
+                                                <i class="mr-1 text-green-500 fas fa-check-circle"></i> Applied
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <!-- View Full Details Button -->
+                                        <div class="flex mt-3">
+                                            <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
+                                                onclick="event.stopPropagation();"
+                                                class="px-3 py-1 text-xs font-medium text-blue-600 transition bg-blue-100 border border-blue-300 rounded hover:bg-blue-200">
+                                                View Full Details
+                                            </a>
+                                        </div>
                                     </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="p-8 text-center">
+                                <i class="mx-auto text-4xl text-gray-300 fas fa-briefcase"></i>
+                                <p class="mt-2 text-gray-500">No jobs available</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Job Details Preview -->
+            <div class="w-full lg:w-3/5 xl:w-2/3">
+                <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
+                    <!-- Job Details Card -->
+                    <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($selectedJob['job_title']); ?></h2>
+                                <div class="flex items-center mt-2 space-x-4">
+                                    <p class="text-gray-600">
+                                        <i class="mr-1 fas fa-building"></i>
+                                        <?php echo htmlspecialchars($selectedJob['company_name'] ?? $selectedJob['business_name'] ?? 'Company'); ?>
+                                    </p>
+                                    <p class="text-gray-600">
+                                        <i class="mr-1 fas fa-map-marker-alt"></i>
+                                        <?php echo htmlspecialchars($selectedJob['location']); ?>
+                                    </p>
                                 </div>
                             </div>
+                            <div class="flex space-x-2">
+                                <?php if ($hasProfile): ?>
+                                    <button onclick="toggleSaveJob(<?php echo $selectedJob['job_id']; ?>, this)"
+                                        class="p-2 text-gray-400 rounded-full hover:bg-gray-100 hover:text-yellow-500"
+                                        title="<?php echo (isset($selectedJob['is_saved']) && $selectedJob['is_saved']) ? 'Remove from saved' : 'Save job'; ?>">
+                                        <i class="<?php echo (isset($selectedJob['is_saved']) && $selectedJob['is_saved']) ? 'fas text-yellow-500' : 'far'; ?> fa-bookmark"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
+                                    class="p-2 text-gray-400 rounded-full hover:bg-gray-100 hover:text-primary"
+                                    title="View Full Details">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-3 py-1 text-sm rounded-full <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'; ?>">
+                                    <?php echo strtoupper($selectedJob['job_type']); ?>
+                                </span>
+                                <?php if ($selectedJob['show_pay'] && $selectedJob['salary']): ?>
+                                    <span class="px-3 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">
+                                        ₱<?php echo number_format($selectedJob['salary'], 2); ?>
+                                        <span class="text-xs text-gray-500">/ <?php echo $selectedJob['pay_type'] ?? 'month'; ?></span>
+                                    </span>
+                                <?php endif; ?>
+                                <span class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full">
+                                    <i class="mr-1 fas fa-clock"></i>
+                                    Posted <?php echo date('M j', strtotime($selectedJob['created_at'])); ?>
+                                </span>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="mb-2 text-lg font-semibold text-gray-900">Job Description</h3>
+                                <div class="prose-sm prose text-gray-700 max-w-none">
+                                    <?php echo nl2br(htmlspecialchars($selectedJob['job_summary'])); ?>
+                                </div>
+                            </div>
+
+                            <?php if (!empty($selectedJob['full_description'])): ?>
+                                <div class="mb-6">
+                                    <h3 class="mb-2 text-lg font-semibold text-gray-900">Full Description</h3>
+                                    <div class="prose-sm prose text-gray-700 max-w-none">
+                                        <?php echo nl2br(htmlspecialchars($selectedJob['full_description'])); ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="flex flex-col gap-3 mt-8 sm:flex-row">
+                                <?php if (!$hasProfile): ?>
+                                    <a href="?page=complete-jobseeker-profile"
+                                        class="w-full px-4 py-2 text-sm font-medium text-center text-white bg-gray-600 rounded-lg hover:bg-gray-700">
+                                        Complete Profile to Apply
+                                    </a>
+                                <?php elseif (isset($selectedJob['has_applied']) && $selectedJob['has_applied']): ?>
+                                    <span class="w-full px-4 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-lg">
+                                        <i class="mr-1 fas fa-check-circle"></i> Applied
+                                    </span>
+                                <?php else: ?>
+                                    <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&step=1"
+                                        class="w-full px-4 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary hover:bg-primary/90">
+                                        <i class="mr-1 fas fa-paper-plane"></i> Apply Now
+                                    </a>
+                                <?php endif; ?>
+                                <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
+                                    class="w-full px-4 py-2 text-sm font-medium text-center bg-white border rounded-lg text-primary border-primary hover:bg-primary/5">
+                                    View Full Details
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <!-- Empty State -->
+                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                        <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Select a job to view details</h3>
+                        <p class="mt-1 text-gray-500">Click on any job from the list to see its full details</p>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php else: ?>
-            <!-- No jobs available -->
-            <div class="py-12 text-center bg-white rounded-lg shadow">
-                <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
-                <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs available</h3>
-                <p class="mb-4 text-gray-500">Check back later for new job postings</p>
-                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                    Browse All Jobs
-                </a>
-            </div>
-        <?php endif; ?>
         </div>
     </div>
 </div>
 
-
-</div>
-
 <script>
-function toggleSaveJob(jobId, button) {
-    // Same JavaScript code as in browse-jobs.php
-    const isSaved = button.getAttribute('data-saved') === 'true';
-    const action = isSaved ? 'unsave-job' : 'save-job';
-    
-    fetch('ajax/job-actions.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ action: action, job_id: jobId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update the button appearance
-            button.classList.toggle('text-yellow-700');
-            button.classList.toggle('bg-yellow-100');
-            button.classList.toggle('border-yellow-300');
-            button.classList.toggle('text-gray-600');
-            button.classList.toggle('bg-gray-100');
-            button.classList.toggle('border-gray-300');
-            
-            // Update the icon
-            const icon = button.querySelector('i');
-            if (isSaved) {
-                icon.classList.remove('fas', 'fa-bookmark');
-                icon.classList.add('far', 'fa-bookmark');
-            } else {
-                icon.classList.remove('far', 'fa-bookmark');
-                icon.classList.add('fas', 'fa-bookmark');
-            }
-            
-            // Update the saved status data attribute
-            button.setAttribute('data-saved', !isSaved);
-            
-            // Show a toast message
-            showToast(isSaved ? 'Job removed from saved jobs' : 'Job saved for later', 'success');
-        } else {
-            showToast('Action failed. Please try again.', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('An error occurred. Please try again.', 'error');
-    });
-}
+    // Same JavaScript functions as before
+    function toggleSaveJob(jobId, button) {
+        const isSaved = button.querySelector('i').classList.contains('fas');
+        const action = isSaved ? 'unsave-job' : 'save-job';
 
-function showToast(message, type) {
-    // Same showToast function as in browse-jobs.php
-    const toast = document.createElement('div');
-    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded-md shadow-lg text-sm font-medium text-white transition-opacity duration-300 ease-in-out
+        fetch('ajax/job-actions.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    action: action,
+                    job_id: jobId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = button.querySelector('i');
+                    if (isSaved) {
+                        icon.classList.remove('fas', 'text-yellow-500');
+                        icon.classList.add('far');
+                    } else {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas', 'text-yellow-500');
+                    }
+                    showToast(isSaved ? 'Job removed from saved' : 'Job saved successfully', 'success');
+
+                    // Update the card in the list if it exists
+                    const cardBtn = document.querySelector(`.job-card[onclick*="job_id=${jobId}"] button`);
+                    if (cardBtn) {
+                        const cardIcon = cardBtn.querySelector('i');
+                        if (isSaved) {
+                            cardIcon.classList.remove('fas', 'text-yellow-500');
+                            cardIcon.classList.add('far');
+                        } else {
+                            cardIcon.classList.remove('far');
+                            cardIcon.classList.add('fas', 'text-yellow-500');
+                        }
+                    }
+                } else {
+                    showToast('Action failed: ' + (data.message || 'Please try again'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred. Please try again.', 'error');
+            });
+    }
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded-md shadow-lg text-sm font-medium text-white transition-opacity duration-300 ease-in-out
                       ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-    toast.innerText = message;
-    document.body.appendChild(toast);
+        toast.innerText = message;
+        document.body.appendChild(toast);
 
-    setTimeout(() => {
-        toast.classList.add('opacity-0');
         setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 300);
-    }, 3000);
-}
+            toast.classList.add('opacity-0');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
 </script>

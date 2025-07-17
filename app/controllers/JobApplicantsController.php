@@ -20,6 +20,6 @@ class JobApplicantsController
     public function viewAllApplicants()
         {
             $applicants = $this->jobApplicantsModel->getAllApplicants();
-            include __DIR__ . '/../views/employers/manage-applications.php';
+            include __DIR__ . '/../views/employers/browse-candidates.php';
         }
 }

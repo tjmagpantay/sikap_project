@@ -114,7 +114,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
-    
+        
+        case 'view-all-applicants':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewAllApplicants();
+            break;
         case 'view-applicants':
             require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
             $controller = new JobApplicantsController();

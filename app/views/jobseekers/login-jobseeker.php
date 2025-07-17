@@ -1,91 +1,76 @@
 <?php
-    include_once __DIR__ . '/../components/navbar-top.php';
-    include_once __DIR__ . '/../components/navbar.php';
+include_once __DIR__ . '/../components/navbar-top.php';
+include_once __DIR__ . '/../components/navbar.php';
 ?>
 
-<div class="flex flex-col justify-center py-12 min-h-screen bg-gray-50 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900">Jobseeker Sign In</h2>
-            <p class="mt-2 text-sm text-gray-600">
-                Sign in to your jobseeker account
-            </p>
-        </div> 
-    </div>
-
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
+<div class="flex items-center justify-center px-2 py-8 bg-gray-50">
+    <div class="flex flex-col-reverse max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
+        <!-- Left: Login Card -->
+        <div class="flex flex-col justify-center w-full px-6 py-8 md:w-1/2">
+            <h2 class="mb-4 text-3xl font-bold text-gray-900">Login</h2>
+            <p class="mb-6 text-sm text-gray-600">Sign in to your jobseeker account</p>
             <?php if (!empty($error)): ?>
-                <div class="px-4 py-3 mb-4 text-red-600 bg-red-50 rounded-md border border-red-200">
+                <div class="px-4 py-3 mb-6 text-red-600 border border-red-200 rounded-md bg-red-50">
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=login-jobseeker">
+            <form class="space-y-5" method="POST" action="?page=login-jobseeker">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                    <div class="mt-1">
-                        <input id="email" name="email" type="email" required 
-                               value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
-                               class="block px-3 py-2 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input id="email" name="email" type="email" required
+                        value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
+                        class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
-
-                <div>
+                <div class="mt-2">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <div class="mt-1">
-                        <input id="password" name="password" type="password" required 
-                               value="<?php echo htmlspecialchars($formData['password'] ?? ''); ?>"
-                               class="block px-3 py-2 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
+                    <input id="password" name="password" type="password" required
+                        class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
-
-
-            <div class="flex justify-start">
-                <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a>
-            </div>
-
-
-                <div>
-                    <button type="submit" class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white rounded-md border border-transparent shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Sign In
-                    </button>
+                <div class="flex justify-end mt-2">
+                    <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a>
                 </div>
+                <button type="submit"
+                    class="justify-end w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                    Sign In
+                </button>
             </form>
 
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="flex absolute inset-0 items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="flex relative justify-center text-sm">
-                        <span class="px-2 text-gray-500 bg-white">Or</span>
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <a href="?page=google-login&type=jobseeker"
-                        class="flex justify-center items-center px-4 py-2 w-full text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="mr-2 w-5 h-5">
-                        Continue with Google
-                    </a>
-                </div>
-
-                <div class="mt-6 text-center">
-                   
-                    <p class="mt-2 text-sm text-gray-600">
-                        Don't have an account? 
-                        <a href="?page=signup-jobseeker" class="font-medium text-primary hover:underline">Sign up as Jobseeker</a>
-                    </p>
-                    <p class="mt-2 text-sm text-gray-600">
-                        Are you an employer? 
-                        <a href="?page=login-employer" class="font-medium text-secondary hover:underline">Employer Sign In</a>
-                    </p>
-                </div>
+            <!-- Or Separator -->
+            <div class="flex items-center justify-center py-2 my-6">
+                <div class="flex-grow border-t border-gray-400"></div>
+                <span class="px-2 mx-4 text-sm font-medium text-gray-600 bg-white">or</span>
+                <div class="flex-grow border-t border-gray-400"></div>
             </div>
 
-           
+            <!-- Google Sign In -->
+            <a href="?page=google-login&type=jobseeker"
+                class="flex items-center justify-center w-full px-4 py-3 mb-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="w-5 h-5 mr-2">
+                Sign in with Google
+            </a>
+
+            <!-- Sign Up Link -->
+            <div class="mt-4 text-center">
+                <p class="mb-2 text-sm text-gray-600">
+                    Don't have an account?
+                    <a href="?page=signup-jobseeker" class="font-medium text-primary hover:underline">Sign Up</a>
+                </p>
+                <p class="text-sm text-gray-600">
+                    Are you an employer?
+                    <a href="?page=login-employer" class="font-medium text-secondary hover:underline">Employer Sign In</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Right: Image Carousel -->
+        <div class="items-center justify-center hidden bg-gray-100 md:flex md:w-1/2">
+            <div class="flex items-center justify-center w-full h-full">
+                <!-- Simple carousel (static for demo, replace with JS carousel if needed) -->
+                <div class="flex items-center justify-center w-full h-full">
+                    <img src="../public/assets/images/hero-page-img.png" alt="Jobseekers" class="object-cover w-full h-full rounded-r-xl" />
+                </div>
+            </div>
         </div>
     </div>
 </div>

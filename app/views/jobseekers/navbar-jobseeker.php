@@ -13,7 +13,6 @@
         <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
         <li><a href="#" class="nav-link">Programs</a></li>
         <li><a href="#" class="nav-link">Explore Companies</a></li>
-        <li><a href="#" class="nav-link">Community</a></li>
       </ul>
     </div>
 

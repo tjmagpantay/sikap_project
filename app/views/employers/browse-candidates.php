@@ -5,7 +5,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
 <div class="min-h-screen px-4 py-8 sm:px-6 md:px-16 lg:px-24">
     <div class="max-w-5xl mx-auto">
-        <h2 class="mb-8 text-2xl font-bold text-gray-900">Manage Applicants</h2>
+        <h2 class="mb-8 text-2xl font-bold text-gray-900">All Applicants</h2>
         <div class="bg-white rounded-lg shadow">
             <div class="w-full overflow-x-auto">
                 <table class="w-full divide-y divide-gray-200 table-fixed">
