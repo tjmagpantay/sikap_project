@@ -3,57 +3,61 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
     <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <!-- Hero Search Section -->
-        <div class="mb-8">
-            <div class="relative overflow-hidden shadow-xl rounded-xl bg-gradient-to-r from-primary to-secondary">
-                <div class="absolute inset-0">
-                    <img src="assets/images/hero-page-bg.png"
-                        alt="Hero Background"
-                        class="object-cover w-full h-full opacity-20"
-                        onerror="this.style.display='none'">
+        <div class="relative px-6 py-6 mb-8 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
+            <!-- Background Image and Gradient Overlay (below content) -->
+            <div class="absolute inset-0 z-0">
+                <img src="assets/images/hero-page-bg.png"
+                    alt="Hero Background"
+                    class="object-cover w-full h-full opacity-20"
+                    onerror="this.style.display='none'">
+                <div class="absolute inset-0"
+                    style="background: linear-gradient(to right, var(--color-primary, #092C4C) 0%, transparent 100%); opacity: 0.85;">
                 </div>
-                <div class="relative px-6 py-6 sm:px-8 sm:py-12 lg:px-12 lg:py-16">
-                    <div class="flex flex-col max-w-5xl gap-6 mx-auto md:flex-row md:items-center md:justify-between">
-                        <!-- Left: Headline -->
-                        <div class="flex-1">
-                            <h1 class="justify-center mb-3 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
-                                Find Your Dream Job Today
-                            </h1>
-                        </div>
-                        <!-- Right: Search Form -->
-                        <div class="flex-1">
-                            <form class="w-full max-w-md ml-auto md:max-w-lg lg:max-w-xl">
-                                <div class="flex flex-col gap-2 p-3 bg-white rounded-sm shadow md:flex-row md:flex-nowrap">
-                                    <!-- Job Title Field -->
-                                    <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
-                                        <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
-                                        <input
-                                            type="text"
-                                            placeholder="Job title"
-                                            class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-                                    </div>
-                                    <!-- Separator -->
-                                    <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
-                                    <!-- Location Field -->
-                                    <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
-                                        <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
-                                            <img src="assets/icons/location-information-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
-                                            <input
-                                                type="text"
-                                                placeholder="Location"
-                                                class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-                                        </div>
-                                    </div>
-                                    <!-- Search Button -->
-                                    <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
-                                        Search
-                                    </button>
+            </div>
+            <!-- Content (above gradient) -->
+            <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto md:flex-row md:items-center md:justify-between" style="min-height:70px;">
+                <!-- Left: Headline -->
+                <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
+                    <h1 class="w-full mb-1 text-2xl font-bold text-center text-white sm:text-3xl lg:text-4xl md:w-auto md:text-left">
+                        Find Your Dream Job Today
+                    </h1>
+                    <p class="max-w-2xl mt-2 text-sm leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-sm">
+                        Apply job that match you.
+                    </p>
+                </div>
+                <!-- Right: Search Form -->
+                <div class="flex-1">
+                    <form class="w-full max-w-md ml-auto md:max-w-lg lg:max-w-xl">
+                        <div class="flex flex-col gap-2 p-3 bg-white rounded-md shadow md:flex-row md:flex-nowrap">
+                            <!-- Job Title Field -->
+                            <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
+                                <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
+                                <input
+                                    type="text"
+                                    placeholder="Job title"
+                                    class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
+                            </div>
+                            <!-- Separator -->
+                            <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
+                            <!-- Location Field -->
+                            <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
+                                <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
+                                    <img src="assets/icons/location-information-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
+                                    <input
+                                        type="text"
+                                        placeholder="Location"
+                                        class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
                                 </div>
-                            </form>
+                            </div>
+                            <!-- Search Button -->
+                            <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
+                                Search
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -62,7 +66,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <div class="flex flex-col gap-6 lg:flex-row">
             <!-- Left Side - Job Cards (Scrollable) -->
             <div class="w-full lg:w-2/5 xl:w-1/3">
-                <div class="p-4 bg-white border border-gray-200 shadow-sm rounded-xl">
+                <div class="">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-900">Available Jobs</h2>
                         <span class="text-sm text-gray-500"><?php echo count($jobs); ?> jobs</span>
@@ -118,7 +122,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <div class="flex mt-3">
                                             <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
                                                 onclick="event.stopPropagation();"
-                                                class="px-3 py-1 text-xs font-medium text-blue-600 transition bg-blue-100 border border-blue-300 rounded hover:bg-blue-200">
+                                                class="px-3 py-1 mt-2 text-xs font-medium text-blue-600 transition bg-blue-100 border border-blue-300 rounded hover:bg-blue-200">
                                                 View Full Details
                                             </a>
                                         </div>

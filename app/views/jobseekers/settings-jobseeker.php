@@ -14,8 +14,8 @@ if ($jobseeker === false) {
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen bg-gray-100">
-    <div class="max-w-4xl px-4 py-8 mx-auto sm:px-6 lg:px-8">
+<div class="min-h-screen ">
+    <div class="max-w-4xl px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center mb-2 space-x-3">
@@ -37,7 +37,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <p class="mt-1 text-sm text-gray-600">Update your password to keep your account secure</p>
                     </div>
                     <button onclick="togglePasswordForm()" 
-                            class="flex items-center px-4 py-2 text-sm font-medium text-green-600 transition-colors border border-green-200 rounded-md bg-green-50 hover:bg-green-100">
+                            class="flex items-center px-4 py-2 text-sm font-medium transition-colors border rounded-md border-primary text-primary bg-lightBluehover:bg-green-100">
                         <i class="mr-2 fas fa-key"></i>
                         Change Password
                     </button>
@@ -118,7 +118,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <div class="mt-6">
-                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-md hover:bg-green-700">
+                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-green-700">
                         Save Preferences
                     </button>
                 </div>
@@ -167,7 +167,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <div class="mt-6">
-                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-md hover:bg-green-700">
+                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-green-700">
                         Save Privacy Settings
                     </button>
                 </div>
