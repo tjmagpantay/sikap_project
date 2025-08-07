@@ -23,6 +23,41 @@ class JobApplicants
         }
     }
 
+    public function getAllApplicantsGroupedByJob()
+    {
+        $sql = "SELECT 
+                    ja.application_id,
+                    ja.jobseeker_id,
+                    ja.job_id,
+                    ja.application_status,
+                    ja.applied_at,
+                    js.first_name,
+                    js.last_name,
+                    u.email,
+                    js.profile_picture,
+                    jp.job_title
+                FROM job_application ja
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                JOIN users u ON js.user_id = u.user_id
+                JOIN job_post jp ON ja.job_id = jp.job_id
+                ORDER BY jp.job_title, ja.applied_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Group by job title
+        $grouped = [];
+        foreach ($results as $applicant) {
+            $jobTitle = $applicant['job_title'];
+            if (!isset($grouped[$jobTitle])) {
+                $grouped[$jobTitle] = [];
+            }
+            $grouped[$jobTitle][] = $applicant;
+        }
+        
+        return $grouped;
+    }
+
     public function getAllApplicants()
     {
         $sql = "SELECT 

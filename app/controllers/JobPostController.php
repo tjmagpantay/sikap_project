@@ -52,7 +52,7 @@ class JobPostController
         $jobData = [];
         $attachments = [];
         $screeningQuestions = [];
-        
+
         if ($isEditing) {
             // Get basic job data
             $jobData = $this->jobPostModel->getJobById($job_id);
@@ -63,13 +63,13 @@ class JobPostController
 
             // Get job skills
             $jobData['skills'] = $this->jobPostModel->getJobSkills($job_id);
-            
+
             // Get attachments for step 2
             $attachments = $this->jobPostModel->getJobAttachments($job_id);
-            
+
             // Get screening questions for step 3
             $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
-            
+
             // For step 5, get full job data including all related data
             if ($step == 5) {
                 $jobData = $this->jobPostModel->getFullJobDataForReview($job_id);
@@ -152,6 +152,9 @@ class JobPostController
 
         try {
             error_log("DEBUG: handleJobStep1 called");
+            error_log("DEBUG: POST data: " . print_r($data, true));
+            error_log("DEBUG: save_draft isset: " . (isset($data['save_draft']) ? 'YES' : 'NO'));
+            error_log("DEBUG: job_id: " . ($job_id ?? 'null'));
 
             // Validate required fields
             $required = ['job_title', 'job_category_id', 'job_type', 'location', 'job_summary'];
@@ -212,8 +215,11 @@ class JobPostController
                 // Check if it's a draft save
                 if (isset($data['save_draft'])) {
                     header("Location: ?page=post-job&step=1&job_id=$currentJobId&success=" . urlencode('Job saved as draft successfully!'));
+                } elseif (isset($data['continue_to_step2'])) {
+                    // Explicit step 2 progression
+                    header("Location: ?page=post-job&step=2&job_id=$currentJobId&success=" . urlencode('Job details saved!'));
                 } else {
-                    // Redirect to next step
+                    // Redirect to next step (default behavior)
                     header("Location: ?page=post-job&step=2&job_id=$currentJobId&success=" . urlencode('Job details saved!'));
                 }
                 exit;
@@ -298,8 +304,8 @@ class JobPostController
                 }
             }
 
-            $message = $questionsSaved > 0 ? 
-                "Screening questions saved! ($questionsSaved questions)" : 
+            $message = $questionsSaved > 0 ?
+                "Screening questions saved! ($questionsSaved questions)" :
                 'No valid questions to save.';
 
             header("Location: ?page=post-job&step=4&job_id=$job_id&success=" . urlencode($message));
@@ -513,7 +519,7 @@ class JobPostController
         // Get jobseeker info to check application status and saved status
         $jobseeker = null;
         $jobseeker_id = null;
-        
+
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             try {
                 require_once __DIR__ . '/../models/Jobseeker.php';
@@ -527,17 +533,17 @@ class JobPostController
 
         // Use the SAME logic as dashboard to get jobs
         $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-        
+
         // Add saved status to each job if user is logged in
         if ($jobseeker_id) {
             require_once __DIR__ . '/../models/SavedJobs.php';
             $savedJobsModel = new SavedJobs();
-            
+
             foreach ($jobs as &$job) {
                 $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
             }
         }
-        
+
         error_log('=== BROWSE JOBS CONTROLLER DEBUG ===');
         error_log('Browse jobs found: ' . count($jobs));
         error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not logged in'));

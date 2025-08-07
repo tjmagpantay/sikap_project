@@ -1,4 +1,4 @@
-<nav class="w-full px-4 py-2 bg-gray-100 shadow-md font-inter sm:px-6 md:px-16 lg:px-24 text-gray">
+<nav class="w-full px-8 py-2 bg-gray-100 shadow-md font-inter sm:px-6 md:px-12 lg:px-24 text-gray">
   <div class="flex flex-wrap items-center justify-between">
     <!-- Left navigation links -->
     <div class="block">

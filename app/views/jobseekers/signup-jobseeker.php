@@ -10,10 +10,10 @@
 <script src="/sikap_development/app/views/components/terms-condi.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<body class="flex justify-center items-center min-h-screen bg-gray-100">
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
     
  
-<div class="flex flex-col justify-center py-12 min-h-screen bg-gray-50 sm:px-6 lg:px-8">
+<div class="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-gray-900">Create Jobseeker Account</h2>
@@ -32,13 +32,13 @@
                             <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
                             <input id="first_name" name="first_name" type="text" required 
                                    value="<?php echo htmlspecialchars($formData['first_name'] ?? ''); ?>"
-                                   class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                                   class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                         </div>
                         <div>
                             <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
                             <input id="last_name" name="last_name" type="text" required 
                                    value="<?php echo htmlspecialchars($formData['last_name'] ?? ''); ?>"
-                                   class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                                   class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                         </div>
                     </div>
 
@@ -46,28 +46,28 @@
                         <label for="contact_number" class="block text-sm font-medium text-gray-700">Contact Number</label>
                         <input id="contact_number" name="contact_number" type="tel" required 
                                value="<?php echo htmlspecialchars($formData['contact_number'] ?? ''); ?>"
-                               class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
                         <input id="email" name="email" type="email" required 
                                value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
-                               class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                         <input id="password" name="password" type="password" required 
                                value="<?php echo htmlspecialchars($formData['password'] ?? ''); ?>"
-                               class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
 
                     <div>
                         <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
                         <input id="confirm_password" name="confirm_password" type="password" required 
                                value="<?php echo htmlspecialchars($formData['confirm_password'] ?? ''); ?>"
-                               class="block px-3 py-2 mt-1 w-full placeholder-gray-400 rounded-md border border-gray-300 appearance-none focus:outline-none focus:ring-primary focus:border-primary">
+                               class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-primary focus:border-primary">
                     </div> 
 
                     <!-- Add this before the submit button -->
@@ -75,7 +75,7 @@
                             <div class="flex items-start">
                                 <div class="flex items-center h-5">
                                     <input id="terms" name="terms" type="checkbox" required
-                                        class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                        class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary">
                                 </div>
                                 <div class="ml-3 text-sm">
                                     <label for="terms" class="font-medium text-gray-700">
@@ -93,7 +93,7 @@
                         </div>
 
                     <div>
-                        <button type="submit" class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white rounded-md border border-transparent shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <button type="submit" class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                             Create Account
                         </button>
                     </div>

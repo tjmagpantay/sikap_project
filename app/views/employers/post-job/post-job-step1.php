@@ -37,6 +37,8 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 
         <!-- Form -->
         <form class="mt-10 space-y-6 font-inter" method="POST" action="?page=post-job&step=1<?php echo $job_id ? '&job_id=' . $job_id : ''; ?>">
+            <!-- Hidden field to ensure step progression -->
+            <input type="hidden" name="continue_to_step2" value="1">
             <div>
                 <label for="job_title" class="block mb-1 text-sm font-medium text-primary">Job Title</label>
                 <input

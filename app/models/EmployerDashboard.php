@@ -22,7 +22,7 @@ class EmployerDashboard
         }
     }
 
-    public function getEmployerJobPosts($employer_id, $limit = 10)
+    public function getEmployerJobPosts($employer_id, $limit = 5, $offset = 0)
     {
         try {
             $sql = "SELECT 
@@ -37,19 +37,34 @@ class EmployerDashboard
                     LEFT JOIN job_application ja ON jp.job_id = ja.job_id AND ja.is_finalized = 1
                     WHERE jp.employer_id = ?
                     GROUP BY jp.job_id, jp.job_title, jp.job_type, jp.job_status, jp.application_deadline, jp.created_at
-                    ORDER BY jp.created_at
-                    LIMIT " . intval($limit);
-                    //bawal ang LIMIT = ?
-            
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute([$employer_id]);
-                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+                    ORDER BY jp.created_at DESC
+                    LIMIT " . intval($limit) . " OFFSET " . intval($offset);
+            //bawal ang LIMIT = ?
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer_id]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             error_log('EmployerDashboard Model - Job posts found: ' . count($result));
             return $result;
         } catch (PDOException $e) {
             error_log('Error fetching employer job posts: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    public function getTotalJobCount($employer_id)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM job_post WHERE employer_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $result['total'];
+        } catch (PDOException $e) {
+            error_log('Error getting total job count: ' . $e->getMessage());
+            return 0;
         }
     }
 
@@ -106,16 +121,16 @@ class EmployerDashboard
         if (!$deadline) {
             return 'No deadline';
         }
-        
+
         try {
             $now = new DateTime();
             $deadlineDate = new DateTime($deadline);
             $diff = $now->diff($deadlineDate);
-            
+
             if ($deadlineDate < $now) {
                 return 'Expired';
             }
-            
+
             return $diff->days;
         } catch (Exception $e) {
             error_log('Error calculating days remaining: ' . $e->getMessage());
@@ -137,28 +152,28 @@ class EmployerDashboard
                     FROM job_post jp
                     LEFT JOIN job_application ja ON jp.job_id = ja.job_id AND ja.is_finalized = 1
                     WHERE jp.employer_id = ?";
-            
+
             $params = [$employer_id];
-            
+
             // Add status filter if provided
             if (!empty($filters['status'])) {
                 $sql .= " AND jp.job_status = ?";
                 $params[] = $filters['status'];
             }
-            
+
             // Add date range filter if provided
             if (!empty($filters['date_from'])) {
                 $sql .= " AND jp.created_at >= ?";
                 $params[] = $filters['date_from'];
             }
-            
+
             if (!empty($filters['date_to'])) {
                 $sql .= " AND jp.created_at <= ?";
                 $params[] = $filters['date_to'];
             }
-            
+
             $sql .= " GROUP BY jp.job_id, jp.job_title, jp.job_type, jp.job_status, jp.application_deadline, jp.created_at";
-            
+
             // Add sorting
             $sortBy = $filters['sort'] ?? 'recent';
             switch ($sortBy) {
@@ -171,17 +186,17 @@ class EmployerDashboard
                 default: // recent
                     $sql .= " ORDER BY jp.created_at DESC";
             }
-            
+
             // Add pagination
-            $limit = $filters['limit'] ?? 10;
+            $limit = $filters['limit'] ?? 5;
             $offset = ($filters['page'] ?? 1 - 1) * $limit;
             $sql .= " LIMIT ? OFFSET ?";
             $params[] = $limit;
             $params[] = $offset;
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute($params);
-            
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error fetching filtered job posts: ' . $e->getMessage());
@@ -195,10 +210,10 @@ class EmployerDashboard
             $sql = "UPDATE job_post 
                     SET job_status = 'expired', updated_at = NOW() 
                     WHERE job_id = ? AND employer_id = ?";
-            
+
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$job_id, $employer_id]);
-            
+
             if ($result && $stmt->rowCount() > 0) {
                 error_log("Job $job_id expired successfully by employer $employer_id");
                 return true;
@@ -232,27 +247,27 @@ class EmployerDashboard
                 FROM employer e
                 LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                 WHERE e.employer_id = ?";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id]);
             $employer = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
             if (!$employer) {
                 return ['has_profile' => false, 'can_post_jobs' => false, 'profile_data' => null];
             }
-        
+
             // Check if basic profile is complete
-            $hasBasicProfile = !empty($employer['first_name']) && 
-                          !empty($employer['last_name']) && 
-                          !empty($employer['phone']) && 
-                          !empty($employer['company_name']);
-        
+            $hasBasicProfile = !empty($employer['first_name']) &&
+                !empty($employer['last_name']) &&
+                !empty($employer['phone']) &&
+                !empty($employer['company_name']);
+
             // Check if business profile exists
             $hasBusinessProfile = !empty($employer['business_id']);
-        
+
             // Employer can post jobs if they have basic profile (verification optional for now)
             $canPostJobs = $hasBasicProfile;
-        
+
             return [
                 'has_profile' => $hasBasicProfile,
                 'has_business_profile' => $hasBusinessProfile,
@@ -271,13 +286,13 @@ class EmployerDashboard
         try {
             // Get basic stats
             $stats = $this->getEmployerStats($employer_id);
-        
+
             // Get profile completion
             $profileStatus = $this->checkProfileCompletion($employer_id);
-        
+
             // Get recent activities (optional)
             $recentApplications = $this->getRecentApplications($employer_id, 5);
-        
+
             return [
                 'stats' => $stats,
                 'profile_status' => $profileStatus,
@@ -309,10 +324,10 @@ class EmployerDashboard
                 WHERE jp.employer_id = ? AND ja.is_finalized = 1
                 ORDER BY ja.created_at DESC
                 LIMIT ?";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id, $limit]);
-        
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting recent applications: ' . $e->getMessage());
@@ -320,4 +335,3 @@ class EmployerDashboard
         }
     }
 }
-?>

@@ -19,7 +19,7 @@ class JobApplicantsController
         }
     public function viewAllApplicants()
         {
-            $applicants = $this->jobApplicantsModel->getAllApplicants();
+            $jobGroups = $this->jobApplicantsModel->getAllApplicantsGroupedByJob();
             include __DIR__ . '/../views/employers/browse-candidates.php';
         }
 }

@@ -24,8 +24,13 @@ include_once __DIR__ . '/../components/navbar.php';
                 </div>
                 <div class="mt-2">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input id="password" name="password" type="password" required
-                        class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="relative">
+                        <input id="password" name="password" type="password" required
+                            class="block w-full px-3 py-2 pr-10 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+                            <i id="password-icon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex justify-end mt-2">
                     <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a>
