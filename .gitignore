@@ -17,6 +17,7 @@ __pycache__/
 config/
 config/db_structure_viewer.php
 config/sikap_db.php
+config/google_oauth.php
 
 # OS
 .DS_Store
