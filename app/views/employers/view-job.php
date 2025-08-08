@@ -5,11 +5,11 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
 <div class="min-h-screen bg-gray-50">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-        <!-- Main Grid Layout -->
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-12">
+        <!-- Main Flex Layout -->
+        <div class="flex flex-col gap-8 md:flex-row">
 
-            <!-- Left Section - Main Content (8/12 = 66.7% width) -->
-            <div class="space-y-6 md:col-span-8">
+            <!-- Left Section - Main Content (8/12 width) -->
+            <div class="w-full space-y-6 md:w-8/12">
 
                 <!-- Header Card -->
                 <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
@@ -17,15 +17,15 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <!-- Job Title and Badges -->
                         <div class="flex items-start justify-between mb-6">
                             <div>
-                                <h1 class="mb-2 text-3xl font-bold text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h1>
+                                <h1 class="text-xl font-semibold text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h1>
                                 <div class="flex items-center gap-3">
                                     <!-- Employment Type Badge -->
-                                    <span class="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
                                         <?php echo strtoupper(str_replace('-', ' ', $job['job_type'])); ?>
                                     </span>
 
                                     <!-- Status Badge -->
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium
                                         <?php
                                         switch ($job['job_status']) {
                                             case 'open':
@@ -81,9 +81,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         </div>
 
                         <!-- Application Info Bar -->
-                        <div class="grid grid-cols-3 gap-4 p-4 mb-6 rounded-lg bg-gray-50">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-gray-900">
+                        <div class="flex justify-between p-4 mx-4 mb-6 rounded-lg bg-gray-50">
+                            <div class="text-start">
+                                <div class="text-xs text-gray-400">Days remaining</div>
+                                <div class="text-sm text-primary">
                                     <?php
                                     if (!empty($job['application_deadline'])) {
                                         $deadline = new DateTime($job['application_deadline']);
@@ -98,17 +99,16 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     }
                                     ?>
                                 </div>
-                                <div class="text-sm text-gray-600">Days remaining</div>
                             </div>
-                            <div class="text-center">
-                                <div class="text-sm font-medium text-gray-900">Application Start</div>
-                                <div class="text-sm text-gray-600">
+                            <div class="text-start">
+                                <div class="text-xs text-gray-400">Application Start</div>
+                                <div class="text-sm text-primary">
                                     <?php echo $job['application_start'] ? date('M j, Y', strtotime($job['application_start'])) : 'Immediately'; ?>
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <div class="text-sm font-medium text-gray-900">Application End</div>
-                                <div class="text-sm text-gray-600">
+                            <div class="text-start">
+                                <div class="text-xs text-gray-400">Application End</div>
+                                <div class="text-sm text-primary">
                                     <?php echo $job['application_deadline'] ? date('M j, Y', strtotime($job['application_deadline'])) : 'No deadline'; ?>
                                 </div>
                             </div>
@@ -116,20 +116,20 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                         <!-- Job Summary -->
                         <div class="mb-8">
-                            <h2 class="mb-3 text-xl font-semibold text-gray-900">Job Summary</h2>
-                            <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
+                            <h2 class="mb-1 font-semibold text-primary text-md">Job Summary</h2>
+                            <p class="text-sm font-light text-gray-600"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
                         </div>
 
                         <!-- Skills -->
                         <?php if (!empty($job['skills'])): ?>
                             <div class="mb-8">
-                                <h2 class="mb-3 text-xl font-semibold text-gray-900">Skills</h2>
+                                <h2 class="mb-1 font-semibold text-primary text-md">Skills</h2>
                                 <div class="flex flex-wrap gap-2">
                                     <?php
                                     $uniqueSkills = array_unique($job['skills']);
                                     foreach ($uniqueSkills as $skill):
                                     ?>
-                                        <span class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg">
+                                        <span class="px-3 py-1 text-sm font-light text-gray-600 bg-gray-100 rounded-sm">
                                             <?php echo htmlspecialchars($skill); ?>
                                         </span>
                                     <?php endforeach; ?>
@@ -139,28 +139,28 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                         <!-- Basic Information -->
                         <div class="mb-8">
-                            <h2 class="mb-3 text-xl font-semibold text-gray-900">Basic Information</h2>
+                            <h2 class="mb-1 font-semibold text-primary text-md">Basic Information</h2>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div class="text-sm font-medium text-gray-500">Category</div>
-                                    <div class="text-gray-900"><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></div>
+                                    <div class="text-xs text-gray-400">Category</div>
+                                    <div class="text-sm text-primary"><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></div>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-500">Type</div>
-                                    <div class="text-gray-900"><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></div>
+                                    <div class="text-xs text-gray-400">Type</div>
+                                    <div class="text-sm text-primary"><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></div>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-500">Location</div>
-                                    <div class="text-gray-900"><?php echo htmlspecialchars($job['location']); ?></div>
+                                    <div class="text-xs text-gray-400">Location</div>
+                                    <div class="text-sm text-primary"><?php echo htmlspecialchars($job['location']); ?></div>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-500">Workplace</div>
-                                    <div class="text-gray-900"><?php echo ucfirst($job['workplace_option']); ?></div>
+                                    <div class="text-xs text-gray-400">Workplace</div>
+                                    <div class="text-sm text-primary"><?php echo ucfirst($job['workplace_option']); ?></div>
                                 </div>
                                 <?php if ($job['show_pay'] && ($job['salary'] || $job['pay_range'])): ?>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-500">Salary Range</div>
-                                        <div class="text-gray-900">
+                                        <div class="text-xs text-gray-400">Salary Range</div>
+                                        <div class="text-sm text-primary">
                                             <?php
                                             if ($job['salary']) {
                                                 echo '₱' . number_format($job['salary'], 2);
@@ -172,8 +172,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-500">Pay Type</div>
-                                        <div class="text-gray-900"><?php echo ucfirst($job['pay_type'] ?? 'Monthly'); ?></div>
+                                        <div class="text-xs text-gray-400">Pay Type</div>
+                                        <div class="text-sm text-primary"><?php echo ucfirst($job['pay_type'] ?? 'Monthly'); ?></div>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -182,8 +182,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <!-- Full Description -->
                         <?php if ($job['full_description'] && $job['full_description'] != $job['job_summary']): ?>
                             <div class="mb-8">
-                                <h2 class="mb-3 text-xl font-semibold text-gray-900">Full Description</h2>
-                                <div class="text-gray-700">
+                                <h2 class="mb-1 font-semibold text-primary text-md">Full Description</h2>
+                                <div class="text-sm font-light text-gray-600">
                                     <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
                                 </div>
                             </div>
@@ -191,20 +191,22 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                         <!-- Attachments -->
                         <div>
-                            <h2 class="mb-3 text-xl font-semibold text-gray-900">Attachments</h2>
+                            <h2 class="mb-1 font-semibold text-primary text-md">Attachments</h2>
                             <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
                                 <div class="flex items-center">
-                                    <div class="flex items-center justify-center w-10 h-10 mr-3 bg-red-100 rounded-lg">
-                                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd" />
-                                        </svg>
+                                    <!-- Larger container with bigger image -->
+                                    <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                        <img
+                                            src="../public/assets/icons/pdf-icon.png"
+                                            alt="Icon"
+                                            class="object-cover w-8 h-8" />
                                     </div>
                                     <div>
-                                        <div class="font-medium text-gray-900">Attachment.pdf</div>
-                                        <div class="text-sm text-gray-500">280kB</div>
+                                        <div class="text-sm text-primary">Attachment.pdf</div>
+                                        <div class="text-xs text-gray-400">280kB</div>
                                     </div>
                                 </div>
-                                <button class="px-4 py-2 text-sm font-medium text-blue-700 transition-colors rounded-lg bg-blue-50 hover:bg-blue-100">
+                                <button class="px-4 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
                                     Download ↓
                                 </button>
                             </div>
@@ -213,59 +215,66 @@ include_once __DIR__ . '../components/navbar-employer.php';
                 </div>
             </div>
 
-            <!-- Right Section - Sidebar (4/12 = 33.3% width) -->
-            <div class="md:col-span-4">
+            <!-- Right Section - Sidebar (4/12 width) -->
+            <div class="w-full md:w-4/12">
+
                 <!-- Single Sidebar Card -->
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
                     <!-- Application Statistics -->
                     <div class="mb-8">
                         <h3 class="mb-4 text-xl font-semibold text-gray-900">Application Statistics</h3>
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Total Applications:</span>
-                                <span class="text-xl font-bold text-gray-900"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                <span class="text-xs text-gray-400">Total Applications:</span>
+                                <span class="text-sm text-primary"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Pending Review:</span>
-                                <span class="text-xl font-bold text-yellow-600"><?php echo $job['pending_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                <span class="text-xs text-gray-400">Pending Review:</span>
+                                <span class="text-sm text-primary"><?php echo $job['pending_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Shortlisted:</span>
-                                <span class="text-xl font-bold text-purple-600"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                <span class="text-xs text-gray-400">Shortlisted:</span>
+                                <span class="text-sm text-primary"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Hired:</span>
-                                <span class="text-xl font-bold text-green-600"><?php echo $job['hired_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                <span class="text-xs text-gray-400">Hired:</span>
+                                <span class="text-sm text-primary"><?php echo $job['hired_count'] ?? 0; ?></span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Posted Date -->
-                    <div class="mb-8">
+                    <div class="grid grid-cols-2 gap-4 p-4 mb-8 rounded-lg bg-gray-50">
+                        <!-- Posted Date -->
                         <div class="text-center">
                             <div class="mb-1 text-sm font-medium text-gray-500">Posted</div>
-                            <div class="text-lg font-semibold text-gray-900"><?php echo date('M j, Y', strtotime($job['created_at'])); ?></div>
-                        </div>
-                    </div>
-
-                    <!-- Last Updated -->
-                    <?php if ($job['updated_at'] != $job['created_at']): ?>
-                        <div class="mb-8">
-                            <div class="text-center">
-                                <div class="mb-1 text-sm font-medium text-gray-500">Last Updated</div>
-                                <div class="text-lg font-semibold text-gray-900"><?php echo date('M j, Y', strtotime($job['updated_at'])); ?></div>
+                            <div class="text-sm font-semibold text-primary">
+                                <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                             </div>
                         </div>
-                    <?php endif; ?>
+
+                        <!-- Last Updated -->
+                        <?php if ($job['updated_at'] != $job['created_at']): ?>
+                            <div class="text-center">
+                                <div class="mb-1 text-sm font-medium text-gray-500">Last Updated</div>
+                                <div class="text-sm font-semibold text-primary">
+                                    <?php echo date('M j, Y', strtotime($job['updated_at'])); ?>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <!-- Empty column to maintain layout -->
+                            <div class="text-center">
+                                <div class="mb-1 text-sm font-medium text-gray-500">&nbsp;</div>
+                                <div class="text-sm font-semibold text-primary">&nbsp;</div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
                     <!-- Quick Actions -->
                     <?php if (($job['total_applications'] ?? $job['application_count'] ?? 0) > 0): ?>
                         <div>
                             <button onclick="window.location.href='?page=view-all-applicants&job_id=<?php echo $job['job_id']; ?>'"
-                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                                </svg>
+                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
+
                                 View All Applications
                             </button>
                         </div>
