@@ -417,7 +417,7 @@ class JobPostController
             exit;
         }
 
-        // Get all jobs for this employer
+        // Get all jobs for this employer (now includes employer profile data)
         $jobs = $this->jobPostModel->getJobsByEmployer($employer['employer_id']);
 
         // Get any messages
