@@ -147,7 +147,7 @@ class JobPost
             $sql = "SELECT * FROM job_post_questions 
                     WHERE job_id = :job_id 
                     ORDER BY question_id";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['job_id' => $job_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -229,16 +229,16 @@ class JobPost
                     GROUP BY employer_id
                 ) eb ON e.employer_id = eb.employer_id
                 WHERE jp.job_id = :job_id";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['job_id' => $job_id]);
             $job = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             // Debug: Log what fields are available
             if ($job) {
                 error_log('DEBUG: Job data keys: ' . implode(', ', array_keys($job)));
             }
-            
+
             return $job;
         } catch (PDOException $e) {
             error_log('Error getting full job data: ' . $e->getMessage());
@@ -295,16 +295,26 @@ class JobPost
         }
     }
 
-    public function getJobsByEmployer($employer_id) {
+    public function getJobsByEmployer($employer_id)
+    {
         try {
             // Single query with LEFT JOIN to get application counts efficiently
-            $sql = "SELECT jp.*, jc.category_name,
+            $sql = "SELECT jp.*, jc.category_name, jas.max_applicants,
                            COALESCE(app_counts.application_count, 0) as application_count,
                            COALESCE(app_counts.pending_count, 0) as pending_count,
                            COALESCE(app_counts.shortlisted_count, 0) as shortlisted_count,
-                           COALESCE(app_counts.hired_count, 0) as hired_count
+                           COALESCE(app_counts.hired_count, 0) as hired_count,
+                           e.profile_picture as employer_profile_photo,
+                           e.first_name as employer_first_name,
+                           e.last_name as employer_last_name,
+                           eb.business_logo,
+                           eb.business_name,
+                           eb.business_desc
                     FROM job_post jp
                     LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                     LEFT JOIN (
                         SELECT job_id, 
                                COUNT(*) as application_count,
@@ -317,24 +327,31 @@ class JobPost
                     ) app_counts ON jp.job_id = app_counts.job_id
                     WHERE jp.employer_id = :employer_id
                     ORDER BY jp.created_at DESC";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['employer_id' => $employer_id]);
             $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             error_log('DEBUG: Found ' . count($jobs) . ' jobs for employer_id: ' . $employer_id);
             return $jobs;
-            
         } catch (PDOException $e) {
             error_log('Error getting jobs by employer: ' . $e->getMessage());
             // Fallback to simple query without application counts
             try {
-                $sql = "SELECT jp.*, jc.category_name, 0 as application_count, 0 as pending_count, 0 as shortlisted_count, 0 as hired_count
+                $sql = "SELECT jp.*, jc.category_name, 0 as application_count, 0 as pending_count, 0 as shortlisted_count, 0 as hired_count,
+                               e.profile_picture as employer_profile_photo,
+                               e.first_name as employer_first_name,
+                               e.last_name as employer_last_name,
+                               eb.business_logo,
+                               eb.business_name,
+                               eb.business_desc
                         FROM job_post jp
                         LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                        LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                        LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                         WHERE jp.employer_id = :employer_id
                         ORDER BY jp.created_at DESC";
-                
+
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute(['employer_id' => $employer_id]);
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -345,33 +362,33 @@ class JobPost
         }
     }
 
-    public function deleteJob($job_id) {
+    public function deleteJob($job_id)
+    {
         try {
             // Start transaction
             $this->db->beginTransaction();
-            
+
             // Delete related records first
             $tables = [
                 'job_post_skills',
-                'job_post_questions', 
+                'job_post_questions',
                 'job_post_attachments',
                 'job_post_application_settings'
             ];
-            
+
             foreach ($tables as $table) {
                 $sql = "DELETE FROM $table WHERE job_id = :job_id";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute(['job_id' => $job_id]);
             }
-            
+
             // Delete the job post
             $sql = "DELETE FROM job_post WHERE job_id = :job_id";
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute(['job_id' => $job_id]);
-            
+
             $this->db->commit();
             return $result;
-            
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log('Error deleting job: ' . $e->getMessage());
@@ -379,7 +396,8 @@ class JobPost
         }
     }
 
-    public function getJobSkills($job_id) {
+    public function getJobSkills($job_id)
+    {
         try {
             $sql = "SELECT skill_name FROM job_post_skills WHERE job_id = :job_id ORDER BY job_skill_id";
             $stmt = $this->db->prepare($sql);
@@ -391,10 +409,10 @@ class JobPost
         }
     }
 
-public function getOpenJobs()
-{
-    try {
-        $sql = "SELECT jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
+    public function getOpenJobs()
+    {
+        try {
+            $sql = "SELECT jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
                        jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
                        jc.category_name, 
                        e.first_name as employer_first_name, 
@@ -411,15 +429,15 @@ public function getOpenJobs()
                 WHERE jp.job_status = 'open'
                 AND (jp.application_deadline IS NULL OR jp.application_deadline > NOW())
                 ORDER BY jp.created_at DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $jobs;
-    } catch (PDOException $e) {
-        error_log('Error getting open jobs: ' . $e->getMessage());
-        return [];
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $jobs;
+        } catch (PDOException $e) {
+            error_log('Error getting open jobs: ' . $e->getMessage());
+            return [];
+        }
     }
-}
 
     public function getJobsByStatus($status)
     {
@@ -437,7 +455,7 @@ public function getOpenJobs()
                     ) eb ON e.employer_id = eb.employer_id
                     WHERE jp.job_status = :status
                     ORDER BY jp.created_at DESC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['status' => $status]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -462,7 +480,7 @@ public function getOpenJobs()
                         GROUP BY employer_id
                     ) eb ON e.employer_id = eb.employer_id
                     ORDER BY jp.created_at DESC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -472,7 +490,8 @@ public function getOpenJobs()
         }
     }
 
-    public function getJobWithApplicationStats($job_id, $employer_id = null) {
+    public function getJobWithApplicationStats($job_id, $employer_id = null)
+    {
         try {
             $sql = "SELECT jp.*, jc.category_name,
                            e.first_name as employer_first_name, 
@@ -507,26 +526,26 @@ public function getOpenJobs()
                         GROUP BY job_id
                     ) app_stats ON jp.job_id = app_stats.job_id
                     WHERE jp.job_id = :job_id";
-        
+
             // Add employer verification if provided
             if ($employer_id) {
                 $sql .= " AND jp.employer_id = :employer_id";
             }
-        
+
             $stmt = $this->db->prepare($sql);
             $params = ['job_id' => $job_id];
             if ($employer_id) {
                 $params['employer_id'] = $employer_id;
             }
-        
+
             $stmt->execute($params);
             $job = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
             // Get job skills
             if ($job) {
                 $job['skills'] = $this->getJobSkills($job_id);
             }
-        
+
             return $job;
         } catch (PDOException $e) {
             error_log('Error getting job with application stats: ' . $e->getMessage());
@@ -534,11 +553,11 @@ public function getOpenJobs()
         }
     }
 
-public function getAllActiveJobs($jobseeker_id = null)
-{
-    try {
-        // Use the same logic as your working API
-        $sql = "SELECT 
+    public function getAllActiveJobs($jobseeker_id = null)
+    {
+        try {
+            // Use the same logic as your working API
+            $sql = "SELECT 
                     jp.job_id,
                     jp.job_title,
                     jp.job_summary,
@@ -556,18 +575,18 @@ public function getAllActiveJobs($jobseeker_id = null)
                      eb.business_logo,
                     e.profile_photo as employer_profile_photo
                 ";
-        
-        // Add application status check if jobseeker_id is provided
-        if ($jobseeker_id) {
-            $sql .= ", (SELECT COUNT(*) 
+
+            // Add application status check if jobseeker_id is provided
+            if ($jobseeker_id) {
+                $sql .= ", (SELECT COUNT(*) 
                         FROM job_application ja 
                         WHERE ja.job_id = jp.job_id 
                         AND ja.jobseeker_id = ?
                         AND ja.is_finalized = 1
                        ) > 0 as has_applied";
-        }
-        
-        $sql .= " FROM job_post jp
+            }
+
+            $sql .= " FROM job_post jp
                   LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                   LEFT JOIN employer e ON jp.employer_id = e.employer_id
                   LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
@@ -576,11 +595,11 @@ public function getAllActiveJobs($jobseeker_id = null)
                   GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
                            jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
                            jc.category_name, e.first_name, e.last_name";
-        
-        // Add has_applied to GROUP BY if needed
-        if ($jobseeker_id) {
-            // For GROUP BY compatibility with has_applied subquery, we'll handle it differently
-            $sql = "SELECT 
+
+            // Add has_applied to GROUP BY if needed
+            if ($jobseeker_id) {
+                // For GROUP BY compatibility with has_applied subquery, we'll handle it differently
+                $sql = "SELECT 
                         jp.job_id,
                         jp.job_title,
                         jp.job_summary,
@@ -608,8 +627,8 @@ public function getAllActiveJobs($jobseeker_id = null)
                     GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
                              jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
                              jc.category_name, e.first_name, e.last_name";
-        } else {
-            $sql .= ", COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name
+            } else {
+                $sql .= ", COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name
                      FROM job_post jp
                      LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                      LEFT JOIN employer e ON jp.employer_id = e.employer_id
@@ -619,52 +638,52 @@ public function getAllActiveJobs($jobseeker_id = null)
                      GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
                               jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
                               jc.category_name, e.first_name, e.last_name";
-        }
-        
-        $sql .= " ORDER BY jp.created_at DESC";
-        
-        $stmt = $this->db->prepare($sql);
-        
-        if ($jobseeker_id) {
-            $stmt->execute([$jobseeker_id]);
-        } else {
-            $stmt->execute();
-        }
-        
-        $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // Convert has_applied to boolean for consistency
-        if ($jobseeker_id) {
-            foreach ($jobs as &$job) {
-                $job['has_applied'] = (bool)$job['has_applied'];
             }
-        }
-        
-        error_log('=== JOB POST MODEL DEBUG ===');
-        error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not provided'));
-        error_log('Jobs found: ' . count($jobs));
-        if (!empty($jobs)) {
-            error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
-            error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
-            // Check for duplicates
-            $job_ids = array_column($jobs, 'job_id');
-            $unique_job_ids = array_unique($job_ids);
-            if (count($job_ids) !== count($unique_job_ids)) {
-                error_log('WARNING: Duplicate job IDs found!');
-                error_log('All IDs: ' . implode(', ', $job_ids));
-                error_log('Unique IDs: ' . implode(', ', $unique_job_ids));
+
+            $sql .= " ORDER BY jp.created_at DESC";
+
+            $stmt = $this->db->prepare($sql);
+
+            if ($jobseeker_id) {
+                $stmt->execute([$jobseeker_id]);
             } else {
-                error_log('SUCCESS: All job IDs are unique');
+                $stmt->execute();
             }
+
+            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Convert has_applied to boolean for consistency
+            if ($jobseeker_id) {
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = (bool)$job['has_applied'];
+                }
+            }
+
+            error_log('=== JOB POST MODEL DEBUG ===');
+            error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not provided'));
+            error_log('Jobs found: ' . count($jobs));
+            if (!empty($jobs)) {
+                error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
+                error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
+                // Check for duplicates
+                $job_ids = array_column($jobs, 'job_id');
+                $unique_job_ids = array_unique($job_ids);
+                if (count($job_ids) !== count($unique_job_ids)) {
+                    error_log('WARNING: Duplicate job IDs found!');
+                    error_log('All IDs: ' . implode(', ', $job_ids));
+                    error_log('Unique IDs: ' . implode(', ', $unique_job_ids));
+                } else {
+                    error_log('SUCCESS: All job IDs are unique');
+                }
+            }
+            error_log('=== END JOB POST MODEL DEBUG ===');
+
+            return $jobs;
+        } catch (PDOException $e) {
+            error_log('Error getting active jobs: ' . $e->getMessage());
+            return [];
         }
-        error_log('=== END JOB POST MODEL DEBUG ===');
-        
-        return $jobs;
-    } catch (PDOException $e) {
-        error_log('Error getting active jobs: ' . $e->getMessage());
-        return [];
     }
-}
     // Also make sure you have this method for getting the PDO connection if needed
     public function getPdo()
     {
@@ -672,20 +691,21 @@ public function getAllActiveJobs($jobseeker_id = null)
     }
 
     // Add this method for getting single job details:
-    public function getJobForJobseeker($job_id, $jobseeker_id = null) {
+    public function getJobForJobseeker($job_id, $jobseeker_id = null)
+    {
         try {
             $sql = "SELECT jp.*, jc.category_name,
                        e.first_name as employer_first_name, 
                        e.last_name as employer_last_name,
                        eb.business_name as company_name";
-        
+
             // Add application check if jobseeker_id is provided
             if ($jobseeker_id) {
                 $sql .= ", CASE WHEN ja.application_id IS NOT NULL THEN 1 ELSE 0 END as has_applied";
             } else {
                 $sql .= ", 0 as has_applied";
             }
-        
+
             $sql .= " FROM job_post jp
                       LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                       LEFT JOIN employer e ON jp.employer_id = e.employer_id
@@ -694,26 +714,25 @@ public function getAllActiveJobs($jobseeker_id = null)
                           FROM employers_business
                           GROUP BY employer_id
                       ) eb ON e.employer_id = eb.employer_id";
-        
+
             // Add application check JOIN if jobseeker_id is provided
             if ($jobseeker_id) {
                 $sql .= " LEFT JOIN job_application ja ON jp.job_id = ja.job_id 
                           AND ja.jobseeker_id = :jobseeker_id 
                           AND ja.is_finalized = 1";
             }
-        
+
             $sql .= " WHERE jp.job_id = :job_id";
-        
+
             $stmt = $this->db->prepare($sql);
             $params = ['job_id' => $job_id];
-        
+
             if ($jobseeker_id) {
                 $params['jobseeker_id'] = $jobseeker_id;
             }
-        
+
             $stmt->execute($params);
             return $stmt->fetch(PDO::FETCH_ASSOC);
-        
         } catch (PDOException $e) {
             error_log('Error getting job for jobseeker: ' . $e->getMessage());
             return false;
@@ -739,19 +758,44 @@ public function getAllActiveJobs($jobseeker_id = null)
                 ) eb ON e.employer_id = eb.employer_id
                 LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
                 WHERE jp.job_id = :job_id";
-        
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['job_id' => $job_id]);
             $job = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
             if ($job) {
                 // Add skills
                 $job['skills'] = $this->getJobSkills($job_id);
             }
-        
+
             return $job;
         } catch (PDOException $e) {
             error_log('Error getting full job data for review: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getEmployerProfileData($employer_id)
+    {
+        try {
+            $sql = "SELECT e.employer_id, e.profile_picture as employer_profile_photo, e.first_name, e.last_name,
+                           eb.business_logo, eb.business_name, eb.business_desc
+                    FROM employer e
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE e.employer_id = :employer_id";
+
+            error_log('DEBUG: Executing employer profile query for employer_id: ' . $employer_id);
+            error_log('DEBUG: SQL: ' . $sql);
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['employer_id' => $employer_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log('DEBUG: Query result: ' . print_r($result, true));
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error getting employer profile data: ' . $e->getMessage());
             return false;
         }
     }

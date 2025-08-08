@@ -26,4 +26,4 @@ Thumbs.db
 # ML model
 /ml_service/model.pkl 
 
-git rm -r --cached vendor/
+

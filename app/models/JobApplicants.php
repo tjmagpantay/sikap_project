@@ -44,7 +44,7 @@ class JobApplicants
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Group by job title
         $grouped = [];
         foreach ($results as $applicant) {
@@ -54,7 +54,7 @@ class JobApplicants
             }
             $grouped[$jobTitle][] = $applicant;
         }
-        
+
         return $grouped;
     }
 
