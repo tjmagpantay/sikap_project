@@ -12,7 +12,19 @@ class ReviewApplication
 
     public function getApplication($application_id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM job_application WHERE application_id = ?");
+        $stmt = $this->db->prepare("
+            SELECT ja.*, 
+                   js.first_name, js.last_name, js.middle_name, js.suffix,
+                   js.date_of_birth, js.sex, js.address, js.contact_no,
+                   js.profile_picture, js.profile_completion,
+                   u.email,
+                   jp.job_title, jp.job_summary, jp.job_type, jp.location
+            FROM job_application ja
+            JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+            JOIN users u ON js.user_id = u.user_id
+            JOIN job_post jp ON ja.job_id = jp.job_id
+            WHERE ja.application_id = ?
+        ");
         $stmt->execute([$application_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

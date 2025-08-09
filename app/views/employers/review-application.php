@@ -65,10 +65,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-gray-900 truncate">
-                                    <?php echo htmlspecialchars(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? '')); ?>
+                                    <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['middle_name'] ?? '') . ' ' . ($application['last_name'] ?? '') . ' ' . ($application['suffix'] ?? ''))); ?>
                                 </h3>
                                 <p class="text-sm text-gray-600 truncate">
                                     <?php echo htmlspecialchars($application['email'] ?? ''); ?>
+                                </p>
+                                <p class="text-xs text-gray-500 truncate">
+                                    <?php echo htmlspecialchars($application['contact_no'] ?? 'No phone provided'); ?>
                                 </p>
                                 <p class="mt-1 text-xs text-gray-400">
                                     Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?>
@@ -125,19 +128,19 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <h4 class="mb-3 text-sm font-medium text-gray-900">Quick Actions</h4>
                             <div class="space-y-2">
                                 <button class="w-full px-3 py-2 text-xs font-medium text-left text-green-700 transition-colors rounded-md bg-green-50 hover:bg-green-100">
-                                    <svg class="inline-block w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                     Accept Application
                                 </button>
                                 <button class="w-full px-3 py-2 text-xs font-medium text-left text-red-700 transition-colors rounded-md bg-red-50 hover:bg-red-100">
-                                    <svg class="inline-block w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                     Reject Application
                                 </button>
                                 <button class="w-full px-3 py-2 text-xs font-medium text-left transition-colors rounded-md text-primary bg-blue-50 hover:bg-blue-100">
-                                    <svg class="inline-block w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Schedule Interview
@@ -200,26 +203,57 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         <div>
                                             <label class="block text-sm font-medium text-gray-500">Full Name</label>
                                             <p class="mt-1 text-sm text-gray-900">
-                                                <?php echo htmlspecialchars(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? '')); ?>
+                                                <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['middle_name'] ?? '') . ' ' . ($application['last_name'] ?? '') . ' ' . ($application['suffix'] ?? ''))); ?>
                                             </p>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-500">Email</label>
+                                            <label class="block text-sm font-medium text-gray-500">Email Address</label>
                                             <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['email'] ?? 'Not provided'); ?></p>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-500">Phone</label>
-                                            <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['phone'] ?? 'Not provided'); ?></p>
+                                            <label class="block text-sm font-medium text-gray-500">Contact Number</label>
+                                            <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['contact_no'] ?? 'Not provided'); ?></p>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-500">Address</label>
                                             <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['address'] ?? 'Not provided'); ?></p>
                                         </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Date of Birth</label>
+                                            <p class="mt-1 text-sm text-gray-900">
+                                                <?php
+                                                if (!empty($application['date_of_birth'])) {
+                                                    $birthDate = new DateTime($application['date_of_birth']);
+                                                    $today = new DateTime();
+                                                    $age = $today->diff($birthDate)->y;
+                                                    echo date('F j, Y', strtotime($application['date_of_birth'])) . " (Age: $age)";
+                                                } else {
+                                                    echo 'Not provided';
+                                                }
+                                                ?>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Gender</label>
+                                            <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars(ucfirst($application['sex'] ?? 'Not specified')); ?></p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="space-y-4">
-                                    <h4 class="text-lg font-medium text-gray-900">Application Details</h4>
+                                    <h4 class="text-lg font-medium text-gray-900">Application Information</h4>
                                     <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Position Applied</label>
+                                            <p class="mt-1 text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($application['job_title'] ?? 'N/A'); ?></p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Job Type</label>
+                                            <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars(ucfirst(str_replace('-', ' ', $application['job_type'] ?? ''))); ?></p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Location</label>
+                                            <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['location'] ?? 'N/A'); ?></p>
+                                        </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-500">Applied Date</label>
                                             <p class="mt-1 text-sm text-gray-900"><?php echo date('F j, Y \a\t g:i A', strtotime($application['applied_at'])); ?></p>
@@ -255,9 +289,32 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             <label class="block text-sm font-medium text-gray-500">Application ID</label>
                                             <p class="mt-1 font-mono text-sm text-gray-900">#<?php echo htmlspecialchars($application['application_id']); ?></p>
                                         </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-500">Profile Completion</label>
+                                            <div class="mt-1">
+                                                <?php $completion = $application['profile_completion'] ?? 0; ?>
+                                                <div class="flex items-center">
+                                                    <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                                        <div class="bg-primary h-2 rounded-full" style="width: <?php echo $completion; ?>%"></div>
+                                                    </div>
+                                                    <span class="text-sm font-medium text-gray-900"><?php echo $completion; ?>%</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Job Summary for Context -->
+                            <?php if (!empty($application['job_summary'])): ?>
+                                <div class="pt-6 border-t border-gray-200">
+                                    <h4 class="text-lg font-medium text-gray-900 mb-3">Position Overview</h4>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h5 class="font-medium text-gray-900 mb-2"><?php echo htmlspecialchars($application['job_title']); ?></h5>
+                                        <p class="text-sm text-gray-700"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Resume Tab -->
