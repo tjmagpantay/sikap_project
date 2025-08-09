@@ -224,46 +224,50 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     <div class="mb-8">
                         <h3 class="mb-4 text-xl font-semibold text-gray-900">Application Statistics</h3>
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                <span class="text-xs text-gray-400">Total Applications:</span>
-                                <span class="text-sm text-primary"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
+                                <span class="text-sm font-light text-gray-600">Total Applications:</span>
+                                <span class="font-bold text-primary text-md"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                <span class="text-xs text-gray-400">Pending Review:</span>
-                                <span class="text-sm text-primary"><?php echo $job['pending_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
+                                <span class="text-sm font-light text-gray-600">Pending Review:</span>
+                                <span class="font-bold text-primary text-md"><?php echo $job['pending_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                <span class="text-xs text-gray-400">Shortlisted:</span>
-                                <span class="text-sm text-primary"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
+                                <span class="text-sm font-light text-gray-600">Shortlisted:</span>
+                                <span class="font-bold text-primary text-md"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
                             </div>
-                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                <span class="text-xs text-gray-400">Hired:</span>
-                                <span class="text-sm text-primary"><?php echo $job['hired_count'] ?? 0; ?></span>
+                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
+                                <span class="text-sm font-light text-gray-600">Hired:</span>
+                                <span class="font-bold text-primary text-md"><?php echo $job['hired_count'] ?? 0; ?></span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 p-4 mb-8 rounded-lg bg-gray-50">
+                    <!-- Posted Date -->
+                    <div class="flex justify-between mb-8">
                         <!-- Posted Date -->
-                        <div class="text-center">
+                        <div class="flex-1 text-center">
                             <div class="mb-1 text-sm font-medium text-gray-500">Posted</div>
                             <div class="text-sm font-semibold text-primary">
                                 <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                             </div>
                         </div>
 
+                        <!-- Vertical Separator -->
+                        <div class="self-center h-12 border-r border-gray-600"></div>
+
                         <!-- Last Updated -->
                         <?php if ($job['updated_at'] != $job['created_at']): ?>
-                            <div class="text-center">
-                                <div class="mb-1 text-sm font-medium text-gray-500">Last Updated</div>
+                            <div class="flex-1 text-center">
+                                <div class="mb-1 text-sm text-gray-500">Last Updated</div>
                                 <div class="text-sm font-semibold text-primary">
                                     <?php echo date('M j, Y', strtotime($job['updated_at'])); ?>
                                 </div>
                             </div>
                         <?php else: ?>
                             <!-- Empty column to maintain layout -->
-                            <div class="text-center">
-                                <div class="mb-1 text-sm font-medium text-gray-500">&nbsp;</div>
+                            <div class="flex-1 text-center">
+                                <div class="mb-1 text-sm text-gray-500">&nbsp;</div>
                                 <div class="text-sm font-semibold text-primary">&nbsp;</div>
                             </div>
                         <?php endif; ?>
@@ -273,8 +277,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     <?php if (($job['total_applications'] ?? $job['application_count'] ?? 0) > 0): ?>
                         <div>
                             <button onclick="window.location.href='?page=view-all-applicants&job_id=<?php echo $job['job_id']; ?>'"
-                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
-
+                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                 View All Applications
                             </button>
                         </div>
