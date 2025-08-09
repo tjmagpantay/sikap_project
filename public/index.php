@@ -138,6 +138,28 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             $controller->view($_GET['application_id'] ?? null);
             break;
+        case 'test-application-data':
+            require_once __DIR__ . '/../app/models/ReviewApplication.php';
+            $reviewApp = new ReviewApplication();
+            $app_id = $_GET['app_id'] ?? 7;
+            $type = $_GET['type'] ?? 'full'; // 'basic' or 'full'
+            
+            header('Content-Type: application/json');
+            
+            if ($type === 'basic') {
+                $result = $reviewApp->getApplication($app_id);
+            } else {
+                $result = $reviewApp->getFullApplicationDetails($app_id);
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'application_id' => $app_id,
+                'type' => $type,
+                'data' => $result
+            ], JSON_PRETTY_PRINT);
+            exit;
+            break;
         
         // Admin Routes
         case 'admin-login':
