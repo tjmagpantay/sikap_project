@@ -440,7 +440,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         <td class="px-6 py-5">
                                             <div class="flex items-center">
                                                 <?php if (!empty($app['profile_picture'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($app['profile_picture']); ?>" alt="Profile" class="object-cover w-10 h-10 mr-4 border border-gray-200 rounded-full">
+                                                    <img src="<?php echo htmlspecialchars($app['profile_picture']); ?>" alt="Profile" class="object-cover w-12 h-12 mr-4 border border-gray-200 rounded-md">
                                                 <?php else: ?>
                                                     <div class="flex items-center justify-center w-10 h-10 mr-4 bg-gray-100 rounded-full">
                                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

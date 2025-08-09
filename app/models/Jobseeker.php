@@ -365,7 +365,7 @@ public function calculateProfileCompletion($user_id)
 
     public function updateProfilePhoto($user_id, $photo_path)
     {
-        $stmt = $this->db->prepare("UPDATE jobseeker SET profile_photo = ? WHERE user_id = ?");
+        $stmt = $this->db->prepare("UPDATE jobseeker SET profile_picture = ? WHERE user_id = ?");
         return $stmt->execute([$photo_path, $user_id]);
     }
 

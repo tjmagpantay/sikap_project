@@ -52,7 +52,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     <div class="px-6 py-6 border-b border-gray-200">
                         <div class="flex items-center space-x-4">
                             <?php if (!empty($application['profile_picture'])): ?>
-                                <img src="<?php echo htmlspecialchars($application['profile_picture']); ?>"
+                                <img src="<?php echo '/sikap/public/' . htmlspecialchars($application['profile_picture']); ?>"
                                     alt="Profile"
                                     class="object-cover w-16 h-16 border border-gray-200 rounded-full">
                             <?php else: ?>

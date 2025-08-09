@@ -602,12 +602,12 @@ class JobseekerController
             exit;
         }
 
-        if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($_FILES['profile_picture']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
             exit;
         }
 
-        $file = $_FILES['profile_photo'];
+        $file = $_FILES['profile_picture'];
 
         // Validate file type
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];

@@ -28,7 +28,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Google login Jobseeker & Employer
 
-         case 'google-login':
+        case 'google-login':
             require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
             $controller = new GoogleAuthController();
             $controller->initiateLogin();
@@ -38,7 +38,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new GoogleAuthController();
             $controller->handleCallback();
             break;
-            
+
         // Jobseeker Routes
         case 'login-jobseeker':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
@@ -83,9 +83,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->savedJobs();
-            break;         
+            break;
 
- // Jobseeker 2FA OTP Routes NEWWWWWWWWWW
+        // Jobseeker 2FA OTP Routes NEWWWWWWWWWW
         case 'verify-otp':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
-        
+
         case 'view-all-applicants':
             require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
             $controller = new JobApplicantsController();
@@ -138,29 +138,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             $controller->view($_GET['application_id'] ?? null);
             break;
-        case 'test-application-data':
-            require_once __DIR__ . '/../app/models/ReviewApplication.php';
-            $reviewApp = new ReviewApplication();
-            $app_id = $_GET['app_id'] ?? 7;
-            $type = $_GET['type'] ?? 'full'; // 'basic' or 'full'
-            
-            header('Content-Type: application/json');
-            
-            if ($type === 'basic') {
-                $result = $reviewApp->getApplication($app_id);
-            } else {
-                $result = $reviewApp->getFullApplicationDetails($app_id);
-            }
-            
-            echo json_encode([
-                'success' => true,
-                'application_id' => $app_id,
-                'type' => $type,
-                'data' => $result
-            ], JSON_PRETTY_PRINT);
-            exit;
-            break;
-        
+
         // Admin Routes
         case 'admin-login':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
@@ -391,37 +369,37 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
-             // Forgot Password Routes NEWWWWWWWWWWWWWW
-       
-             case 'forgot-password':
-                require_once __DIR__ . '/../app/controllers/UserController.php';
-                $controller = new UserController();
-                $controller->forgotPassword();
-                break;
+        // Forgot Password Routes NEWWWWWWWWWWWWWW
 
-            case 'forgot-password-request':
-                require_once __DIR__ . '/../app/controllers/UserController.php';
-                $controller = new UserController();
-                $controller->forgotPasswordRequest();
-                break;
+        case 'forgot-password':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->forgotPassword();
+            break;
 
-            case 'verify-forgotpassword':
-                require_once __DIR__ . '/../app/controllers/UserController.php';
-                $controller = new UserController();
-                $controller->verifyForgotPasswordOtp();
-                break;
+        case 'forgot-password-request':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->forgotPasswordRequest();
+            break;
 
-            case 'resend-forgotpassword':
-                require_once __DIR__ . '/../app/controllers/UserController.php';
-                $controller = new UserController();
-                $controller->resendOtp();
-                break;
+        case 'verify-forgotpassword':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->verifyForgotPasswordOtp();
+            break;
 
-            case 'reset-password':
-                require_once __DIR__ . '/../app/controllers/UserController.php';
-                $controller = new UserController();
-                $controller->resetPassword();
-                break;
+        case 'resend-forgotpassword':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->resendOtp();
+            break;
+
+        case 'reset-password':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->resetPassword();
+            break;
     }
     ?>
 </body>

@@ -53,19 +53,24 @@ include_once __DIR__ . '/navbar-jobseeker.php';
           <div class="flex flex-col items-center">
             <!-- Profile Photo -->
             <div class="relative group">
-              <img src="<?php echo htmlspecialchars($jobseeker['profile_photo'] ?? '/app/assets/images/default-avatar.svg'); ?>"
-                alt="Profile" class="object-cover w-20 h-20 border-2 border-gray-200 rounded-full shadow-sm">
-              <form method="POST" enctype="multipart/form-data" id="profile-photo-form">
+              <img src="<?php
+                        if (!empty($jobseeker['profile_picture'])) {
+                          echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
+                        } else {
+                          echo '/sikap/public/assets/images/default-avatar.jpg';
+                        }
+                        ?>" alt="Profile" class="object-cover w-16 h-16 border-2 border-gray-200 rounded-full shadow-sm">
+              <div class="relative group">
                 <button type="button"
-                  class="absolute flex items-center justify-center text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg w-7 h-7 bg-primary -top-2 -right-2 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
-                  onclick="document.getElementById('profile-photo-input').click()" title="Change profile photo">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  class="absolute flex items-center justify-center w-6 h-6 text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg bg-primary -top-1 -right-1 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
+                  onclick="document.getElementById('profile-picture-input').click()" title="Change profile photo">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
                   </svg>
                 </button>
-                <input type="file" name="profile_photo" id="profile-photo-input" accept="image/*" class="hidden"
-                  onchange="document.getElementById('profile-photo-form').submit();">
-              </form>
+                <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" class="hidden"
+                  onchange="handleProfilePhotoUpload(this);">
+              </div>
             </div>
             <!-- Name & Info -->
             <div class="mt-4 text-center">
@@ -408,8 +413,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
     $relativePath = '/public/uploads/profile_photos/' . $fileName;
     $jobseekerModel->updateProfilePhoto($_SESSION['user_id'], $relativePath);
     // Refresh page to show new photo
-    echo "<script>window.location.reload();</script>";
-    exit;
   }
 }
 ?>
+
+<script>
+  function handleProfilePhotoUpload(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB.');
+        return;
+      }
+
+      // Create FormData for upload
+      const formData = new FormData();
+      formData.append('profile_picture', file);
+
+      // Show loading state
+      const button = document.querySelector('button[title="Change profile photo"]');
+      const originalContent = button.innerHTML;
+      button.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+      button.disabled = true;
+
+      // Upload the file
+      fetch('?page=upload-profile-photo', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the profile image
+            const profileImg = document.querySelector('img[alt="Profile"]');
+            profileImg.src = '/sikap/public/' + data.image_url + '?t=' + new Date().getTime(); // Add timestamp to force reload
+
+            // Show success message
+            showNotification('Profile photo updated successfully!', 'success');
+          } else {
+            showNotification(data.message || 'Failed to upload photo', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('Failed to upload photo', 'error');
+        })
+        .finally(() => {
+          // Restore button state
+          button.innerHTML = originalContent;
+          button.disabled = false;
+          input.value = ''; // Clear the input
+        });
+    }
+  }
+
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                ${type === 'success' 
+                    ? '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>'
+                    : '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>'
+                }
+            </svg>
+            <span class="text-sm">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 5000);
+  }
+</script>
