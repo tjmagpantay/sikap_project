@@ -74,197 +74,130 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 <div class="min-h-screen">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
         <div class="flex flex-col gap-8 md:flex-row">
-            <!-- Sidebar -->
+            <!-- Sidebar - Personal Profile -->
             <div class="w-full md:w-1/3">
                 <div class="p-6 bg-white border border-gray-200 shadow rounded-xl">
                     <div class="flex flex-col items-center">
-                        <!-- Business Logo (smaller, primary color) -->
-                        <div class="relative group">
-                            <img src="<?php
-                                        // Priority: Business logo > Default company logo
-                                        if (!empty($business['business_logo'])) {
-                                            echo htmlspecialchars($business['business_logo']);
-                                        } else {
-                                            $companyName = $business['business_name'] ?? $employer['company_name'] ?? 'Company';
-                                            // Use your primary color hex (e.g. 1d4ed8 for blue-700)
-                                            echo 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=1d4ed8&color=fff&size=64&format=svg&bold=true';
-                                        }
-                                        ?>"
-                                class="object-cover w-16 h-16 border-2 border-gray-200 rounded-full shadow-sm" alt="Business Logo">
+                        <!-- Profile Section with Photo and Info Side by Side -->
+                        <div class="flex items-center w-full mb-6">
+                            <!-- Personal Profile Photo -->
+                            <div class="relative mr-4 group">
+                                <img src="<?php
+                                            // Display personal profile photo or generate avatar from name
+                                            if (!empty($employer['profile_picture'])) {
+                                                echo htmlspecialchars('/sikap/public/' . $employer['profile_picture']);
+                                            } else {
+                                                $fullName = trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''));
+                                                if (empty($fullName)) $fullName = 'User';
+                                                echo 'https://ui-avatars.com/api/?name=' . urlencode($fullName) . '&background=1d4ed8&color=fff&size=80&format=svg&bold=true';
+                                            }
+                                            ?>"
+                                    class="object-cover w-20 h-20 border-4 border-white rounded-full shadow-lg" alt="Profile Photo">
 
-                            <!-- Edit button (primary color) -->
-                            <button class="absolute flex items-center justify-center w-6 h-6 text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg bg-primary -top-1 -right-1 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
-                                onclick="document.getElementById('business-logo-input').click()"
-                                title="Change business logo">
-                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
+                                <!-- Edit button -->
+                                <button class="absolute flex items-center justify-center text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg w-7 h-7 bg-primary -top-1 -right-1 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
+                                    onclick="document.getElementById('profile-photo-input').click()"
+                                    title="Change profile photo">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
 
-                            <!-- Hidden file input for business logo upload -->
-                            <input type="file" id="business-logo-input" accept="image/*" class="hidden" onchange="handleBusinessLogoUpload(this)">
+                                <!-- Hidden file input for profile photo upload -->
+                                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this)">
+                            </div>
+
+                            <!-- Personal Info -->
+                            <div class="flex-1">
+                                <h2 class="text-xl font-bold text-gray-900">
+                                    <?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?>
+                                </h2>
+                                <?php if (!empty($employer['position'])): ?>
+                                    <p class="text-sm font-medium text-primary"><?php echo htmlspecialchars($employer['position']); ?></p>
+                                <?php endif; ?>
+
+                                <?php if (!empty($business['business_name'])): ?>
+                                    <p class="text-xs text-gray-500">at <?php echo htmlspecialchars($business['business_name']); ?></p>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
-                        <!-- Company Name and Info -->
-                        <div class="mt-4 text-center">
-                            <h2 class="text-lg font-bold text-gray-800">
-                                <?php echo htmlspecialchars($business['business_name'] ?? $employer['company_name'] ?? 'Company Name'); ?>
-                            </h2>
-                            <?php if (!empty($business['business_industry'])): ?>
-                                <p class="text-xs text-gray-600"><?php echo htmlspecialchars($business['business_industry']); ?></p>
-                            <?php endif; ?>
-                            <?php if (!empty($business['business_type'])): ?>
-                                <p class="text-xs font-medium text-primary"><?php echo htmlspecialchars($business['business_type']); ?></p>
-                            <?php endif; ?>
-                            <p class="mt-1 text-xs text-gray-500">
-                                <?php echo htmlspecialchars(trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''))); ?>
-                                <?php if (!empty($employer['position'])): ?>
-                                    • <?php echo htmlspecialchars($employer['position']); ?>
+                        <!-- Profile Completion Progress -->
+                        <div class="w-full mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Profile Completion</span>
+                                <span class="text-sm font-bold text-primary"><?php echo round($personalCompletion); ?>%</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-200 rounded-full">
+                                <div class="h-2 transition-all duration-300 rounded-full bg-primary" style="width: <?php echo $personalCompletion; ?>%"></div>
+                            </div>
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-xs text-gray-500">
+                                    <?php echo $personalCompleted; ?>/<?php echo count($personalFields); ?> fields completed
+                                </p>
+                                <?php if ($personalCompletion < 100): ?>
+                                    <a href="?page=employer-personal-profile" class="text-xs text-primary hover:text-blue-700">Complete</a>
+                                <?php else: ?>
+                                    <span class="text-xs text-green-600">✓ Complete</span>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Business Profile Completion -->
+                        <div class="w-full p-2 mt-4 bg-gray-400">
+                            <div class="flex items-center justify-between mb-2 ">
+                                <span class="text-sm font-medium text-gray-700">Business Profile Completion</span>
+                                <span class="text-sm font-bold text-orange-600"><?php echo round($businessCompletion); ?>%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-gray-200 ">
+                                <div class="h-2.5 transition-all duration-300 bg-orange-500 " style="width: <?php echo $businessCompletion; ?>%"></div>
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500">
+                                <?php echo $businessCompleted; ?> of <?php echo $totalBusinessItems; ?> completed
                             </p>
                         </div>
 
-                        <!-- Verification Status -->
-                        <div class="w-full mt-4">
-                            <?php if ($isVerified): ?>
-                                <div class="flex items-center justify-center px-3 py-2 bg-green-100 border border-green-200 rounded-lg">
-                                    <i class="mr-2 text-green-600 fas fa-check-circle"></i>
-                                    <span class="text-sm font-medium text-green-800">Verified Employer</span>
-                                </div>
-                                <?php if (!empty($verificationStatus['verified_at'])): ?>
-                                    <p class="mt-1 text-xs text-center text-green-600">
-                                        Verified on <?php echo date('M j, Y', strtotime($verificationStatus['verified_at'])); ?>
-                                    </p>
-                                <?php endif; ?>
-                            <?php elseif ($verificationStatus['status'] === 'rejected'): ?>
-                                <div class="flex items-center justify-center px-3 py-2 bg-red-100 border border-red-200 rounded-lg">
-                                    <i class="mr-2 text-red-600 fas fa-times-circle"></i>
-                                    <span class="text-sm font-medium text-red-800">Application Rejected</span>
-                                </div>
-                                <?php if (!empty($verificationStatus['reason'])): ?>
-                                    <p class="mt-1 text-xs text-center text-red-600">
-                                        Reason: <?php echo htmlspecialchars($verificationStatus['reason']); ?>
-                                    </p>
-                                <?php endif; ?>
-                            <?php elseif ($verificationStatus['status'] === 'pending'): ?>
-                                <div class="flex items-center justify-center px-3 py-2 bg-yellow-100 border border-yellow-200 rounded-lg">
-                                    <i class="mr-2 text-yellow-600 fas fa-clock"></i>
-                                    <span class="text-sm font-medium text-yellow-800">Pending Verification</span>
-                                </div>
-                                <p class="mt-1 text-xs text-center text-yellow-600">
-                                    Your application is being reviewed by our team
-                                </p>
-                            <?php else: ?>
-                                <div class="flex items-center justify-center px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg">
-                                    <i class="mr-2 text-gray-600 fas fa-info-circle"></i>
-                                    <span class="text-sm font-medium text-gray-800">Complete Profile</span>
-                                </div>
-                                <p class="mt-1 text-xs text-center text-gray-600">
-                                    Complete your profile to submit for verification
-                                </p>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Profile Completion -->
-                        <div class="w-full mt-4 space-y-4">
-                            <!-- Personal Profile Completion -->
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-medium text-gray-700">Personal Profile</span>
-                                    <span class="text-sm font-medium text-blue-600"><?php echo round($personalCompletion); ?>%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 rounded-full">
-                                    <div class="h-2 transition-all duration-300 bg-blue-600 rounded-full" style="width: <?php echo $personalCompletion; ?>%"></div>
-                                </div>
-                                <div class="flex items-center justify-between mt-1">
-                                    <p class="text-xs text-gray-500">
-                                        <?php echo $personalCompleted; ?>/<?php echo count($personalFields); ?> fields completed
-                                    </p>
-                                    <?php if ($personalCompletion < 100): ?>
-                                        <a href="?page=employer-personal-profile" class="text-xs text-blue-600 hover:text-blue-700">Complete</a>
-                                    <?php else: ?>
-                                        <span class="text-xs text-green-600">✓ Complete</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Business Setup Completion -->
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-medium text-gray-700">Business Setup</span>
-                                    <span class="text-sm font-medium text-orange-600"><?php echo round($businessCompletion); ?>%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 rounded-full">
-                                    <div class="h-2 transition-all duration-300 bg-orange-600 rounded-full" style="width: <?php echo $businessCompletion; ?>%"></div>
-                                </div>
-                                <div class="flex items-center justify-between mt-1">
-                                    <p class="text-xs text-gray-500">
-                                        <?php echo $businessCompleted; ?>/<?php echo $totalBusinessItems; ?> items completed
-                                    </p>
-                                    <?php if ($businessCompletion < 100): ?>
-                                        <a href="?page=complete-employer-business&step=1" class="text-xs text-orange-600 hover:text-orange-700">Complete</a>
-                                    <?php else: ?>
-                                        <span class="text-xs text-green-600">✓ Complete</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Overall Progress -->
-                            <div class="pt-2 mt-3 border-t border-gray-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-semibold text-gray-800">Overall Progress</span>
-                                    <span class="text-sm font-semibold text-green-600"><?php echo round(($personalCompletion + $businessCompletion) / 2); ?>%</span>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 rounded-full">
-                                    <div class="h-2 transition-all duration-300 bg-green-600 rounded-full" style="width: <?php echo ($personalCompletion + $businessCompletion) / 2; ?>%"></div>
-                                </div>
-                                <?php if (($personalCompletion + $businessCompletion) / 2 < 100): ?>
-                                    <p class="mt-1 text-xs text-gray-500">Complete both sections to unlock all features</p>
-                                <?php else: ?>
-                                    <p class="mt-1 text-xs text-green-600">🎉 Profile fully completed!</p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- Contact Information -->
+                        <!-- Contact Info -->
                         <?php if (!empty($employer['contact_no'])): ?>
-                            <div class="w-full p-3 mt-4 rounded-lg bg-gray-50">
-                                <div class="flex items-center">
-                                    <i class="mr-2 text-gray-500 fas fa-phone"></i>
-                                    <span class="text-sm text-gray-700"><?php echo htmlspecialchars($employer['contact_no']); ?></span>
+                            <div class="w-full mt-6">
+                                <h4 class="mb-3 text-sm font-semibold text-gray-800">Contact</h4>
+                                <div class="flex items-center space-x-3 text-sm text-gray-600">
+                                    <i class="w-4 h-4 text-gray-400 fas fa-envelope"></i>
+                                    <span><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></span>
+                                </div>
+                                <div class="flex items-center mt-2 space-x-3 text-sm text-gray-600">
+                                    <i class="w-4 h-4 text-gray-400 fas fa-phone"></i>
+                                    <span><?php echo htmlspecialchars($employer['contact_no']); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
 
-                        <!-- Quick Actions - Replace the existing section -->
-                        <div class="w-full mt-4 space-y-2">
+                        <!-- Action Buttons -->
+                        <div class="w-full mt-6 space-y-3">
+                            <!-- Profile Setup -->
+                            <button class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                <i class="mr-2 fas fa-user-cog"></i>
+                                Profile Setup
+                            </button>
+
+                            <!-- Business -->
+                            <button class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                <i class="mr-2 fas fa-building"></i>
+                                Business
+                            </button>
+
+                            <!-- Quick Actions -->
                             <?php if ($canPostJobs): ?>
-                                <a href="?page=post-job" class="flex items-center justify-center w-full px-4 py-2 text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
+                                <a href="?page=post-job" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                     <i class="mr-2 fas fa-plus"></i>
                                     Post New Job
                                 </a>
                             <?php else: ?>
-                                <button disabled class="flex items-center justify-center w-full px-4 py-2 text-gray-500 bg-gray-300 rounded-lg cursor-not-allowed">
+                                <button disabled class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-gray-500 bg-gray-300 rounded-lg cursor-not-allowed">
                                     <i class="mr-2 fas fa-lock"></i>
                                     Complete Profile to Post Jobs
                                 </button>
                             <?php endif; ?>
-
-                            <div class="grid grid-cols-2 gap-2">
-                                <a href="?page=employer-personal-profile" class="flex items-center justify-center px-3 py-2 text-xs text-blue-700 transition-colors bg-blue-100 rounded-lg hover:bg-blue-200">
-                                    <i class="mr-1 fas fa-user"></i>
-                                    Personal
-                                </a>
-                                <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center px-3 py-2 text-xs text-orange-700 transition-colors bg-orange-100 rounded-lg hover:bg-orange-200">
-                                    <i class="mr-1 fas fa-building"></i>
-                                    Business
-                                </a>
-                            </div>
-
-                            <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-2 text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200">
-                                <i class="mr-2 fas fa-cog"></i>
-                                Profile Dashboard
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -288,6 +221,112 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         </div>
                     </div>
                 <?php endif; ?>
+
+                <!-- Business Profile Card -->
+                <div class="p-6 bg-white border border-gray-200 shadow rounded-xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="flex items-center text-lg font-semibold text-gray-900">
+                            <i class="mr-2 text-blue-600 fas fa-building"></i>
+                            Business Profile
+                        </h3>
+                        <a href="?page=complete-employer-business&step=1" class="text-blue-600 hover:text-blue-700">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:text-left">
+                        <!-- Business Logo -->
+                        <div class="relative mb-4 sm:mb-0 sm:mr-6">
+                            <img src="<?php
+                                        if (!empty($business['business_logo'])) {
+                                            echo htmlspecialchars($business['business_logo']);
+                                        } else {
+                                            $companyName = $business['business_name'] ?? $employer['company_name'] ?? 'Company';
+                                            echo 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=1d4ed8&color=fff&size=80&format=svg&bold=true';
+                                        }
+                                        ?>"
+                                class="object-cover w-20 h-20 border-4 border-white rounded-full shadow-lg" alt="Business Logo">
+
+                            <!-- Verification Badge -->
+                            <?php if ($isVerified): ?>
+                                <div class="absolute flex items-center justify-center w-6 h-6 bg-green-500 border-2 border-white rounded-full shadow-lg -bottom-1 -right-1">
+                                    <i class="text-xs text-white fas fa-check"></i>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Business Details -->
+                        <div class="flex-1">
+                            <h4 class="text-xl font-bold text-gray-900">
+                                <?php echo htmlspecialchars($business['business_name'] ?? $employer['company_name'] ?? 'Company Name'); ?>
+                            </h4>
+
+                            <?php if (!empty($business['business_industry'])): ?>
+                                <p class="text-sm font-medium text-primary"><?php echo htmlspecialchars($business['business_industry']); ?></p>
+                            <?php endif; ?>
+
+                            <?php if (!empty($business['business_type'])): ?>
+                                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($business['business_type']); ?></p>
+                            <?php endif; ?>
+
+                            <!-- Status and Team Size -->
+                            <div class="flex flex-wrap gap-4 mt-3">
+                                <?php if ($isVerified): ?>
+                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                                        <i class="mr-1 fas fa-check-circle"></i>
+                                        Verified Employer
+                                    </div>
+                                <?php elseif ($verificationStatus['status'] === 'pending'): ?>
+                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full">
+                                        <i class="mr-1 fas fa-clock"></i>
+                                        Pending Verification
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($business['business_team_size'])): ?>
+                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                                        <i class="mr-1 fas fa-users"></i>
+                                        <?php echo htmlspecialchars($business['business_team_size']); ?> employees
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Stats -->
+                    <div class="grid grid-cols-3 gap-4 p-4 mt-6 bg-gray-50 rounded-xl">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-primary"><?php echo round($businessCompletion); ?>%</div>
+                            <div class="text-xs text-gray-600">Business Setup</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600"><?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?></div>
+                            <div class="text-xs text-gray-600">Documents</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">0</div>
+                            <div class="text-xs text-gray-600">Active Jobs</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <a href="?page=complete-employer-business&step=1" class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
+                            <i class="mr-2 fas fa-edit"></i>
+                            Edit Business
+                        </a>
+                        <a href="?page=complete-employer-business&step=4" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            <i class="mr-2 fas fa-upload"></i>
+                            Upload Documents
+                        </a>
+                        <?php if ($isVerified): ?>
+                            <a href="?page=post-job" class="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200">
+                                <i class="mr-2 fas fa-plus"></i>
+                                Post Job
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
                 <!-- About Section -->
                 <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
