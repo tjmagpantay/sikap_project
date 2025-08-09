@@ -87,6 +87,20 @@ $endDate = date('M j');
 
         <!-- Statistics Cards Section -->
         <div class="mb-8">
+            <?php
+            // Calculate statistics from jobs data for Card 3
+            $totalJobs = count($jobs ?? []);
+            $activeJobs = 0;
+
+            // Count active jobs (jobs with status 'open')
+            if (!empty($jobs)) {
+                foreach ($jobs as $job) {
+                    if (trim($job['job_status']) === 'open') {
+                        $activeJobs++;
+                    }
+                }
+            }
+            ?>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 
                 <!-- Card 1: New Job Post to review -->
@@ -134,7 +148,7 @@ $endDate = date('M j');
                 <!-- Card 2: New Employer to review -->
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div class="mb-6">
-                        <h3 class="mb-6 text-gray-700 text-md font-xl">New Employer to review</h3>
+                        <h3 class="mb-6 text-gray-700 text-md font-xl">New Jobseeker to review</h3>
                         <div class="flex items-baseline">
                             <span class="text-3xl font-bold text-gray-900">
                                 <?php
@@ -145,7 +159,7 @@ $endDate = date('M j');
                             </span>
                         </div>
                         <p class="mt-2 text-xs text-gray-500">
-                            Total of employer to review as of <?php echo date('F j'); ?>
+                            Total of jobseeker to review as of <?php echo date('F j'); ?>
                         </p>
                     </div>
 
@@ -172,7 +186,7 @@ $endDate = date('M j');
                         <div class="flex items-center justify-start mb-4">
                             <div class="relative w-16 h-16 mr-4">
                                 <?php
-                                $activePercentage = $totalJobs > 0 ? round(($activeJobs / $totalJobs) * 100) : 84;
+                                $activePercentage = $totalJobs > 0 ? round(($activeJobs / $totalJobs) * 100) : 0;
                                 $circumference = 2 * 3.14159 * 24; // radius = 24 (smaller circle)
                                 $strokeDashoffset = $circumference - ($activePercentage / 100) * $circumference;
                                 ?>
@@ -236,12 +250,12 @@ $endDate = date('M j');
 
         <!-- Recent Job Posts Section -->
         <div class="mb-8">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 w-full">
+            <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm">
                 <div class="px-6 py-5 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <!-- Left side: Title and Count -->
                         <div class="flex items-center">
-                            <h3 class="text-2xl font-semibold text-gray-900">
+                            <h3 class="text-xl font-semibold text-gray-900">
                                 Recent Job Post
                             </h3>
                             <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -257,7 +271,7 @@ $endDate = date('M j');
                                     @click.away="open = false"
                                     class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between min-w-[140px]">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
@@ -270,7 +284,7 @@ $endDate = date('M j');
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-10 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <a href="?page=dashboard"
@@ -333,7 +347,7 @@ $endDate = date('M j');
                                     @click.away="open = false"
                                     class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between min-w-[140px]">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
@@ -346,7 +360,7 @@ $endDate = date('M j');
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-10 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <a href="?page=manage-jobs"
@@ -381,21 +395,21 @@ $endDate = date('M j');
                 </div>
 
                 <!-- Jobs List -->
-                <div class="overflow-hidden w-full">
-                    <table class="w-full table-fixed divide-y divide-gray-300">
+                <div class="w-full overflow-visible">
+                    <table class="w-full divide-y divide-gray-300 table-fixed">
                         <!-- Table Header -->
                         <thead class="bg-primary">
                             <tr>
-                                <th scope="col" class="w-3/5 px-6 py-4 text-left text-sm font-medium text-white uppercase tracking-wider">
+                                <th scope="col" class="w-3/5 px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase">
                                     JOBS
                                 </th>
-                                <th scope="col" class="w-1/8 px-6 py-4 text-left text-sm font-medium text-white uppercase tracking-wider">
+                                <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
                                     STATUS
                                 </th>
-                                <th scope="col" class="w-1/8 px-6 py-4 text-left text-sm font-medium text-white uppercase tracking-wider">
+                                <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
                                     APPLICATIONS
                                 </th>
-                                <th scope="col" class="w-1/5 px-6 py-4 text-left text-sm font-medium text-white uppercase tracking-wider">
+                                <th scope="col" class="w-1/5 px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase">
                                     ACTIONS
                                 </th>
                             </tr>
@@ -414,7 +428,7 @@ $endDate = date('M j');
                                             </p>
                                             <div class="mt-6">
                                                 <a href="?page=post-job"
-                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                                     <i class="mr-2 fas fa-plus"></i>
                                                     Post Your First Job
                                                 </a>
@@ -440,7 +454,7 @@ $endDate = date('M j');
                                         <!-- Job Info Column -->
                                         <td class="px-6 py-5">
                                             <div>
-                                                <div class="text-sm font-medium text-gray-900 mb-1">
+                                                <div class="mb-1 text-sm font-medium text-gray-900">
                                                     <?php echo htmlspecialchars($job['job_title']); ?>
                                                 </div>
                                                 <div class="text-xs text-gray-500">
@@ -512,7 +526,7 @@ $endDate = date('M j');
                                             <div class="flex items-center space-x-3">
                                                 <!-- View Applications Button -->
                                                 <a href="?page=job-applications&job_id=<?php echo $job['job_id']; ?>"
-                                                    class="inline-flex items-center px-6 py-3 text-sm font-medium text-primary bg-gray-100 rounded-sm hover:bg-primary hover:text-white hover:background-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                                                    class="inline-flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white hover:background-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                                     View Applications
                                                 </a>
 
@@ -520,7 +534,7 @@ $endDate = date('M j');
                                                 <div class="relative" x-data="{ open: false }">
                                                     <button @click="open = !open"
                                                         @click.away="open = false"
-                                                        class="flex items-center justify-center w-8 h-8 text-gray-400 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                                                        class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                                                         </svg>
@@ -534,7 +548,7 @@ $endDate = date('M j');
                                                         x-transition:leave="transition ease-in duration-75"
                                                         x-transition:leave-start="transform opacity-100 scale-100"
                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                        class="absolute right-0 z-10 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                                        class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                                         x-cloak>
                                                         <div class="py-1">
                                                             <!-- Promote Job Option (for highlighted job - you can add logic for this later) -->
@@ -587,7 +601,7 @@ $endDate = date('M j');
                                 <!-- Previous Page -->
                                 <?php if ($hasPrevPage): ?>
                                     <a href="?page=dashboard&p=<?php echo $currentPage - 1; ?>"
-                                        class="flex items-center justify-center w-8 h-8 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors duration-200">
+                                        class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                                         </svg>
@@ -608,12 +622,12 @@ $endDate = date('M j');
                                 for ($i = $startPage; $i <= $endPage; $i++):
                                 ?>
                                     <?php if ($i == $currentPage): ?>
-                                        <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white bg-primary rounded">
+                                        <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white rounded bg-primary">
                                             <?php echo sprintf('%02d', $i); ?>
                                         </span>
                                     <?php else: ?>
                                         <a href="?page=dashboard&p=<?php echo $i; ?>"
-                                            class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors duration-200">
+                                            class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 transition-colors duration-200 rounded hover:bg-gray-100">
                                             <?php echo sprintf('%02d', $i); ?>
                                         </a>
                                     <?php endif; ?>
@@ -622,7 +636,7 @@ $endDate = date('M j');
                                 <!-- Next Page -->
                                 <?php if ($hasNextPage): ?>
                                     <a href="?page=dashboard&p=<?php echo $currentPage + 1; ?>"
-                                        class="flex items-center justify-center w-8 h-8 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors duration-200">
+                                        class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                         </svg>
@@ -635,12 +649,12 @@ $endDate = date('M j');
                                     </span>
                                 <?php endif; ?>
                             </nav>
-                            <div class="text-sm text-gray-700 justify-end">
+                            <div class="justify-end text-sm text-gray-700">
                                 Showing <?php echo (($currentPage - 1) * 5) + 1; ?> to <?php echo min($currentPage * 5, $totalJobCount); ?> of <?php echo $totalJobCount; ?> results
                             </div>
                         </div>
                     <?php else: ?>
-                        <div class="text-center text-sm text-gray-500">
+                        <div class="text-sm text-center text-gray-500">
                             Showing all <?php echo $totalJobCount; ?> job<?php echo $totalJobCount != 1 ? 's' : ''; ?>
                         </div>
                     <?php endif; ?>
