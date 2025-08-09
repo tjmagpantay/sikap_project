@@ -252,33 +252,128 @@ $endDate = date('M j');
                         <!-- Right side: Filters -->
                         <div class="flex items-center space-x-4">
                             <!-- Job Status Filter -->
-                            <div class="relative">
-                                <select class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200">
-                                    <option value="">Job status</option>
-                                    <option value="open">Active</option>
-                                    <option value="closed">Closed</option>
-                                    <option value="paused">Paused</option>
-                                    <option value="draft">Draft</option>
-                                </select>
-                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="relative" x-data="{ open: false, selected: 'Job status' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between min-w-[140px]">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-10 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <a href="?page=dashboard"
+                                            @click="selected = 'All Status'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
+                                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            All Status
+                                        </a>
+                                        <a href="?page=dashboard&status=open"
+                                            @click="selected = 'Active'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
+                                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            Active
+                                        </a>
+                                        <a href="?page=dashboard&status=closed"
+                                            @click="selected = 'Closed'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
+                                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                            Closed
+                                        </a>
+                                        <a href="?page=dashboard&status=paused"
+                                            @click="selected = 'Paused'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
+                                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            Paused
+                                        </a>
+                                        <a href="?page=dashboard&status=draft"
+                                            @click="selected = 'Draft'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
+                                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </div>
+                                            Draft
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- All Jobs Filter -->
-                            <div class="relative">
-                                <select class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200">
-                                    <option value="?page=manage-jobs">All Jobs</option>
-                                    <option value="recent">Recent</option>
-                                    <option value="popular">Most Popular</option>
-                                    <option value="expiring">Expiring Soon</option>
-                                </select>
-                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="relative" x-data="{ open: false, selected: 'All Jobs' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between min-w-[140px]">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-10 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <a href="?page=manage-jobs"
+                                            @click="selected = 'All Jobs'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <i class="mr-3 text-blue-400 fas fa-briefcase"></i>
+                                            All Jobs
+                                        </a>
+                                        <a href="?page=dashboard&sort=recent"
+                                            @click="selected = 'Recent'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <i class="mr-3 text-green-400 fas fa-clock"></i>
+                                            Recent
+                                        </a>
+                                        <a href="?page=dashboard&sort=popular"
+                                            @click="selected = 'Most Popular'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <i class="mr-3 text-purple-400 fas fa-star"></i>
+                                            Most Popular
+                                        </a>
+                                        <a href="?page=dashboard&sort=expiring"
+                                            @click="selected = 'Expiring Soon'; open = false"
+                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <i class="mr-3 text-orange-400 fas fa-exclamation-triangle"></i>
+                                            Expiring Soon
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
