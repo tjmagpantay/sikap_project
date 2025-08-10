@@ -43,23 +43,72 @@ include_once __DIR__ . '../components/navbar-employer.php';
             });
             if (empty($filteredJobs)): ?>
                 <div class="col-span-full">
-                    <div class="flex flex-col items-center justify-center p-12 text-center bg-white border-2 border-gray-200 border-dashed rounded-lg">
-                        <div class="flex items-center justify-center w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full">
-                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 00-2 2H8a2 2 0 00-2-2V6m8 0H8m0 0v-.5A.5.5 0 018.5 5h7a.5.5 0 01.5.5V6m-8 0V6a2 2 0 012-2h4a2 2 0 012 2v0" />
-                            </svg>
+                    <div class="flex flex-col items-center justify-center w-screen p-16 text-center bg-white border-2 border-gray-200 border-dashed rounded-lg min-h-[300px]">
+
+                        <div class="flex items-center justify-center w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full">
+                            <?php if ($activeTab == 'draft'): ?>
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            <?php elseif ($activeTab == 'closed'): ?>
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            <?php else: ?>
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 00-2 2H8a2 2 0 00-2-2V6m8 0H8m0 0v-.5A.5.5 0 018.5 5h7a.5.5 0 01.5.5V6m-8 0V6a2 2 0 012-2h4a2 2 0 012 2v0" />
+                                </svg>
+                            <?php endif; ?>
                         </div>
-                        <h3 class="mb-2 text-xl font-semibold text-gray-900">No job posts yet</h3>
-                        <p class="max-w-sm mb-6 text-gray-500">
-                            Create your first job post to start attracting qualified candidates to your company.
-                        </p>
-                        <a href="?page=post-job"
-                            class="inline-flex items-center px-6 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-lg bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Post Your First Job
-                        </a>
+
+                        <?php if ($activeTab == 'draft'): ?>
+                            <h3 class="mb-3 text-lg font-semibold text-primary">No Draft Jobs</h3>
+                            <p class="max-w-md mb-8 text-sm text-gray-500">
+                                You don't have any draft jobs. Start creating a job post and save it as a draft to continue later.
+                            </p>
+                        <?php elseif ($activeTab == 'closed'): ?>
+                            <h3 class="mb-3 text-lg font-semibold text-primary">No Expired Jobs</h3>
+                            <p class="max-w-md mb-8 text-sm text-gray-500">
+                                You don't have any expired or closed jobs yet. Jobs will appear here when they reach their deadline or are manually closed.
+                            </p>
+                        <?php else: ?>
+                            <h3 class="mb-3 text-2xl font-semibold text-gray-900">No Active Jobs</h3>
+                            <p class="max-w-md mb-8 text-gray-500">
+                                You don't have any active job posts. Create your first job post to start attracting qualified candidates.
+                            </p>
+                        <?php endif; ?>
+
+                        <?php if ($activeTab != 'closed'): ?>
+                            <div class="flex flex-col gap-3 sm:flex-row">
+                                <a href="?page=post-job"
+                                    class="inline-flex items-center px-6 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-lg bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Create New Job
+                                </a>
+                                <?php if ($activeTab == 'open' && count(array_filter($jobs, function ($job) {
+                                    return $job['job_status'] == 'draft';
+                                })) > 0): ?>
+                                    <a href="?page=manage-jobs&job_status=draft"
+                                        class="inline-flex items-center px-6 py-3 text-sm font-medium text-blue-600 transition-colors duration-200 border border-blue-200 rounded-lg bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        View Drafts
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php else: ?>
+                            <a href="?page=manage-jobs&job_status=open"
+                                class="inline-flex items-center px-6 py-3 text-sm font-medium text-blue-600 transition-colors duration-200 border border-blue-200 rounded-lg bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                View Active Jobs
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php else:
