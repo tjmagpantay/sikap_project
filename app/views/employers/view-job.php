@@ -5,6 +5,40 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
 <div class="min-h-screen bg-gray-50">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
+        <!-- Header with breadcrumbs -->
+        <div class="mb-8">
+            <!-- Breadcrumb Navigation -->
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="?page=employer-dashboard" class="inline-flex items-center text-sm text-gray-400 hover:text-gray-600">
+
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            <a href="?page=manage-jobs" class="ml-1 text-sm text-gray-400 hover:text-gray-600 md:ml-2">
+                                Job Management
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-1 text-sm font-medium text-primary md:ml-2">View Job</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-2xl font-bold text-gray-900">Job Details</h1>
+        </div>
+
         <!-- Main Flex Layout -->
         <div class="flex flex-col gap-8 md:flex-row">
 
