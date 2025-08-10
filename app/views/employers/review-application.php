@@ -5,16 +5,38 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
 <div class="min-h-screen bg-gray-50">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-        <!-- Header with back button -->
+        <!-- Header with breadcrumbs -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <a href="?page=manage-applications" class="flex items-center text-sm font-medium transition-colors text-primary hover:text-secondary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Applications
-                </a>
-                <h1 class="mt-2 text-2xl font-bold text-gray-900">Review Application</h1>
+                <!-- Breadcrumb Navigation -->
+                <nav class="flex mb-4" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="?page=employer-dashboard" class="inline-flex items-center text-sm text-gray-400 hover:text-gray-600">
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                <a href="?page=view-all-applicants" class="ml-1 text-sm text-gray-400 hover:text-gray-600 md:ml-2">
+                                    Manage Applications
+                                </a>
+                            </div>
+                        </li>
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="ml-1 text-sm font-medium text-primary md:ml-2">Review Application</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+                <h1 class="text-2xl font-bold text-gray-900">Review Application</h1>
             </div>
             <span class="px-3 py-1 text-xs font-medium  
                 <?php
@@ -43,7 +65,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
         </div>
 
         <!-- Main Flex Layout -->
-        <div class="flex flex-col gap-8 md:flex-row" x-data="{ activeTab: 'profile' }">
+        <div class="flex flex-col gap-8 md:flex-row" x-data="{ activeTab: 'profile', editingInterview: false }">
 
             <!-- Left Section - Applicant Profile Card -->
             <div class="w-full md:w-4/12">
@@ -105,19 +127,19 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     echo 'text-primary border-2 border-gray';
                                     break;
                                 case 'reviewed':
-                                    echo 'text-primary bg-blue-100 border ';
+                                    echo 'text-primary bg-blue-100 border-gray';
                                     break;
                                 case 'shortlisted':
-                                    echo 'text-primary  border border-purple-200';
+                                    echo 'text-primary  border border-gray';
                                     break;
                                 case 'rejected':
-                                    echo 'text-primary border border-red-200';
+                                    echo 'text-primary border border-gray';
                                     break;
                                 case 'hired':
-                                    echo 'text-primary  border border-green-200';
+                                    echo 'text-white  border border-gray bg-secondary';
                                     break;
                                 default:
-                                    echo 'text-primary  border border-gray-200';
+                                    echo 'text-primary  border border-gray';
                             }
                             ?>">
                             <?php echo ucfirst($application['application_status']); ?>
@@ -193,23 +215,52 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <h4 class="mb-3 text-sm font-semibold text-gray-900">Quick Actions</h4>
                         <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
                             <!-- Accept Application Button -->
-                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Accept
-                            </button>
+                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                <input type="hidden" name="application_status" value="hired">
+                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Accept
+                                </button>
+                            </form>
 
                             <!-- Reject Application Button -->
-                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                Reject
-                            </button>
+                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                <input type="hidden" name="application_status" value="rejected">
+                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Reject
+                                </button>
+                            </form>
+
+                            <!-- Reviewed Application Button -->
+                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                <input type="hidden" name="application_status" value="reviewed">
+                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Reviewed
+                                </button>
+                            </form>
+
+                            <!-- Shortlisted Application Button -->
+                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                <input type="hidden" name="application_status" value="shortlisted">
+                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
+                                    </svg>
+                                    Shortlisted
+                                </button>
+                            </form>
 
                             <!-- Schedule Interview Button -->
-                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                            <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
                                 <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
@@ -341,10 +392,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
                                                 <div class="flex items-start justify-between">
                                                     <div class="flex-1">
-                                                        <h5 class="font-medium text-gray-900"><?php echo htmlspecialchars($education['school_name']); ?></h5>
-                                                        <p class="text-sm text-gray-700"><?php echo htmlspecialchars($education['education_level']); ?></p>
+                                                        <h5 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($education['school_name']); ?></h5>
+                                                        <p class="text-xs text-gray-400"><?php echo htmlspecialchars($education['education_level']); ?></p>
                                                         <?php if (!empty($education['field_of_study'])): ?>
-                                                            <p class="text-sm text-gray-600"><?php echo htmlspecialchars($education['field_of_study']); ?></p>
+                                                            <p class="text-xs text-gray-400"><?php echo htmlspecialchars($education['field_of_study']); ?></p>
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="text-xs text-gray-500">
@@ -541,7 +592,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400">Current Status</label>
-                                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 text-xs font-medium
                                                 <?php
                                                 switch ($application['application_status']) {
                                                     case 'pending':
@@ -593,7 +644,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Position Overview</h4>
                                     <div class="p-4 rounded-lg bg-gray-50">
                                         <h5 class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></h5>
-                                        <p class="text-sm text-gray-700"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
+                                        <p class="text-xs text-gray-400"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -613,18 +664,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         </select>
                                     </div>
                                     <div class="flex space-x-3">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
                                             Update Status
                                         </button>
-                                        <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 8a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
-                                            Schedule Interview
-                                        </button>
+
                                     </div>
                                 </form>
                             </div>
@@ -633,75 +679,126 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <!-- Schedule Interview Tab -->
                         <div x-show="activeTab === 'schedule'">
                             <div class="space-y-6">
+                                <!-- Header Section -->
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-lg font-medium text-gray-900">Interview Schedule</h4>
-                                    <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        Add Schedule Interview
-                                    </button>
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Interview Schedule</h4>
+
+                                    <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                        <!-- Edit Button - Show only when interview exists and not editing -->
+                                        <button @click="editingInterview = true"
+                                            x-show="!editingInterview"
+                                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent shadow-sm bg-primary hover:bg-blue-700">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Edit Schedule
+                                        </button>
+
+                                        <!-- Cancel Edit Button - Show only when editing -->
+                                        <button @click="editingInterview = false"
+                                            x-show="editingInterview"
+                                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300shadow-sm hover:bg-gray-50">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel
+                                        </button>
+                                    <?php else: ?>
+                                        <!-- Add Schedule Button - Show only when no interview exists -->
+                                        <span class="text-sm text-gray-500">No interview scheduled</span>
+                                    <?php endif; ?>
                                 </div>
 
-                                <!-- Interview Scheduling Form -->
-                                <form method="POST" action="?page=review-application&action=scheduleInterview&application_id=<?php echo $application['application_id']; ?>" class="space-y-6">
-                                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                        <div>
-                                            <label class="block mb-2 text-sm font-medium text-gray-700">Date & Time</label>
-                                            <input type="datetime-local" name="interview_date"
-                                                value="<?php echo htmlspecialchars($interview['interview_date'] ?? ''); ?>"
-                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
-                                        </div>
-                                        <div>
-                                            <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
-                                            <input type="text" name="interview_location"
-                                                value="<?php echo htmlspecialchars($interview['interview_location'] ?? ''); ?>"
-                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-                                                placeholder="Office address or Zoom meeting link">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block mb-2 text-sm font-medium text-gray-700">Notes</label>
-                                        <textarea name="notes" rows="4"
-                                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-                                            placeholder="Add any additional instructions for the candidate"><?php echo htmlspecialchars($interview['notes'] ?? ''); ?></textarea>
-                                    </div>
-                                    <div>
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            Schedule Interview
-                                        </button>
-                                    </div>
-                                </form>
+                                <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                    <!-- Display Existing Interview Schedule -->
+                                    <div x-show="!editingInterview">
+                                        <div class="p-6 bg-gray-50">
+                                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                                <div>
+                                                    <label class="block mb-2 text-sm font-medium text-gray-700">Date & Time</label>
+                                                    <div class="flex items-center p-3 bg-white rounded-md shadow-sm">
+                                                        <svg class="w-5 h-5 mr-3 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span class="text-sm text-gray-900">
+                                                            <?php echo date('F j, Y \a\t g:i A', strtotime($interview['interview_date'])); ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                <!-- Sample Interview Schedule (like in the reference image) -->
-                                <div class="pt-6 border-t border-gray-200">
-                                    <h5 class="mb-4 font-medium text-gray-900">Interview List</h5>
-                                    <div class="space-y-3">
-                                        <div class="p-4 border rounded-lg">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <h6 class="font-medium text-gray-900">Tomorrow - 10 July, 2021</h6>
+                                                <div>
+                                                    <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
+                                                    <div class="flex items-center p-3 bg-white rounded-md shadow-sm">
+                                                        <svg class="w-5 h-5 mr-3 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                        <span class="text-sm text-gray-900">
+                                                            <?php echo htmlspecialchars($interview['interview_location']); ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full">
-                                                    <span class="text-xs font-medium text-gray-600">KM</span>
+
+                                            <?php if (!empty($interview['notes'])): ?>
+                                                <div class="mt-6">
+                                                    <label class="block mb-2 text-sm font-medium text-gray-700">Notes</label>
+                                                    <div class="p-3 bg-white rounded-md shadow-sm">
+
+                                                        <span class="text-sm text-gray-900">
+                                                            <?php echo nl2br(htmlspecialchars($interview['notes'])); ?>
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm font-medium text-gray-900">Kathryn Murphy</p>
-                                                    <p class="text-xs text-gray-500">Written Test</p>
-                                                </div>
-                                                <div class="text-right">
-                                                    <p class="text-sm font-medium text-gray-900">10:00 AM - 11:30 AM</p>
-                                                    <p class="text-xs text-gray-500">Silver Crysta Room, Nomad</p>
-                                                </div>
-                                                <button class="text-sm font-medium text-primary hover:text-primary-dark">
-                                                    Add Feedback
-                                                </button>
-                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
+                                <?php endif; ?>
+
+                                <!-- Interview Scheduling Form (Show when no interview OR when editing) -->
+                                <div x-show="<?php echo empty($interview) || empty($interview['interview_date']) ? 'true' : 'editingInterview'; ?>">
+                                    <form method="POST" action="?page=review-application&action=scheduleInterview&application_id=<?php echo $application['application_id']; ?>" class="space-y-6">
+                                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                            <div>
+                                                <label class="block mb-2 text-sm font-medium text-gray-700">Date & Time</label>
+                                                <input type="datetime-local" name="interview_date"
+                                                    value="<?php echo htmlspecialchars($interview['interview_date'] ?? ''); ?>"
+                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                                                    required>
+                                            </div>
+                                            <div>
+                                                <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
+                                                <input type="text" name="interview_location"
+                                                    value="<?php echo htmlspecialchars($interview['interview_location'] ?? ''); ?>"
+                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder:text-sm placeholder:text-gray-400"
+                                                    placeholder="Office address or online meeting link"
+                                                    required>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block mb-2 text-sm font-medium text-gray-700">Notes (Optional)</label>
+                                            <textarea name="notes" rows="4"
+                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder:text-sm placeholder:text-gray-400"
+                                                placeholder="Add any additional instructions or requirements for the candidate"><?php echo htmlspecialchars($interview['notes'] ?? ''); ?></textarea>
+                                        </div>
+
+                                        <div class="flex gap-3">
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <?php echo (!empty($interview) && !empty($interview['interview_date'])) ? 'Update Interview' : 'Schedule Interview'; ?>
+                                            </button>
+
+                                            <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                                <button type="button" @click="editingInterview = false"
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                    Cancel
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
