@@ -1,35 +1,98 @@
 <?php
+require_once __DIR__ . '/Jobseeker.php';
+
 class ReviewApplication
 {
     protected $db;
+    private $jobseekerModel;
 
     public function __construct()
     {
-        // Update DSN as needed for your environment
-        $this->db = new PDO('mysql:host=localhost;dbname=sikap_db;charset=utf8mb4', 'root', '');
-        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Use the same config as Jobseeker model for consistency
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+        try {
+            $this->db = new PDO(
+                "mysql:host={$config['db_host']};dbname={$config['db_name']};charset=utf8mb4",
+                $config['db_user'],
+                $config['db_pass']
+            );
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Connection failed: " . $e->getMessage());
+        }
+
+        $this->jobseekerModel = new Jobseeker();
     }
 
     public function getApplication($application_id)
     {
         $stmt = $this->db->prepare("
-            SELECT ja.*, 
-                   js.first_name, js.last_name, js.middle_name, js.suffix,
-                   js.date_of_birth, js.sex, js.address, js.contact_no,
-                   js.profile_picture, js.profile_completion, js.created_at as jobseeker_created_at,
-                   js.updated_at as jobseeker_updated_at, js.profile_completed,
-                   u.email, u.created_at as user_created_at, u.status as user_status,
-                   jp.job_title, jp.job_summary, jp.job_type, jp.location, jp.pay_range,
-                   jae.interested_program, jae.priority_sector
+            SELECT 
+                ja.*,
+                -- Jobseeker basic info
+                js.first_name, 
+                js.middle_name, 
+                js.last_name, 
+                js.suffix,
+                js.date_of_birth, 
+                js.sex, 
+                js.address, 
+                js.contact_no,
+                js.profile_picture, 
+                js.profile_completion, 
+                js.created_at as jobseeker_created_at,
+                js.updated_at as jobseeker_updated_at, 
+                js.profile_completed, 
+                js.user_id,
+                -- User info
+                u.user_id as user_id, 
+                u.email, 
+                u.created_at as user_created_at, 
+                u.status as user_status,
+                -- Job post info
+                jp.job_title, 
+                jp.job_summary, 
+                jp.job_type, 
+                jp.location, 
+                jp.pay_range,
+                -- Application eligibility
+                jae.interested_program, 
+                jae.priority_sector,
+                -- Education data
+                GROUP_CONCAT(DISTINCT CONCAT_WS('|', e.education_id, e.school_name, e.education_level, e.field_of_study, e.start_date, e.end_date) SEPARATOR ';;') as education_data,
+                -- Skills data
+                GROUP_CONCAT(DISTINCT CONCAT_WS('|', s.skill_id, s.skill_name, s.proficiency_level) SEPARATOR ';;') as skills_data,
+                -- Work experience data
+                GROUP_CONCAT(DISTINCT CONCAT_WS('|', w.experience_id, w.job_title, w.company_name, w.start_date, w.end_date, w.responsibilities, w.achievements, w.employment_type, w.currently_working) SEPARATOR ';;') as work_experience_data,
+                -- Certificates data
+                GROUP_CONCAT(DISTINCT CONCAT_WS('|', c.certificate_id, c.certificate_title, c.issuing_organization, c.date_issued) SEPARATOR ';;') as certificates_data
             FROM job_application ja
             LEFT JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
             LEFT JOIN users u ON js.user_id = u.user_id
             LEFT JOIN job_post jp ON ja.job_id = jp.job_id
             LEFT JOIN job_application_eligibility jae ON ja.application_id = jae.application_id
+            LEFT JOIN jobseeker_education e ON js.jobseeker_id = e.jobseeker_id
+            LEFT JOIN jobseeker_skills s ON js.jobseeker_id = s.jobseeker_id
+            LEFT JOIN jobseeker_work_experience w ON js.jobseeker_id = w.jobseeker_id
+            LEFT JOIN jobseeker_certificates c ON js.jobseeker_id = c.jobseeker_id
             WHERE ja.application_id = ?
+            GROUP BY ja.application_id
         ");
         $stmt->execute([$application_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            // Parse the concatenated data into arrays
+            $result['education'] = $this->parseEducationData($result['education_data'] ?? '');
+            $result['skills'] = $this->parseSkillsData($result['skills_data'] ?? '');
+            $result['work_experience'] = $this->parseWorkExperienceData($result['work_experience_data'] ?? '');
+            $result['certificates'] = $this->parseCertificatesData($result['certificates_data'] ?? '');
+
+            // Clean up the raw concatenated data
+            unset($result['education_data'], $result['skills_data'], $result['work_experience_data'], $result['certificates_data']);
+        }
+
+        return $result;
     }
 
     public function getJobseekerEducation($jobseeker_id)
@@ -92,9 +155,9 @@ class ReviewApplication
         $stmt = $this->db->prepare("
             SELECT jaa.*, jq.question_text, jq.question_type 
             FROM job_application_answers jaa
-            LEFT JOIN job_questions jq ON jaa.question_id = jq.question_id
+            LEFT JOIN job_post_questions jq ON jaa.question_id = jq.question_id
             WHERE jaa.application_id = ?
-            ORDER BY jaa.question_id
+            ORDER BY jaa.question_id;
         ");
         $stmt->execute([$application_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -106,16 +169,43 @@ class ReviewApplication
 
         if ($application && !empty($application['jobseeker_id'])) {
             $jobseeker_id = $application['jobseeker_id'];
+            $user_id = $application['user_id'] ?? null;
 
-            $application['education'] = $this->getJobseekerEducation($jobseeker_id);
-            $application['work_experience'] = $this->getJobseekerWorkExperience($jobseeker_id);
-            $application['skills'] = $this->getJobseekerSkills($jobseeker_id);
-            $application['certificates'] = $this->getJobseekerCertificates($jobseeker_id);
+            // The education, skills, work_experience, and certificates are already parsed from the main query
+            // But we still need to get documents and answers separately
             $application['documents'] = $this->getJobseekerDocuments($jobseeker_id);
             $application['answers'] = $this->getApplicationAnswers($application_id);
+
+            // Get REAL profile completion percentage using Jobseeker model
+            if ($user_id) {
+                $application['profile_completion_percentage'] = $this->jobseekerModel->calculateProfileCompletion($user_id);
+            } else {
+                $application['profile_completion_percentage'] = 0;
+            }
+
+            // Get resume/CV documents specifically
+            $application['resume_documents'] = $this->getResumeDocuments($jobseeker_id);
         }
 
         return $application;
+    }
+
+    public function getResumeDocuments($jobseeker_id)
+    {
+        $stmt = $this->db->prepare("
+            SELECT * FROM jobseeker_documents 
+            WHERE jobseeker_id = ? 
+            AND (file_type LIKE '%resume%' OR file_type LIKE '%cv%' OR file_name LIKE '%resume%' OR file_name LIKE '%cv%')
+            ORDER BY uploaded_at DESC
+        ");
+        $stmt->execute([$jobseeker_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getProfileCompletionPercentage($user_id)
+    {
+        // Use the Jobseeker model's calculation method for consistency
+        return $this->jobseekerModel->calculateProfileCompletion($user_id);
     }
 
     public function getInterview($application_id)
@@ -157,5 +247,104 @@ class ReviewApplication
     {
         $stmt = $this->db->prepare("INSERT INTO job_application_status_logs (application_id, status, changed_by_role, changed_at, remarks) VALUES (?, ?, ?, NOW(), ?)");
         return $stmt->execute([$application_id, $status, $changed_by_role, $remarks]);
+    }
+
+    // Helper methods to parse concatenated data
+    private function parseEducationData($data)
+    {
+        if (empty($data)) return [];
+
+        $items = explode(';;', $data);
+        $education = [];
+
+        foreach ($items as $item) {
+            if (empty($item)) continue;
+            $parts = explode('|', $item);
+            if (count($parts) >= 6) {
+                $education[] = [
+                    'education_id' => $parts[0],
+                    'school_name' => $parts[1],
+                    'education_level' => $parts[2],
+                    'field_of_study' => $parts[3],
+                    'start_date' => $parts[4],
+                    'end_date' => $parts[5]
+                ];
+            }
+        }
+
+        return $education;
+    }
+
+    private function parseSkillsData($data)
+    {
+        if (empty($data)) return [];
+
+        $items = explode(';;', $data);
+        $skills = [];
+
+        foreach ($items as $item) {
+            if (empty($item)) continue;
+            $parts = explode('|', $item);
+            if (count($parts) >= 3) {
+                $skills[] = [
+                    'skill_id' => $parts[0],
+                    'skill_name' => $parts[1],
+                    'proficiency_level' => $parts[2]
+                ];
+            }
+        }
+
+        return $skills;
+    }
+
+    private function parseWorkExperienceData($data)
+    {
+        if (empty($data)) return [];
+
+        $items = explode(';;', $data);
+        $work_experience = [];
+
+        foreach ($items as $item) {
+            if (empty($item)) continue;
+            $parts = explode('|', $item);
+            if (count($parts) >= 9) {
+                $work_experience[] = [
+                    'work_experience_id' => $parts[0],
+                    'job_title' => $parts[1],
+                    'company_name' => $parts[2],
+                    'start_date' => $parts[3],
+                    'end_date' => $parts[4],
+                    'responsibilities' => $parts[5],
+                    'achievements' => $parts[6],
+                    'employment_type' => $parts[7],
+                    'currently_working' => $parts[8]
+                ];
+            }
+        }
+
+        return $work_experience;
+    }
+
+    private function parseCertificatesData($data)
+    {
+        if (empty($data)) return [];
+
+        $items = explode(';;', $data);
+        $certificates = [];
+
+        foreach ($items as $item) {
+            if (empty($item)) continue;
+            $parts = explode('|', $item);
+            if (count($parts) >= 4) {
+                $certificates[] = [
+                    'certificate_id' => $parts[0],
+                    'certificate_title' => $parts[1],
+                    'issuing_organization' => $parts[2],
+                    'date_issued' => $parts[3]
+                ];
+            }
+        }
+
+        return $certificates;
     }
 }

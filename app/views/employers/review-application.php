@@ -16,7 +16,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                 </a>
                 <h1 class="mt-2 text-2xl font-bold text-gray-900">Review Application</h1>
             </div>
-            <span class="px-3 py-1 text-xs font-medium rounded-full 
+            <span class="px-3 py-1 text-xs font-medium  
                 <?php
                 switch ($application['application_status']) {
                     case 'pending':
@@ -45,107 +45,176 @@ include_once __DIR__ . '../components/navbar-employer.php';
         <!-- Main Flex Layout -->
         <div class="flex flex-col gap-8 md:flex-row" x-data="{ activeTab: 'profile' }">
 
-            <!-- Left Section - Applicant Summary (4/12 width) -->
+            <!-- Left Section - Applicant Profile Card -->
             <div class="w-full md:w-4/12">
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <!-- Applicant Header -->
-                    <div class="px-6 py-6 border-b border-gray-200">
-                        <div class="flex items-center space-x-4">
+                    <!-- Profile Header with Circle Photo -->
+                    <div class="flex items-center mb-6">
+                        <!-- Circle Profile Photo -->
+                        <div class="mr-4">
                             <?php if (!empty($application['profile_picture'])): ?>
                                 <img src="<?php echo '/sikap/public/' . htmlspecialchars($application['profile_picture']); ?>"
                                     alt="Profile"
-                                    class="object-cover w-16 h-16 border border-gray-200 rounded-full">
+                                    class="object-cover w-16 h-16 rounded-full shadow-sm">
                             <?php else: ?>
-                                <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full">
+                                <div class="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full">
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                 </div>
                             <?php endif; ?>
+                        </div>
 
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-bold text-gray-900 truncate">
-                                    <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['middle_name'] ?? '') . ' ' . ($application['last_name'] ?? '') . ' ' . ($application['suffix'] ?? ''))); ?>
-                                </h3>
-                                <p class="text-sm text-gray-600 truncate">
-                                    <?php echo htmlspecialchars($application['email'] ?? ''); ?>
-                                </p>
-                                <p class="text-xs text-gray-500 truncate">
-                                    <?php echo htmlspecialchars($application['contact_no'] ?? 'No phone provided'); ?>
-                                </p>
-                                <p class="mt-1 text-xs text-gray-400">
-                                    Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?>
-                                </p>
-                            </div>
+                        <!-- Name and Date Applied -->
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900">
+                                <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>
+                            </h3>
+                            <p class="text-sm text-gray-600">
+                                <?php echo htmlspecialchars($application['position_applied'] ?? 'Job Applicant'); ?>
+                            </p>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?>
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Application Details -->
-                    <div class="px-6 py-4 space-y-4">
-                        <div>
-                            <h4 class="mb-3 text-sm font-medium text-gray-900">Application Details</h4>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-xs font-medium text-gray-500">Application ID</span>
-                                    <span class="text-xs text-gray-900">#<?php echo htmlspecialchars($application['application_id']); ?></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-xs font-medium text-gray-500">Jobseeker ID</span>
-                                    <span class="text-xs text-gray-900">#<?php echo htmlspecialchars($application['jobseeker_id']); ?></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-xs font-medium text-gray-500">Status</span>
-                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
-                                        <?php
-                                        switch ($application['application_status']) {
-                                            case 'pending':
-                                                echo 'text-yellow-800 bg-yellow-100';
-                                                break;
-                                            case 'reviewed':
-                                                echo 'text-blue-800 bg-blue-100';
-                                                break;
-                                            case 'shortlisted':
-                                                echo 'text-purple-800 bg-purple-100';
-                                                break;
-                                            case 'rejected':
-                                                echo 'text-red-800 bg-red-100';
-                                                break;
-                                            case 'hired':
-                                                echo 'text-green-800 bg-green-100';
-                                                break;
-                                            default:
-                                                echo 'text-gray-800 bg-gray-100';
-                                        }
-                                        ?>">
-                                        <?php echo ucfirst($application['application_status']); ?>
+                    <!-- Profile Completion Card -->
+                    <div class="p-4 mb-6 bg-gray-50">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Profile Completion</span>
+                            <span class="text-sm font-bold text-primary">
+                                <?php
+                                $completion = $application['profile_completion_percentage'] ?? 0;
+                                echo $completion;
+                                ?>%
+                            </span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200">
+                            <div class="h-2 transition-all duration-300 bg-primary"
+                                style="width: <?php echo $completion; ?>%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Status Button -->
+                    <div class="mb-6">
+                        <button class="w-full px-4 py-2 text-sm font-medium
+                            <?php
+                            switch ($application['application_status']) {
+                                case 'pending':
+                                    echo 'text-primary border-2 border-gray';
+                                    break;
+                                case 'reviewed':
+                                    echo 'text-primary bg-blue-100 border ';
+                                    break;
+                                case 'shortlisted':
+                                    echo 'text-primary  border border-purple-200';
+                                    break;
+                                case 'rejected':
+                                    echo 'text-primary border border-red-200';
+                                    break;
+                                case 'hired':
+                                    echo 'text-primary  border border-green-200';
+                                    break;
+                                default:
+                                    echo 'text-primary  border border-gray-200';
+                            }
+                            ?>">
+                            <?php echo ucfirst($application['application_status']); ?>
+                        </button>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="mb-6">
+                        <h4 class="mb-3 text-sm font-semibold text-gray-900">Contact</h4>
+                        <div class="space-y-3">
+                            <!-- Email -->
+                            <?php if (!empty($application['email'])): ?>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 3.26a2 2 0 001.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="break-all">
+                                        <?php echo htmlspecialchars($application['email']); ?>
                                     </span>
                                 </div>
-                            </div>
-                        </div>
+                            <?php endif; ?>
 
-                        <!-- Quick Actions -->
-                        <div class="pt-4 border-t border-gray-200">
-                            <h4 class="mb-3 text-sm font-medium text-gray-900">Quick Actions</h4>
-                            <div class="space-y-2">
-                                <button class="w-full px-3 py-2 text-xs font-medium text-left text-green-700 transition-colors rounded-md bg-green-50 hover:bg-green-100">
-                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            <!-- Phone -->
+                            <?php if (!empty($application['contact_no'])): ?>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                     </svg>
-                                    Accept Application
-                                </button>
-                                <button class="w-full px-3 py-2 text-xs font-medium text-left text-red-700 transition-colors rounded-md bg-red-50 hover:bg-red-100">
-                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <span><?php echo htmlspecialchars($application['contact_no']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Address -->
+                            <?php if (!empty($application['address'])): ?>
+                                <div class="flex items-start text-sm text-gray-600">
+                                    <svg class="w-4 h-4 mr-3 mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    Reject Application
-                                </button>
-                                <button class="w-full px-3 py-2 text-xs font-medium text-left transition-colors rounded-md text-primary bg-blue-50 hover:bg-blue-100">
-                                    <svg class="inline-block w-2 h-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <span class="break-words">
+                                        <?php echo htmlspecialchars($application['address']); ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- LinkedIn/Social Media if available -->
+                            <?php if (!empty($application['linkedin_url'])): ?>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                                     </svg>
-                                    Schedule Interview
-                                </button>
-                            </div>
+                                    <a href="<?php echo htmlspecialchars($application['linkedin_url']); ?>" target="_blank" class="text-blue-600 break-all hover:text-blue-800">
+                                        LinkedIn Profile
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Website if available -->
+                            <?php if (!empty($application['website_url'])): ?>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s1.343-9-3-9m-9 9a9 9 0 019-9" />
+                                    </svg>
+                                    <a href="<?php echo htmlspecialchars($application['website_url']); ?>" target="_blank" class="text-blue-600 break-all hover:text-blue-800">
+                                        <?php echo htmlspecialchars(parse_url($application['website_url'], PHP_URL_HOST) ?? $application['website_url']); ?>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <h4 class="mb-3 text-sm font-semibold text-gray-900">Quick Actions</h4>
+                        <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
+                            <!-- Accept Application Button -->
+                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Accept
+                            </button>
+
+                            <!-- Reject Application Button -->
+                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Reject
+                            </button>
+
+                            <!-- Schedule Interview Button -->
+                            <button class="px-3 py-3 text-sm font-medium text-center transition-colors text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Schedule
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -186,7 +255,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <div x-show="activeTab === 'profile'" class="space-y-6">
                             <!-- Personal Information Section -->
                             <div class="space-y-4">
-                                <h4 class="pb-2 font-semibold border-b border-gray-200 text-primary text-m">Personal Information</h4>
+                                <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Personal Information</h4>
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
                                         <label class="block text-xs text-gray-400">Full Name</label>
@@ -228,14 +297,232 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                             </div>
 
+                            <!-- Skills & Experience Summary -->
+                            <?php if (!empty($application['skills']) || !empty($application['work_experience'])): ?>
+                                <div class="space-y-4">
+                                    <?php if (!empty($application['skills'])): ?>
+                                        <div>
+                                            <h4 class="pb-2 font-semibold border-b border-gray-200 text-primary text-md">Top Skills</h4>
+                                            <div class="flex flex-wrap gap-2 mt-3">
+                                                <?php foreach (array_slice($application['skills'], 0, 6) as $skill): ?>
+                                                    <span class="px-2 py-1 text-xs font-medium rounded text-primary bg-blue-50 hover:bg-blue-100">
+                                                        <?php echo htmlspecialchars($skill['skill_name']); ?>
+                                                        <?php if (!empty($skill['proficiency_level'])): ?>
+                                                            (<?php echo htmlspecialchars($skill['proficiency_level']); ?>)
+                                                        <?php endif; ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($application['work_experience'])): ?>
+                                        <div>
+                                            <h4 class="pb-2 font-semibold border-b border-gray-200 text-primary text-md">Recent Experience</h4>
+                                            <div class="mt-3 space-y-2">
+                                                <?php foreach (array_slice($application['work_experience'], 0, 2) as $work): ?>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($work['job_title']); ?></p>
+                                                        <p class="text-xs text-gray-600"><?php echo htmlspecialchars($work['company_name']); ?></p>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Education Section -->
+                            <?php if (!empty($application['education'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Education Background</h4>
+                                    <div class="space-y-4">
+                                        <?php foreach ($application['education'] as $education): ?>
+                                            <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                                <div class="flex items-start justify-between">
+                                                    <div class="flex-1">
+                                                        <h5 class="font-medium text-gray-900"><?php echo htmlspecialchars($education['school_name']); ?></h5>
+                                                        <p class="text-sm text-gray-700"><?php echo htmlspecialchars($education['education_level']); ?></p>
+                                                        <?php if (!empty($education['field_of_study'])): ?>
+                                                            <p class="text-sm text-gray-600"><?php echo htmlspecialchars($education['field_of_study']); ?></p>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        <?php
+                                                        if (!empty($education['start_date'])) {
+                                                            echo date('M Y', strtotime($education['start_date']));
+                                                            if (!empty($education['end_date'])) {
+                                                                echo ' - ' . date('M Y', strtotime($education['end_date']));
+                                                            } else {
+                                                                echo ' - Present';
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Detailed Work Experience Section -->
+                            <?php if (!empty($application['work_experience'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Complete Work Experience</h4>
+                                    <div class="space-y-4">
+                                        <?php foreach ($application['work_experience'] as $work): ?>
+                                            <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                                <div class="flex items-start justify-between mb-2">
+                                                    <div class="flex-1">
+                                                        <h5 class="font-medium text-gray-900"><?php echo htmlspecialchars($work['job_title']); ?></h5>
+                                                        <p class="text-sm text-gray-700"><?php echo htmlspecialchars($work['company_name']); ?></p>
+                                                        <?php if (!empty($work['employment_type'])): ?>
+                                                            <span class="inline-block px-2 py-1 mt-1 text-xs font-medium text-blue-700 bg-blue-100 rounded">
+                                                                <?php echo htmlspecialchars(ucfirst($work['employment_type'])); ?>
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        <?php
+                                                        if (!empty($work['start_date'])) {
+                                                            echo date('M Y', strtotime($work['start_date']));
+                                                            if (!empty($work['end_date']) && $work['currently_working'] != 1) {
+                                                                echo ' - ' . date('M Y', strtotime($work['end_date']));
+                                                            } elseif ($work['currently_working'] == 1) {
+                                                                echo ' - Present';
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                                <?php if (!empty($work['responsibilities'])): ?>
+                                                    <div class="mt-2">
+                                                        <p class="text-xs font-medium text-gray-400">Responsibilities:</p>
+                                                        <p class="mt-1 text-sm text-gray-600"><?php echo nl2br(htmlspecialchars($work['responsibilities'])); ?></p>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($work['achievements'])): ?>
+                                                    <div class="mt-2">
+                                                        <p class="text-xs font-medium text-gray-400">Achievements:</p>
+                                                        <p class="mt-1 text-sm text-gray-600"><?php echo nl2br(htmlspecialchars($work['achievements'])); ?></p>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+
+
+                            <!-- Certificates Section -->
+                            <?php if (!empty($application['certificates'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Certificates & Achievements</h4>
+                                    <div class="space-y-3">
+                                        <?php foreach ($application['certificates'] as $certificate): ?>
+                                            <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-3">
+                                                        <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                        </svg>
+                                                        <div>
+                                                            <h5 class="font-medium text-gray-900"><?php echo htmlspecialchars($certificate['certificate_title']); ?></h5>
+                                                            <p class="text-sm text-gray-600"><?php echo htmlspecialchars($certificate['issuing_organization']); ?></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        <?php if (!empty($certificate['date_issued'])): ?>
+                                                            <?php echo date('M Y', strtotime($certificate['date_issued'])); ?>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Application Eligibility Information -->
+                            <?php if (!empty($application['interested_program']) || !empty($application['priority_sector'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Application Preferences</h4>
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <?php if (!empty($application['interested_program'])): ?>
+                                            <div>
+                                                <label class="block text-xs text-gray-400">Interested Program</label>
+                                                <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['interested_program']); ?></p>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($application['priority_sector'])): ?>
+                                            <div>
+                                                <label class="block text-xs text-gray-400">Priority Sector</label>
+                                                <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['priority_sector']); ?></p>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+
+                        </div>
+                        <!-- Resume Tab -->
+                        <div x-show="activeTab === 'resume'">
+                            <?php if (!empty($application['resume_documents'])): ?>
+                                <div class="space-y-4">
+                                    <h2 class="mb-4 font-semibold text-primary text-md">Resume & CV Documents</h2>
+                                    <?php foreach ($application['resume_documents'] as $document): ?>
+                                        <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                            <div class="flex items-center">
+                                                <!-- PDF Icon Container -->
+                                                <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                                    <img
+                                                        src="../public/assets/icons/pdf-icon.png"
+                                                        alt="Icon"
+                                                        class="object-cover w-8 h-8" />
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-primary"><?php echo htmlspecialchars($document['file_name']); ?></div>
+                                                    <div class="text-xs text-gray-500">
+                                                        Type: <?php echo htmlspecialchars(ucfirst($document['file_type'])); ?> •
+                                                        Uploaded: <?php echo date('M j, Y', strtotime($document['uploaded_at'])); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <a href="?page=download-document&doc_id=<?php echo $document['document_id']; ?>"
+                                                    target="_blank"
+                                                    class="px-4 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+                                                    View
+                                                </a>
+                                                <a href="?page=download-document&doc_id=<?php echo $document['document_id']; ?>&download=1"
+                                                    class="px-4 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-gray-50 hover:bg-gray-100">
+                                                    Download ↓
+                                                </a>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="py-12 text-center">
+                                    <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No Resume Found</h3>
+                                    <p class="mt-1 text-sm text-gray-500">This applicant hasn't uploaded a resume or CV yet.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Application Tab -->
+                        <!-- Application Tab -->
+                        <div x-show="activeTab === 'application'" class="space-y-6">
                             <!-- Application Information Section -->
                             <div class="space-y-4">
-                                <h4 class="pb-2 font-semibold text-primary text-m">Application Information</h4>
+                                <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Application Information</h4>
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <div>
-                                        <label class="block text-xs text-gray-400">Position Applied</label>
-                                        <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['job_title'] ?? 'N/A'); ?></p>
-                                    </div>
                                     <div>
                                         <label class="block text-xs text-gray-400">Job Type</label>
                                         <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars(ucfirst(str_replace('-', ' ', $application['job_type'] ?? ''))); ?></p>
@@ -255,27 +542,27 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <div>
                                         <label class="block text-xs text-gray-400">Current Status</label>
                                         <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            <?php
-                                            switch ($application['application_status']) {
-                                                case 'pending':
-                                                    echo 'bg-yellow-100 text-yellow-800';
-                                                    break;
-                                                case 'reviewed':
-                                                    echo 'bg-blue-100 text-blue-800';
-                                                    break;
-                                                case 'shortlisted':
-                                                    echo 'bg-purple-100 text-purple-800';
-                                                    break;
-                                                case 'rejected':
-                                                    echo 'bg-red-100 text-red-800';
-                                                    break;
-                                                case 'hired':
-                                                    echo 'bg-green-100 text-green-800';
-                                                    break;
-                                                default:
-                                                    echo 'bg-gray-100 text-gray-800';
-                                            }
-                                            ?>">
+                                                <?php
+                                                switch ($application['application_status']) {
+                                                    case 'pending':
+                                                        echo 'bg-yellow-100 text-yellow-800';
+                                                        break;
+                                                    case 'reviewed':
+                                                        echo 'bg-blue-100 text-blue-800';
+                                                        break;
+                                                    case 'shortlisted':
+                                                        echo 'bg-purple-100 text-purple-800';
+                                                        break;
+                                                    case 'rejected':
+                                                        echo 'bg-red-100 text-red-800';
+                                                        break;
+                                                    case 'hired':
+                                                        echo 'bg-green-100 text-green-800';
+                                                        break;
+                                                    default:
+                                                        echo 'bg-gray-100 text-gray-800';
+                                                }
+                                                ?>">
                                             <?php echo ucfirst($application['application_status']); ?>
                                         </span>
                                     </div>
@@ -287,113 +574,59 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         <label class="block text-xs text-gray-400">Priority Sector</label>
                                         <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['priority_sector'] ?? 'None'); ?></p>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs text-gray-400">Application ID</label>
-                                        <p class="mt-1 font-mono text-sm text-gray-900">#<?php echo htmlspecialchars($application['application_id']); ?></p>
-                                    </div>
                                 </div>
+                            </div>
 
-                                <!-- Profile Completion - Full Width -->
-                                <div class="pt-4">
-                                    <label class="block text-xs text-gray-400">Profile Completion</label>
-                                    <div class="mt-2">
-                                        <?php $completion = $application['profile_completion'] ?? 0; ?>
-                                        <div class="flex items-center">
-                                            <div class="flex-1 h-2 mr-3 bg-gray-200 rounded-full">
-                                                <div class="h-2 rounded-full bg-primary" style="width: <?php echo $completion; ?>%"></div>
-                                            </div>
-                                            <span class="text-sm font-medium text-gray-900"><?php echo $completion; ?>%</span>
-                                        </div>
-                                    </div>
+                            <!-- Cover Letter -->
+                            <div class="space-y-4">
+                                <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Cover Letter</h4>
+                                <div class="p-6 rounded-lg bg-gray-50">
+                                    <p class="text-sm leading-relaxed text-gray-900">
+                                        <?= htmlspecialchars($application['cover_letter'] ?? 'No cover letter provided.') ?>
+                                    </p>
                                 </div>
                             </div>
 
                             <!-- Job Summary for Context -->
                             <?php if (!empty($application['job_summary'])): ?>
-                                <div class="pt-6 border-t border-gray-200">
-                                    <h4 class="mb-3 font-semibold text-primary text-md">Position Overview</h4>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Position Overview</h4>
                                     <div class="p-4 rounded-lg bg-gray-50">
-                                        <h5 class="mb-2 font-medium text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></h5>
+                                        <h5 class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></h5>
                                         <p class="text-sm text-gray-700"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
-                        </div>
 
-                        <!-- Resume Tab -->
-                        <div x-show="activeTab === 'resume'">
-                            <div class="py-12 text-center">
-                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">Resume Preview</h3>
-                                <p class="mt-1 text-sm text-gray-500">View and download the applicant's resume</p>
-                                <div class="mt-6 space-x-3">
-                                    <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        View Resume
-                                    </button>
-                                    <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                                        </svg>
-                                        Download Resume
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Application Tab -->
-                        <div x-show="activeTab === 'application'">
-                            <div class="space-y-6">
-                                <div>
-                                    <h4 class="mb-4 text-lg font-medium text-gray-900">Update Application Status</h4>
-                                    <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4">
-                                        <div>
-                                            <label class="block mb-2 text-sm font-medium text-gray-700">Status</label>
-                                            <select name="application_status" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
-                                                <?php foreach (['pending', 'reviewed', 'shortlisted', 'rejected', 'hired'] as $status): ?>
-                                                    <option value="<?php echo $status; ?>" <?php if ($application['application_status'] == $status) echo 'selected'; ?>>
-                                                        <?php echo ucfirst($status); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                Update Status
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <div class="pt-6 border-t border-gray-200">
-                                    <h5 class="mb-3 font-medium text-gray-900">Cover Letter</h5>
-                                    <div class="p-4 text-sm text-gray-700 rounded-lg bg-gray-50">
-                                        <?php echo htmlspecialchars($application['cover_letter'] ?? 'No cover letter provided.'); ?>
+                            <!-- Application Status Management -->
+                            <div class="space-y-4">
+                                <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Update Application Status</h4>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4">
+                                    <div>
+                                        <label class="block mb-2 text-sm font-medium text-gray-700">Status</label>
+                                        <select name="application_status" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs">
+                                            <?php foreach (['pending', 'reviewed', 'shortlisted', 'rejected', 'hired'] as $status): ?>
+                                                <option value="<?php echo $status; ?>" <?php if ($application['application_status'] == $status) echo 'selected'; ?>>
+                                                    <?php echo ucfirst($status); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
-                                </div>
-
-                                <div class="flex pt-4 space-x-4">
-                                    <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Accept Application
-                                    </button>
-                                    <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                        Reject Application
-                                    </button>
-                                </div>
+                                    <div class="flex space-x-3">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Update Status
+                                        </button>
+                                        <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 8a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            Schedule Interview
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
 

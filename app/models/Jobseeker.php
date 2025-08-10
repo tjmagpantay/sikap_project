@@ -271,59 +271,68 @@ class Jobseeker
         }
     }
 
-public function calculateProfileCompletion($user_id)
-{
-    $jobseeker = $this->findByUserId($user_id);
-    if (!$jobseeker) return 0;
+    public function calculateProfileCompletion($user_id)
+    {
+        $jobseeker = $this->findByUserId($user_id);
+        if (!$jobseeker) {
+            return 0;
+        }
 
-    $completionScore = 0;
+        $completionScore = 0;
 
-    // Basic profile info (first_name, last_name, contact_no) - 20%
-    $fields = ['first_name', 'last_name', 'contact_no'];
-    $filled = 0;
-    foreach ($fields as $field) {
-        if (!empty($jobseeker[$field])) $filled++;
+        // Basic profile info (first_name, last_name, contact_no) - 20%
+        $fields = ['first_name', 'last_name', 'contact_no'];
+        $filled = 0;
+        foreach ($fields as $field) {
+            if (!empty($jobseeker[$field])) {
+                $filled++;
+            }
+        }
+        $basicScore = ($filled / count($fields)) * 20;
+        $completionScore += $basicScore;
+
+        // Documents (15%)
+        $documents = $this->getDocuments($user_id);
+        if (!empty($documents)) {
+            $completionScore += 15;
+        }
+
+        // Education (15%)
+        $education = $this->getEducation($user_id);
+        if (!empty($education)) {
+            $completionScore += 15;
+        }
+
+        // Work Experience (20%)
+        $workExp = $this->getWorkExperience($user_id);
+        if (!empty($workExp)) {
+            $completionScore += 20;
+        }
+
+        // Skills (15%)
+        $skills = $this->getSkills($user_id);
+        if (!empty($skills)) {
+            $completionScore += 15;
+        }
+
+        // Certificates (10%)
+        $certificates = $this->getCertificates($user_id);
+        if (!empty($certificates)) {
+            $completionScore += 10;
+        }
+
+        // Address (5%)
+        if (!empty($jobseeker['address'])) {
+            $completionScore += 5;
+        }
+
+        $finalScore = min(100, round($completionScore));
+
+        // Debug log only when there's a discrepancy
+        error_log("ProfileCompletion Debug - User ID: $user_id, Final Score: $finalScore");
+
+        return $finalScore;
     }
-    $completionScore += ($filled / count($fields)) * 20;
-
-    // Documents (15%)
-    $documents = $this->getDocuments($user_id);
-    if (!empty($documents)) {
-        $completionScore += 15;
-    }
-
-    // Education (15%)
-    $education = $this->getEducation($user_id);
-    if (!empty($education)) {
-        $completionScore += 15;
-    }
-
-    // Work Experience (20%)
-    $workExp = $this->getWorkExperience($user_id);
-    if (!empty($workExp)) {
-        $completionScore += 20;
-    }
-
-    // Skills (15%)
-    $skills = $this->getSkills($user_id);
-    if (!empty($skills)) {
-        $completionScore += 15;
-    }
-
-    // Certificates (10%)
-    $certificates = $this->getCertificates($user_id);
-    if (!empty($certificates)) {
-        $completionScore += 10;
-    }
-
-    // Address (5%)
-    if (!empty($jobseeker['address'])) {
-        $completionScore += 5;
-    }
-
-    return min(100, round($completionScore));
-}
-
     public function getDocumentById($documentId)
     {
         try {
