@@ -365,6 +365,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->unsaveJob();
             break;
 
+        case 'setting-employer':
+            include __DIR__ . '/../app/views/employers/setting-employer.php';
+            break;
+
         default:
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
