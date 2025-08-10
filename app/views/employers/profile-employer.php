@@ -161,30 +161,43 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <?php if (!empty($employer['contact_no'])): ?>
                             <div class="w-full mt-6">
                                 <h4 class="mb-3 text-sm font-semibold text-gray-800">Contact</h4>
+
+                                <!-- Email -->
                                 <div class="flex items-center space-x-3 text-sm text-gray-600">
-                                    <i class="w-4 h-4 text-gray-400 fas fa-envelope"></i>
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M16.5 4.5h-9A2.5 2.5 0 005 7v10a2.5 2.5 0 002.5 2.5h9A2.5 2.5 0 0019 17V7a2.5 2.5 0 00-2.5-2.5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M5.5 7l6.5 5 6.5-5" />
+                                    </svg>
                                     <span><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></span>
                                 </div>
+
+                                <!-- Phone -->
                                 <div class="flex items-center mt-2 space-x-3 text-sm text-gray-600">
-                                    <i class="w-4 h-4 text-gray-400 fas fa-phone"></i>
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M2 5.5A2.5 2.5 0 014.5 3h2a1 1 0 011 1v3a1 1 0 01-.27.69l-1.29 1.29a14.5 14.5 0 006.58 6.58l1.29-1.29A1 1 0 0114 13.5h3a1 1 0 011 1v2A2.5 2.5 0 0115.5 19h-1A17.5 17.5 0 012 5.5v0z" />
+                                    </svg>
                                     <span><?php echo htmlspecialchars($employer['contact_no']); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
 
+
                         <!-- Action Buttons -->
                         <div class="w-full mt-6 space-y-3">
                             <!-- Profile Setup -->
-                            <button class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <i class="mr-2 fas fa-user-cog"></i>
-                                Profile Setup
-                            </button>
+                            <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                    <i class="mr-2 fas fa-plus"></i>
+                                    Profile Setup
+                            </a> 
 
-                            <!-- Business -->
-                            <button class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border-2 border-gray-200 rounded-lg hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <i class="mr-2 fas fa-building"></i>
-                                Business
-                            </button>
+                                                        <!-- Profile Setup -->
+                            <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                    <i class="mr-2 fas fa-plus"></i>
+                                    Business Setup
+                            </a>
 
                             <!-- Quick Actions -->
                             <?php if ($canPostJobs): ?>
@@ -223,9 +236,9 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <?php endif; ?>
 
                 <!-- Business Profile Card -->
-                <div class="p-6 bg-white border border-gray-200 shadow rounded-xl">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="flex items-center text-lg font-semibold text-gray-900">
+                <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="flex items-center font-semibold text-primary text-md">
                             <i class="mr-2 text-blue-600 fas fa-building"></i>
                             Business Profile
                         </h3>
@@ -234,9 +247,9 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         </a>
                     </div>
 
-                    <div class="flex flex-col items-center text-center sm:flex-row sm:text-left">
+                    <div class="flex items-center w-full ">
                         <!-- Business Logo -->
-                        <div class="relative mb-4 sm:mb-0 sm:mr-6">
+                        <div class="relative flex-shrink-0 mr-4">
                             <img src="<?php
                                         if (!empty($business['business_logo'])) {
                                             echo htmlspecialchars($business['business_logo']);
@@ -245,47 +258,57 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                             echo 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=1d4ed8&color=fff&size=80&format=svg&bold=true';
                                         }
                                         ?>"
-                                class="object-cover w-20 h-20 border-4 border-white rounded-full shadow-lg" alt="Business Logo">
+                                class="object-cover w-16 h-16 border-2 border-gray-100 rounded-lg shadow-sm" alt="Business Logo">
 
                             <!-- Verification Badge -->
                             <?php if ($isVerified): ?>
-                                <div class="absolute flex items-center justify-center w-6 h-6 bg-green-500 border-2 border-white rounded-full shadow-lg -bottom-1 -right-1">
-                                    <i class="text-xs text-white fas fa-check"></i>
+                                <div class="absolute flex items-center justify-center w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-sm -bottom-1 -right-1 ">
+                                    <svg class="w-2.5 h-2.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
                                 </div>
                             <?php endif; ?>
                         </div>
 
                         <!-- Business Details -->
-                        <div class="flex-1">
-                            <h4 class="text-xl font-bold text-gray-900">
-                                <?php echo htmlspecialchars($business['business_name'] ?? $employer['company_name'] ?? 'Company Name'); ?>
-                            </h4>
+                        <div class="flex flex-col justify-center flex-1">
+
 
                             <?php if (!empty($business['business_industry'])): ?>
-                                <p class="text-sm font-medium text-primary"><?php echo htmlspecialchars($business['business_industry']); ?></p>
+                                <p class="text-xs font-medium text-gray-500 mt-0.5">
+                                    <?php echo htmlspecialchars($business['business_industry']); ?>
+                                </p>
                             <?php endif; ?>
 
                             <?php if (!empty($business['business_type'])): ?>
-                                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($business['business_type']); ?></p>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    <?php echo htmlspecialchars($business['business_type']); ?>
+                                </p>
                             <?php endif; ?>
 
                             <!-- Status and Team Size -->
-                            <div class="flex flex-wrap gap-4 mt-3">
+                            <div class="flex flex-wrap gap-2 mt-2">
                                 <?php if ($isVerified): ?>
-                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                                        <i class="mr-1 fas fa-check-circle"></i>
-                                        Verified Employer
+                                    <div class="flex items-center px-2 py-0.5 text-xs font-medium text-primary bg-blue-50 ">
+                                        <svg class="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Verified
                                     </div>
                                 <?php elseif ($verificationStatus['status'] === 'pending'): ?>
-                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full">
-                                        <i class="mr-1 fas fa-clock"></i>
-                                        Pending Verification
+                                    <div class="flex items-center px-2 py-0.5 text-xs font-medium text-yellow-700 bg-yellow-50 rounded-full">
+                                        <svg class="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
+                                        </svg>
+                                        Pending
                                     </div>
                                 <?php endif; ?>
 
                                 <?php if (!empty($business['business_team_size'])): ?>
-                                    <div class="flex items-center px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
-                                        <i class="mr-1 fas fa-users"></i>
+                                    <div class="flex items-center px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-50 rounded-full">
+                                        <svg class="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V9H2v11h5m10-9h5M2 11h5" />
+                                        </svg>
                                         <?php echo htmlspecialchars($business['business_team_size']); ?> employees
                                     </div>
                                 <?php endif; ?>
@@ -294,52 +317,33 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                     </div>
 
                     <!-- Business Stats -->
-                    <div class="grid grid-cols-3 gap-4 p-4 mt-6 bg-gray-50 rounded-xl">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-primary"><?php echo round($businessCompletion); ?>%</div>
-                            <div class="text-xs text-gray-600">Business Setup</div>
+                    <div class="flex justify-between p-3 mt-4 rounded-lg bg-gray-50">
+                        <div class="flex-1 text-center">
+                            <div class="text-xl font-bold text-primary"><?php echo round($businessCompletion); ?>%</div>
+                            <div class="text-xs text-gray-500">Profile Complete</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-green-600"><?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?></div>
-                            <div class="text-xs text-gray-600">Documents</div>
+                        <div class="flex-1 text-center border-l border-gray-200">
+                            <div class="text-xl font-bold text-green-600"><?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?></div>
+                            <div class="text-xs text-gray-500">Documents</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-blue-600">0</div>
-                            <div class="text-xs text-gray-600">Active Jobs</div>
+                        <div class="flex-1 text-center border-l border-gray-200">
+                            <div class="text-xl font-bold text-secondary">0</div>
+                            <div class="text-xs text-gray-500">Active Jobs</div>
                         </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="flex flex-wrap gap-3 mt-6">
-                        <a href="?page=complete-employer-business&step=1" class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
-                            <i class="mr-2 fas fa-edit"></i>
-                            Edit Business
-                        </a>
-                        <a href="?page=complete-employer-business&step=4" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-                            <i class="mr-2 fas fa-upload"></i>
-                            Upload Documents
-                        </a>
-                        <?php if ($isVerified): ?>
-                            <a href="?page=post-job" class="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200">
-                                <i class="mr-2 fas fa-plus"></i>
-                                Post Job
-                            </a>
-                        <?php endif; ?>
                     </div>
                 </div>
 
                 <!-- About Section -->
                 <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="flex items-center text-lg font-semibold text-gray-900">
-                            <i class="mr-2 text-blue-600 fas fa-info-circle"></i>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="flex items-center font-semibold text-primary text-md">
                             About <?php echo !empty($business['business_name']) ? htmlspecialchars($business['business_name']) : 'Us'; ?>
                         </h3>
                         <a href="?page=complete-employer-business&step=1" class="text-blue-600 hover:text-blue-700">
                             <i class="fas fa-edit"></i>
                         </a>
                     </div>
-                    <p class="leading-relaxed text-gray-700 break-words">
+                    <p class="text-sm leading-relaxed text-gray-600 break-words">
                         <?php echo nl2br(htmlspecialchars($business['business_desc'] ?? $employer['about_us'] ?? '')); ?>
                     </p>
                 </div>
@@ -348,8 +352,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <?php if ($business): ?>
                     <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="flex items-center text-lg font-semibold text-gray-800">
-                                <i class="mr-2 text-blue-600 fas fa-building"></i>
+                            <h3 class="flex items-center font-semibold text-primary text-md">
                                 Business Information
                             </h3>
                             <a href="?page=complete-employer-business&step=2" class="text-blue-600 hover:text-blue-700">
@@ -362,7 +365,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <i class="mr-3 text-gray-500 fas fa-building"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Organization Type</p>
-                                        <p class="font-medium text-gray-800"><?php echo htmlspecialchars($business['business_type']); ?></p>
+                                        <p class="text-sm text-gray-800 font-sm"><?php echo htmlspecialchars($business['business_type']); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -371,7 +374,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <i class="mr-3 text-gray-500 fas fa-industry"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Industry</p>
-                                        <p class="font-medium text-gray-800"><?php echo htmlspecialchars($business['business_industry']); ?></p>
+                                        <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_industry']); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -389,7 +392,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <i class="mr-3 text-gray-500 fas fa-calendar"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Established</p>
-                                        <p class="font-medium text-gray-800"><?php echo date('Y', strtotime($business['business_established_year'])); ?></p>
+                                        <p class="text-sm font-medium text-gray-800"><?php echo date('Y', strtotime($business['business_established_year'])); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -399,7 +402,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <div>
                                         <p class="text-xs text-gray-500">Website</p>
                                         <a href="<?php echo htmlspecialchars($business['business_website']); ?>" target="_blank"
-                                            class="font-medium text-blue-600 break-all hover:text-blue-700">
+                                            class="text-sm font-medium text-blue-600 break-all hover:text-blue-700">
                                             <?php echo htmlspecialchars($business['business_website']); ?>
                                         </a>
                                     </div>
@@ -410,7 +413,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <i class="mr-3 text-gray-500 fas fa-phone"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Business Contact</p>
-                                        <p class="font-medium text-gray-800"><?php echo htmlspecialchars($business['business_contact']); ?></p>
+                                        <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_contact']); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -421,7 +424,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <i class="mt-1 mr-3 text-gray-500 fas fa-map-marker-alt"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Address</p>
-                                        <p class="font-medium text-gray-800 break-words"><?php echo nl2br(htmlspecialchars($business['business_address'])); ?></p>
+                                        <p class="text-sm font-medium text-gray-800 break-words"><?php echo nl2br(htmlspecialchars($business['business_address'])); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -433,7 +436,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <?php if (!empty($socials)): ?>
                     <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="flex items-center text-lg font-semibold text-gray-800">
+                            <h3 class="flex items-center font-semibold text-primary text-md">
                                 <i class="mr-2 text-blue-600 fas fa-share-alt"></i>
                                 Social Media
                             </h3>
@@ -446,8 +449,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                 <?php if (!empty($url)): ?>
                                     <a href="<?php echo htmlspecialchars($url); ?>" target="_blank"
                                         class="flex items-center justify-center p-4 break-all transition-colors rounded-lg bg-gray-50 hover:bg-gray-100">
-                                        <i class="fab fa-<?php echo $platform; ?> text-2xl text-gray-600 mr-2"></i>
-                                        <span class="font-medium text-gray-800 capitalize"><?php echo $platform; ?></span>
+                                        <span class="text-sm font-medium text-gray-800 capitalize"><?php echo $platform; ?></span>
                                     </a>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -458,7 +460,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <!-- Documents Status -->
                 <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="flex items-center text-lg font-semibold text-gray-800">
+                        <h3 class="flex items-center font-semibold text-primary text-md">
                             <i class="mr-2 text-blue-600 fas fa-file-alt"></i>
                             Required Documents
                             <span class="ml-2 text-sm text-gray-500">(<?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?>)</span>
@@ -469,15 +471,15 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                     </div>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         <?php foreach ($documentTypes as $type => $label): ?>
-                            <div class="flex items-center justify-between p-3 border rounded-lg <?php echo !empty($documents[$type]) ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'; ?>">
+                            <div class="flex items-center justify-between p-3 border rounded-lg <?php echo !empty($documents[$type]) ? 'bg-blue-50' : 'border-gray-200 bg-gray-50'; ?>">
                                 <div class="flex items-center">
                                     <i class="fas fa-file-pdf <?php echo !empty($documents[$type]) ? 'text-green-600' : 'text-gray-400'; ?> mr-3"></i>
                                     <div>
-                                        <p class="text-sm font-medium <?php echo !empty($documents[$type]) ? 'text-green-800' : 'text-gray-600'; ?>">
+                                        <p class="text-sm font-medium <?php echo !empty($documents[$type]) ? 'text-primary' : 'text-gray-600'; ?>">
                                             <?php echo $label; ?>
                                         </p>
                                         <?php if (!empty($documents[$type])): ?>
-                                            <p class="text-xs text-green-600">Uploaded</p>
+                                            <p class="text-xs text-primary">Uploaded</p>
                                         <?php else: ?>
                                             <p class="text-xs text-gray-500">Not uploaded</p>
                                         <?php endif; ?>
@@ -487,11 +489,11 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <?php if (!empty($documents[$type])): ?>
                                         <!-- NEW: Secure document links -->
                                         <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>" target="_blank"
-                                            class="text-xs text-green-600 hover:text-green-700" title="View Document">
+                                            class="text-xs text-primary  title="View Document">
                                             View
                                         </a>
                                         <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>&download=1"
-                                            class="text-xs text-blue-600 hover:text-blue-700" title="Download Document">
+                                            class="text-xs text-secondary  title="Download Document">
                                             Download
                                         </a>
                                     <?php else: ?>
@@ -534,7 +536,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         </div>
 
                         <?php if ($isVerified): ?>
-                            <div class="flex items-center p-3 rounded-lg bg-green-50">
+                            <div class="flex items-center p-3 rounded-lg bg-yellow-50">
                                 <i class="mr-3 text-green-600 fas fa-check-circle"></i>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800">Profile verified</p>

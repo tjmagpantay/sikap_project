@@ -88,7 +88,7 @@
                 Manage Jobs
               </a>
 
-              <a href="?page=profile-employer" 
+              <a href="?page=view-all-applicants" 
                  class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
                 <i class="mr-3 text-gray-400 fas fa-user-tie"></i>
                 View Applications
