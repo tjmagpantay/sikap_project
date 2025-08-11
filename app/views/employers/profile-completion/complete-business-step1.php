@@ -27,9 +27,55 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 
     <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-            <!-- Progress bar -->
-            <div class="w-full h-2 mb-6 bg-gray-200 rounded">
-                <div class="h-2 rounded bg-primary" style="width: 20%"></div>
+            <!-- Enhanced Progress bar with clickable steps -->
+            <div class="mb-6">
+                <!-- Step indicators -->
+                <div class="flex items-center justify-between w-full mb-4">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
+                            <span class="text-sm font-semibold">1</span>
+                        </div>
+                        <span class="mt-1 text-xs text-gray-600">Basic</span>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=2" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">2</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Founding</span>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">3</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Social</span>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">4</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Documents</span>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">5</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Review</span>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="w-full h-2 bg-gray-200 rounded">
+                    <div class="h-2 rounded bg-primary" style="width: 20%"></div>
+                </div>
             </div>
 
             <!-- Error Messages -->
@@ -165,19 +211,33 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                 </div>
 
                 <div class="flex justify-between">
-                    <a href="?page=employer-dashboard" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                    <a href="?page=complete-employer-profile" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Back to Dashboard
+                        Back to Setup
                     </a>
-                    <button type="submit" name="submit_step1"
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </button>
+                    <?php
+                    // Check if business has existing data
+                    $hasExistingData = !empty($business['business_name']) || !empty($business['business_desc']);
+                    ?>
+                    <?php if ($hasExistingData): ?>
+                        <button type="submit" name="submit_step1"
+                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Update
+                        </button>
+                    <?php else: ?>
+                        <button type="submit" name="submit_step1"
+                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                            Next Step
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>

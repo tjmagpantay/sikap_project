@@ -197,13 +197,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <!-- Profile Setup -->
                             <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                 <i class="mr-2 fas fa-plus"></i>
-                                Profile Setup
-                            </a>
-
-                            <!-- Profile Setup -->
-                            <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <i class="mr-2 fas fa-plus"></i>
-                                Business Setup
+                                Profile and Busines Setup
                             </a>
 
                             <!-- Quick Actions -->

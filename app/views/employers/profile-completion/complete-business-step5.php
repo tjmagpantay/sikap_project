@@ -1,6 +1,6 @@
-<?php include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-employer.php';
-
+<?php
+include_once __DIR__ . '../../../components/navbar-top.php';
+include_once __DIR__ . '/../components/navbar-employer.php';
 // Decode social media data
 $socials = [];
 if (!empty($business['business_socials'])) {
@@ -29,14 +29,14 @@ foreach ($documentTypes as $type => $label) {
 }
 ?>
 
-<div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-4xl">
+<div class="min-h-screen py-6">
+    <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
+            <!-- <div class="flex justify-center mb-4">
                 <div class="p-3 bg-blue-600 rounded-full">
                     <i class="text-2xl text-white fas fa-check-circle"></i>
                 </div>
-            </div>
+            </div> -->
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Profile Review
             </h2>
@@ -49,12 +49,90 @@ foreach ($documentTypes as $type => $label) {
         </div>
     </div>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-4xl">
+    <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-            <!-- Progress bar -->
-            <div class="w-full h-2 mb-6 bg-gray-200 rounded">
-                <div class="h-2 bg-green-600 rounded" style="width: 100%"></div>
+            <!-- Enhanced Progress bar with clickable steps -->
+            <div class="mb-6">
+                <!-- Step indicators -->
+                <div class="flex items-center justify-between w-full mb-4">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-blue-700">
+                            <span class="text-sm font-semibold">1</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-600">Basic</span>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=2" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-blue-700">
+                            <span class="text-sm font-semibold">2</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-600">Founding</span>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=3" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-blue-700">
+                            <span class="text-sm font-semibold">3</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-600">Social</span>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-employer-business&step=4" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-blue-700">
+                            <span class="text-sm font-semibold">4</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-600">Documents</span>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-8 h-8 text-white bg-green-600 rounded-full">
+                            <span class="text-sm font-semibold">5</span>
+                        </div>
+                        <span class="mt-1 text-xs text-gray-600">Review</span>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="w-full h-2 bg-gray-200 rounded">
+                    <div class="h-2 rounded bg-primary" style="width: 100%"></div>
+                </div>
             </div>
+
+            <!-- Error Messages -->
+            <?php if (!empty($error)): ?>
+                <div class="p-4 mb-4 border border-red-200 rounded-md bg-red-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-600"><?php echo htmlspecialchars($error); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Success Messages -->
+            <?php if (!empty($success)): ?>
+                <div class="p-4 mb-4 border border-green-200 rounded-md bg-green-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-600"><?php echo htmlspecialchars($success); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Profile Summary -->
             <div class="space-y-8">
@@ -92,16 +170,16 @@ foreach ($documentTypes as $type => $label) {
                         <i class="mr-2 text-blue-600 fas fa-building"></i>
                         Business Information
                     </h3>
-                    
+
                     <?php if (!empty($business['banner_image'])): ?>
                         <div class="mb-4">
                             <p class="mb-2 text-sm text-gray-600">Banner Image</p>
-                            <img src="<?php echo htmlspecialchars($business['banner_image']); ?>" 
-                                 alt="Banner" 
-                                 class="object-cover w-full h-32 border border-gray-300 rounded-md">
+                            <img src="<?php echo htmlspecialchars($business['banner_image']); ?>"
+                                alt="Banner"
+                                class="object-cover w-full h-32 border border-gray-300 rounded-md">
                         </div>
                     <?php endif; ?>
-                    
+
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <div>
                             <p class="text-sm text-gray-600">Company Name</p>
@@ -128,21 +206,21 @@ foreach ($documentTypes as $type => $label) {
                             <p class="font-medium"><?php echo htmlspecialchars($business['business_contact'] ?? 'Not specified'); ?></p>
                         </div>
                     </div>
-                    
+
                     <?php if (!empty($business['business_address'])): ?>
                         <div class="mt-4">
                             <p class="text-sm text-gray-600">Address</p>
                             <p class="font-medium"><?php echo htmlspecialchars($business['business_address']); ?></p>
                         </div>
                     <?php endif; ?>
-                    
+
                     <?php if (!empty($business['business_website'])): ?>
                         <div class="mt-4">
                             <p class="text-sm text-gray-600">Website</p>
                             <a href="<?php echo htmlspecialchars($business['business_website']); ?>" target="_blank" class="font-medium text-blue-600 hover:text-blue-700"><?php echo htmlspecialchars($business['business_website']); ?></a>
                         </div>
                     <?php endif; ?>
-                    
+
                     <?php if (!empty($business['business_desc'])): ?>
                         <div class="mt-4">
                             <p class="text-sm text-gray-600">Description</p>
@@ -208,15 +286,33 @@ foreach ($documentTypes as $type => $label) {
 
             <form method="POST" action="?page=complete-employer-business&step=5">
                 <div class="flex justify-between mt-8">
-                    <a href="?page=complete-employer-business&step=4" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                        <i class="mr-2 fas fa-arrow-left"></i>
+                    <a href="?page=complete-employer-business&step=4" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
                         Back
                     </a>
-                    <button type="submit" name="submit_business_profile"
-                        class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        <i class="mr-2 fas fa-check"></i>
-                        Complete Profile
-                    </button>
+                    <?php
+                    // Check if business profile is already completed (based on completion status)
+                    $isUpdating = $businessCompleted;
+                    ?>
+                    <?php if ($isUpdating): ?>
+                        <button type="submit" name="submit_business_profile"
+                            class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Update Profile
+                        </button>
+                    <?php else: ?>
+                        <button type="submit" name="submit_business_profile"
+                            class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Complete Profile
+                        </button>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
