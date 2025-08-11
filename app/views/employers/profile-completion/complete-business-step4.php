@@ -45,7 +45,8 @@ if (!$employer) {
         </div>
     </div>
 
-    <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
+
+    <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
             <!-- Enhanced Progress bar with clickable steps -->
             <div class="mb-6">
@@ -69,10 +70,10 @@ if (!$employer) {
 
                     <!-- Step 3 -->
                     <div class="flex flex-col items-center">
-                        <a href="?page=complete-employer-business&step=3" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-blue-700">
+                        <a href="?page=complete-employer-business&step=3" class="flex items-center justify-center w-8 h-8 text-white transition-colors rounded-full bg-primary hover:bg-gray-300 hover:text-white">
                             <span class="text-sm font-semibold">3</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-600">Social</span>
+                        <span class="mt-1 text-xs text-gray-500">Socials</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -109,22 +110,6 @@ if (!$employer) {
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-red-600"><?php echo htmlspecialchars($error); ?></p>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Success Messages -->
-            <?php if (!empty($success)): ?>
-                <div class="p-4 mb-4 border rounded-md border-primary bg-blue-50">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-gray-400"><?php echo htmlspecialchars($success); ?></p>
                         </div>
                     </div>
                 </div>
@@ -196,25 +181,41 @@ if (!$employer) {
                 </div>
 
                 <!-- Important Notice -->
-                <div class="p-4 border border-yellow-200 rounded-md bg-yellow-50">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h4 class="text-sm font-medium text-yellow-800">Important Notice</h4>
-                            <div class="mt-2 text-sm text-yellow-700">
-                                <ul class="space-y-1 list-disc list-inside">
-                                    <li>All documents must be in PDF format</li>
-                                    <li>Maximum file size: 5MB per document</li>
-                                    <li>Documents marked with * are required</li>
-                                    <li>Ensure all documents are clear and legible</li>
-                                    <li>Documents will be reviewed by admin for verification</li>
-                                </ul>
-                            </div>
-                        </div>
+                <div class="p-4 rounded-md bg-yellow-50">
+                    <h4 class="text-sm font-medium text-yellow-800">Important Notice</h4>
+                    <div class="mt-2 text-xs text-yellow-700">
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-4 h-4 mt-0.5 mr-2 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                All documents must be in PDF format
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-4 h-4 mt-0.5 mr-2 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                Maximum file size: 5MB per document
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-4 h-4 mt-0.5 mr-2 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                Documents marked with * are required
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-4 h-4 mt-0.5 mr-2 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                Ensure all documents are clear and legible
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-4 h-4 mt-0.5 mr-2 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                Documents will be reviewed by admin for verification
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
