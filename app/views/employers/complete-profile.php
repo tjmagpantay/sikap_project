@@ -190,13 +190,5 @@ include_once __DIR__ . '../components/navbar-employer.php';
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex justify-center mt-8 space-x-4">
-            <a href="?page=employer-dashboard"
-                class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                <i class="mr-2 fas fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
-        </div>
     </div>
 </div>
