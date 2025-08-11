@@ -25,6 +25,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
+        case 'updateStatus':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->updateStatus();
+            break;
+        case 'update-employer-status':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->updateStatus();
+            break;
+
 
         // Google login Jobseeker & Employer
 
@@ -151,6 +162,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->dashboard();
             break;
 
+
+               //NEWWWWWWWWWWWWWWW
+
+            // User Management Routes
+            case 'admin-jobseekers':
+                require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+                $controller = new UserManagementController();
+                $controller->index('jobseekers');
+                break;
+
+            case 'admin-employers':
+                require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+                $controller = new UserManagementController();
+                $controller->index('employers');
+                break;
+
+                
         // case 'admin-users':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();

@@ -1,4 +1,4 @@
-<header class="bg-white border-b border-gray-200 flex-shrink-0">
+<header class="flex-shrink-0 bg-white border-b border-gray-200">
     <div class="flex items-center justify-between px-6 py-4">
         <!-- Left Section -->
         <div class="flex items-center">
