@@ -92,18 +92,18 @@ class EmployerDashboard
                     WHERE jp.employer_id = ? AND ja.is_finalized = 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id]);
-            $stats['total_applications'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stats['total_applications'] = $result['count'];
 
             // Pending reviews
             $sql = "SELECT COUNT(*) as count 
                     FROM job_application ja 
                     JOIN job_post jp ON ja.job_id = jp.job_id 
-                    WHERE jp.employer_id = ? AND ja.status = 'pending' AND ja.is_finalized = 1";
+                    WHERE jp.employer_id = ? AND ja.application_status = 'pending' AND ja.is_finalized = 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id]);
             $stats['pending_reviews'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            error_log('EmployerDashboard Model - Stats calculated: ' . json_encode($stats));
             return $stats;
         } catch (PDOException $e) {
             error_log('Error calculating employer stats: ' . $e->getMessage());
@@ -313,7 +313,7 @@ class EmployerDashboard
         try {
             $sql = "SELECT 
                     ja.application_id,
-                    ja.status,
+                    ja.application_status,
                     ja.created_at,
                     jp.job_title,
                     js.first_name,

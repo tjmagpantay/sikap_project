@@ -75,9 +75,7 @@ class EmployerDashboardController
 
         if ($employer['employer_id']) {
             $stats = $this->dashboardModel->getEmployerStats($employer['employer_id']);
-        }
-
-        // Add calculated fields to job posts
+        }        // Add calculated fields to job posts
         foreach ($jobPosts as &$job) {
             $job['days_remaining'] = $this->dashboardModel->calculateDaysRemaining($job['application_deadline']);
         }
@@ -91,18 +89,6 @@ class EmployerDashboardController
         // Profile status for quick actions
         $hasProfile = $employer && !empty($employer['first_name']);
         $canPostJobs = $employer['employer_id'] ? $this->employerModel->canPostJobs($_SESSION['user_id']) : false;
-
-        // Debug logging
-        error_log('=== EMPLOYER DASHBOARD CONTROLLER DEBUG ===');
-        error_log('Employer ID: ' . ($employer['employer_id'] ?? 'NULL'));
-        error_log('JobPosts count: ' . count($jobPosts));
-        error_log('Jobs count: ' . count($jobs));
-        error_log('TotalJobPosts: ' . $totalJobPosts);
-        error_log('TotalJobCount: ' . $totalJobCount);
-        error_log('Current Page: ' . $currentPage);
-        error_log('Total Pages: ' . $totalPages);
-        error_log('Has Profile: ' . ($hasProfile ? 'YES' : 'NO'));
-        error_log('=== END DEBUG ===');
 
         include __DIR__ . '/../views/employers/dashboard.php';
     }
