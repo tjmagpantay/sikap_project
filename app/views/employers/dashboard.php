@@ -106,7 +106,7 @@ $endDate = date('M j');
                 <!-- Card 1: New Job Post to review -->
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div class="mb-6">
-                        <h3 class="mb-6 text-gray-700 text-md font-xl">New Job Post to review</h3>
+                        <h3 class="mb-6 text-gray-700 text-md font-xl">New Applicants to review</h3>
                         <div class="flex items-baseline">
                             <span class="text-3xl font-bold text-gray-900"><?php echo $pendingReviews ?? '0'; ?></span>
                             <svg class="ml-2" width="24px" height="24px" viewBox="0 0 20.00 20.00" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
@@ -127,7 +127,7 @@ $endDate = date('M j');
                             </svg>
                         </div>
                         <p class="mt-2 text-xs text-gray-500">
-                            Total of job post to review as of <?php echo date('F j'); ?>
+                            Total of job applicants to review as of <?php echo date('F j'); ?>
                         </p>
                     </div>
 
@@ -145,27 +145,33 @@ $endDate = date('M j');
                     </div>
                 </div>
 
-                <!-- Card 2: New Employer to review -->
+                <!-- Card 2: Total Applications Received -->
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div class="mb-6">
-                        <h3 class="mb-6 text-gray-700 text-md font-xl">New Jobseeker to review</h3>
+                        <h3 class="mb-6 text-gray-700 text-md font-xl">Total Applications Received</h3>
                         <div class="flex items-baseline">
                             <span class="text-3xl font-bold text-gray-900">
                                 <?php
-                                // Calculate pending employer applications
-                                $pendingEmployers = 4; // You can fetch this from your database
-                                echo $pendingEmployers;
+                                // Use the total applications from controller stats
+                                echo $totalApplications ?? 0;
                                 ?>
                             </span>
+                            <svg class="ml-2" width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path d="M17.5 18H18.7687C19.2035 18 19.4209 18 19.5817 17.9473C20.1489 17.7612 20.5308 17.1231 20.498 16.4163C20.4887 16.216 20.42 15.9676 20.2825 15.4708C20.168 15.0574 20.1108 14.8507 20.0324 14.6767C19.761 14.0746 19.2766 13.6542 18.7165 13.5346C18.5546 13.5 18.3737 13.5 18.0118 13.5L15.5 13.5346M14.6899 11.6996C15.0858 11.892 15.5303 12 16 12C17.6569 12 19 10.6569 19 9C19 7.34315 17.6569 6 16 6C15.7295 6 15.4674 6.0358 15.2181 6.10291M13.5 8C13.5 10.2091 11.7091 12 9.5 12C7.29086 12 5.5 10.2091 5.5 8C5.5 5.79086 7.29086 4 9.5 4C11.7091 4 13.5 5.79086 13.5 8ZM6.81765 14H12.1824C12.6649 14 12.9061 14 13.1219 14.0461C13.8688 14.2056 14.5147 14.7661 14.8765 15.569C14.9811 15.8009 15.0574 16.0765 15.21 16.6278C15.3933 17.2901 15.485 17.6213 15.4974 17.8884C15.5411 18.8308 15.0318 19.6817 14.2756 19.9297C14.0613 20 13.7714 20 13.1916 20H5.80844C5.22864 20 4.93875 20 4.72441 19.9297C3.96818 19.6817 3.45888 18.8308 3.50261 17.8884C3.51501 17.6213 3.60668 17.2901 3.79003 16.6278C3.94262 16.0765 4.01891 15.8009 4.12346 15.569C4.4853 14.7661 5.13116 14.2056 5.87806 14.0461C6.09387 14 6.33513 14 6.81765 14Z" stroke="#F3AF0E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </g>
+                            </svg>
                         </div>
                         <p class="mt-2 text-xs text-gray-500">
-                            Total of jobseeker to review as of <?php echo date('F j'); ?>
+                            Candidates who applied to your job posts as of <?php echo date('F j'); ?>
                         </p>
                     </div>
 
                     <div class="pt-4">
-                        <a href="?page=pending-employer-reviews" class="flex items-center text-sm text-primary font-sm">
-                            All Employer
+                        <a href="?page=view-all-applicants" class="flex items-center text-sm text-primary font-sm">
+                            View All Applicants
                             <svg class="ml-2" width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>

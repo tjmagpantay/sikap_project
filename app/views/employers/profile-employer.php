@@ -129,7 +129,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                 <span class="text-sm font-bold text-primary"><?php echo round($personalCompletion); ?>%</span>
                             </div>
                             <div class="w-full h-2 bg-gray-200 rounded-full">
-                                <div class="h-2 transition-all duration-300 rounded-full bg-primary" style="width: <?php echo $personalCompletion; ?>%"></div>
+                                <div class="h-2 transition-all duration-300 bg-primary" style="width: <?php echo $personalCompletion; ?>%"></div>
                             </div>
                             <div class="flex items-center justify-between mt-1">
                                 <p class="text-xs text-gray-500">
@@ -144,17 +144,24 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         </div>
 
                         <!-- Business Profile Completion -->
-                        <div class="w-full p-2 mt-4 bg-gray-400">
-                            <div class="flex items-center justify-between mb-2 ">
+                        <div class="w-full mt-6">
+                            <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-medium text-gray-700">Business Profile Completion</span>
                                 <span class="text-sm font-bold text-orange-600"><?php echo round($businessCompletion); ?>%</span>
                             </div>
-                            <div class="w-full h-2.5 bg-gray-200 ">
-                                <div class="h-2.5 transition-all duration-300 bg-orange-500 " style="width: <?php echo $businessCompletion; ?>%"></div>
+                            <div class="w-full h-2 bg-gray-200 rounded-full">
+                                <div class="h-2 transition-all duration-300 bg-secondary" style="width: <?php echo $businessCompletion; ?>%"></div>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">
-                                <?php echo $businessCompleted; ?> of <?php echo $totalBusinessItems; ?> completed
-                            </p>
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-xs text-gray-500">
+                                    <?php echo $businessCompleted; ?> of <?php echo $totalBusinessItems; ?> completed
+                                </p>
+                                <?php if ($businessCompletion < 100): ?>
+                                    <a href="?page=complete-employer-business&step=1" class="text-xs text-orange-600 hover:text-orange-700">Complete</a>
+                                <?php else: ?>
+                                    <span class="text-xs text-green-600">✓ Complete</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                         <!-- Contact Info -->
@@ -189,14 +196,8 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <div class="w-full mt-6 space-y-3">
                             <!-- Profile Setup -->
                             <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                    <i class="mr-2 fas fa-plus"></i>
-                                    Profile Setup
-                            </a> 
-
-                                                        <!-- Profile Setup -->
-                            <a href="?page=complete-employer-business&step=1" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                    <i class="mr-2 fas fa-plus"></i>
-                                    Business Setup
+                                <i class="mr-2 fas fa-plus"></i>
+                                Profile and Busines Setup
                             </a>
 
                             <!-- Quick Actions -->
@@ -359,13 +360,13 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                 <i class="fas fa-edit"></i>
                             </a>
                         </div>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
                             <?php if (!empty($business['business_type'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
                                     <i class="mr-3 text-gray-500 fas fa-building"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Organization Type</p>
-                                        <p class="text-sm text-gray-800 font-sm"><?php echo htmlspecialchars($business['business_type']); ?></p>
+                                        <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_type']); ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -469,7 +470,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <i class="fas fa-upload"></i>
                         </a>
                     </div>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
                         <?php foreach ($documentTypes as $type => $label): ?>
                             <div class="flex items-center justify-between p-3 border rounded-lg <?php echo !empty($documents[$type]) ? 'bg-blue-50' : 'border-gray-200 bg-gray-50'; ?>">
                                 <div class="flex items-center">
@@ -489,11 +490,11 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <?php if (!empty($documents[$type])): ?>
                                         <!-- NEW: Secure document links -->
                                         <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>" target="_blank"
-                                            class="text-xs text-primary  title="View Document">
+                                            class="text-xs text-primary  title=" View Document">
                                             View
                                         </a>
                                         <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>&download=1"
-                                            class="text-xs text-secondary  title="Download Document">
+                                            class="text-xs text-secondary  title=" Download Document">
                                             Download
                                         </a>
                                     <?php else: ?>

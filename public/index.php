@@ -223,8 +223,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Complete Profile Routes
         case 'complete-employer-profile':
-            // This is now the choice page
-            include __DIR__ . '/../app/views/employers/complete-profile.php';
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->completeProfile();
             break;
 
         case 'employer-personal-profile':
