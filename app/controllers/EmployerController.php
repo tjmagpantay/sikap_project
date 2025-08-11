@@ -119,6 +119,12 @@ class EmployerController
 
     public function completeProfile()
     {
+        // Add authentication check
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
         $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -137,20 +143,48 @@ class EmployerController
             return;
         }
 
-        // Get employer data
+        // Get employer data and calculate completion status
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
         if ($employer === false) {
             $employer = [];
+        }
+
+        // Initialize variables with default values
+        $personalCompleted = false;
+        $businessCompleted = false;
+
+        // Calculate personal completion status
+        if (!empty($employer)) {
+            $personalCompleted = !empty($employer['first_name']) &&
+                !empty($employer['last_name']) &&
+                !empty($employer['position']);
+        }
+
+        // Calculate business completion status
+        if (!empty($employer) && isset($employer['employer_id'])) {
+            $business = $this->employerModel->getBusiness($employer['employer_id']);
+            $documents = $this->employerModel->getDocuments($employer['employer_id']);
+
+            // Check if business profile has essential fields completed
+            if ($business) {
+                $businessCompleted = !empty($business['business_name']) &&
+                    !empty($business['business_desc']) &&
+                    !empty($business['business_type']) &&
+                    !empty($business['business_industry']);
+
+                // Also check if at least some documents are uploaded
+                if ($businessCompleted && is_array($documents)) {
+                    $documentCount = count(array_filter($documents));
+                    $businessCompleted = $businessCompleted && $documentCount > 0;
+                }
+            }
         }
 
         $user = $_SESSION;
         $error = $_GET['error'] ?? '';
         $success = $_GET['success'] ?? '';
 
-        // Get existing profile data
-        // Get user data for autofill (name from signup)
-
-        // Include the main controller
+        // Include the main controller with variables in scope
         include __DIR__ . '/../views/employers/complete-profile.php';
     }
 
@@ -262,7 +296,7 @@ class EmployerController
             $error = 'Invalid form submission.';
             return;
         }
-        
+
         $required = ['business_name', 'business_desc'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -299,7 +333,7 @@ class EmployerController
         }
 
         $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
-        
+
         if ($result) {
             header('Location: ?page=complete-employer-business&step=2&success=' . urlencode('Business information saved successfully!'));
             exit;
@@ -575,76 +609,76 @@ class EmployerController
         }
     }
 
-private function handleDocumentUpload($file, $type, &$error)
-{
-    try {
-        error_log("DEBUG: handleDocumentUpload called for type: $type");
+    private function handleDocumentUpload($file, $type, &$error)
+    {
+        try {
+            error_log("DEBUG: handleDocumentUpload called for type: $type");
 
-        // Validate file
-        $allowedTypes = ['pdf'];  // Only PDF for documents
-        $maxSize = 5 * 1024 * 1024; // 5MB
+            // Validate file
+            $allowedTypes = ['pdf'];  // Only PDF for documents
+            $maxSize = 5 * 1024 * 1024; // 5MB
 
-        $fileInfo = pathinfo($file['name']);
-        $extension = strtolower($fileInfo['extension'] ?? '');
+            $fileInfo = pathinfo($file['name']);
+            $extension = strtolower($fileInfo['extension'] ?? '');
 
-        if (!in_array($extension, $allowedTypes)) {
-            $error = 'Invalid file type. Only PDF files are allowed for documents.';
-            return false;
-        }
-
-        if ($file['size'] > $maxSize) {
-            $error = 'File too large. Maximum size: 5MB';
-            return false;
-        }
-
-        // Get employer info to check for existing file
-        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        if (!$employer) {
-            $error = 'Employer not found';
-            return false;
-        }
-
-        // Check for existing document and delete old file
-        $existingDocuments = $this->employerModel->getDocuments($employer['employer_id']);
-        if (!empty($existingDocuments[$type])) {
-            $oldFilePath = __DIR__ . '/../../' . $existingDocuments[$type];
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-                error_log("DEBUG: Deleted old file: $oldFilePath");
-            }
-        }
-
-        // Store documents outside public directory for security
-        $uploadDir = __DIR__ . '/../../uploads/documents/';
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
-                $error = 'Failed to create upload directory';
+            if (!in_array($extension, $allowedTypes)) {
+                $error = 'Invalid file type. Only PDF files are allowed for documents.';
                 return false;
             }
-        }
 
-        // Generate unique filename
-        $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-        $filePath = $uploadDir . $filename;
+            if ($file['size'] > $maxSize) {
+                $error = 'File too large. Maximum size: 5MB';
+                return false;
+            }
 
-        error_log("DEBUG: Attempting to move file to: $filePath");
+            // Get employer info to check for existing file
+            $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+            if (!$employer) {
+                $error = 'Employer not found';
+                return false;
+            }
 
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filePath)) {
-            error_log("DEBUG: File moved successfully");
-            // Return relative path for database storage
-            return 'uploads/documents/' . $filename;
-        } else {
-            $error = 'Failed to move uploaded file';
-            error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
+            // Check for existing document and delete old file
+            $existingDocuments = $this->employerModel->getDocuments($employer['employer_id']);
+            if (!empty($existingDocuments[$type])) {
+                $oldFilePath = __DIR__ . '/../../' . $existingDocuments[$type];
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                    error_log("DEBUG: Deleted old file: $oldFilePath");
+                }
+            }
+
+            // Store documents outside public directory for security
+            $uploadDir = __DIR__ . '/../../uploads/documents/';
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    $error = 'Failed to create upload directory';
+                    return false;
+                }
+            }
+
+            // Generate unique filename
+            $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+            $filePath = $uploadDir . $filename;
+
+            error_log("DEBUG: Attempting to move file to: $filePath");
+
+            // Move uploaded file
+            if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                error_log("DEBUG: File moved successfully");
+                // Return relative path for database storage
+                return 'uploads/documents/' . $filename;
+            } else {
+                $error = 'Failed to move uploaded file';
+                error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log('Error in handleDocumentUpload: ' . $e->getMessage());
+            $error = 'Upload processing error';
             return false;
         }
-    } catch (Exception $e) {
-        error_log('Error in handleDocumentUpload: ' . $e->getMessage());
-        $error = 'Upload processing error';
-        return false;
     }
-}
 
     private function handleBannerUpload($file, &$error)
     {

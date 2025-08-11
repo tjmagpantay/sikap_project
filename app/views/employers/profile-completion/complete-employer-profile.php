@@ -1,5 +1,4 @@
-<?php include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-employer.php';
+<?php
 
 // Split the full name from signup if it exists
 $fullName = $user['name'] ?? '';
@@ -9,11 +8,12 @@ $autoLastName = count($nameParts) > 1 ? end($nameParts) : '';
 $autoMiddleName = count($nameParts) > 2 ? implode(' ', array_slice($nameParts, 1, -1)) : '';
 ?>
 
-<?php include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-employer.php';
+<?php
+include_once __DIR__ . '../../../components/navbar-top.php';
+include_once __DIR__ . '/../components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+<div class="min-h-screen py-12 ">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
             <div class="flex justify-center mb-4">
