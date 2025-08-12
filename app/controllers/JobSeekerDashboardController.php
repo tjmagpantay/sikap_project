@@ -2,46 +2,58 @@
 // filepath: app/controllers/JobSeekerDashboardController.php
 
 require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../models/Jobseeker.php';
 require_once __DIR__ . '/../models/JobPost.php';
+require_once __DIR__ . '/../models/Jobseeker.php';
 require_once __DIR__ . '/../models/JobApplication.php';
+require_once __DIR__ . '/../models/JobseekerDashboard.php';
 
 class JobSeekerDashboardController
 {
-    private $userModel;
-    private $jobseekerModel;
     private $jobPostModel;
+    private $jobseekerModel;
     private $jobApplicationModel;
+    private $dashboardModel;
 
     public function __construct()
     {
-        $this->userModel = new User();
-        $this->jobseekerModel = new Jobseeker();
         $this->jobPostModel = new JobPost();
+        $this->jobseekerModel = new Jobseeker();
         $this->jobApplicationModel = new JobApplication();
+        $this->dashboardModel = new JobseekerDashboard();
     }
 
     public function dashboard()
     {
+        // Authentication check
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
             header('Location: ?page=login-jobseeker');
             exit;
         }
 
-        // Get jobseeker info
+        // Get jobseeker profile
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $hasProfile = !empty($jobseeker['first_name']) && !empty($jobseeker['last_name']);
 
-        // Get ALL active jobs using the same method as browse-jobs
-        try {
-            $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
-            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-        } catch (Exception $e) {
-            error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
-            $jobs = [];
-        }
+        // Get jobseeker ID if profile exists
+        $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
 
-        // Select job for preview (fix: must be after jobs are loaded)
+        // Use the working JobPost model to get jobs (like the old working controller)
+        $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+
+        // Get dashboard stats from the dashboard model
+        $stats = $this->dashboardModel->getJobseekerStats($jobseeker_id);
+        $recentApplications = $this->dashboardModel->getRecentApplications($jobseeker_id);
+        $profileCompletion = $this->dashboardModel->getProfileCompletion($jobseeker_id);
+
+        // Convert stats to the format expected by the view (for backward compatibility)
+        $applicationStats = [
+            'total' => $stats['total_applications'],
+            'pending' => $stats['pending_applications'],
+            'shortlisted' => $stats['shortlisted_applications'],
+            'hired' => $stats['hired_applications']
+        ];
+
+        // Select job for preview (maintaining existing functionality)
         $selectedJobId = $_GET['job_id'] ?? ($jobs[0]['job_id'] ?? null);
         $selectedJob = null;
         foreach ($jobs as $job) {
@@ -51,29 +63,7 @@ class JobSeekerDashboardController
             }
         }
 
-        // Get application statistics if profile exists
-        $applicationStats = [];
-        if ($hasProfile) {
-            try {
-                $applications = $this->jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
-                $applicationStats = [
-                    'total' => count($applications),
-                    'pending' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'pending';
-                    })),
-                    'shortlisted' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
-                    })),
-                    'hired' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'hired';
-                    }))
-                ];
-            } catch (Exception $e) {
-                error_log('Error fetching application stats: ' . $e->getMessage());
-                $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
-            }
-        }
-
+        // Include the view
         include __DIR__ . '/../views/jobseekers/dashboard.php';
     }
 }

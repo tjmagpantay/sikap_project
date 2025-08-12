@@ -74,15 +74,15 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                     <!-- Filter Buttons -->
                     <div class="flex gap-2 mb-4">
-                        <button class="flex-1 px-3 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        <button class="flex-1 px-3 py-4 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="all" onclick="filterJobs('all', this)">
                             All Jobs
                         </button>
-                        <button class="flex-1 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        <button class="flex-1 px-3 py-4 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="recent" onclick="filterJobs('recent', this)">
                             Most Recent
                         </button>
-                        <button class="flex-1 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        <button class="flex-1 px-3 py-4 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="matches" onclick="filterJobs('matches', this)">
                             Best Matches
                         </button>
