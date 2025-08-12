@@ -4,7 +4,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
 <div class="min-h-screen">
-    <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
         <!-- Hero Search Section -->
         <div class="relative px-6 py-6 mb-8 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
             <!-- Background Image and Gradient Overlay (below content) -->
@@ -65,11 +65,27 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <!-- Main Dashboard Content -->
         <div class="flex flex-col gap-6 lg:flex-row">
             <!-- Left Side - Job Cards (Scrollable) -->
-            <div class="w-full lg:w-2/5 xl:w-1/3">
+            <div class="w-full lg:w-1/3 xl:w-1/4">
                 <div class="">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-900">Available Jobs</h2>
                         <span class="text-sm text-gray-500"><?php echo count($jobs); ?> jobs</span>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="flex gap-2 mb-4">
+                        <button class="flex-1 px-3 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            data-filter="all" onclick="filterJobs('all', this)">
+                            All Jobs
+                        </button>
+                        <button class="flex-1 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            data-filter="recent" onclick="filterJobs('recent', this)">
+                            Most Recent
+                        </button>
+                        <button class="flex-1 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            data-filter="matches" onclick="filterJobs('matches', this)">
+                            Best Matches
+                        </button>
                     </div>
 
                     <div class="overflow-y-auto" style="max-height: 600px;">
@@ -140,7 +156,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
 
             <!-- Right Side - Job Details Preview -->
-            <div class="w-full lg:w-3/5 xl:w-2/3">
+            <div class="w-full lg:w-2/3 xl:w-3/4">
                 <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
                     <!-- Job Details Card -->
                     <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
@@ -308,5 +324,55 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 document.body.removeChild(toast);
             }, 300);
         }, 3000);
+    }
+
+    // Filter functionality
+    function filterJobs(filterType, button) {
+        // Update button states
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        filterButtons.forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
+        });
+
+        // Set active button
+        button.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
+        button.classList.add('bg-primary', 'text-white');
+
+        // Get all job cards
+        const jobCards = document.querySelectorAll('.job-card');
+
+        // Show all jobs first
+        jobCards.forEach(card => {
+            card.style.display = 'block';
+        });
+
+        // Apply filter logic
+        if (filterType === 'recent') {
+            // Sort by most recent (this is a simple example - you might want to implement server-side sorting)
+            const jobContainer = document.querySelector('.space-y-3');
+            const cards = Array.from(jobCards);
+
+            // For demo purposes, we'll just reverse the order
+            cards.reverse().forEach(card => {
+                jobContainer.appendChild(card);
+            });
+
+        } else if (filterType === 'matches') {
+            // Hide jobs that don't match (this is a placeholder - implement your matching logic)
+            jobCards.forEach((card, index) => {
+                // Example: show only every other job as "best match"
+                if (index % 3 !== 0) {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Update job count
+        const visibleJobs = document.querySelectorAll('.job-card[style="display: block"], .job-card:not([style*="display: none"])').length;
+        const jobCountElement = document.querySelector('.text-gray-500');
+        if (jobCountElement) {
+            jobCountElement.textContent = `${visibleJobs} jobs`;
+        }
     }
 </script>
