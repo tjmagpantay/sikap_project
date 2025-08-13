@@ -304,6 +304,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->viewEmployerProfileForJobseeker();
             break;
 
+        case 'explore-companies':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->exploreCompanies();
+            break;
+
         case 'view-employer-job':
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();

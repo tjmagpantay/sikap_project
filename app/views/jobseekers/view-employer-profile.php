@@ -21,42 +21,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
                     <!-- Profile Header -->
                     <div class="p-6 border-b border-gray-200 bg-gray-50">
-                        <div class="flex items-start space-x-6">
+                        <div class="flex items-start px-4 space-x-4">
                             <!-- Business Logo -->
-                            <div class="flex items-center justify-center w-24 h-24 overflow-hidden border-2 border-gray-200 rounded-lg">
-                                <?php if (!empty($employer['business_logo'])): ?>
-                                    <img src="<?php echo htmlspecialchars($employer['business_logo']); ?>" alt="Company Logo"
-                                        class="object-cover w-full h-full">
-                                <?php else: ?>
-                                    <i class="text-4xl text-gray-500 fas fa-building"></i>
-                                <?php endif; ?>
+                            <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg">
+                                <img src="uploads/profile_pictures/business_logo_3_1751288392.jpg" alt="Company Logo" class="object-cover w-full h-full">
                             </div>
 
                             <div class="flex-1">
-                                <h1 class="text-2xl font-bold text-gray-900">
-                                    <?php echo htmlspecialchars($employer['business_name'] ?? ($employer['first_name'] . ' ' . $employer['last_name'])); ?>
-                                </h1>
+                                <h1 class="text-xl font-bold text-gray-900">
+                                    Google Philippines Inc. </h1>
 
-                                <?php if (!empty($employer['business_industry'])): ?>
-                                    <p class="mt-1 text-lg text-gray-600"><?php echo htmlspecialchars($employer['business_industry']); ?></p>
-                                <?php endif; ?>
+                                <p class="text-sm text-gray-600 ">Technology</p>
 
                                 <!-- Company Stats -->
                                 <div class="flex flex-wrap items-center gap-4 mt-3 text-sm">
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="mr-1.5 text-gray-400 fas fa-map-marker-alt"></i>
-                                        <?php echo htmlspecialchars($employer['business_address'] ?? 'Location not specified'); ?>
+                                    <div class="flex items-center text-xs text-gray-600">
+                                        8th Floor, Net Park Building, 5th Ave, BGC, Taguig, Metro Manila
                                     </div>
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="mr-1.5 text-gray-400 fas fa-briefcase"></i>
-                                        <?php echo $employer['active_jobs_count'] ?? 0; ?> Active Jobs
-                                    </div>
-                                    <?php if (!empty($employer['business_established_year'])): ?>
-                                        <div class="flex items-center text-gray-600">
-                                            <i class="mr-1.5 text-gray-400 fas fa-calendar"></i>
-                                            Established <?php echo htmlspecialchars($employer['business_established_year']); ?>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -85,6 +66,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             <div class="text-xs font-medium text-gray-500">Business Type</div>
                                             <div class="text-sm text-gray-900"><?php echo ucfirst(htmlspecialchars($employer['business_type'])); ?></div>
                                         </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Business Type</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
+                                        </div>
                                     <?php endif; ?>
 
                                     <?php if (!empty($employer['business_industry'])): ?>
@@ -92,12 +78,22 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             <div class="text-xs font-medium text-gray-500">Industry</div>
                                             <div class="text-sm text-gray-900"><?php echo htmlspecialchars($employer['business_industry']); ?></div>
                                         </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Industry</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
+                                        </div>
                                     <?php endif; ?>
 
-                                    <?php if (!empty($employer['business_size'])): ?>
+                                    <?php if (!empty($employer['business_established_year'])): ?>
                                         <div>
-                                            <div class="text-xs font-medium text-gray-500">Company Size</div>
-                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($employer['business_size']); ?></div>
+                                            <div class="text-xs font-medium text-gray-500">Year Established</div>
+                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($employer['business_established_year']); ?></div>
+                                        </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Year Established</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -108,6 +104,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <div>
                                             <div class="text-xs font-medium text-gray-500">Contact Number</div>
                                             <div class="text-sm text-gray-900"><?php echo htmlspecialchars($employer['business_contact']); ?></div>
+                                        </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Contact Number</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
                                         </div>
                                     <?php endif; ?>
 
@@ -120,12 +121,24 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                 <?php echo htmlspecialchars($employer['business_website']); ?>
                                             </a>
                                         </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Website</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
+                                        </div>
                                     <?php endif; ?>
 
-                                    <?php if (!empty($employer['business_established_year'])): ?>
+                                    <?php if (!empty($employer['business_size'])): ?>
                                         <div>
-                                            <div class="text-xs font-medium text-gray-500">Year Established</div>
-                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($employer['business_established_year']); ?></div>
+                                            <div class="text-xs font-medium text-gray-500">Company Size</div>
+                                            <div class="text-sm <?php echo !empty($employer['business_size']) ? 'text-gray-900' : 'text-gray-400'; ?>">
+                                                <?php echo !empty($employer['business_size']) ? htmlspecialchars($employer['business_size']) : 'N/A'; ?>
+                                            </div>
+                                        </div>
+                                    <?php else: ?>
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500">Company Size</div>
+                                            <div class="text-sm text-gray-400">N/A</div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -140,8 +153,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     <?php if (!empty($employer['facebook_url'])): ?>
                                         <a href="<?php echo htmlspecialchars($employer['facebook_url']); ?>"
                                             target="_blank"
-                                            class="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
-                                            <i class="mr-2 fab fa-facebook"></i>
+                                            class="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
                                             Facebook
                                         </a>
                                     <?php endif; ?>
@@ -175,87 +187,57 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 </div>
                             </div>
                         <?php endif; ?>
-
-                        <!-- Current Job Openings -->
-                        <?php if (!empty($activeJobs)): ?>
-                            <div class="mb-8">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h2 class="text-lg font-semibold text-primary">Current Job Openings</h2>
-                                    <a href="?page=browse-jobs&employer_id=<?php echo $employer['employer_id']; ?>"
-                                        class="px-4 py-2 text-sm font-medium transition-colors border rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
-                                        View All Jobs
-                                    </a>
-                                </div>
-                                <div class="space-y-3">
-                                    <?php foreach ($activeJobs as $activeJob): ?>
-                                        <div class="p-4 transition-colors border border-gray-200 rounded-lg hover:bg-gray-50">
-                                            <div class="flex items-start justify-between">
-                                                <div class="flex-1">
-                                                    <h3 class="font-medium text-gray-900">
-                                                        <a href="?page=view-job&job_id=<?php echo $activeJob['job_id']; ?>"
-                                                            class="hover:text-primary">
-                                                            <?php echo htmlspecialchars($activeJob['job_title']); ?>
-                                                        </a>
-                                                    </h3>
-                                                    <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
-                                                        <span class="flex items-center">
-                                                            <i class="mr-1 fas fa-briefcase"></i>
-                                                            <?php echo ucfirst(str_replace('-', ' ', $activeJob['job_type'])); ?>
-                                                        </span>
-                                                        <span class="flex items-center">
-                                                            <i class="mr-1 fas fa-map-marker-alt"></i>
-                                                            <?php echo htmlspecialchars($activeJob['location']); ?>
-                                                        </span>
-                                                        <?php if (!empty($activeJob['category_name'])): ?>
-                                                            <span class="flex items-center">
-                                                                <i class="mr-1 fas fa-tag"></i>
-                                                                <?php echo htmlspecialchars($activeJob['category_name']); ?>
-                                                            </span>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                    <div class="mt-2 text-xs text-gray-500">
-                                                        Posted <?php echo date('M j, Y', strtotime($activeJob['created_at'])); ?>
-                                                        <?php if (!empty($activeJob['application_deadline'])): ?>
-                                                            • Deadline: <?php echo date('M j, Y', strtotime($activeJob['application_deadline'])); ?>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </div>
-                                                <a href="?page=view-job&job_id=<?php echo $activeJob['job_id']; ?>"
-                                                    class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-secondary">
-                                                    View Job
-                                                </a>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
 
             <!-- Right Section - Sidebar (4/12 width) -->
-            <div class="w-full md:w-4/12">
-                <!-- Company Stats Card -->
-                <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900">Company Statistics</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                            <span class="text-sm font-light text-gray-600">Active Jobs:</span>
-                            <span class="font-bold text-primary text-md"><?php echo $employer['active_jobs_count'] ?? 0; ?></span>
+            <div class="w-full space-y-6 md:w-4/12">
+                <!-- Current Job Openings -->
+                <!-- Current Job Openings -->
+                <?php if (!empty($activeJobs)): ?>
+                    <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Current Job Openings</h3>
+                            <a href="?page=browse-jobs&employer_id=<?php echo $employer['employer_id']; ?>"
+                                class="px-3 py-2 text-xs font-medium transition-colors border text-primary border-primary hover:bg-primary hover:text-white">
+                                View All
+                            </a>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                            <span class="text-sm font-light text-gray-600">Total Jobs Posted:</span>
-                            <span class="font-bold text-primary text-md"><?php echo $employer['total_jobs_count'] ?? 0; ?></span>
+                        <div class="space-y-3">
+                            <?php foreach ($activeJobs as $activeJob): ?>
+                                <div class="p-3 px-4 transition-colors border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-gray-900">
+                                                <a href="?page=view-job&job_id=<?php echo $activeJob['job_id']; ?>"
+                                                    class="text-sm hover:text-primary">
+                                                    <?php echo htmlspecialchars($activeJob['job_title']); ?>
+                                                </a>
+                                            </h4>
+                                            <div class="mt-1 text-xs text-gray-600">
+                                                <span class="flex items-center">
+                                                   
+                                                    <?php echo htmlspecialchars($activeJob['location']); ?>
+                                                </span>
+                                                <?php if (!empty($activeJob['application_deadline'])): ?>
+                                                    <span class="flex items-center mt-1">
+                                                       
+                                                        Until <?php echo date('M j, Y', strtotime($activeJob['application_deadline'])); ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <a href="?page=view-job&job_id=<?php echo $activeJob['job_id']; ?>"
+                                            class="px-3 py-2 ml-4 text-xs font-medium transition-colors bg-blue-50 text-primary hover:bg-blue-100">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                        <?php if (!empty($employer['business_established_year'])): ?>
-                            <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Years in Business:</span>
-                                <span class="font-bold text-primary text-md"><?php echo date('Y') - intval($employer['business_established_year']); ?></span>
-                            </div>
-                        <?php endif; ?>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <!-- Quick Actions -->
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">

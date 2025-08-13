@@ -850,6 +850,51 @@ class JobPost
         }
     }
 
+    public function getAllEmployers($limit = null)
+    {
+        try {
+            $sql = "SELECT e.employer_id, e.first_name, e.last_name, e.profile_picture,
+                           eb.business_name, eb.business_logo, eb.business_desc, 
+                           eb.business_industry, eb.business_type, eb.business_address,
+                           eb.business_website, eb.business_socials,
+                           (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id AND job_status = 'open') as active_jobs_count,
+                           (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id) as total_jobs_count
+                    FROM employer e 
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE eb.business_name IS NOT NULL
+                    ORDER BY eb.business_name ASC";
+
+            if ($limit) {
+                $sql .= " LIMIT :limit";
+            }
+
+            $stmt = $this->db->prepare($sql);
+            if ($limit) {
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $employers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Parse social media for each employer
+            foreach ($employers as &$employer) {
+                if (!empty($employer['business_socials'])) {
+                    $socials = json_decode($employer['business_socials'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($socials)) {
+                        $employer['facebook_url'] = $socials['facebook'] ?? '';
+                        $employer['twitter_url'] = $socials['twitter'] ?? '';
+                        $employer['instagram_url'] = $socials['instagram'] ?? '';
+                        $employer['youtube_url'] = $socials['youtube'] ?? '';
+                    }
+                }
+            }
+
+            return $employers;
+        } catch (PDOException $e) {
+            error_log('Error getting all employers: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getEmployerActiveJobs($employer_id, $limit = 10)
     {
         try {

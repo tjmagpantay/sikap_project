@@ -717,4 +717,12 @@ class JobPostController
 
         include __DIR__ . '/../views/jobseekers/view-employer-profile.php';
     }
+
+    public function exploreCompanies()
+    {
+        // Get all employers with business profiles
+        $employers = $this->jobPostModel->getAllEmployers();
+
+        include __DIR__ . '/../views/jobseekers/explore-companies.php';
+    }
 }
