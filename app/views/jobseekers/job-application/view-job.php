@@ -1,7 +1,5 @@
-<?php
-include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-jobseeker.php';
-?>
+<?php include_once __DIR__ . '/../../components/navbar-top.php';
+include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
 <div class="min-h-screen bg-gray-50">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
@@ -17,25 +15,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Left Section - Main Content (8/12 width) -->
             <div class="w-full space-y-6 md:w-8/12">
                 <!-- Job Details Card -->
-                <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">h: app/views/jobseekers/job-application/view-job.php
-include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-jobseeker.php';
-?>
-
-<div class="min-h-screen bg-gray-50">
-    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-        <!-- Back Button -->
-        <div class="mb-6">
-            <a href="?page=browse-jobs" class="inline-flex items-center text-sm font-medium text-primary hover:text-secondary">
-                <i class="mr-2 fas fa-arrow-left"></i> Back to Jobs
-            </a>
-        </div>
-
-        <!-- Job Details Card -->
-        <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
+                <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
                     <!-- Job Header -->
                     <div class="p-6 border-b border-gray-200 bg-gray-50">
-                        <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-start justify-between mb-2">
                             <div class="flex items-start space-x-4">
                                 <!-- Business Logo -->
                                 <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg">
@@ -49,7 +32,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                                 <div>
                                     <h1 class="text-xl font-semibold text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h1>
-                                    
+
                                     <?php
                                     $companyName = '';
                                     if (!empty($job['company_name'])) {
@@ -62,34 +45,17 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                         $companyName = 'Company Name Not Available';
                                     }
                                     ?>
-                                    <p class="mt-1 text-lg text-gray-600"><?php echo htmlspecialchars($companyName); ?></p>
-                                    
-                                    <!-- Job Type and Status Badges -->
-                                    <div class="flex items-center gap-3 mt-2">
-                                        <!-- Employment Type Badge -->
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
-                                            <?php echo strtoupper(str_replace('-', ' ', $job['job_type'] ?? 'FULL-TIME')); ?>
-                                        </span>
-
-                                        <!-- Status Badge -->
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-sm 
-                                            <?php echo $job['job_status'] === 'open' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
-                                            <?php echo strtoupper($job['job_status']); ?>
-                                        </span>
-                                        
-                                        <?php if (!empty($job['workplace_option'])): ?>
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-purple-800 bg-purple-100 rounded-sm">
-                                                <?php echo strtoupper($job['workplace_option']); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
+                                    <a href="?page=view-employer-profile&employer_id=<?php echo $job['employer_id']; ?>"
+                                        class="mt-1 text-sm transition-colors text-primary hover:text-secondary hover:underline">
+                                        <?php echo htmlspecialchars($companyName); ?>
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Application Timeline Bar -->
                         <?php if (!empty($job['application_start']) || !empty($job['application_deadline'])): ?>
-                            <div class="flex justify-between p-4 mx-4 mb-6 rounded-lg bg-gray-50">
+                            <div class="flex justify-between p-4 mx-4 rounded-lg bg-gray-50">
                                 <div class="text-start">
                                     <div class="text-xs text-gray-400">Days remaining</div>
                                     <div class="text-sm text-primary">
@@ -229,7 +195,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                             <div class="text-sm text-primary"><?php echo htmlspecialchars($job['business_address']); ?></div>
                                         </div>
                                     <?php endif; ?>
-                                    
+
                                     <?php if (!empty($job['business_description'])): ?>
                                         <div>
                                             <div class="text-xs text-gray-400">About the Company</div>
@@ -238,6 +204,39 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                             </div>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Job Attachments -->
+                        <?php if (!empty($job['attachments'])): ?>
+                            <div class="mb-8">
+                                <h2 class="mb-1 font-semibold text-primary text-md">Job Attachments</h2>
+                                <div class="space-y-3">
+                                    <?php foreach ($job['attachments'] as $attachment): ?>
+                                        <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                                            <div class="flex items-center">
+                                    <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                        <img
+                                            src="../public/assets/icons/pdf-icon.png"
+                                            alt="Icon"
+                                            class="object-cover w-8 h-8" />
+                                    </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars(basename($attachment['file_path'])); ?>
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">PDF Document</div>
+                                                </div>
+                                            </div>
+                                            <a href="<?php echo htmlspecialchars($attachment['file_path']); ?>"
+                                                target="_blank"
+                                                class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+                                                <i class="mr-2 fas fa-download"></i>
+                                                Download
+                                            </a>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -252,7 +251,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     <!-- Application Status -->
                     <div class="mb-8">
                         <h3 class="mb-4 text-xl font-semibold text-gray-900">Application Status</h3>
-                        
+
                         <?php if (!isset($_SESSION['user_id'])): ?>
                             <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                 <div class="flex items-center">
@@ -310,24 +309,23 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 </div>
                             </div>
                         <?php else: ?>
-                            <div class="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
+                            <div class="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <i class="mr-3 text-green-500 fas fa-check-circle"></i>
                                         <div>
-                                            <p class="text-sm font-medium text-green-800">Ready to Apply</p>
-                                            <p class="text-xs text-green-600">Quick & secure process</p>
+                                            <p class="text-sm font-medium text-secondary">Ready to Apply</p>
+                                            <p class="text-xs text-primary">Quick & secure process</p>
                                         </div>
                                     </div>
                                     <?php if (!empty($job['application_deadline'])): ?>
                                         <div class="text-right">
-                                            <p class="text-xs font-medium text-green-700">Deadline</p>
-                                            <p class="text-xs text-green-600"><?php echo date('M j', strtotime($job['application_deadline'])); ?></p>
+                                            <p class="text-xs font-medium text-secondary">Deadline</p>
+                                            <p class="text-xs text-primary"><?php echo date('M j', strtotime($job['application_deadline'])); ?></p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            
+
                             <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
                                 class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                 <i class="mr-2 fas fa-paper-plane"></i>
@@ -344,7 +342,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 <span class="text-sm font-light text-gray-600">Posted:</span>
                                 <span class="text-sm font-medium text-primary"><?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
                             </div>
-                            
+
                             <?php if (!empty($job['application_deadline'])): ?>
                                 <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
                                     <span class="text-sm font-light text-gray-600">Deadline:</span>
@@ -353,44 +351,18 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     </span>
                                 </div>
                             <?php endif; ?>
-                            
-                            <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Type:</span>
-                                <span class="text-sm font-medium text-primary"><?php echo ucfirst(str_replace('-', ' ', $job['job_type'] ?? 'Full-time')); ?></span>
-                            </div>
-                            
-                            <?php if (!empty($job['workplace_option'])): ?>
-                                <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                    <span class="text-sm font-light text-gray-600">Workplace:</span>
-                                    <span class="text-sm font-medium text-primary"><?php echo ucfirst($job['workplace_option']); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if ($job['show_pay'] && (!empty($job['salary']) || !empty($job['pay_range']))): ?>
-                                <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                    <span class="text-sm font-light text-gray-600">Salary:</span>
-                                    <span class="text-sm font-medium text-primary">
-                                        <?php
-                                        if (!empty($job['pay_range'])) {
-                                            echo htmlspecialchars($job['pay_range']);
-                                        } elseif (!empty($job['salary'])) {
-                                            echo '₱' . number_format($job['salary'], 2);
-                                        }
-                                        ?>
-                                    </span>
-                                </div>
-                            <?php endif; ?>
+
                         </div>
                     </div>
 
                     <!-- Quick Actions -->
                     <div class="space-y-3">
-                        <button onclick="window.print()" 
+                        <button onclick="window.print()"
                             class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                             <i class="mr-2 fas fa-print"></i>
                             Print Job Details
                         </button>
-                        
+
                         <button onclick="navigator.share ? navigator.share({title: '<?php echo htmlspecialchars($job['job_title']); ?>', url: window.location.href}) : alert('Share feature not supported')"
                             class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                             <i class="mr-2 fas fa-share"></i>

@@ -7,7 +7,17 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Browse Jobs</h1>
-        <p class="mt-2 text-sm text-gray-600">Find your perfect job opportunity</p>
+        <?php if (isset($_GET['employer_id']) && !empty($employer)): ?>
+            <div class="flex items-center p-3 mt-3 border-l-4 border-blue-400 rounded-r bg-blue-50">
+                <i class="mr-2 text-blue-600 fas fa-filter"></i>
+                <span class="text-sm text-blue-800">
+                    Showing jobs from: <strong><?php echo htmlspecialchars($employer['business_name'] ?? 'Selected Employer'); ?></strong>
+                </span>
+                <a href="?page=browse-jobs" class="ml-3 text-xs text-blue-600 hover:underline">Clear filter</a>
+            </div>
+        <?php else: ?>
+            <p class="mt-2 text-sm text-gray-600">Find your perfect job opportunity</p>
+        <?php endif; ?>
     </div>
 
     <!-- Job Listings -->
@@ -44,7 +54,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         <span class="inline-block px-2 py-1 text-xs font-semibold rounded <?php echo strtolower($job['job_type']) === 'full-time' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'; ?>">
                             <?php echo strtoupper($job['job_type']); ?>
                         </span>
-                        <?php if ($job['show_pay'] && $job['salary']): ?>
+                        <?php if (isset($job['show_pay']) && $job['show_pay'] && isset($job['salary']) && $job['salary']): ?>
                             <span class="block mt-1 mb-2 text-xs text-gray-600">Salary: ₱<?php echo number_format($job['salary'], 2); ?></span>
                         <?php endif; ?>
 

@@ -151,11 +151,6 @@ class JobPostController
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
 
         try {
-            error_log("DEBUG: handleJobStep1 called");
-            error_log("DEBUG: POST data: " . print_r($data, true));
-            error_log("DEBUG: save_draft isset: " . (isset($data['save_draft']) ? 'YES' : 'NO'));
-            error_log("DEBUG: job_id: " . ($job_id ?? 'null'));
-
             // Validate required fields
             $required = ['job_title', 'job_category_id', 'job_type', 'location', 'job_summary'];
             foreach ($required as $field) {
@@ -531,8 +526,30 @@ class JobPostController
             }
         }
 
-        // Use the SAME logic as dashboard to get jobs
-        $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+        // Check for employer filter
+        $employer_id = $_GET['employer_id'] ?? null;
+        $employer = null;
+
+        if ($employer_id) {
+            // Get employer info for display
+            $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
+
+            // Get jobs from specific employer only
+            $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+
+            // Add application status for jobseeker
+            if ($jobseeker_id && !empty($jobs)) {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                $jobApplicationModel = new JobApplication();
+
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker_id, $job['job_id']);
+                }
+            }
+        } else {
+            // Use the SAME logic as dashboard to get jobs
+            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+        }
 
         // Add saved status to each job if user is logged in
         if ($jobseeker_id) {
@@ -543,15 +560,6 @@ class JobPostController
                 $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
             }
         }
-
-        error_log('=== BROWSE JOBS CONTROLLER DEBUG ===');
-        error_log('Browse jobs found: ' . count($jobs));
-        error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not logged in'));
-        if (!empty($jobs)) {
-            error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
-            error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
-        }
-        error_log('=== END BROWSE JOBS CONTROLLER DEBUG ===');
 
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
@@ -687,5 +695,26 @@ class JobPostController
             header('Location: ?page=manage-jobs&error=' . urlencode('Failed to delete job.'));
         }
         exit;
+    }
+
+    public function viewEmployerProfileForJobseeker()
+    {
+        $employer_id = $_GET['employer_id'] ?? null;
+        if (!$employer_id) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Employer not found.'));
+            exit;
+        }
+
+        // Get employer profile data
+        $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
+        if (!$employer) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Employer profile not found.'));
+            exit;
+        }
+
+        // Get active jobs from this employer
+        $activeJobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+
+        include __DIR__ . '/../views/jobseekers/view-employer-profile.php';
     }
 }

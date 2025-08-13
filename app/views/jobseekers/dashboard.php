@@ -70,7 +70,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                     <!-- Filter Buttons -->
                     <div class="flex gap-2 mb-4">
-                        <button class="flex-1 px-3 py-4 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        <button class="flex-1 px-3 py-4 text-sm font-medium text-white transition-colors rounded-md bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="all" onclick="filterJobs('all', this)">
                             All Jobs
                             <span class="text-sm font-normal text-gray-400 whitespace-nowrap">(<?php echo count($jobs); ?> jobs)</span>
@@ -363,7 +363,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
                         <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
                         <h3 class="mt-4 text-lg font-medium text-gray-900">Select a job to view details</h3>
-                        <p class="mt-1 text-gray-500">Click on any job from the list to see its full details</p>
+                        <p class="mt-1 text-xs text-gray-500">Click on any job from the list to see its full details</p>
                     </div>
                 <?php endif; ?>
             </div>

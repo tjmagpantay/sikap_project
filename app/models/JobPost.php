@@ -15,7 +15,6 @@ class JobPost
                 $config['db_pass']
             );
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            error_log("DEBUG: JobPost database connection established successfully");
         } catch (PDOException $e) {
             error_log("JobPost database connection failed: " . $e->getMessage());
             die("Connection failed: " . $e->getMessage());
@@ -219,24 +218,45 @@ class JobPost
             $sql = "SELECT jp.*, jc.category_name, 
                        e.first_name as employer_first_name, 
                        e.last_name as employer_last_name,
-                       eb.business_name as company_name
+                       e.employer_id,
+                       eb.business_name as company_name,
+                       eb.business_logo,
+                       eb.business_desc as business_description,
+                       eb.business_address,
+                       eb.business_contact,
+                       eb.business_industry,
+                       eb.business_type,
+                       eb.business_size,
+                       eb.business_established_year,
+                       eb.business_website,
+                       eb.business_socials
                 FROM job_post jp 
                 LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                 LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                LEFT JOIN (
-                    SELECT employer_id, MIN(business_name) as business_name
-                    FROM employers_business
-                    GROUP BY employer_id
-                ) eb ON e.employer_id = eb.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                 WHERE jp.job_id = :job_id";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['job_id' => $job_id]);
             $job = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Debug: Log what fields are available
             if ($job) {
-                error_log('DEBUG: Job data keys: ' . implode(', ', array_keys($job)));
+                // Add skills
+                $job['skills'] = $this->getJobSkills($job_id);
+
+                // Add attachments
+                $job['attachments'] = $this->getJobAttachments($job_id);
+
+                // Parse social media JSON and add individual fields for backward compatibility
+                if (!empty($job['business_socials'])) {
+                    $socials = json_decode($job['business_socials'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($socials)) {
+                        $job['facebook_url'] = $socials['facebook'] ?? '';
+                        $job['twitter_url'] = $socials['twitter'] ?? '';
+                        $job['instagram_url'] = $socials['instagram'] ?? '';
+                        $job['youtube_url'] = $socials['youtube'] ?? '';
+                    }
+                }
             }
 
             return $job;
@@ -332,7 +352,6 @@ class JobPost
             $stmt->execute(['employer_id' => $employer_id]);
             $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            error_log('DEBUG: Found ' . count($jobs) . ' jobs for employer_id: ' . $employer_id);
             return $jobs;
         } catch (PDOException $e) {
             error_log('Error getting jobs by employer: ' . $e->getMessage());
@@ -564,6 +583,7 @@ class JobPost
                     jp.location,
                     jp.job_type,
                     jp.pay_range,
+                    jp.salary,
                     jp.show_pay,
                     jp.job_status,
                     jp.created_at,
@@ -746,16 +766,23 @@ class JobPost
             $sql = "SELECT jp.*, jc.category_name, 
                        e.first_name as employer_first_name, 
                        e.last_name as employer_last_name,
+                       e.employer_id,
                        eb.business_name as company_name,
+                       eb.business_logo,
+                       eb.business_desc as business_description,
+                       eb.business_address,
+                       eb.business_contact,
+                       eb.business_industry,
+                       eb.business_type,
+                       eb.business_size,
+                       eb.business_established_year,
+                       eb.business_website,
+                       eb.business_socials,
                        jas.*
                 FROM job_post jp 
                 LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                 LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                LEFT JOIN (
-                    SELECT employer_id, MIN(business_name) as business_name
-                    FROM employers_business
-                    GROUP BY employer_id
-                ) eb ON e.employer_id = eb.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                 LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
                 WHERE jp.job_id = :job_id";
 
@@ -766,6 +793,20 @@ class JobPost
             if ($job) {
                 // Add skills
                 $job['skills'] = $this->getJobSkills($job_id);
+
+                // Add attachments
+                $job['attachments'] = $this->getJobAttachments($job_id);
+
+                // Parse social media JSON and add individual fields for backward compatibility
+                if (!empty($job['business_socials'])) {
+                    $socials = json_decode($job['business_socials'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($socials)) {
+                        $job['facebook_url'] = $socials['facebook'] ?? '';
+                        $job['twitter_url'] = $socials['twitter'] ?? '';
+                        $job['instagram_url'] = $socials['instagram'] ?? '';
+                        $job['youtube_url'] = $socials['youtube'] ?? '';
+                    }
+                }
             }
 
             return $job;
@@ -778,25 +819,57 @@ class JobPost
     public function getEmployerProfileData($employer_id)
     {
         try {
-            $sql = "SELECT e.employer_id, e.profile_picture as employer_profile_photo, e.first_name, e.last_name,
-                           eb.business_logo, eb.business_name, eb.business_desc
-                    FROM employer e
-                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    WHERE e.employer_id = :employer_id";
-
-            error_log('DEBUG: Executing employer profile query for employer_id: ' . $employer_id);
-            error_log('DEBUG: SQL: ' . $sql);
+            $sql = "SELECT e.*, eb.*,
+                       (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id AND job_status = 'open') as active_jobs_count,
+                       (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id) as total_jobs_count
+                FROM employer e 
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE e.employer_id = :employer_id";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['employer_id' => $employer_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log('DEBUG: Query result: ' . print_r($result, true));
+            if ($result) {
+                // Parse social media JSON and add individual fields for backward compatibility
+                if (!empty($result['business_socials'])) {
+                    $socials = json_decode($result['business_socials'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($socials)) {
+                        $result['facebook_url'] = $socials['facebook'] ?? '';
+                        $result['twitter_url'] = $socials['twitter'] ?? '';
+                        $result['instagram_url'] = $socials['instagram'] ?? '';
+                        $result['youtube_url'] = $socials['youtube'] ?? '';
+                    }
+                }
+            }
 
             return $result;
         } catch (PDOException $e) {
             error_log('Error getting employer profile data: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getEmployerActiveJobs($employer_id, $limit = 10)
+    {
+        try {
+            $sql = "SELECT jp.job_id, jp.job_title, jp.job_type, jp.location, 
+                           jp.created_at, jp.application_deadline, jc.category_name
+                    FROM job_post jp 
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    WHERE jp.employer_id = :employer_id AND jp.job_status = 'open'
+                    ORDER BY jp.created_at DESC
+                    LIMIT :limit";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':employer_id', $employer_id, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting employer active jobs: ' . $e->getMessage());
+            return [];
         }
     }
 }
