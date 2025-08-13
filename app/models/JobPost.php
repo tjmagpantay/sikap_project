@@ -563,7 +563,7 @@ class JobPost
                     jp.job_summary,
                     jp.location,
                     jp.job_type,
-                    jp.salary,
+                    jp.pay_range,
                     jp.show_pay,
                     jp.job_status,
                     jp.created_at,
@@ -572,8 +572,7 @@ class JobPost
                     e.first_name as employer_first_name,
                     e.last_name as employer_last_name,
                     COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                     eb.business_logo,
-                    e.profile_photo as employer_profile_photo
+                    eb.business_logo
                 ";
 
             // Add application status check if jobseeker_id is provided
@@ -593,8 +592,8 @@ class JobPost
                   WHERE jp.job_status = 'open'
                   AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
                   GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
-                           jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
-                           jc.category_name, e.first_name, e.last_name";
+                           jp.pay_range, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                           jc.category_name, e.first_name, e.last_name, eb.business_logo";
 
             // Add has_applied to GROUP BY if needed
             if ($jobseeker_id) {
@@ -605,7 +604,7 @@ class JobPost
                         jp.job_summary,
                         jp.location,
                         jp.job_type,
-                        jp.salary,
+                        jp.pay_range,
                         jp.show_pay,
                         jp.job_status,
                         jp.created_at,
@@ -614,6 +613,7 @@ class JobPost
                         e.first_name as employer_first_name,
                         e.last_name as employer_last_name,
                         COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                        eb.business_logo,
                         EXISTS(SELECT 1 FROM job_application ja 
                                WHERE ja.job_id = jp.job_id 
                                AND ja.jobseeker_id = ?
@@ -625,8 +625,8 @@ class JobPost
                     WHERE jp.job_status = 'open'
                     AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
                     GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
-                             jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
-                             jc.category_name, e.first_name, e.last_name";
+                             jp.pay_range, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                             jc.category_name, e.first_name, e.last_name, eb.business_logo";
             } else {
                 $sql .= ", COALESCE(MIN(eb.business_name), CONCAT(e.first_name, ' ', e.last_name)) as company_name
                      FROM job_post jp
@@ -636,8 +636,8 @@ class JobPost
                      WHERE jp.job_status = 'open'
                      AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
                      GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
-                              jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
-                              jc.category_name, e.first_name, e.last_name";
+                              jp.pay_range, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                              jc.category_name, e.first_name, e.last_name, eb.business_logo";
             }
 
             $sql .= " ORDER BY jp.created_at DESC";

@@ -118,7 +118,7 @@ class JobseekerDashboard
                     jp.job_summary,
                     jp.location,
                     jp.job_type,
-                    jp.salary,
+                    jp.pay_range,
                     jp.show_pay,
                     jp.job_status,
                     jp.created_at,
@@ -127,8 +127,7 @@ class JobseekerDashboard
                     e.first_name as employer_first_name,
                     e.last_name as employer_last_name,
                     COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                    eb.business_logo,
-                    e.profile_photo as employer_profile_photo
+                    eb.business_logo
                 ";
 
             // Add application status check if jobseeker_id is provided
@@ -146,7 +145,7 @@ class JobseekerDashboard
                   WHERE jp.job_status = 'open'
                   AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
                   GROUP BY jp.job_id, jp.job_title, jp.job_summary, jp.location, jp.job_type, 
-                           jp.salary, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
+                           jp.pay_range, jp.show_pay, jp.job_status, jp.created_at, jp.application_deadline,
                            jc.category_name, e.first_name, e.last_name";
 
             $sql .= " ORDER BY jp.created_at DESC";

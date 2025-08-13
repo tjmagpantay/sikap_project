@@ -67,16 +67,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Left Side - Job Cards (Scrollable) -->
             <div class="w-full lg:w-1/3 xl:w-1/4">
                 <div class="">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold text-gray-900">Available Jobs</h2>
-                        <span class="text-sm text-gray-500"><?php echo count($jobs); ?> jobs</span>
-                    </div>
 
                     <!-- Filter Buttons -->
                     <div class="flex gap-2 mb-4">
                         <button class="flex-1 px-3 py-4 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="all" onclick="filterJobs('all', this)">
                             All Jobs
+                            <span class="text-sm font-normal text-gray-400 whitespace-nowrap">(<?php echo count($jobs); ?> jobs)</span>
                         </button>
                         <button class="flex-1 px-3 py-4 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
                             data-filter="recent" onclick="filterJobs('recent', this)">
@@ -88,19 +85,26 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </button>
                     </div>
 
-                    <div class="overflow-y-auto" style="max-height: 600px;">
+                    <!-- Job Post Card -->
+                    <div class="overflow-y-auto " style="max-height: 600px; ">
                         <?php if (!empty($jobs)): ?>
                             <div class="space-y-3">
                                 <?php foreach ($jobs as $job): ?>
-                                    <div class="p-4 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
+                                    <div class="p-6 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
                                         onclick="window.location.href='?page=jobseeker-dashboard&job_id=<?php echo $job['job_id']; ?>'">
 
                                         <!-- Row 1: Business Profile + Job Title + Business Name + Urgent + Saved Icon -->
                                         <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center space-x-3">
+                                            <div class="flex items-center gap-2">
                                                 <!-- Business Profile Image -->
-                                                <div class="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
-                                                    <i class="text-gray-500 fas fa-building"></i>
+                                                <div class="flex items-center justify-center w-12 h-12 p-1 overflow-hidden rounded-md bg-primary">
+                                                    <?php if (!empty($job['business_logo'])): ?>
+                                                        <img src="<?php echo htmlspecialchars($job['business_logo']); ?>"
+                                                            alt="<?php echo htmlspecialchars($job['company_name'] ?? 'Company'); ?> Logo"
+                                                            class="object-cover w-full h-full">
+                                                    <?php else: ?>
+                                                        <i class="text-gray-500 fas fa-building"></i>
+                                                    <?php endif; ?>
                                                 </div>
 
                                                 <!-- Job Title and Business Name -->
@@ -118,44 +122,58 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                     </span>
                                                 <?php endif; ?>
 
-<!-- Saved Icon -->
-<?php if ($hasProfile): ?>
-    <button onclick="event.stopPropagation(); toggleSaveJob(<?php echo $job['job_id']; ?>, this)"
-        class="p-1 text-gray-400 save-btn hover:text-yellow-500"
-        data-job-id="<?php echo $job['job_id']; ?>"
-        data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
-        title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
-        <!-- Bookmark SVG Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" 
-            fill="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'currentColor' : 'none'; ?>" 
-            stroke="currentColor" 
-            stroke-width="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? '0' : '1.5'; ?>">
-            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-        </svg>
-    </button>
-<?php endif; ?>
-</div>
-</div>
+                                                <!-- Saved Icon -->
+                                                <?php if ($hasProfile): ?>
+                                                    <button onclick="event.stopPropagation(); toggleSaveJob(<?php echo $job['job_id']; ?>, this)"
+                                                        class=" text-secondary save-btn hover:text-yellow-500"
+                                                        data-job-id="<?php echo $job['job_id']; ?>"
+                                                        data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
+                                                        title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
+                                                        <!-- Bookmark SVG Icon -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20"
+                                                            fill="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'currentColor' : 'none'; ?>"
+                                                            stroke="currentColor"
+                                                            stroke-width="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? '0' : '1.5'; ?>">
+                                                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                                        </svg>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
 
-<!-- Row 2: Location with Icon -->
-<div class="flex items-center mb-2">
-    <!-- Location Marker SVG Icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-    <span class="text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
-</div>
+                                        <!-- Row 2: Location with Icon -->
+                                        <div class="flex items-center mb-1">
+                                            <!-- Location Marker SVG Icon -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span class="text-xs text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
+                                        </div>
 
-                                        <!-- Row 3: Tags for Job Info -->
-                                        <div class="flex items-center mb-2 space-x-2">
-                                            <span class="px-3 py-1 text-xs font-medium rounded <?php echo strtolower($job['job_type']) === 'full-time' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'; ?>">
+                                        <!-- Row 3: Pay Range with Icon -->
+                                        <?php if (!empty($job['pay_range'])): ?>
+                                            <div class="flex items-center mb-2">
+                                                <!-- Dollar Sign SVG Icon -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 13C7 11.1144 7 10.1716 7.58579 9.58579C8.17157 9 9.11438 9 11 9H14H17C18.8856 9 19.8284 9 20.4142 9.58579C21 10.1716 21 11.1144 21 13V14V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H14H11C9.11438 19 8.17157 19 7.58579 18.4142C7 17.8284 7 16.8856 7 15V14V13Z" stroke-linejoin="round"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 15V15C5.11438 15 4.17157 15 3.58579 14.4142C3.58579 14.4142 3.58579 14.4142 3.58579 14.4142C3 13.8284 3 12.8856 3 11L3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5L13 5C14.8856 5 15.8284 5 16.4142 5.58579C17 6.17157 17 7.11438 17 9V9" stroke-linejoin="round"></path>
+                                                    <path d="M16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14C12 12.8954 12.8954 12 14 12C15.1046 12 16 12.8954 16 14Z"></path>
+                                                </svg>
+                                                <span class="text-xs text-gray-600"><?php echo htmlspecialchars($job['pay_range']); ?></span>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- Row 4: Tags for Job Info -->
+                                        <div class="flex items-center gap-2 mb-2 space-x-2">
+                                            <span class="px-3 py-1 text-xs font-medium rounded <?php echo strtolower($job['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-blue-100 text-primary'; ?>">
                                                 <?php echo strtoupper($job['job_type']); ?>
                                             </span>
 
-                                            <?php if ($job['show_pay'] && $job['salary']): ?>
-                                                <span class="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">
-                                                    ₱<?php echo number_format($job['salary'], 0); ?><?php echo isset($job['pay_type']) ? '/' . $job['pay_type'] : ''; ?>
+                                            <!-- Job Category -->
+                                            <?php if (!empty($job['category_name'])): ?>
+                                                <span class="px-3 py-1 text-xs font-medium rounded text-secondary bg-yellow-50">
+                                                    <?php echo htmlspecialchars($job['category_name']); ?>
                                                 </span>
                                             <?php endif; ?>
 
@@ -167,13 +185,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             <?php endif; ?>
                                         </div>
 
-                                        <!-- Row 4: Posted Date + Best Matches Info -->
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
+                                        <!-- Row 5: Posted Date + Best Matches Info -->
+                                        <div class="flex items-center justify-between text-xs text-gray-400">
                                             <span>
                                                 <i class="mr-1 fas fa-clock"></i>
                                                 Posted <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                                             </span>
-                                            <span class="px-2 py-1 text-xs text-blue-600 rounded bg-blue-50">
+                                            <span class="px-2 py-1 text-xs rounded text-primary bg-blue-50">
                                                 Best Match
                                             </span>
                                         </div>
@@ -233,16 +251,15 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                         <div class="mt-6">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="px-3 py-1 text-sm rounded-full <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'; ?>">
+                                <span class="px-3 py-1 text-sm rounded-full <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-green-800'; ?>">
                                     <?php echo strtoupper($selectedJob['job_type']); ?>
                                 </span>
-                                <?php if ($selectedJob['show_pay'] && $selectedJob['salary']): ?>
+                                <?php if (!empty($selectedJob['pay_range'])): ?>
                                     <span class="px-3 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">
-                                        ₱<?php echo number_format($selectedJob['salary'], 2); ?>
-                                        <span class="text-xs text-gray-500">/ <?php echo $selectedJob['pay_type'] ?? 'month'; ?></span>
+                                        <?php echo htmlspecialchars($selectedJob['pay_range']); ?>
                                     </span>
                                 <?php endif; ?>
-                                <span class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full">
+                                <span class="px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-full">
                                     <i class="mr-1 fas fa-clock"></i>
                                     Posted <?php echo date('M j', strtotime($selectedJob['created_at'])); ?>
                                 </span>
