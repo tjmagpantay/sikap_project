@@ -45,22 +45,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
   <?php include_once __DIR__ . '/../components/navbar-top.php'; ?>
   <?php include_once __DIR__ . '/navbar-jobseeker.php'; ?>
 
-  <div class="py-8 mx-auto max-w-7xl sm:px-6 lg:px-12">
+  <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
     <div class="flex flex-col gap-8 md:flex-row">
       <!-- Sidebar -->
       <div class="w-full md:w-1/3">
-        <div class="p-6 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex flex-col items-center">
-            <!-- Profile Photo -->
-            <div class="relative group">
-              <img src="<?php
-                        if (!empty($jobseeker['profile_picture'])) {
-                          echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
-                        } else {
-                          echo '/sikap/public/assets/images/default-avatar.jpg';
-                        }
-                        ?>" alt="Profile" class="object-cover w-16 h-16 border-2 border-gray-200 rounded-full shadow-sm">
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+          <div class="flex flex-col items-start">
+            <!-- Profile Photo (Keep existing PHP logic) -->
+            <div class="flex items-start">
+              <!-- Profile Picture -->
               <div class="relative group">
+                <img src="<?php
+                          if (!empty($jobseeker['profile_picture'])) {
+                            echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
+                          } else {
+                            echo '/sikap/public/assets/images/default-avatar.jpg';
+                          }
+                          ?>" alt="Profile" class="object-cover w-16 h-16 border-2 border-gray-200 rounded-md shadow-sm">
                 <button type="button"
                   class="absolute flex items-center justify-center w-6 h-6 text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg bg-primary -top-1 -right-1 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
                   onclick="document.getElementById('profile-picture-input').click()" title="Change profile photo">
@@ -68,61 +69,57 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
                   </svg>
                 </button>
-                <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" class="hidden"
-                  onchange="handleProfilePhotoUpload(this);">
+                <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this);">
+              </div>
+
+              <!-- Name & Title -->
+              <div class="items-center mt-0 ml-4">
+                <h2 class="text-lg font-bold text-gray-800">
+                  <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
+                </h2>
+                <p class="font-normal text-gray-400 text-md"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
               </div>
             </div>
-            <!-- Name & Info -->
-            <div class="mt-4 text-center">
-              <h2 class="text-lg font-bold text-gray-800">
-                <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
-              </h2>
-              <p class="text-xs text-gray-600"><?php echo htmlspecialchars($jobseeker['sex'] ?? ''); ?></p>
-              <p class="mt-1 text-xs text-gray-500"><?php echo htmlspecialchars($jobseeker['address'] ?? ''); ?></p>
-            </div>
+
             <!-- Profile Completion -->
-            <div class="w-full mt-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-700">Profile Completion</span>
-                <span class="text-sm font-medium text-blue-600"><?php echo round($completionPercentage); ?>%</span>
+            <div class="w-full p-4 mt-6 rounded-sm bg-gray-50">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-normal text-gray-700">Profile Completion</span>
+                <span class="text-sm font-normal text-primary"><?php echo round($completionPercentage); ?>%</span>
               </div>
               <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div class="h-2 transition-all duration-300 bg-blue-600 rounded-full" style="width: <?php echo $completionPercentage; ?>%"></div>
-              </div>
-              <div class="flex items-center justify-between mt-1">
-                <p class="text-xs text-gray-500">
-                  <?php echo $completionPercentage; ?>% completed
-                </p>
-                <?php if ($completionPercentage < 100): ?>
-                  <a href="?page=complete-jobseeker-profile" class="text-xs text-blue-600 hover:text-blue-700">Complete</a>
-                <?php else: ?>
-                  <span class="text-xs text-green-600">✓ Complete</span>
-                <?php endif; ?>
+                <div class="h-2 bg-primary" style="width: <?php echo $completionPercentage; ?>%"></div>
               </div>
             </div>
-            <!-- Contact Info -->
-            <?php if (!empty($jobseeker['contact_no'])): ?>
-              <div class="w-full p-3 mt-4 rounded-lg bg-gray-50">
-                <div class="flex items-center">
-                  <i class="mr-2 text-gray-500 fas fa-phone"></i>
-                  <span class="text-sm text-gray-700"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></span>
-                </div>
-              </div>
-            <?php endif; ?>
-            <!-- Quick Actions -->
-            <div class="w-full mt-4 space-y-4">
-              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-2 text-white transition-colors rounded-lg bg-primary hover:bg-blue-700">
-                <i class="mr-2 fas fa-cog"></i>
+
+            <!-- Edit Profile Button -->
+            <div class="w-full mt-4">
+              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm transition-colors border-2 border-gray-200 text-primary hover:bg-blue-700">
                 Edit Profile
               </a>
-              <a href="?page=jobseeker-documents" class="flex items-center justify-center w-full px-4 py-2 text-blue-700 transition-colors bg-blue-100 rounded-lg hover:bg-blue-200">
-                <i class="mr-2 fas fa-file-alt"></i>
-                Resume & Documents
-              </a>
-              <a href="?page=jobseeker-applications" class="flex items-center justify-center w-full px-4 py-2 text-green-700 transition-colors bg-green-100 rounded-lg hover:bg-green-200">
-                <i class="mr-2 fas fa-briefcase"></i>
-                Job Applications
-              </a>
+            </div>
+
+            <!-- Separator -->
+            <div class="w-full my-4 border-t border-gray-200"></div>
+
+            <!-- Contact Info -->
+            <div class="w-full">
+              <h3 class="mb-3 text-sm font-semibold text-gray-700">Contact</h3>
+              <ul class="space-y-2">
+                <?php if (!empty($jobseeker['email'])): ?>
+                  <li class="flex items-center">
+                    <i class="w-4 mr-2 text-gray-500 fas fa-envelope"></i>
+                    <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['email']); ?></span>
+                  </li>
+                <?php endif; ?>
+                <?php if (!empty($jobseeker['contact_no'])): ?>
+                  <li class="flex items-center">
+                    <i class="w-4 mr-2 text-gray-500 fas fa-phone"></i>
+                    <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></span>
+                  </li>
+                <?php endif; ?>
+                <!-- Add other contact fields as needed -->
+              </ul>
             </div>
           </div>
         </div>

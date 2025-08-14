@@ -21,7 +21,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto md:flex-row md:items-center md:justify-between" style="min-height:70px;">
                 <!-- Left: Headline -->
                 <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
-                    <h1 class="w-full mb-1 text-2xl font-bold text-center text-white sm:text-3xl lg:text-4xl md:w-auto md:text-left">
+                    <h1 class="w-full mb-1 text-2xl font-bold text-white text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
                         Find Your Dream Job Today
                     </h1>
                     <p class="max-w-2xl mt-2 text-sm leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-sm">
@@ -216,10 +216,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <div class="flex items-start justify-between">
                             <div class="flex items-start space-x-4">
                                 <!-- Business Logo/Profile -->
-                                <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-md">
+                                <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-gray-200 rounded-md">
                                     <?php if (!empty($selectedJob['business_logo'])): ?>
                                         <img src="<?php echo htmlspecialchars($selectedJob['business_logo']); ?>" alt="Company Logo"
-                                            class="object-cover w-full h-full min-w-full min-h-full">
+                                            class="object-cover w-full h-full min-w-full min-h-full border-2 border-gray-200 rounded-md">
                                     <?php else: ?>
                                         <i class="text-2xl text-gray-500 fas fa-building"></i>
                                     <?php endif; ?>

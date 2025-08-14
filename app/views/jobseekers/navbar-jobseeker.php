@@ -178,9 +178,9 @@ if ($jobseeker === false) {
       class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
       style="display: none;">
       <ul class="flex flex-col gap-4 mt-8">
-        <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
+        <li><a href="#" class="nav-link">Job Search</a></li>
         <li><a href="#" class="nav-link">Programs</a></li>
-        <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
+        <li><a href="#" class="nav-link">Explore Companies</a></li>
         <li><a href="#" class="nav-link">Community</a></li>
         <li><a href="#" class="nav-link">Notifications</a></li>
         <li><a href="#" class="nav-link">Saved Jobs</a></li>

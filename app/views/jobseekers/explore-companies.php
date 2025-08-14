@@ -22,12 +22,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <?php else: ?>
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($employers as $employer): ?>
-                    <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
+                    <div class="overflow-hidden transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg">
                         <!-- Company Header -->
                         <div class="p-6 border-b border-gray-100 bg-gray-50">
                             <div class="flex items-start space-x-4">
                                 <!-- Company Logo -->
-                                <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg flex-shrink-0">
+                                <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
                                     <?php if (!empty($employer['business_logo'])): ?>
                                         <img src="<?php echo htmlspecialchars($employer['business_logo']); ?>"
                                             alt="<?php echo htmlspecialchars($employer['business_name']); ?> Logo"
@@ -67,7 +67,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <!-- Company Info -->
                         <div class="p-6">
                             <?php if (!empty($employer['business_desc'])): ?>
-                                <p class="text-sm text-gray-600 line-clamp-3 mb-4">
+                                <p class="mb-4 text-sm text-gray-600 line-clamp-3">
                                     <?php echo htmlspecialchars(substr($employer['business_desc'], 0, 150)) . (strlen($employer['business_desc']) > 150 ? '...' : ''); ?>
                                 </p>
                             <?php endif; ?>
@@ -84,7 +84,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     <i class="mr-2 text-gray-500 fas fa-globe"></i>
                                     <a href="<?php echo htmlspecialchars($employer['business_website']); ?>"
                                         target="_blank"
-                                        class="text-primary hover:text-secondary hover:underline truncate">
+                                        class="truncate text-primary hover:text-secondary hover:underline">
                                         <?php echo htmlspecialchars($employer['business_website']); ?>
                                     </a>
                                 </div>
