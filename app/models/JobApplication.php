@@ -198,7 +198,7 @@ class JobApplication
     public function getApplicationAnswers($application_id)
     {
         try {
-            $sql = "SELECT jaa.*, jpq.question_text, jpq.question_type, jpq.is_required
+            $sql = "SELECT jaa.*, jpq.question_text, jpq.question_type
                     FROM job_application_answers jaa
                     LEFT JOIN job_post_questions jpq ON jaa.question_id = jpq.question_id
                     WHERE jaa.application_id = :application_id

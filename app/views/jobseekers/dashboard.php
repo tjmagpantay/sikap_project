@@ -130,7 +130,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                         data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
                                                         title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
                                                         <!-- Bookmark SVG Icon -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20"
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20"
                                                             fill="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'currentColor' : 'none'; ?>"
                                                             stroke="currentColor"
                                                             stroke-width="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? '0' : '1.5'; ?>">
@@ -144,56 +144,62 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <!-- Row 2: Location with Icon -->
                                         <div class="flex items-center mb-1">
                                             <!-- Location Marker SVG Icon -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            <span class="text-xs text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
+                                            <span class="ml-2 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
                                         </div>
 
                                         <!-- Row 3: Pay Range with Icon -->
                                         <?php if (!empty($job['pay_range'])): ?>
                                             <div class="flex items-center mb-2">
                                                 <!-- Dollar Sign SVG Icon -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 13C7 11.1144 7 10.1716 7.58579 9.58579C8.17157 9 9.11438 9 11 9H14H17C18.8856 9 19.8284 9 20.4142 9.58579C21 10.1716 21 11.1144 21 13V14V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H14H11C9.11438 19 8.17157 19 7.58579 18.4142C7 17.8284 7 16.8856 7 15V14V13Z" stroke-linejoin="round"></path>
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 15V15C5.11438 15 4.17157 15 3.58579 14.4142C3.58579 14.4142 3.58579 14.4142 3.58579 14.4142C3 13.8284 3 12.8856 3 11L3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5L13 5C14.8856 5 15.8284 5 16.4142 5.58579C17 6.17157 17 7.11438 17 9V9" stroke-linejoin="round"></path>
                                                     <path d="M16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14C12 12.8954 12.8954 12 14 12C15.1046 12 16 12.8954 16 14Z"></path>
                                                 </svg>
-                                                <span class="text-xs text-gray-600"><?php echo htmlspecialchars($job['pay_range']); ?></span>
+                                                <span class="text-sm text-gray-600"><?php echo htmlspecialchars($job['pay_range']); ?></span>
                                             </div>
                                         <?php endif; ?>
 
                                         <!-- Row 4: Tags for Job Info -->
-                                        <div class="flex items-center gap-2 mb-2 space-x-2">
-                                            <span class="px-3 py-1 text-xs font-medium rounded <?php echo strtolower($job['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-blue-100 text-primary'; ?>">
-                                                <?php echo strtoupper($job['job_type']); ?>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <!-- Job Type Tag -->
+                                            <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
+                                                <?php echo htmlspecialchars(ucfirst($job['job_type'])); ?>
                                             </span>
 
                                             <!-- Job Category -->
                                             <?php if (!empty($job['category_name'])): ?>
-                                                <span class="px-3 py-1 text-xs font-medium rounded text-secondary bg-yellow-50">
+                                                <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
                                                     <?php echo htmlspecialchars($job['category_name']); ?>
                                                 </span>
                                             <?php endif; ?>
 
                                             <!-- Applied Status -->
                                             <?php if (isset($job['has_applied']) && $job['has_applied']): ?>
-                                                <span class="px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded">
-                                                    <i class="mr-1 text-green-600 fas fa-check-circle"></i> Applied
+                                                <span class="flex items-center px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
+                                                    <!-- Checkmark SVG -->
+                                                    <svg class="w-3 h-3 mr-1 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Applied
                                                 </span>
                                             <?php endif; ?>
                                         </div>
 
                                         <!-- Row 5: Posted Date + Best Matches Info -->
-                                        <div class="flex items-center justify-between text-xs text-gray-400">
+                                        <div class="flex items-center justify-between text-xs text-gray-500">
                                             <span>
-                                                <i class="mr-1 fas fa-clock"></i>
                                                 Posted <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                                             </span>
-                                            <span class="px-2 py-1 text-xs rounded text-primary bg-blue-50">
-                                                Best Match
-                                            </span>
+
+                                            <span>Best Match:
+                                                <!-- Checkmark in Circle -->
+                                                <span class="text-sm font-semibold text-primary"><?php echo htmlspecialchars($currentJob['match_percentage'] ?? '95'); ?>%</span> </span>
+
                                         </div>
                                     </div>
                                 <?php endforeach; ?>

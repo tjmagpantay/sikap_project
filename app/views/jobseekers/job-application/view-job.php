@@ -3,12 +3,25 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
 <div class="min-h-screen bg-gray-50">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-        <!-- Back Button -->
-        <div class="mb-6">
-            <a href="?page=browse-jobs" class="inline-flex items-center text-sm font-medium text-primary hover:text-secondary">
-                <i class="mr-2 fas fa-arrow-left"></i> Back to Jobs
-            </a>
-        </div>
+
+        <!-- Breadcrumbs -->
+        <nav class="mb-6">
+            <div class="flex items-center space-x-2 text-sm">
+                <a href="?page=jobseeker-dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                    Dashboard
+                </a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <a href="?page=browse-jobs" class="text-gray-500 transition-colors hover:text-primary">
+                    Browse Jobs
+                </a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="font-medium text-primary"><?php echo htmlspecialchars($job['job_title'] ?? 'Job Details'); ?></span>
+            </div>
+        </nav>
 
         <!-- Main Flex Layout -->
         <div class="flex flex-col gap-8 md:flex-row">
@@ -216,12 +229,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                     <?php foreach ($job['attachments'] as $attachment): ?>
                                         <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
                                             <div class="flex items-center">
-                                    <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
-                                        <img
-                                            src="../public/assets/icons/pdf-icon.png"
-                                            alt="Icon"
-                                            class="object-cover w-8 h-8" />
-                                    </div>
+                                                <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                                    <img
+                                                        src="../public/assets/icons/pdf-icon.png"
+                                                        alt="Icon"
+                                                        class="object-cover w-8 h-8" />
+                                                </div>
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900">
                                                         <?php echo htmlspecialchars(basename($attachment['file_path'])); ?>
