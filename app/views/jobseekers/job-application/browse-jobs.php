@@ -47,7 +47,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 <!-- Simple, clean job card - fully clickable -->
                 <a href="?page=view-job&job_id=<?php echo $currentJob['job_id']; ?>"
                     class="block overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-lg hover:border-gray-300 hover:-translate-y-1">
-                    
+
                     <!-- Header: Company Logo and Job Title with Gray Background -->
                     <div class="flex items-start gap-4 p-6 pb-4 bg-gray-50">
                         <img src="<?php echo !empty($currentJob['business_logo']) ? htmlspecialchars($currentJob['business_logo']) : 'assets/logos/default.png'; ?>"
@@ -70,7 +70,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         <!-- Save Button -->
                         <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] == 3): ?>
                             <button onclick="event.preventDefault(); event.stopPropagation(); toggleSaveJob(<?php echo $currentJob['job_id']; ?>, this)"
-                                class="relative z-10 p-2 rounded-md text-secondary hover:bg-gray-100"
+                                class="relative z-10 p-2 rounded-md transition-colors <?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'text-secondary hover:bg-yellow-50' : 'text-gray-500 hover:bg-gray-100 hover:text-yellow-600'; ?>"
                                 data-job-id="<?php echo $currentJob['job_id']; ?>"
                                 data-saved="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'true' : 'false'; ?>"
                                 title="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
@@ -137,13 +137,11 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         const action = isSaved ? 'unsave-job' : 'save-job';
 
         // Show loading state
-        const icon = button.querySelector('i');
-        const text = button.querySelector('.save-text');
-        const originalIcon = icon.className;
-        const originalText = text.textContent;
+        const svgIcon = button.querySelector('svg');
+        const originalFill = svgIcon.getAttribute('fill');
 
-        icon.className = 'fas fa-spinner fa-spin mr-1';
-        text.textContent = 'Loading...';
+        // Show spinner/loading state
+        svgIcon.classList.add('animate-pulse');
         button.disabled = true;
 
         const formData = new FormData();
@@ -177,36 +175,33 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     if (isSaved) {
                         // Job was unsaved
                         button.setAttribute('data-saved', 'false');
-                        button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600';
-                        icon.className = 'far fa-bookmark mr-1';
-                        text.textContent = 'Save';
+                        svgIcon.setAttribute('fill', 'none');
                         button.title = 'Save job for later';
+                        button.className = 'relative z-10 p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-yellow-600';
                     } else {
                         // Job was saved
                         button.setAttribute('data-saved', 'true');
-                        button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-yellow-700 bg-yellow-100 border border-yellow-300';
-                        icon.className = 'fas fa-bookmark mr-1';
-                        text.textContent = 'Saved';
+                        svgIcon.setAttribute('fill', 'currentColor');
                         button.title = 'Remove from saved jobs';
+                        button.className = 'relative z-10 p-2 rounded-md text-yellow-600 hover:bg-yellow-50';
                     }
 
                     // Show success toast
                     showToast(data.message || 'Job ' + (isSaved ? 'unsaved' : 'saved') + ' successfully!', 'success');
                 } else {
                     // Restore original state on error
-                    icon.className = originalIcon;
-                    text.textContent = originalText;
+                    svgIcon.setAttribute('fill', originalFill);
                     showToast(data.message || 'Error occurred', 'error');
                 }
             })
             .catch(error => {
                 // Restore original state on error
-                icon.className = originalIcon;
-                text.textContent = originalText;
+                svgIcon.setAttribute('fill', originalFill);
                 console.error('Fetch error:', error);
                 showToast('Error occurred while ' + (isSaved ? 'unsaving' : 'saving') + ' job', 'error');
             })
             .finally(() => {
+                svgIcon.classList.remove('animate-pulse');
                 button.disabled = false;
             });
     }

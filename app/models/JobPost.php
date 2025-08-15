@@ -782,15 +782,18 @@ class JobPost
     public function getAllEmployers($limit = null)
     {
         try {
-            $sql = "SELECT e.employer_id, e.first_name, e.last_name, e.profile_picture,
+            $sql = "SELECT e.employer_id, e.first_name, e.last_name, e.profile_picture, e.profile_completed,
                            eb.business_name, eb.business_logo, eb.business_desc, 
                            eb.business_industry, eb.business_type, eb.business_address,
-                           eb.business_website, eb.business_socials,
+                           eb.business_website, eb.business_socials, eb.business_completed,
                            (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id AND job_status = 'open') as active_jobs_count,
                            (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id) as total_jobs_count
                     FROM employer e 
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    WHERE eb.business_name IS NOT NULL
+                    WHERE eb.business_name IS NOT NULL 
+                        AND e.profile_completed = 1
+                        AND eb.business_completed = 1
+                        AND e.status IN ('verified', 'pending_verification')
                     ORDER BY eb.business_name ASC";
 
             if ($limit) {
@@ -827,11 +830,31 @@ class JobPost
     public function getEmployerActiveJobs($employer_id, $limit = 10)
     {
         try {
-            $sql = "SELECT jp.job_id, jp.job_title, jp.job_type, jp.location, 
-                           jp.created_at, jp.application_deadline, jc.category_name
+            $sql = "SELECT DISTINCT
+                    jp.job_id,
+                    jp.job_title,
+                    jp.job_summary,
+                    jp.location,
+                    jp.job_type,
+                    jp.pay_range,
+                    jp.salary,
+                    jp.show_pay,
+                    jp.job_status,
+                    jp.created_at,
+                    jp.application_deadline,
+                    jc.category_name,
+                    e.first_name as employer_first_name,
+                    e.last_name as employer_last_name,
+                    eb.business_name,
+                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                    eb.business_logo
                     FROM job_post jp 
                     LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                    WHERE jp.employer_id = :employer_id AND jp.job_status = 'open'
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE jp.employer_id = :employer_id 
+                        AND jp.job_status = 'open'
+                        AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
                     ORDER BY jp.created_at DESC
                     LIMIT :limit";
 

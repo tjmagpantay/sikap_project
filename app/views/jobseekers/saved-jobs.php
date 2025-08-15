@@ -4,21 +4,32 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <!-- Page Header -->
-    <div class="mb-8">
-        <div class="sm:flex sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Saved Jobs</h1>
-                <p class="mt-2 text-sm text-gray-600">Jobs you've saved for later</p>
-            </div>
-            <div class="mt-4 sm:mt-0">
-                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
-                    <i class="mr-2 fas fa-search"></i>
-                    Browse More Jobs
-                </a>
-            </div>
+<div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <div class="flex items-center space-x-2 text-sm">
+            <a href="?page=jobseeker-dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                Dashboard
+            </a>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="font-medium text-primary">Saved Jobs</span>
         </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Saved Jobs</h1>
+            <p class="mt-1 text-sm text-gray-600">Jobs you've bookmarked for later</p>
+        </div>
+        <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-primary rounded-lg hover:bg-primary-600">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Browse More Jobs
+        </a>
     </div>
 
     <!-- Saved Jobs List -->

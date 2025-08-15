@@ -48,6 +48,139 @@ class Employer
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Check if business profile is completed
+     */
+    public function checkBusinessCompletion($employer_id)
+    {
+        try {
+            // Get employer data
+            $employer = $this->findById($employer_id);
+            if (!$employer) {
+                return false;
+            }
+
+            // Check employer profile completion
+            $employerCompleted = !empty($employer['first_name']) &&
+                !empty($employer['last_name']) &&
+                !empty($employer['contact_no']) &&
+                !empty($employer['company_name']) &&
+                $employer['profile_completed'] == 1;
+
+            // Get business data
+            $business = $this->getBusiness($employer_id);
+            if (!$business) {
+                return false;
+            }
+
+            // Check business profile completion - essential fields
+            $businessCompleted = !empty($business['business_name']) &&
+                !empty($business['business_desc']) &&
+                !empty($business['business_type']) &&
+                !empty($business['business_industry']) &&
+                !empty($business['business_address']) &&
+                !empty($business['business_contact']) &&
+                !empty($business['business_size']) &&
+                !empty($business['business_established_year']);
+
+            return $employerCompleted && $businessCompleted;
+        } catch (Exception $e) {
+            error_log('Error checking business completion: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update business completion status
+     */
+    public function updateBusinessCompletionStatus($employer_id)
+    {
+        try {
+            $isCompleted = $this->checkBusinessCompletion($employer_id) ? 1 : 0;
+
+            $sql = "UPDATE employers_business SET business_completed = ? WHERE employer_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$isCompleted, $employer_id]);
+
+            if ($result) {
+                error_log("Business completion status updated for employer $employer_id: $isCompleted");
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error updating business completion status: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update employer profile completion status
+     */
+    public function updateEmployerCompletionStatus($employer_id)
+    {
+        try {
+            $employer = $this->findById($employer_id);
+            if (!$employer) {
+                return false;
+            }
+
+            // Check if employer profile is completed
+            $isCompleted = !empty($employer['first_name']) &&
+                !empty($employer['last_name']) &&
+                !empty($employer['contact_no']) &&
+                !empty($employer['company_name']) ? 1 : 0;
+
+            $sql = "UPDATE employer SET profile_completed = ? WHERE employer_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$isCompleted, $employer_id]);
+
+            if ($result) {
+                error_log("Employer profile completion status updated for employer $employer_id: $isCompleted");
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error updating employer completion status: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Find employer by ID
+     */
+    public function findById($employer_id)
+    {
+        try {
+            $sql = "SELECT * FROM employer WHERE employer_id = :employer_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['employer_id' => $employer_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding employer by ID: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // public function findByUserId($user_id)
+    // {
+    //     try {
+    //         $sql = "SELECT * FROM employer WHERE user_id = :user_id";
+    //         $stmt = $this->db->prepare($sql);
+    //         $stmt->execute(['user_id' => $user_id]);
+    //         return $stmt->fetch(PDO::FETCH_ASSOC);
+    //     } catch (PDOException $e) {
+    //         error_log('Error finding employer by user ID: ' . $e->getMessage());
+    //         return false;
+    //     }
+    // }
+
+    // public function getBusiness($employer_id)
+    // {
+    //     $stmt = $this->db->prepare("SELECT * FROM employers_business WHERE employer_id = ? LIMIT 1");
+    //     $stmt->execute([$employer_id]);
+    //     return $stmt->fetch(PDO::FETCH_ASSOC);
+    // }
+
     public function getDocuments($employer_id)
     {
         try {
@@ -193,7 +326,7 @@ class Employer
             SET first_name = ?, middle_name = ?, last_name = ?, position = ?, contact_no = ?, company_name = ?, about_us = ?, updated_at = NOW() 
             WHERE user_id = ?
         ");
-        return $stmt->execute([
+        $result = $stmt->execute([
             $data['first_name'],
             $data['middle_name'],
             $data['last_name'],
@@ -203,6 +336,17 @@ class Employer
             $data['about_us'],
             $user_id
         ]);
+
+        // Update completion status after profile update
+        if ($result) {
+            $employer = $this->findByUserId($user_id);
+            if ($employer) {
+                $this->updateEmployerCompletionStatus($employer['employer_id']);
+                $this->updateBusinessCompletionStatus($employer['employer_id']);
+            }
+        }
+
+        return $result;
     }
 
     public function createOrUpdateProfile($user_id, $data)
@@ -230,10 +374,17 @@ class Employer
         $existing = $this->getBusiness($employer_id);
 
         if ($existing) {
-            return $this->updateBusiness($employer_id, $data);
+            $result = $this->updateBusiness($employer_id, $data);
         } else {
-            return $this->createBusiness($employer_id, $data);
+            $result = $this->createBusiness($employer_id, $data);
         }
+
+        // Update completion status after create/update
+        if ($result) {
+            $this->updateBusinessCompletionStatus($employer_id);
+        }
+
+        return $result;
     }
 
     public function createBusiness($employer_id, $data)
@@ -353,6 +504,8 @@ class Employer
 
             if ($result) {
                 $this->createAccreditationRecord($employer_id);
+                // Update business completion status
+                $this->updateBusinessCompletionStatus($employer_id);
                 error_log("DEBUG: Profile marked as completed successfully");
             }
 

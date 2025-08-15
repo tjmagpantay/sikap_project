@@ -24,20 +24,32 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <div class="flex items-start px-4 space-x-4">
                             <!-- Business Logo -->
                             <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg">
-                                <img src="uploads/profile_pictures/business_logo_3_1751288392.jpg" alt="Company Logo" class="object-cover w-full h-full">
+                                <?php if (!empty($employer['business_logo'])): ?>
+                                    <img src="<?php echo htmlspecialchars($employer['business_logo']); ?>"
+                                        alt="<?php echo htmlspecialchars($employer['business_name'] ?? 'Company'); ?> Logo"
+                                        class="object-cover w-full h-full">
+                                <?php else: ?>
+                                    <i class="text-2xl text-gray-400 fas fa-building"></i>
+                                <?php endif; ?>
                             </div>
 
                             <div class="flex-1">
                                 <h1 class="text-xl font-bold text-gray-900">
-                                    Google Philippines Inc. </h1>
+                                    <?php echo htmlspecialchars($employer['business_name'] ?? $employer['company_name'] ?? 'Company Name'); ?>
+                                </h1>
 
-                                <p class="text-sm text-gray-600 ">Technology</p>
+                                <?php if (!empty($employer['business_industry'])): ?>
+                                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($employer['business_industry']); ?></p>
+                                <?php endif; ?>
 
                                 <!-- Company Stats -->
                                 <div class="flex flex-wrap items-center gap-4 mt-3 text-sm">
-                                    <div class="flex items-center text-xs text-gray-600">
-                                        8th Floor, Net Park Building, 5th Ave, BGC, Taguig, Metro Manila
-                                    </div>
+                                    <?php if (!empty($employer['business_address'])): ?>
+                                        <div class="flex items-center text-xs text-gray-600">
+                                            <i class="mr-1 fas fa-map-marker-alt"></i>
+                                            <?php echo htmlspecialchars($employer['business_address']); ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -217,12 +229,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             </h4>
                                             <div class="mt-1 text-xs text-gray-600">
                                                 <span class="flex items-center">
-                                                   
+
                                                     <?php echo htmlspecialchars($activeJob['location']); ?>
                                                 </span>
                                                 <?php if (!empty($activeJob['application_deadline'])): ?>
                                                     <span class="flex items-center mt-1">
-                                                       
+
                                                         Until <?php echo date('M j, Y', strtotime($activeJob['application_deadline'])); ?>
                                                     </span>
                                                 <?php endif; ?>
