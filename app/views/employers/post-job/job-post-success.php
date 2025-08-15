@@ -101,22 +101,22 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 
                 <!-- Action Buttons -->
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <a href="?page=manage-jobs" 
-                       class="flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all duration-200 border border-transparent rounded-lg shadow-sm bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <a href="?page=manage-jobs"
+                        class="flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all duration-200 border border-transparent rounded-lg shadow-sm bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                         View Jobs
                     </a>
-                    <a href="?page=post-job" 
-                       class="flex items-center justify-center px-6 py-3 text-sm font-medium transition-all duration-200 bg-white border border-green-300 rounded-lg shadow-sm text-primary hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <a href="?page=post-job"
+                        class="flex items-center justify-center px-6 py-3 text-sm font-medium transition-all duration-200 bg-white border border-green-300 rounded-lg shadow-sm text-primary hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
                         Post Another
                     </a>
-                    <a href="?page=employer-dashboard" 
-                       class="flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    <a href="?page=employer-dashboard"
+                        class="flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                         </svg>

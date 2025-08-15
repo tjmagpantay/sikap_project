@@ -28,7 +28,7 @@ if ($jobseeker === false) {
         <li><a href="?page=jobseeker-dashboard" class="nav-link">Home</a></li>
         <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
         <li><a href="#" class="nav-link">Programs</a></li>
-        <li><a href="#" class="nav-link">Explore Companies</a></li>
+        <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
       </ul>
     </div>
 

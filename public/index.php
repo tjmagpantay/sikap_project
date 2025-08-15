@@ -227,22 +227,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
 
-               //NEWWWWWWWWWWWWWWW
+        //NEWWWWWWWWWWWWWWW
 
-            // User Management Routes
-            case 'admin-jobseekers':
-                require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-                $controller = new UserManagementController();
-                $controller->index('jobseekers');
-                break;
+        // User Management Routes
+        case 'admin-jobseekers':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->index('jobseekers');
+            break;
 
-            case 'admin-employers':
-                require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-                $controller = new UserManagementController();
-                $controller->index('employers');
-                break;
+        case 'admin-employers':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->index('employers');
+            break;
 
-                
+
         // case 'admin-users':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
@@ -365,6 +365,18 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
             $controller->viewJobForJobseeker(); // Use the new method name
+            break;
+
+        case 'view-employer-profile':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->viewEmployerProfileForJobseeker();
+            break;
+
+        case 'explore-companies':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->exploreCompanies();
             break;
 
         case 'view-employer-job':

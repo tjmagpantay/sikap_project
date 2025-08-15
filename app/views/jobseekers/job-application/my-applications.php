@@ -235,7 +235,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 <!-- Withdraw Application (only if pending) -->
                                 <?php if ($application['application_status'] === 'pending'): ?>
                                     <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
-                                        onclick="return confirm('Are you sure you want to withdraw your application for \" <?php echo addslashes($application['job_title']); ?>\"?\n\nThis action cannot be undone.')"
+                                        onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
                                         class="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition bg-red-600 rounded hover:bg-red-700"
                                         title="Withdraw Application">
                                         <i class="mr-2 fas fa-times"></i>
@@ -316,8 +316,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     function showToast(message, type) {
         const toast = document.createElement('div');
         toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300 ${
-        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-    }`;
+            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
         toast.textContent = message;
 
         document.body.appendChild(toast);
