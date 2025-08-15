@@ -42,41 +42,23 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 <div class="flex items-center justify-between w-full mb-4">
                     <!-- Step 1 -->
                     <div class="flex flex-col items-center">
-                        <?php if (!empty($application_id)): ?>
-                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1&application_id=<?php echo $application_id; ?>"
-                                class="flex items-center justify-center w-8 h-8 text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors cursor-pointer"
-                                title="Click to go back to Personal Information step">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        <?php else: ?>
-                            <div class="flex items-center justify-center w-8 h-8 text-white bg-green-600 rounded-full">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        <?php endif; ?>
+                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1&application_id=<?php echo $application_id; ?>"
+                            class="flex items-center justify-center w-8 h-8 text-white transition-colors bg-green-600 rounded-full hover:bg-green-700">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
                         <span class="mt-1 text-xs text-gray-600">Personal Info</span>
                     </div>
 
                     <!-- Step 2 -->
                     <div class="flex flex-col items-center">
-                        <?php if (!empty($application_id)): ?>
-                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=2&application_id=<?php echo $application_id; ?>"
-                                class="flex items-center justify-center w-8 h-8 text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors cursor-pointer"
-                                title="Click to go back to Screening Questions step">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        <?php else: ?>
-                            <div class="flex items-center justify-center w-8 h-8 text-white bg-green-600 rounded-full">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        <?php endif; ?>
+                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=2&application_id=<?php echo $application_id; ?>"
+                            class="flex items-center justify-center w-8 h-8 text-white transition-colors bg-green-600 rounded-full hover:bg-green-700">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
                         <span class="mt-1 text-xs text-gray-600">Screening</span>
                     </div>
 
@@ -90,9 +72,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                     <!-- Step 4 -->
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
+                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=4&application_id=<?php echo $application_id; ?>"
+                            class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
-                        </div>
+                        </a>
                         <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>

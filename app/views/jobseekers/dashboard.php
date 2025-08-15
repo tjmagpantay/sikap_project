@@ -65,7 +65,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <!-- Main Dashboard Content -->
         <div class="flex flex-col gap-6 lg:flex-row">
             <!-- Left Side - Job Cards (Scrollable) -->
-            <div class="w-full lg:w-1/3 xl:w-1/4">
+            <div class="w-full lg:w-[25%] xl:w-[25%]">
                 <div class="">
 
                     <!-- Filter Buttons -->
@@ -215,7 +215,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
 
             <!-- Right Side - Job Details Preview -->
-            <div class="w-full lg:w-2/3 xl:w-3/4">
+            <div class="w-full lg:w-[75%] xl:w-[75%]">
                 <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
                     <!-- Job Details Card -->
                     <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
@@ -272,14 +272,20 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             </div>
                         </div>
 
-                        <div class="mt-6">
+                        <div class="mt-4">
                             <div class="flex flex-wrap items-center gap-2 mb-4">
-                                <span class="px-3 py-1 text-sm font-medium  <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-green-800'; ?>">
+                                <span class="px-3 py-2 text-xs   <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-green-800'; ?>">
                                     <?php echo strtoupper($selectedJob['job_type']); ?>
                                 </span>
+                                
+                                <?php if (!empty($selectedJob['category_name'])): ?>
+                                    <span class="px-3 py-2 text-xs text-secondary bg-yellow-50">
+                                        <?php echo htmlspecialchars($selectedJob['category_name']); ?>
+                                    </span>
+                                <?php endif; ?>
 
                                 <?php if (!empty($selectedJob['pay_range'])): ?>
-                                    <span class="flex items-center px-3 py-1 text-sm font-medium text-gray-800 bg-gray-100 ">
+                                    <span class="flex items-center px-3 py-2 text-xs text-gray-600 bg-gray-100 ">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
@@ -287,13 +293,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     </span>
                                 <?php endif; ?>
 
-                                <?php if (!empty($selectedJob['category_name'])): ?>
-                                    <span class="px-3 py-1 text-sm font-medium text-secondary bg-yellow-50">
-                                        <?php echo htmlspecialchars($selectedJob['category_name']); ?>
-                                    </span>
-                                <?php endif; ?>
-
-                                <span class="flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 ">
+                                <span class="flex items-center px-3 py-2 text-xs text-gray-600 bg-gray-100 ">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>

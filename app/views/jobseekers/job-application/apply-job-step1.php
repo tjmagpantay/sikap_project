@@ -50,25 +50,46 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                     <!-- Step 2 -->
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
-                            <span class="text-sm font-semibold">2</span>
-                        </div>
+                        <?php if (!empty($application_id)): ?>
+                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=2&application_id=<?php echo $application_id; ?>"
+                                class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                                <span class="text-sm font-semibold">2</span>
+                            </a>
+                        <?php else: ?>
+                            <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
+                                <span class="text-sm font-semibold">2</span>
+                            </div>
+                        <?php endif; ?>
                         <span class="mt-1 text-xs text-gray-500">Screening</span>
                     </div>
 
                     <!-- Step 3 -->
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
-                            <span class="text-sm font-semibold">3</span>
-                        </div>
+                        <?php if (!empty($application_id)): ?>
+                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=3&application_id=<?php echo $application_id; ?>"
+                                class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                                <span class="text-sm font-semibold">3</span>
+                            </a>
+                        <?php else: ?>
+                            <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
+                                <span class="text-sm font-semibold">3</span>
+                            </div>
+                        <?php endif; ?>
                         <span class="mt-1 text-xs text-gray-500">Eligibility</span>
                     </div>
 
                     <!-- Step 4 -->
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
-                            <span class="text-sm font-semibold">4</span>
-                        </div>
+                        <?php if (!empty($application_id)): ?>
+                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=4&application_id=<?php echo $application_id; ?>"
+                                class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                                <span class="text-sm font-semibold">4</span>
+                            </a>
+                        <?php else: ?>
+                            <div class="flex items-center justify-center w-8 h-8 text-gray-500 bg-gray-200 rounded-full">
+                                <span class="text-sm font-semibold">4</span>
+                            </div>
+                        <?php endif; ?>
                         <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
