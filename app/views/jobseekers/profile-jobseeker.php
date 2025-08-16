@@ -93,14 +93,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
 
             <!-- Edit Profile Button -->
-            <div class="w-full mt-4">
-              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm transition-colors border-2 border-gray-200 text-primary hover:bg-blue-700">
+            <div class="w-full mt-4 mb-4">
+              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm transition-colors border-2 border-gray-200 text-primary">
                 Edit Profile
               </a>
             </div>
-
-            <!-- Separator -->
-            <div class="w-full my-4 border-t border-gray-200"></div>
 
             <!-- Contact Info -->
             <div class="w-full">
@@ -108,13 +105,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
               <ul class="space-y-2">
                 <?php if (!empty($jobseeker['email'])): ?>
                   <li class="flex items-center">
-                    <i class="w-4 mr-2 text-gray-500 fas fa-envelope"></i>
+
                     <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['email']); ?></span>
                   </li>
                 <?php endif; ?>
                 <?php if (!empty($jobseeker['contact_no'])): ?>
                   <li class="flex items-center">
-                    <i class="w-4 mr-2 text-gray-500 fas fa-phone"></i>
+
                     <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></span>
                   </li>
                 <?php endif; ?>
@@ -127,214 +124,225 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
       <!-- Main Content -->
       <div class="w-full space-y-8 md:w-2/3 ">
-        <!-- Navigation Tabs -->
-        <div class="flex mb-6 space-x-4 border-b">
-          <a href="?page=profile-jobseeker"
-            class="pb-2 font-semibold text-green-600 transition-colors border-b-2 border-green-500">
-            Applicant Profile
-          </a>
-          <a href="?page=jobseeker-documents"
-            class="pb-2 text-gray-500 transition-colors hover:text-green-600">
-            Resume & Documents
-          </a>
-          <a href="?page=jobseeker-applications"
-            class="pb-2 text-gray-500 transition-colors hover:text-green-600">
-            Job Applications
-          </a>
-        </div>
 
         <!-- Personal Information Card -->
-        <div class="p-6 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-base font-semibold">Personal Information</h4>
-            <a href="?page=complete-jobseeker-profile&step=2"
-              class="flex items-center text-sm text-green-600 hover:text-green-700">
-              <i class="mr-1 fas fa-edit"></i>
-              Edit
+        <div class="p-6 mb-6 bg-white shadow border-gray--200 border-gray border-1-bottom rounded-xl">
+          <div class="relative flex gap-6 mb-6 border-b">
+            <!-- Border below navigation -->
+            <div class="absolute bottom-0 left-0 w-full h-px bg-gray-200"></div>
+
+            <!-- Tabs with animation -->
+            <a href="?page=profile-jobseeker"
+              class="relative pb-2 font-semibold transition-colors duration-300 text-primary group">
+              <span>Applicant Profile</span>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-100"></div>
+            </a>
+
+            <a href="?page=jobseeker-documents"
+              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary">
+              <span>Resume & Documents</span>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100"></div>
+            </a>
+
+            <a href="?page=jobseeker-applications"
+              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary">
+              <span>Job Applications</span>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100"></div>
             </a>
           </div>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="grid w-full grid-cols-1 gap-4 mb-8 md:grid-cols-2">
+            <!-- Profile Details Header -->
+            <div class="flex items-center justify-between w-full col-span-1 mb-4 md:col-span-2">
+              <h4 class="text-base font-semibold">Profile Details</h4>
+              <a href="?page=complete-jobseeker-profile&step=3"
+                class="flex items-center text-sm text-primary">
+                <i class="mr-1 fas fa-edit"></i>
+                Edit
+              </a>
+            </div>
+
             <div>
-              <p class="text-gray-500">Full Name</p>
-              <p class="font-medium">
+              <p class="text-xs text-gray-500">Full Name</p>
+              <p class="text-sm">
                 <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
               </p>
             </div>
             <div>
-              <p class="text-gray-500">Gender</p>
-              <p class="font-medium"><?php echo htmlspecialchars($jobseeker['sex'] ?? 'N/A'); ?></p>
+              <p class="text-xs text-gray-500">Gender</p>
+              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['sex'] ?? 'N/A'); ?></p>
             </div>
             <div>
-              <p class="text-gray-500">Date of Birth</p>
-              <p class="font-medium">
+              <p class="text-xs text-gray-500">Date of Birth</p>
+              <p class="text-sm">
                 <?php echo !empty($jobseeker['date_of_birth']) && $jobseeker['date_of_birth'] ? date('F j, Y', strtotime($jobseeker['date_of_birth'])) : 'N/A'; ?>
               </p>
             </div>
             <div>
-              <p class="text-gray-500">Phone Number</p>
-              <p class="font-medium"><?php echo htmlspecialchars($jobseeker['contact_no'] ?? 'N/A'); ?></p>
+              <p class="text-xs text-gray-500">Phone Number</p>
+              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['contact_no'] ?? 'N/A'); ?></p>
             </div>
             <div class="md:col-span-2">
-              <p class="text-gray-500">Address</p>
-              <p class="font-medium"><?php echo htmlspecialchars($jobseeker['address'] ?? 'N/A'); ?></p>
+              <p class="text-xs text-gray-500">Address</p>
+              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['address'] ?? 'N/A'); ?></p>
             </div>
             <div class="md:col-span-2">
-              <p class="text-gray-500">Email</p>
-              <p class="font-medium"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
+              <p class="text-xs text-gray-500">Email</p>
+              <p class="text-sm"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
             </div>
           </div>
-        </div>
 
-        <!-- Employment Status Card -->
-        <div class="p-6 mt-2 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-base font-semibold">Employment Status</h4>
-            <a href="?page=complete-jobseeker-profile&step=3"
-              class="flex items-center text-sm text-green-600 hover:text-green-700">
-              <i class="mr-1 fas fa-edit"></i>
-              Edit
-            </a>
-          </div>
-          <?php if (!empty($workExperience) && is_array($workExperience) && isset($workExperience[0]['currently_working']) && $workExperience[0]['currently_working'] === 'Yes'): ?>
-            <p class="mb-4 text-sm text-gray-600">
-              Currently working as <?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?>
-              at <?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?>.
-            </p>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <p class="text-gray-500">Current Job</p>
-                <p class="font-medium"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
-              </div>
-              <div>
-                <p class="text-gray-500">Company</p>
-                <p class="font-medium"><?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?></p>
-              </div>
-              <div>
-                <p class="text-gray-500">Employment Type</p>
-                <p class="font-medium"><?php echo htmlspecialchars(ucfirst($workExperience[0]['employment_type'] ?? 'N/A')); ?></p>
-              </div>
-              <div>
-                <p class="text-gray-500">Start Date</p>
-                <p class="font-medium">
-                  <?php echo !empty($workExperience[0]['start_date']) ? date('M Y', strtotime($workExperience[0]['start_date'])) : 'N/A'; ?>
-                </p>
-              </div>
+          <!-- Employment Status Section -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-base font-semibold text-primary">Employment Status</h4>
+              <a href="?page=complete-jobseeker-profile&step=3"
+                class="flex items-center text-sm text-primary">
+                <i class="mr-1 fas fa-edit"></i>
+                Edit
+              </a>
             </div>
-          <?php else: ?>
-            <p class="text-sm text-gray-600">
-              Currently seeking employment opportunities.
-            </p>
-          <?php endif; ?>
-        </div>
 
-        <!-- Work Experience Card -->
-        <div class="p-6 mt-2 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-base font-semibold">Work Experience</h4>
-            <a href="?page=complete-jobseeker-profile&step=5"
-              class="flex items-center text-sm text-green-600 hover:text-green-700">
-              <i class="mr-1 fas fa-edit"></i>
-              Edit
-            </a>
+            <?php if (!empty($workExperience) && is_array($workExperience) && isset($workExperience[0]['currently_working']) && $workExperience[0]['currently_working'] === 'Yes'): ?>
+              <p class="mb-4 text-sm text-gray-500">
+                Currently working as <?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?>
+                at <?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?>.
+              </p>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-xs text-gray-500">Current Job</p>
+                  <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Company</p>
+                  <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?></p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Employment Type</p>
+                  <p class="text-sm font-medium"><?php echo htmlspecialchars(ucfirst($workExperience[0]['employment_type'] ?? 'N/A')); ?></p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Start Date</p>
+                  <p class="text-sm font-medium">
+                    <?php echo !empty($workExperience[0]['start_date']) ? date('M Y', strtotime($workExperience[0]['start_date'])) : 'N/A'; ?>
+                  </p>
+                </div>
+              </div>
+            <?php else: ?>
+              <p class="p-3 text-xs text-gray-500 border border-gray-200 rounded bg-gray-50">
+                Currently seeking employment opportunities.
+              </p>
+            <?php endif; ?>
           </div>
-          <?php if (!empty($workExperience) && is_array($workExperience)): ?>
-            <div class="space-y-4">
-              <?php foreach ($workExperience as $work): ?>
-                <div class="p-4 border border-gray-200 rounded-lg">
-                  <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                    <div>
-                      <p class="text-gray-500">Job Title</p>
-                      <p class="font-medium"><?php echo htmlspecialchars($work['job_title'] ?? 'N/A'); ?></p>
-                    </div>
-                    <div>
-                      <p class="text-gray-500">Duration</p>
-                      <p class="font-medium">
-                        <?php
-                        $start = !empty($work['start_date']) ? date('M Y', strtotime($work['start_date'])) : 'N/A';
-                        $end = ($work['currently_working'] ?? '') === 'Yes' ? 'Present' : (!empty($work['end_date']) ? date('M Y', strtotime($work['end_date'])) : 'N/A');
-                        echo $start . ' - ' . $end;
-                        ?>
-                      </p>
-                    </div>
-                    <div class="md:col-span-2">
-                      <p class="text-gray-500">Company/Organization</p>
-                      <p class="font-medium"><?php echo htmlspecialchars($work['company_name'] ?? 'N/A'); ?></p>
-                    </div>
-                    <?php if (!empty($work['responsibilities']) && $work['responsibilities'] !== 'N/A'): ?>
-                      <div class="md:col-span-2">
-                        <p class="text-gray-500">Responsibilities</p>
-                        <p class="text-sm font-medium"><?php echo htmlspecialchars($work['responsibilities']); ?></p>
+
+
+
+          <!-- Work Experience Card -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-base font-semibold text-primary">Work Experience</h4>
+              <a href="?page=complete-jobseeker-profile&step=5"
+                class="flex items-center text-sm text-primary">
+                <i class="mr-1 fas fa-edit"></i>
+                Edit
+              </a>
+            </div>
+            <?php if (!empty($workExperience) && is_array($workExperience)): ?>
+              <div class="space-y-4">
+                <?php foreach ($workExperience as $work): ?>
+                  <div class="p-4 border border-gray-200 rounded-lg">
+                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                      <div>
+                        <p class="text-xs text-gray-400">Job Title</p>
+                        <p ><?php echo htmlspecialchars($work['job_title'] ?? 'N/A'); ?></p>
                       </div>
-                    <?php endif; ?>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-            </div>
-          <?php else: ?>
-            <p class="text-sm text-gray-500">No work experience added yet.</p>
-          <?php endif; ?>
-        </div>
-
-        <!-- Educational Background Card -->
-        <div class="p-6 mt-2 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-base font-semibold">Educational Background</h4>
-            <a href="?page=complete-jobseeker-profile&step=4"
-              class="flex items-center text-sm text-green-600 hover:text-green-700">
-              <i class="mr-1 fas fa-edit"></i>
-              Edit
-            </a>
-          </div>
-          <?php if (!empty($education) && is_array($education)): ?>
-            <div class="space-y-4">
-              <?php foreach ($education as $edu): ?>
-                <div class="p-4 border border-gray-200 rounded-lg">
-                  <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                    <div>
-                      <p class="text-gray-500">Institution Name</p>
-                      <p class="font-medium"><?php echo htmlspecialchars($edu['school_name'] ?? 'N/A'); ?></p>
-                    </div>
-                    <div>
-                      <p class="text-gray-500">Duration</p>
-                      <p class="font-medium">
-                        <?php
-                        $start = !empty($edu['start_date']) ? date('Y', strtotime($edu['start_date'])) : '';
-                        $end = !empty($edu['end_date']) ? date('Y', strtotime($edu['end_date'])) : '';
-                        echo $start && $end ? $start . ' - ' . $end : 'N/A';
-                        ?>
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-gray-500">Degree/Program</p>
-                      <p class="font-medium"><?php echo htmlspecialchars($edu['education_level'] ?? 'N/A'); ?></p>
-                    </div>
-                    <div>
-                      <p class="text-gray-500">Field of Study</p>
-                      <p class="font-medium"><?php echo htmlspecialchars($edu['field_of_study'] ?? 'N/A'); ?></p>
+                      <div>
+                        <p class="text-xs text-gray-400">Duration</p>
+                        <p >
+                          <?php
+                          $start = !empty($work['start_date']) ? date('M Y', strtotime($work['start_date'])) : 'N/A';
+                          $end = ($work['currently_working'] ?? '') === 'Yes' ? 'Present' : (!empty($work['end_date']) ? date('M Y', strtotime($work['end_date'])) : 'N/A');
+                          echo $start . ' - ' . $end;
+                          ?>
+                        </p>
+                      </div>
+                      <div class="md:col-span-2">
+                        <p class="text-xs text-gray-400">Company/Organization</p>
+                        <p ><?php echo htmlspecialchars($work['company_name'] ?? 'N/A'); ?></p>
+                      </div>
+                      <?php if (!empty($work['responsibilities']) && $work['responsibilities'] !== 'N/A'): ?>
+                        <div class="md:col-span-2">
+                          <p class="text-gray-500">Responsibilities</p>
+                          <p class="text-sm font-medium"><?php echo htmlspecialchars($work['responsibilities']); ?></p>
+                        </div>
+                      <?php endif; ?>
                     </div>
                   </div>
-                </div>
-              <?php endforeach; ?>
-            </div>
-          <?php else: ?>
-            <p class="text-sm text-gray-500">No educational background added yet.</p>
-          <?php endif; ?>
-        </div>
-
-        <!-- Skills Card -->
-        <div class="p-6 mt-2 bg-white border border-gray-200 shadow rounded-xl">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-base font-semibold">Skills & Expertise</h4>
-            <a href="?page=complete-jobseeker-profile&step=6"
-              class="flex items-center text-sm text-green-600 hover:text-green-700">
-              <i class="mr-1 fas fa-edit"></i>
-              Edit
-            </a>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p class="text-sm text-gray-500">No work experience added yet.</p>
+            <?php endif; ?>
           </div>
-          <?php if (!empty($skills) && is_array($skills)): ?>
-            <div class="flex flex-wrap gap-2">
-              <?php foreach ($skills as $skill): ?>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+
+          <!-- Educational Background Card -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-base font-semibold text-primary">Educational Background</h4>
+              <a href="?page=complete-jobseeker-profile&step=4"
+                class="flex items-center text-sm text-primary">
+                <i class="mr-1 fas fa-edit"></i>
+                Edit
+              </a>
+            </div>
+            <?php if (!empty($education) && is_array($education)): ?>
+              <div class="space-y-4">
+                <?php foreach ($education as $edu): ?>
+                  <div class="p-4 border border-gray-200 rounded-lg">
+                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                      <div>
+                        <p class="text-xs text-gray-400">Institution Name</p>
+                        <p> <?php echo htmlspecialchars($edu['school_name'] ?? 'N/A'); ?></p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-400"">Duration</p>
+                        <p >
+                          <?php
+                          $start = !empty($edu['start_date']) ? date('Y', strtotime($edu['start_date'])) : '';
+                          $end = !empty($edu['end_date']) ? date('Y', strtotime($edu['end_date'])) : '';
+                          echo $start && $end ? $start . ' - ' . $end : 'N/A';
+                          ?>
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-400"">Degree/Program</p>
+                        <p ><?php echo htmlspecialchars($edu['education_level'] ?? 'N/A'); ?></p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-400"">Field of Study</p>
+                        <p ><?php echo htmlspecialchars($edu['field_of_study'] ?? 'N/A'); ?></p>
+                      </div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p class="text-xs text-gray-400"">No educational background added yet.</p>
+            <?php endif; ?>
+          </div>
+          <!-- Skills Card -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4 ">
+              <h4 class="text-base font-semibold text-primary">Skills & Expertise</h4>
+              <a href="?page=complete-jobseeker-profile&step=6"
+                class="flex items-center text-sm text-primary">
+                <i class="mr-1 fas fa-edit"></i>
+                Edit
+              </a>
+            </div>
+            <?php if (!empty($skills) && is_array($skills)): ?>
+              <div class="flex flex-wrap gap-2">
+                <?php foreach ($skills as $skill): ?>
+                  <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium p-4
                   <?php
                   switch ($skill['proficiency_level'] ?? '') {
                     case 'Expert':
@@ -350,47 +358,49 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                       echo 'bg-gray-100 text-gray-800';
                   }
                   ?>">
-                  <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
-                  <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
-                </span>
-              <?php endforeach; ?>
+                    <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
+                    <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
+                  </span>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p class="text-sm text-gray-500">No skills added yet.</p>
+            <?php endif; ?>
+          </div>
+
+          <!-- Certificates Card -->
+          <?php if (!empty($certificates) && is_array($certificates)): ?>
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-base font-semibold text-primary">Certificates & Licenses</h4>
+                <a href="?page=complete-jobseeker-profile&step=7"
+                  class="flex items-center text-sm text-primary">
+                  <i class="mr-1 fas fa-edit"></i>
+                  Edit
+                </a>
+              </div>
+              <div class="space-y-3">
+                <?php foreach ($certificates as $cert): ?>
+                  <div class="p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <h5 class="text-sm font-medium"><?php echo htmlspecialchars($cert['certificate_title'] ?? 'N/A'); ?></h5>
+                        <p class="text-xs text-gray-500"><?php echo htmlspecialchars($cert['issuing_organization'] ?? 'N/A'); ?></p>
+                        <?php if (!empty($cert['date_issued'])): ?>
+                          <p class="mt-1 text-xs text-gray-400">
+                            Issued: <?php echo date('M Y', strtotime($cert['date_issued'])); ?>
+                          </p>
+                        <?php endif; ?>
+                      </div>
+                      <i class="text-green-500 fas fa-certificate"></i>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
             </div>
-          <?php else: ?>
-            <p class="text-sm text-gray-500">No skills added yet.</p>
           <?php endif; ?>
         </div>
 
-        <!-- Certificates Card -->
-        <?php if (!empty($certificates) && is_array($certificates)): ?>
-          <div class="p-6 mt-2 bg-white border border-gray-200 shadow rounded-xl">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-base font-semibold">Certificates & Licenses</h4>
-              <a href="?page=complete-jobseeker-profile&step=7"
-                class="flex items-center text-sm text-green-600 hover:text-green-700">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-            <div class="space-y-3">
-              <?php foreach ($certificates as $cert): ?>
-                <div class="p-4 border border-gray-200 rounded-lg">
-                  <div class="flex items-start justify-between">
-                    <div>
-                      <h5 class="text-sm font-medium"><?php echo htmlspecialchars($cert['certificate_title'] ?? 'N/A'); ?></h5>
-                      <p class="text-xs text-gray-500"><?php echo htmlspecialchars($cert['issuing_organization'] ?? 'N/A'); ?></p>
-                      <?php if (!empty($cert['date_issued'])): ?>
-                        <p class="mt-1 text-xs text-gray-400">
-                          Issued: <?php echo date('M Y', strtotime($cert['date_issued'])); ?>
-                        </p>
-                      <?php endif; ?>
-                    </div>
-                    <i class="text-green-500 fas fa-certificate"></i>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-            </div>
-          </div>
-        <?php endif; ?>
       </div>
     </div>
   </div>

@@ -5,18 +5,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
 <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-    <!-- Breadcrumbs -->
-    <nav class="mb-6">
-        <div class="flex items-center space-x-2 text-sm">
-            <a href="?page=jobseeker-dashboard" class="text-gray-500 transition-colors hover:text-primary">
-                Dashboard
-            </a>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-primary">Saved Jobs</span>
-        </div>
-    </nav>
 
     <!-- Page Header -->
     <div class="flex items-center justify-between mb-8">
@@ -24,7 +12,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <h1 class="text-2xl font-bold text-gray-900">Saved Jobs</h1>
             <p class="mt-1 text-sm text-gray-600">Jobs you've bookmarked for later</p>
         </div>
-        <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-primary rounded-lg hover:bg-primary-600">
+        <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary-600">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -38,7 +26,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <i class="mb-4 text-6xl text-gray-400 fas fa-bookmark"></i>
             <h3 class="mb-2 text-lg font-medium text-gray-900">No saved jobs yet</h3>
             <p class="mb-6 text-gray-500">Save jobs you're interested in to view them later</p>
-            <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+            <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary ">
                 <i class="mr-2 fas fa-search"></i>
                 Browse Jobs
             </a>
@@ -48,7 +36,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <?php foreach ($savedJobs as $job): ?>
                 <!-- Modern card design matching browse-jobs.php -->
                 <div class="block overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300 hover:-translate-y-1">
-                    
+
                     <!-- Header: Company Logo and Job Title with Gray Background -->
                     <div class="flex items-start gap-4 p-6 pb-4 bg-gray-50">
                         <img src="<?php echo !empty($job['business_logo']) ? htmlspecialchars($job['business_logo']) : 'assets/logos/default.png'; ?>"
@@ -67,9 +55,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
 
                         <!-- Unsave Button -->
-                        <button onclick="event.preventDefault(); event.stopPropagation(); unsaveJob(<?php echo $job['job_id']; ?>)" 
-                                class="relative z-10 p-2 text-red-500 transition-colors rounded-md hover:bg-red-50 hover:text-red-600"
-                                title="Remove from saved jobs">
+                        <button onclick="event.preventDefault(); event.stopPropagation(); unsaveJob(<?php echo $job['job_id']; ?>)"
+                            class="relative z-10 p-2 transition-colors rounded-md text-secondary hover:bg-red-50 hover:text-red-600"
+                            title="Remove from saved jobs">
                             <!-- Bookmark SVG Icon (filled for saved) -->
                             <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -94,7 +82,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
                                 <?php echo htmlspecialchars(ucfirst(str_replace('-', ' ', $job['job_type']))); ?>
                             </span>
-                            <span class="px-3 py-2 text-xs bg-yellow-100 rounded-sm text-yellow-700">
+                            <span class="px-3 py-2 text-xs text-yellow-700 bg-yellow-100 rounded-sm">
                                 Saved <?php echo date('M j, Y', strtotime($job['saved_at'])); ?>
                             </span>
                         </div>
@@ -106,36 +94,31 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col gap-2 mb-4">
-                            <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" 
-                               class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200 text-center">
-                                View Details
-                            </a>
-                            
+
                             <!-- Apply Button -->
                             <?php if (isset($job['has_applied']) && $job['has_applied']): ?>
-                                <span class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-md text-center">
-                                    <i class="mr-1 fas fa-check-circle"></i>
+                                <span class="px-4 py-2 text-sm font-medium text-center text-white border rounded-md bg-primary">
                                     Applied
                                 </span>
                             <?php elseif ($job['job_status'] !== 'open'): ?>
-                                <span class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-md text-center">
+                                <span class="px-4 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
                                     Not accepting applications
                                 </span>
                             <?php else: ?>
-                                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1" 
-                                   class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 text-center">
-                                    <i class="mr-1 fas fa-paper-plane"></i>
+                                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
+                                    class="px-4 py-2 text-sm font-medium text-center text-white border rounded-md bg-primary">
+                                    
                                     Apply Now
                                 </a>
                             <?php endif; ?>
                         </div>
 
                         <!-- Footer: Posted Date -->
-                        <div class="flex items-center justify-between pt-4 mt-2 border-t border-gray-100">
+                        <div class="flex items-center justify-between pt-4 mt-2 ">
                             <span class="text-xs text-gray-500">
                                 Posted <?php echo date('M d, Y', strtotime($job['created_at'])); ?>
                             </span>
-                            
+
                             <?php if ($job['show_pay'] && $job['salary']): ?>
                                 <span class="text-sm font-semibold text-green-600">
                                     ₱<?php echo number_format($job['salary'], 2); ?>
@@ -150,108 +133,108 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 </div>
 
 <script>
-function unsaveJob(jobId) {
-    if (!confirm('Remove this job from your saved jobs?')) {
-        return;
+    function unsaveJob(jobId) {
+        if (!confirm('Remove this job from your saved jobs?')) {
+            return;
+        }
+
+        // Find the button element
+        const button = event.target.closest('button');
+        const svgIcon = button.querySelector('svg');
+
+        // Show loading state
+        svgIcon.classList.add('animate-pulse');
+        button.disabled = true;
+
+        const formData = new FormData();
+        formData.append('job_id', jobId);
+
+        fetch('?page=unsave-job', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Check if response is ok first
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Check content type
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.error('Expected JSON but got:', text);
+                        throw new Error('Server returned non-JSON response');
+                    });
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server response:', data); // Debug log
+
+                if (data.success) {
+                    // Show success toast
+                    showToast(data.message || 'Job removed from saved jobs successfully!', 'success');
+
+                    // Remove the card from the DOM with fade animation
+                    const card = button.closest('.grid > div');
+                    if (card) {
+                        card.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+
+                        setTimeout(() => {
+                            card.remove();
+
+                            // Check if no saved jobs remain
+                            const remainingCards = document.querySelectorAll('.grid > div');
+                            if (remainingCards.length === 0) {
+                                location.reload(); // Refresh to show the "no saved jobs" message
+                            }
+                        }, 300);
+                    }
+                } else {
+                    showToast(data.message || 'Error removing job from saved jobs', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                showToast('Error occurred while removing job from saved jobs', 'error');
+            })
+            .finally(() => {
+                svgIcon.classList.remove('animate-pulse');
+                button.disabled = false;
+            });
     }
 
-    // Find the button element
-    const button = event.target.closest('button');
-    const svgIcon = button.querySelector('svg');
-    
-    // Show loading state
-    svgIcon.classList.add('animate-pulse');
-    button.disabled = true;
+    function showToast(message, type) {
+        // Remove any existing toasts first
+        const existingToasts = document.querySelectorAll('.toast-notification');
+        existingToasts.forEach(toast => toast.remove());
 
-    const formData = new FormData();
-    formData.append('job_id', jobId);
-
-    fetch('?page=unsave-job', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        // Check if response is ok first
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Check content type
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            return response.text().then(text => {
-                console.error('Expected JSON but got:', text);
-                throw new Error('Server returned non-JSON response');
-            });
-        }
-
-        return response.json();
-    })
-    .then(data => {
-        console.log('Server response:', data); // Debug log
-
-        if (data.success) {
-            // Show success toast
-            showToast(data.message || 'Job removed from saved jobs successfully!', 'success');
-            
-            // Remove the card from the DOM with fade animation
-            const card = button.closest('.grid > div');
-            if (card) {
-                card.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.95)';
-                
-                setTimeout(() => {
-                    card.remove();
-                    
-                    // Check if no saved jobs remain
-                    const remainingCards = document.querySelectorAll('.grid > div');
-                    if (remainingCards.length === 0) {
-                        location.reload(); // Refresh to show the "no saved jobs" message
-                    }
-                }, 300);
-            }
-        } else {
-            showToast(data.message || 'Error removing job from saved jobs', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        showToast('Error occurred while removing job from saved jobs', 'error');
-    })
-    .finally(() => {
-        svgIcon.classList.remove('animate-pulse');
-        button.disabled = false;
-    });
-}
-
-function showToast(message, type) {
-    // Remove any existing toasts first
-    const existingToasts = document.querySelectorAll('.toast-notification');
-    existingToasts.forEach(toast => toast.remove());
-
-    const toast = document.createElement('div');
-    toast.className = `toast-notification fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-all duration-300 transform translate-x-0 ${
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-all duration-300 transform translate-x-0 ${
         type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
     }`;
-    toast.textContent = message;
+        toast.textContent = message;
 
-    document.body.appendChild(toast);
+        document.body.appendChild(toast);
 
-    // Animate in
-    setTimeout(() => {
-        toast.style.opacity = '1';
-    }, 10);
-
-    // Animate out and remove
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
+        // Animate in
         setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
-    }, 3000);
-}
+            toast.style.opacity = '1';
+        }, 10);
+
+        // Animate out and remove
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
 </script>

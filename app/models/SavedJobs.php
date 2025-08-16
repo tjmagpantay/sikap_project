@@ -35,7 +35,7 @@ class SavedJobs
             $sql = "INSERT IGNORE INTO jobseeker_saved_jobs (jobseeker_id, job_id) VALUES (?, ?)";
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$jobseeker_id, $job_id]);
-            
+
             if ($result && $stmt->rowCount() > 0) {
                 error_log("DEBUG: Successfully saved job $job_id for jobseeker $jobseeker_id");
                 return true;
@@ -83,21 +83,27 @@ class SavedJobs
                            e.first_name as employer_first_name, 
                            e.last_name as employer_last_name,
                            COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                           eb.business_logo,
+                           eb.business_name,
+                           eb.business_desc,
+                           eb.business_industry,
+                           eb.business_address,
+                           eb.business_contact,
+                           eb.business_type,
+                           eb.business_size,
+                           eb.business_website,
+                           eb.business_socials,
                            jsj.saved_at
                     FROM jobseeker_saved_jobs jsj
                     JOIN job_post jp ON jsj.job_id = jp.job_id
                     LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                     LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                    LEFT JOIN (
-                        SELECT employer_id, MIN(business_name) as business_name
-                        FROM employers_business
-                        GROUP BY employer_id
-                    ) eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                     WHERE jsj.jobseeker_id = ?
                     AND jp.job_status = 'open'
                     AND (jp.application_deadline IS NULL OR jp.application_deadline > NOW())
                     ORDER BY jsj.saved_at DESC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
