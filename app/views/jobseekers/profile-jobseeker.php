@@ -42,18 +42,14 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
 <div class="min-h-screen">
-  <?php include_once __DIR__ . '/../components/navbar-top.php'; ?>
-  <?php include_once __DIR__ . '/navbar-jobseeker.php'; ?>
-
   <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
     <div class="flex flex-col gap-8 md:flex-row">
-      <!-- Sidebar -->
+      <!-- Sidebar - Fixed -->
       <div class="w-full md:w-1/3">
         <div class="p-6 bg-white border border-gray-200 rounded-xl">
           <div class="flex flex-col items-start">
-            <!-- Profile Photo (Keep existing PHP logic) -->
+            <!-- Profile Photo -->
             <div class="flex items-start">
-              <!-- Profile Picture -->
               <div class="relative group">
                 <img src="<?php
                           if (!empty($jobseeker['profile_picture'])) {
@@ -77,7 +73,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <h2 class="text-lg font-bold text-gray-800">
                   <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
                 </h2>
-                <p class="font-normal text-gray-400 text-md"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
+                <p class="font-normal text-gray-400 text-md"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'Job Seeker'); ?></p>
               </div>
             </div>
 
@@ -88,13 +84,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <span class="text-sm font-normal text-primary"><?php echo round($completionPercentage); ?>%</span>
               </div>
               <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div class="h-2 bg-primary" style="width: <?php echo $completionPercentage; ?>%"></div>
+                <div class="h-2 transition-all duration-300 bg-primary" style="width: <?php echo $completionPercentage; ?>%"></div>
               </div>
             </div>
 
             <!-- Edit Profile Button -->
             <div class="w-full mt-4 mb-4">
-              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm transition-colors border-2 border-gray-200 text-primary">
+              <a href="?page=complete-jobseeker-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm transition-colors border-2 border-gray-200 text-primary hover:bg-gray-50">
                 Edit Profile
               </a>
             </div>
@@ -103,355 +99,213 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <div class="w-full">
               <h3 class="mb-3 text-sm font-semibold text-gray-700">Contact</h3>
               <ul class="space-y-2">
-                <?php if (!empty($jobseeker['email'])): ?>
-                  <li class="flex items-center">
-
-                    <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['email']); ?></span>
-                  </li>
-                <?php endif; ?>
+                <li class="flex items-center">
+                  <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-sm text-gray-600"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></span>
+                </li>
                 <?php if (!empty($jobseeker['contact_no'])): ?>
                   <li class="flex items-center">
-
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
                     <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></span>
                   </li>
                 <?php endif; ?>
-                <!-- Add other contact fields as needed -->
+                <?php if (!empty($jobseeker['address'])): ?>
+                  <li class="flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-sm text-gray-600"><?php echo htmlspecialchars($jobseeker['address']); ?></span>
+                  </li>
+                <?php endif; ?>
               </ul>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="w-full space-y-8 md:w-2/3 ">
-
-        <!-- Personal Information Card -->
-        <div class="p-6 mb-6 bg-white shadow border-gray--200 border-gray border-1-bottom rounded-xl">
+      <!-- Main Content - Dynamic -->
+      <div class="w-full space-y-8 md:w-2/3">
+        <div class="p-6 mb-6 bg-white border border-gray-200 shadow rounded-xl">
+          <!-- Tab Navigation -->
           <div class="relative flex gap-6 mb-6 border-b">
-            <!-- Border below navigation -->
             <div class="absolute bottom-0 left-0 w-full h-px bg-gray-200"></div>
 
-            <!-- Tabs with animation -->
-            <a href="?page=profile-jobseeker"
-              class="relative pb-2 font-semibold transition-colors duration-300 text-primary group">
+            <!-- Dynamic Tabs -->
+            <button onclick="switchTab('profile')" id="tab-profile"
+              class="relative pb-2 font-semibold transition-colors duration-300 text-primary group tab-button active">
               <span>Applicant Profile</span>
-              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-100"></div>
-            </a>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-100 tab-indicator"></div>
+            </button>
 
-            <a href="?page=jobseeker-documents"
-              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary">
+            <button onclick="switchTab('documents')" id="tab-documents"
+              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary tab-button">
               <span>Resume & Documents</span>
-              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100"></div>
-            </a>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 tab-indicator"></div>
+            </button>
 
-            <a href="?page=jobseeker-applications"
-              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary">
+            <button onclick="switchTab('applications')" id="tab-applications"
+              class="relative pb-2 text-gray-500 transition-colors duration-300 group hover:text-primary tab-button">
               <span>Job Applications</span>
-              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100"></div>
-            </a>
-          </div>
-          <div class="grid w-full grid-cols-1 gap-4 mb-8 md:grid-cols-2">
-            <!-- Profile Details Header -->
-            <div class="flex items-center justify-between w-full col-span-1 mb-4 md:col-span-2">
-              <h4 class="text-base font-semibold">Profile Details</h4>
-              <a href="?page=complete-jobseeker-profile&step=3"
-                class="flex items-center text-sm text-primary">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-
-            <div>
-              <p class="text-xs text-gray-500">Full Name</p>
-              <p class="text-sm">
-                <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500">Gender</p>
-              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['sex'] ?? 'N/A'); ?></p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500">Date of Birth</p>
-              <p class="text-sm">
-                <?php echo !empty($jobseeker['date_of_birth']) && $jobseeker['date_of_birth'] ? date('F j, Y', strtotime($jobseeker['date_of_birth'])) : 'N/A'; ?>
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500">Phone Number</p>
-              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['contact_no'] ?? 'N/A'); ?></p>
-            </div>
-            <div class="md:col-span-2">
-              <p class="text-xs text-gray-500">Address</p>
-              <p class="text-sm"><?php echo htmlspecialchars($jobseeker['address'] ?? 'N/A'); ?></p>
-            </div>
-            <div class="md:col-span-2">
-              <p class="text-xs text-gray-500">Email</p>
-              <p class="text-sm"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
-            </div>
+              <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 tab-indicator"></div>
+            </button>
           </div>
 
-          <!-- Employment Status Section -->
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-base font-semibold text-primary">Employment Status</h4>
-              <a href="?page=complete-jobseeker-profile&step=3"
-                class="flex items-center text-sm text-primary">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-
-            <?php if (!empty($workExperience) && is_array($workExperience) && isset($workExperience[0]['currently_working']) && $workExperience[0]['currently_working'] === 'Yes'): ?>
-              <p class="mb-4 text-sm text-gray-500">
-                Currently working as <?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?>
-                at <?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?>.
-              </p>
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <p class="text-xs text-gray-500">Current Job</p>
-                  <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-500">Company</p>
-                  <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?></p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-500">Employment Type</p>
-                  <p class="text-sm font-medium"><?php echo htmlspecialchars(ucfirst($workExperience[0]['employment_type'] ?? 'N/A')); ?></p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-500">Start Date</p>
-                  <p class="text-sm font-medium">
-                    <?php echo !empty($workExperience[0]['start_date']) ? date('M Y', strtotime($workExperience[0]['start_date'])) : 'N/A'; ?>
-                  </p>
-                </div>
-              </div>
-            <?php else: ?>
-              <p class="p-3 text-xs text-gray-500 border border-gray-200 rounded bg-gray-50">
-                Currently seeking employment opportunities.
-              </p>
-            <?php endif; ?>
+          <!-- Loading Indicator -->
+          <div id="tab-loading" class="hidden py-8 text-center">
+            <svg class="w-8 h-8 mx-auto text-primary animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2 text-sm text-gray-500">Loading...</p>
           </div>
 
-
-
-          <!-- Work Experience Card -->
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-base font-semibold text-primary">Work Experience</h4>
-              <a href="?page=complete-jobseeker-profile&step=5"
-                class="flex items-center text-sm text-primary">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-            <?php if (!empty($workExperience) && is_array($workExperience)): ?>
-              <div class="space-y-4">
-                <?php foreach ($workExperience as $work): ?>
-                  <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                      <div>
-                        <p class="text-xs text-gray-400">Job Title</p>
-                        <p ><?php echo htmlspecialchars($work['job_title'] ?? 'N/A'); ?></p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-400">Duration</p>
-                        <p >
-                          <?php
-                          $start = !empty($work['start_date']) ? date('M Y', strtotime($work['start_date'])) : 'N/A';
-                          $end = ($work['currently_working'] ?? '') === 'Yes' ? 'Present' : (!empty($work['end_date']) ? date('M Y', strtotime($work['end_date'])) : 'N/A');
-                          echo $start . ' - ' . $end;
-                          ?>
-                        </p>
-                      </div>
-                      <div class="md:col-span-2">
-                        <p class="text-xs text-gray-400">Company/Organization</p>
-                        <p ><?php echo htmlspecialchars($work['company_name'] ?? 'N/A'); ?></p>
-                      </div>
-                      <?php if (!empty($work['responsibilities']) && $work['responsibilities'] !== 'N/A'): ?>
-                        <div class="md:col-span-2">
-                          <p class="text-gray-500">Responsibilities</p>
-                          <p class="text-sm font-medium"><?php echo htmlspecialchars($work['responsibilities']); ?></p>
-                        </div>
-                      <?php endif; ?>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            <?php else: ?>
-              <p class="text-sm text-gray-500">No work experience added yet.</p>
-            <?php endif; ?>
+          <!-- Dynamic Content Area -->
+          <div id="tab-content">
+            <!-- Default: Applicant Profile Content -->
+            <?php include 'profile-components/profile-content.php'; ?>
           </div>
-
-          <!-- Educational Background Card -->
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-base font-semibold text-primary">Educational Background</h4>
-              <a href="?page=complete-jobseeker-profile&step=4"
-                class="flex items-center text-sm text-primary">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-            <?php if (!empty($education) && is_array($education)): ?>
-              <div class="space-y-4">
-                <?php foreach ($education as $edu): ?>
-                  <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                      <div>
-                        <p class="text-xs text-gray-400">Institution Name</p>
-                        <p> <?php echo htmlspecialchars($edu['school_name'] ?? 'N/A'); ?></p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-400"">Duration</p>
-                        <p >
-                          <?php
-                          $start = !empty($edu['start_date']) ? date('Y', strtotime($edu['start_date'])) : '';
-                          $end = !empty($edu['end_date']) ? date('Y', strtotime($edu['end_date'])) : '';
-                          echo $start && $end ? $start . ' - ' . $end : 'N/A';
-                          ?>
-                        </p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-400"">Degree/Program</p>
-                        <p ><?php echo htmlspecialchars($edu['education_level'] ?? 'N/A'); ?></p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-400"">Field of Study</p>
-                        <p ><?php echo htmlspecialchars($edu['field_of_study'] ?? 'N/A'); ?></p>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            <?php else: ?>
-              <p class="text-xs text-gray-400"">No educational background added yet.</p>
-            <?php endif; ?>
-          </div>
-          <!-- Skills Card -->
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4 ">
-              <h4 class="text-base font-semibold text-primary">Skills & Expertise</h4>
-              <a href="?page=complete-jobseeker-profile&step=6"
-                class="flex items-center text-sm text-primary">
-                <i class="mr-1 fas fa-edit"></i>
-                Edit
-              </a>
-            </div>
-            <?php if (!empty($skills) && is_array($skills)): ?>
-              <div class="flex flex-wrap gap-2">
-                <?php foreach ($skills as $skill): ?>
-                  <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium p-4
-                  <?php
-                  switch ($skill['proficiency_level'] ?? '') {
-                    case 'Expert':
-                      echo 'bg-green-100 text-green-800';
-                      break;
-                    case 'Advanced':
-                      echo 'bg-blue-100 text-blue-800';
-                      break;
-                    case 'Intermediate':
-                      echo 'bg-yellow-100 text-yellow-800';
-                      break;
-                    default:
-                      echo 'bg-gray-100 text-gray-800';
-                  }
-                  ?>">
-                    <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
-                    <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
-                  </span>
-                <?php endforeach; ?>
-              </div>
-            <?php else: ?>
-              <p class="text-sm text-gray-500">No skills added yet.</p>
-            <?php endif; ?>
-          </div>
-
-          <!-- Certificates Card -->
-          <?php if (!empty($certificates) && is_array($certificates)): ?>
-            <div class="mb-8">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="text-base font-semibold text-primary">Certificates & Licenses</h4>
-                <a href="?page=complete-jobseeker-profile&step=7"
-                  class="flex items-center text-sm text-primary">
-                  <i class="mr-1 fas fa-edit"></i>
-                  Edit
-                </a>
-              </div>
-              <div class="space-y-3">
-                <?php foreach ($certificates as $cert): ?>
-                  <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="flex items-start justify-between">
-                      <div>
-                        <h5 class="text-sm font-medium"><?php echo htmlspecialchars($cert['certificate_title'] ?? 'N/A'); ?></h5>
-                        <p class="text-xs text-gray-500"><?php echo htmlspecialchars($cert['issuing_organization'] ?? 'N/A'); ?></p>
-                        <?php if (!empty($cert['date_issued'])): ?>
-                          <p class="mt-1 text-xs text-gray-400">
-                            Issued: <?php echo date('M Y', strtotime($cert['date_issued'])); ?>
-                          </p>
-                        <?php endif; ?>
-                      </div>
-                      <i class="text-green-500 fas fa-certificate"></i>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            </div>
-          <?php endif; ?>
         </div>
-
       </div>
     </div>
   </div>
 </div>
 
-<?php
-// Handle profile photo upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
-  $targetDir = __DIR__ . '/../../../public/uploads/profile_photos/';
-  if (!is_dir($targetDir)) {
-    mkdir($targetDir, 0777, true);
-  }
-  $fileName = 'jobseeker_' . $_SESSION['user_id'] . '_' . time() . '.' . pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
-  $targetFile = $targetDir . $fileName;
-  if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $targetFile)) {
-    // Save the new photo path to the database
-    $relativePath = '/public/uploads/profile_photos/' . $fileName;
-    $jobseekerModel->updateProfilePhoto($_SESSION['user_id'], $relativePath);
-    // Refresh page to show new photo
-  }
-}
-?>
-
 <script>
+  let currentTab = 'profile';
+
+  function switchTab(tabName) {
+    // Don't reload if already on this tab
+    if (currentTab === tabName) return;
+
+    // Show loading
+    showLoading();
+
+    // Update tab styles
+    updateTabStyles(tabName);
+
+    // Load content via AJAX
+    loadTabContent(tabName);
+
+    currentTab = tabName;
+  }
+
+  function updateTabStyles(activeTab) {
+    // Reset all tabs
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.classList.remove('active', 'text-primary', 'font-semibold');
+      button.classList.add('text-gray-500');
+
+      const indicator = button.querySelector('.tab-indicator');
+      if (indicator) {
+        indicator.classList.remove('scale-x-100');
+        indicator.classList.add('scale-x-0');
+      }
+    });
+
+    // Activate current tab
+    const activeButton = document.getElementById(`tab-${activeTab}`);
+    if (activeButton) {
+      activeButton.classList.remove('text-gray-500');
+      activeButton.classList.add('text-primary', 'font-semibold', 'active');
+
+      const indicator = activeButton.querySelector('.tab-indicator');
+      if (indicator) {
+        indicator.classList.remove('scale-x-0');
+        indicator.classList.add('scale-x-100');
+      }
+    }
+  }
+
+  function showLoading() {
+    document.getElementById('tab-loading').classList.remove('hidden');
+    document.getElementById('tab-content').style.opacity = '0.5';
+  }
+
+  function hideLoading() {
+    document.getElementById('tab-loading').classList.add('hidden');
+    document.getElementById('tab-content').style.opacity = '1';
+  }
+
+  function loadTabContent(tabName) {
+    fetch(`?page=profile-tab-content&tab=${tabName}`, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('tab-content').innerHTML = html;
+        hideLoading();
+
+        // Update URL without reload
+        const newUrl = `${window.location.pathname}?page=profile-jobseeker&tab=${tabName}`;
+        window.history.pushState({
+          tab: tabName
+        }, '', newUrl);
+      })
+      .catch(error => {
+        console.error('Error loading tab content:', error);
+        document.getElementById('tab-content').innerHTML = `
+            <div class="py-8 text-center">
+                <svg class="w-12 h-12 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L5.268 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <p class="mt-2 text-sm text-gray-500">Error loading content. Please try again.</p>
+                <button onclick="location.reload()" class="px-4 py-2 mt-3 text-sm text-white rounded bg-primary hover:bg-primary-600">
+                    Refresh Page
+                </button>
+            </div>
+        `;
+        hideLoading();
+      });
+  }
+
+  // Handle browser back/forward
+  window.addEventListener('popstate', function(event) {
+    if (event.state && event.state.tab) {
+      switchTab(event.state.tab);
+    }
+  });
+
+  // Initialize tab from URL
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabFromUrl = urlParams.get('tab');
+
+    if (tabFromUrl && ['profile', 'documents', 'applications'].includes(tabFromUrl)) {
+      switchTab(tabFromUrl);
+    }
+  });
+
+  // Profile photo upload function
   function handleProfilePhotoUpload(input) {
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
-      // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert('Please select an image file.');
+        showNotification('Please select an image file.', 'error');
         return;
       }
 
-      // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB.');
+        showNotification('File size must be less than 2MB.', 'error');
         return;
       }
 
-      // Create FormData for upload
       const formData = new FormData();
       formData.append('profile_picture', file);
 
-      // Show loading state
       const button = document.querySelector('button[title="Change profile photo"]');
       const originalContent = button.innerHTML;
-      button.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+      button.innerHTML = '<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
       button.disabled = true;
 
-      // Upload the file
       fetch('?page=upload-profile-photo', {
           method: 'POST',
           body: formData
@@ -459,11 +313,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            // Update the profile image
             const profileImg = document.querySelector('img[alt="Profile"]');
-            profileImg.src = '/sikap/public/' + data.image_url + '?t=' + new Date().getTime(); // Add timestamp to force reload
-
-            // Show success message
+            profileImg.src = '/sikap/public/' + data.image_url + '?t=' + new Date().getTime();
             showNotification('Profile photo updated successfully!', 'success');
           } else {
             showNotification(data.message || 'Failed to upload photo', 'error');
@@ -474,17 +325,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
           showNotification('Failed to upload photo', 'error');
         })
         .finally(() => {
-          // Restore button state
           button.innerHTML = originalContent;
           button.disabled = false;
-          input.value = ''; // Clear the input
+          input.value = '';
         });
     }
   }
 
   function showNotification(message, type) {
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+    notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 transition-all duration-300 ${
         type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
     }`;
     notification.innerHTML = `
@@ -506,7 +356,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
 
     document.body.appendChild(notification);
 
-    // Auto remove after 5 seconds
     setTimeout(() => {
       if (notification.parentElement) {
         notification.remove();
@@ -514,3 +363,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_photo'])) {
     }, 5000);
   }
 </script>
+
+<style>
+  .tab-button.active .tab-indicator {
+    transform: scaleX(1);
+  }
+
+  #tab-content {
+    transition: opacity 0.3s ease;
+  }
+</style>
