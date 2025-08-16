@@ -134,11 +134,6 @@ if ($jobseeker === false) {
                 Profile
               </a>
 
-              <a href="?page=jobseeker-documents"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                Documents
-              </a>
-
               <a href="?page=saved-jobs"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Saved Jobs
