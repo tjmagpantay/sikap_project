@@ -193,12 +193,29 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         <div class="mb-6">
                             <div class="space-y-2">
                                 <?php foreach ($resumeDocuments as $doc): ?>
+                                    <?php
+                                    // Check if this resume was previously selected
+                                    $isSelected = false;
+                                    if (!empty($existingAttachments)) {
+                                        foreach ($existingAttachments as $attachment) {
+                                            if (
+                                                $attachment['file_type'] === 'resume' &&
+                                                ($attachment['file_path'] === $doc['file_path'] ||
+                                                    (!empty($attachment['profile_document_id']) &&
+                                                        $attachment['profile_document_id'] == $doc['document_id']))
+                                            ) {
+                                                $isSelected = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    ?>
                                     <label class="flex items-center p-3 transition-colors border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                                         <input type="checkbox"
                                             name="selected_resumes[]"
                                             value="<?php echo htmlspecialchars($doc['file_path']); ?>"
                                             class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary/50 focus:border-primary"
-                                            <?php echo (!empty($applicationData['selected_resumes']) && in_array($doc['file_path'], $applicationData['selected_resumes'])) ? 'checked' : ''; ?>>
+                                            <?php echo $isSelected ? 'checked' : ''; ?>>
                                         <div class="ml-3">
                                             <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($doc['file_name']); ?></p>
                                             <p class="text-xs text-gray-500">
@@ -317,12 +334,29 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 <h3 class="mb-3 text-sm font-medium text-gray-700">Your existing CVs</h3>
                                 <div class="space-y-3">
                                     <?php foreach ($cvDocuments as $doc): ?>
+                                        <?php
+                                        // Check if this CV was previously selected
+                                        $isSelected = false;
+                                        if (!empty($existingAttachments)) {
+                                            foreach ($existingAttachments as $attachment) {
+                                                if (
+                                                    $attachment['file_type'] === 'cv' &&
+                                                    ($attachment['file_path'] === $doc['file_path'] ||
+                                                        (!empty($attachment['profile_document_id']) &&
+                                                            $attachment['profile_document_id'] == $doc['document_id']))
+                                                ) {
+                                                    $isSelected = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        ?>
                                         <label class="flex items-start p-4 transition-colors border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                                             <input type="checkbox"
                                                 name="selected_cvs[]"
                                                 value="<?php echo htmlspecialchars($doc['file_path']); ?>"
                                                 class="w-4 h-4 mt-1 border-gray-300 rounded text-primary focus:ring-primary/50 focus:border-primary"
-                                                <?php echo (!empty($applicationData['selected_cvs']) && in_array($doc['file_path'], $applicationData['selected_cvs'])) ? 'checked' : ''; ?>>
+                                                <?php echo $isSelected ? 'checked' : ''; ?>>
                                             <div class="ml-3">
                                                 <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($doc['file_name']); ?></p>
                                                 <p class="mt-1 text-xs text-gray-500">
@@ -355,6 +389,43 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     <p class="mt-1 mb-4 text-xs text-gray-500">
                         Upload any additional documents that support your application (certificates, portfolios, etc.)
                     </p>
+
+                    <!-- Show existing additional attachments -->
+                    <?php
+                    $existingAdditionalAttachments = [];
+                    if (!empty($existingAttachments)) {
+                        foreach ($existingAttachments as $attachment) {
+                            if (!in_array($attachment['file_type'], ['resume', 'cv'])) {
+                                $existingAdditionalAttachments[] = $attachment;
+                            }
+                        }
+                    }
+                    ?>
+
+                    <?php if (!empty($existingAdditionalAttachments)): ?>
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-sm font-medium text-gray-700">Previously uploaded documents:</h4>
+                            <div class="space-y-2">
+                                <?php foreach ($existingAdditionalAttachments as $attachment): ?>
+                                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(basename($attachment['file_path'])); ?></p>
+                                                <p class="text-xs text-gray-500">
+                                                    Type: <?php echo htmlspecialchars($attachment['file_type']); ?>
+                                                    • Uploaded: <?php echo date('M j, Y', strtotime($attachment['uploaded_at'])); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="existing_attachments[]" value="<?php echo htmlspecialchars($attachment['attachment_id']); ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <div id="attachments-container">
                         <div class="p-4 mb-4 border border-gray-300 border-dashed rounded-lg attachment-item">
@@ -402,7 +473,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                     <button type="submit"
                         class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Continue to Step 2
+                        <?php echo ($application_id && !empty($existingAttachments)) ? 'Update & Continue' : 'Continue to Step 2'; ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -476,10 +547,18 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     document.querySelector('form').addEventListener('submit', function(e) {
         const selectedResumes = document.querySelectorAll('input[name="selected_resumes[]"]:checked');
         const newResume = document.getElementById('new_resume').files.length;
+        const selectedCVs = document.querySelectorAll('input[name="selected_cvs[]"]:checked');
+        const newCV = document.getElementById('new_cv').files.length;
 
-        if (selectedResumes.length === 0 && newResume === 0) {
+        // Check if user has selected any resume or CV (existing or new)
+        const hasAnyDocument = selectedResumes.length > 0 || newResume > 0 || selectedCVs.length > 0 || newCV > 0;
+
+        // Check if user has existing attachments (for users navigating back)
+        const hasExistingAttachments = <?php echo !empty($existingAttachments) ? 'true' : 'false'; ?>;
+
+        if (!hasAnyDocument && !hasExistingAttachments) {
             e.preventDefault();
-            alert('Please select at least one existing resume or upload a new resume to continue.');
+            alert('Please select at least one existing document or upload a new resume/CV to continue.');
             return false;
         }
     });

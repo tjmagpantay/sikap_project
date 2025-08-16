@@ -59,7 +59,18 @@ class JobApplicationController
         // If there's an existing draft application, use it
         if ($existingApplication && !$existingApplication['is_finalized']) {
             $application_id = $existingApplication['application_id'];
-            $step = $existingApplication['current_step'];
+            // Allow user to navigate to any step they've reached or go backwards
+            // Don't override the step from URL unless it's invalid
+            if ($step > $existingApplication['current_step']) {
+                $step = $existingApplication['current_step'];
+            }
+
+            // Update current_step if user is moving to a new step they haven't reached
+            // but only if it's not going backwards
+            if ($step <= $existingApplication['current_step'] && $step != $existingApplication['current_step']) {
+                // User is navigating backwards, update the step in database for tracking
+                $this->jobApplicationModel->updateCurrentStep($application_id, $step);
+            }
         }
 
         // Handle form submissions for each step
@@ -96,8 +107,10 @@ class JobApplicationController
 
         // Get existing application data if editing
         $applicationData = null;
+        $existingAttachments = [];
         if ($application_id) {
             $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+            $existingAttachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
         }
 
         $error = $_GET['error'] ?? '';
@@ -109,7 +122,15 @@ class JobApplicationController
     // Step 2: Screening Questions
     private function showStep2($job, $jobseeker, $application_id)
     {
+        // Allow navigation to step 2 if application exists and user has reached at least step 2
         if (!$application_id) {
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
+            exit;
+        }
+
+        // Check if user has reached this step (only block if they've never reached step 2)
+        $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+        if ($applicationData && $applicationData['current_step'] < 2) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
             exit;
         }
@@ -136,8 +157,16 @@ class JobApplicationController
     // Step 3: Eligibility Information
     private function showStep3($job, $jobseeker, $application_id)
     {
+        // Allow navigation to step 3 if application exists and user has reached at least step 3
         if (!$application_id) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete previous steps first.'));
+            exit;
+        }
+
+        // Check if user has reached this step (only block if they've never reached step 3)
+        $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+        if ($applicationData && $applicationData['current_step'] < 3) {
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=' . $applicationData['current_step'] . '&application_id=' . $application_id . '&error=' . urlencode('Please complete previous steps first.'));
             exit;
         }
 
@@ -153,13 +182,20 @@ class JobApplicationController
     // Step 4: Review & Submit
     private function showStep4($job, $jobseeker, $application_id)
     {
+        // Allow navigation to step 4 if application exists and user has reached step 4
         if (!$application_id) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete previous steps first.'));
             exit;
         }
 
-        // Get all application data for review
+        // Check if user has reached this step
         $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+        if ($applicationData && $applicationData['current_step'] < 4) {
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=' . $applicationData['current_step'] . '&application_id=' . $application_id . '&error=' . urlencode('Please complete previous steps first.'));
+            exit;
+        }
+
+        // Get all application data for review
         $answers = $this->jobApplicationModel->getApplicationAnswers($application_id);
         $attachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
         $eligibility = $this->jobApplicationModel->getApplicationEligibility($application_id);
@@ -206,11 +242,29 @@ class JobApplicationController
                 }
             }
 
-            // Clear existing resume attachments for this application
-            $this->jobApplicationModel->clearResumeAttachments($application_id);
+            // Clear existing resume attachments only if user has made new selections
+            // This allows navigation back/forth without losing data
+            $hasNewSelections = (!empty($_POST['selected_resumes']) ||
+                !empty($_FILES['new_resume']['name']) ||
+                !empty($_POST['selected_cvs']) ||
+                !empty($_FILES['new_cv']['name']));
+
+            // Check if there are existing resume/CV attachments
+            $existingAttachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
+            $hasExistingResumes = false;
+            foreach ($existingAttachments as $attachment) {
+                if (in_array(strtolower($attachment['file_type']), ['resume', 'cv'])) {
+                    $hasExistingResumes = true;
+                    break;
+                }
+            }
+
+            if ($hasNewSelections) {
+                $this->jobApplicationModel->clearResumeAttachments($application_id);
+            }
 
             // Handle multiple resume selection
-            $resumeHandled = false;
+            $resumeHandled = $hasExistingResumes && !$hasNewSelections; // If has existing and no new selections, consider handled
 
             // Handle selected existing resumes
             if (!empty($_POST['selected_resumes'])) {
@@ -243,12 +297,48 @@ class JobApplicationController
                     $resumeHandled = true;
 
                     // Optionally save to profile documents for future use
-                    if (isset($_POST['save_to_profile']) && $_POST['save_to_profile'] == '1') {
+                    if (isset($_POST['save_resume_to_profile']) && $_POST['save_resume_to_profile'] == '1') {
                         $this->saveToProfile(
                             $jobseeker['jobseeker_id'],
                             $resumePath,
                             'resume',
                             $_FILES['new_resume']['name']
+                        );
+                    }
+                }
+            }
+
+            // Handle selected existing CVs
+            if (!empty($_POST['selected_cvs'])) {
+                foreach ($_POST['selected_cvs'] as $cvPath) {
+                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $cvPath);
+                    if ($profileDoc) {
+                        // Create reference to existing profile document
+                        $this->jobApplicationModel->saveApplicationAttachmentReference(
+                            $application_id,
+                            $profileDoc['document_id'],
+                            'CV'
+                        );
+                        $resumeHandled = true;
+                    }
+                }
+            }
+
+            // Handle new CV upload
+            if (!empty($_FILES['new_cv']['name'])) {
+                $cvPath = $this->handleResumeUpload($_FILES['new_cv']);
+                if ($cvPath) {
+                    // Save as application attachment
+                    $this->jobApplicationModel->saveApplicationAttachment($application_id, $cvPath, 'CV');
+                    $resumeHandled = true;
+
+                    // Optionally save to profile documents for future use
+                    if (isset($_POST['save_cv_to_profile']) && $_POST['save_cv_to_profile'] == '1') {
+                        $this->saveToProfile(
+                            $jobseeker['jobseeker_id'],
+                            $cvPath,
+                            'cv',
+                            $_FILES['new_cv']['name']
                         );
                     }
                 }

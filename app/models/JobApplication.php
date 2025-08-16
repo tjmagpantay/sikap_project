@@ -404,4 +404,19 @@ class JobApplication
             return false;
         }
     }
+
+    public function updateCurrentStep($application_id, $step)
+    {
+        try {
+            $sql = "UPDATE job_application SET current_step = :step WHERE application_id = :application_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'step' => $step,
+                'application_id' => $application_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error updating current step: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
