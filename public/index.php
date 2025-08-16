@@ -25,11 +25,26 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
-        case 'updateStatus':
-            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-            $controller = new UserManagementController();
-            $controller->updateStatus();
+        case 'program-events':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $events = $controller->getActiveEvents();
+            include __DIR__ . '/../app/views/pages/program-events.php';
             break;
+
+        case 'event-info':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $event = $controller->getEventById($_GET['id'] ?? null);
+            include __DIR__ . '/../app/views/pages/event-info.php';
+            break;
+
+        // case 'updateStatus':
+        //     require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+        //     $controller = new UserManagementController();
+        //     $controller->updateStatus();
+        //     break;
+        
         case 'update-employer-status':
             require_once __DIR__ . '/../app/controllers/UserManagementController.php';
             $controller = new UserManagementController();
@@ -210,6 +225,55 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->dashboard();
             break;
 
+        // Event Management Routes
+        case 'admin-events':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->index();
+            break;
+
+        case 'admin-event-create':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->create();
+            break;
+
+        case 'admin-event-store':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->store();
+            break;
+
+        case 'admin-event-edit':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            if (isset($_GET['id'])) {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    // Fix: ensure $_FILES is available and not empty
+                    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK && !empty($_FILES['image']['name'])) {
+                        $controller->update($_GET['id']);
+                    } else {
+                        $controller->update($_GET['id']);
+                    }
+                } else {
+                    $controller->edit($_GET['id']);
+                }
+            } else {
+                header('Location: index.php?page=admin-events&error=No event specified');
+                exit;
+            }
+            break;
+
+        case 'admin-event-delete':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            if (isset($_GET['id'])) {
+                $controller->delete($_GET['id']);
+            } else {
+                header('Location: index.php?page=admin-events&error=No event specified');
+            }
+            break;
+
 
         //NEWWWWWWWWWWWWWWW
 
@@ -263,17 +327,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     $controller->manageChatbot();
         //     break;
 
-        // case 'admin-events':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageEvents();
-        //     break;
+        case 'admin-event-status':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->toggleEventStatus($_GET['id']);
+            break;
+
+        case 'events-jobfair':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->publicView();
+            break;
 
         // Complete Profile Routes
         case 'complete-employer-profile':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->completeProfile();
+            // This is now the choice page
+            include __DIR__ . '/../app/views/employers/complete-profile.php';
             break;
 
         case 'employer-personal-profile':

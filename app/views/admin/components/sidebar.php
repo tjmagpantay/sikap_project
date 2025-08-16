@@ -127,10 +127,27 @@
                 </li>
                 
                 <li>
-                    <a href="?page=admin-events" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                    <button type="button" 
+                        class="flex items-center w-full px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-gray-50 focus:outline-none"
+                        onclick="toggleDropdown('eventDropdown', 'eventDropdownArrow')">
                         <i class="w-5 h-5 mr-3 fas fa-calendar-alt"></i>
-                        <span>Job Fair / Event Management</span>
-                    </a>
+                        <span>Events & Programs</span>
+                        <span id="eventDropdownArrow" class="ml-auto text-xs transition-transform duration-200">&#9660;</span>
+                    </button>
+                    <ul id="eventDropdown" class="hidden mt-2 ml-8 space-y-1">
+                        <li>
+                            <a href="?page=admin-events" class="flex items-center px-6 py-2 text-xs font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
+                                <i class="w-4 h-4 mr-2 fas fa-list"></i>
+                                <span>All Events</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?page=admin-event-create" class="flex items-center px-6 py-2 text-xs font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
+                                <i class="w-4 h-4 mr-2 fas fa-plus"></i>
+                                <span>Create Event</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -234,10 +251,27 @@
                     </li>
                     
                     <li>
-                        <a href="?page=admin-event-program" class="flex items-center px-4 py-2 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
+                        <button type="button" 
+                            class="flex items-center w-full px-4 py-2 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-gray-50 focus:outline-none"
+                            onclick="toggleDropdown('eventDropdownMobile', 'eventDropdownArrowMobile')">
                             <i class="w-5 h-5 mr-3 fas fa-calendar-alt"></i>
-                            <span>Job Fair / Event Management</span>
-                        </a>
+                            <span>Events & Programs</span>
+                            <span id="eventDropdownArrowMobile" class="ml-auto text-xs transition-transform duration-200">&#9660;</span>
+                        </button>
+                        <ul id="eventDropdownMobile" class="hidden mt-2 ml-8 space-y-1">
+                            <li>
+                                <a href="?page=admin-events" class="flex items-center px-6 py-2 text-xs font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
+                                    <i class="w-4 h-4 mr-2 fas fa-list"></i>
+                                    <span>All Events</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="?page=admin-event-create" class="flex items-center px-6 py-2 text-xs font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
+                                    <i class="w-4 h-4 mr-2 fas fa-plus"></i>
+                                    <span>Create Event</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </nav>
