@@ -50,7 +50,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">3</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Education</span>
+                        <span class="mt-1 text-xs text-gray-500">Employment</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -58,7 +58,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                        <span class="mt-1 text-xs text-gray-500">Education</span>
                     </div>
 
                     <!-- Step 5 -->
@@ -66,13 +66,37 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">5</span>
                         </a>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">6</span>
+                        </a>
                         <span class="mt-1 text-xs text-gray-500">Skills</span>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">7</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">8</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
 
                 <!-- Progress bar -->
                 <div class="w-full h-2 bg-gray-200 rounded">
-                    <div class="h-2 rounded bg-primary" style="width: 20%"></div>
+                    <div class="h-2 rounded bg-primary" style="width: 12.5%"></div>
                 </div>
             </div>
 

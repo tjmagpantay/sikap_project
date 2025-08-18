@@ -50,7 +50,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">3</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Education</span>
+                        <span class="mt-1 text-xs text-gray-500">Employment</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -58,7 +58,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                        <span class="mt-1 text-xs text-gray-500">Education</span>
                     </div>
 
                     <!-- Step 5 -->
@@ -66,13 +66,37 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">5</span>
                         </a>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">6</span>
+                        </a>
                         <span class="mt-1 text-xs text-gray-500">Skills</span>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">7</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">8</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
 
                 <!-- Progress bar -->
                 <div class="w-full h-2 bg-gray-200 rounded">
-                    <div class="h-2 rounded bg-primary" style="width: 40%"></div>
+                    <div class="h-2 rounded bg-primary" style="width: 25%"></div>
                 </div>
             </div>
 
@@ -101,9 +125,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="first_name" name="first_name" type="text" required
-                                   value="<?php echo htmlspecialchars($jobseeker['first_name'] ?? $_POST['first_name'] ?? $user['first_name'] ?? ''); ?>"
-                                   placeholder="First Name"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['first_name'] ?? $_POST['first_name'] ?? $user['first_name'] ?? ''); ?>"
+                                placeholder="First Name"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
 
@@ -114,9 +138,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="last_name" name="last_name" type="text" required
-                                   value="<?php echo htmlspecialchars($jobseeker['last_name'] ?? $_POST['last_name'] ?? $user['last_name'] ?? ''); ?>"
-                                   placeholder="Last Name"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['last_name'] ?? $_POST['last_name'] ?? $user['last_name'] ?? ''); ?>"
+                                placeholder="Last Name"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
                 </div>
@@ -129,9 +153,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="middle_name" name="middle_name" type="text"
-                                   value="<?php echo htmlspecialchars($jobseeker['middle_name'] ?? $_POST['middle_name'] ?? $user['middle_name'] ?? ''); ?>"
-                                   placeholder="Middle Name"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['middle_name'] ?? $_POST['middle_name'] ?? $user['middle_name'] ?? ''); ?>"
+                                placeholder="Middle Name"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
 
@@ -141,8 +165,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             Suffix
                         </label>
                         <div class="mt-1">
-                            <select id="suffix" name="suffix" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="suffix" name="suffix"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">Suffix</option>
                                 <option value="Jr." <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'Jr.' ? 'selected' : ''; ?>>Jr.</option>
                                 <option value="Sr." <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'Sr.' ? 'selected' : ''; ?>>Sr.</option>
@@ -162,8 +186,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="date_of_birth" name="date_of_birth" type="date" required
-                                   value="<?php echo htmlspecialchars($jobseeker['date_of_birth'] ?? $_POST['date_of_birth'] ?? ''); ?>"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['date_of_birth'] ?? $_POST['date_of_birth'] ?? ''); ?>"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
 
@@ -173,8 +197,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             Gender <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
-                            <select id="sex" name="sex" required 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="sex" name="sex" required
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">Gender</option>
                                 <option value="Male" <?php echo ($jobseeker['sex'] ?? $_POST['sex'] ?? '') === 'Male' ? 'selected' : ''; ?>>Male</option>
                                 <option value="Female" <?php echo ($jobseeker['sex'] ?? $_POST['sex'] ?? '') === 'Female' ? 'selected' : ''; ?>>Female</option>
@@ -192,9 +216,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="municipal" name="municipal" type="text"
-                                   value="<?php echo htmlspecialchars($jobseeker['municipal'] ?? $_POST['municipal'] ?? ''); ?>"
-                                   placeholder="Municipal"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['municipal'] ?? $_POST['municipal'] ?? ''); ?>"
+                                placeholder="Municipal"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
 
@@ -205,9 +229,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="barangay" name="barangay" type="text"
-                                   value="<?php echo htmlspecialchars($jobseeker['barangay'] ?? $_POST['barangay'] ?? ''); ?>"
-                                   placeholder="Barangay"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['barangay'] ?? $_POST['barangay'] ?? ''); ?>"
+                                placeholder="Barangay"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
                 </div>
@@ -220,9 +244,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="contact_no" name="contact_no" type="tel" required
-                                   value="<?php echo htmlspecialchars($jobseeker['contact_no'] ?? $_POST['contact_no'] ?? ''); ?>"
-                                   placeholder="Phone Number"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                value="<?php echo htmlspecialchars($jobseeker['contact_no'] ?? $_POST['contact_no'] ?? ''); ?>"
+                                placeholder="Phone Number"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                         </div>
                     </div>
 
@@ -233,9 +257,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         </label>
                         <div class="mt-1">
                             <input id="email" name="email" type="email"
-                                   value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>"
-                                   readonly
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all border border-gray-300 rounded-md shadow-sm bg-gray-50">
+                                value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>"
+                                readonly
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all border border-gray-300 rounded-md shadow-sm bg-gray-50">
                         </div>
                     </div>
                 </div>
@@ -248,7 +272,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step2"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
                         Next Step
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
