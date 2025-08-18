@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Certificates & Licenses
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 7/8 - Professional certifications
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Share any certifications or licenses you've earned (optional)
             </p>
@@ -108,8 +105,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="certificate_title" name="certificate_title" type="text"
-                               placeholder="Certificate/License Title"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            placeholder="Certificate/License Title"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -120,8 +117,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="issuing_organization" name="issuing_organization" type="text"
-                               placeholder="Issuing Organization"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            placeholder="Issuing Organization"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -132,7 +129,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="date_issued" name="date_issued" type="date"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -144,8 +141,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step7"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        <?php echo (!empty($certificates) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

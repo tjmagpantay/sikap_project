@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Review & Complete Profile
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 8/8 - Final confirmation
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Review all information before completing your profile setup
             </p>

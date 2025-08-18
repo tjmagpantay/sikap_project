@@ -82,7 +82,7 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/signup-jobseeker.php';
     }
 
-//NEWWWWWWWWWWWWW -----------------------------------------------
+    //NEWWWWWWWWWWWWW -----------------------------------------------
 
     public function login()
     {
@@ -120,7 +120,7 @@ class JobseekerController
     {
         $mailConfig = require __DIR__ . '/../../config/mailer.php';
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-        try { 
+        try {
             $mail->isSMTP();
             $mail->Host = $mailConfig['host'];
             $mail->SMTPAuth = true;
@@ -200,7 +200,7 @@ class JobseekerController
         header('Location: ?page=verify-otp&resent=0');
         exit;
     }
-//-----------------------------------------
+    //-----------------------------------------
 
 
     public function dashboard()
@@ -219,20 +219,20 @@ class JobseekerController
             // Use getAllActiveJobs instead of getOpenJobs for consistency
             $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
             $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-            
+
             error_log('=== DASHBOARD DEBUG ===');
             error_log('Jobs from getAllActiveJobs: ' . count($jobs));
             foreach ($jobs as $job) {
                 error_log("Job ID: {$job['job_id']}, Title: {$job['job_title']}");
             }
             error_log('=== END DASHBOARD DEBUG ===');
-            
+
             // Limit to recent 6 jobs for dashboard
             $jobs = array_slice($jobs, 0, 6);
-            
+
             // The has_applied field is already set by getAllActiveJobs method
             // No need to check again if jobseeker_id was provided
-            
+
         } catch (Exception $e) {
             error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
             $jobs = [];
@@ -245,20 +245,20 @@ class JobseekerController
                 if (!class_exists('JobApplication')) {
                     require_once __DIR__ . '/../models/JobApplication.php';
                 }
-                
+
                 $jobApplicationModel = new JobApplication();
                 $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
-                
+
                 $applicationStats = [
                     'total' => count($applications),
-                    'pending' => count(array_filter($applications, function($app) { 
-                        return isset($app['application_status']) && $app['application_status'] === 'pending'; 
+                    'pending' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'pending';
                     })),
-                    'shortlisted' => count(array_filter($applications, function($app) { 
-                        return isset($app['application_status']) && $app['application_status'] === 'shortlisted'; 
+                    'shortlisted' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
                     })),
-                    'hired' => count(array_filter($applications, function($app) { 
-                        return isset($app['application_status']) && $app['application_status'] === 'hired'; 
+                    'hired' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'hired';
                     }))
                 ];
             } catch (Exception $e) {
@@ -286,11 +286,27 @@ class JobseekerController
             $step = 1;
         }
 
-        // Get existing profile data
+        // Get existing profile data - Controller loads all data
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-
-        // Get user data for autofill (name from signup)
         $user = $this->userModel->findById($_SESSION['user_id']);
+
+        // Load all existing data for the profile steps
+        $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']);
+        $education = $this->jobseekerModel->getEducation($_SESSION['user_id']);
+        $workExperience = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']);
+        $skills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
+        $certificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']);
+
+        // Process documents by type for easy access in views
+        $resumeDoc = null;
+        $cvDoc = null;
+        foreach ($documents as $doc) {
+            if ($doc['file_type'] === 'resume') {
+                $resumeDoc = $doc;
+            } elseif ($doc['file_type'] === 'cv') {
+                $cvDoc = $doc;
+            }
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleStepSubmission($step, $error, $success);
@@ -383,7 +399,7 @@ class JobseekerController
 
     private function handleStep2($data, &$error, &$success)
     {
-        // Personal Information
+        // Personal Information - including sex (gender) as required
         $required = ['first_name', 'last_name', 'date_of_birth', 'sex', 'contact_no'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -392,7 +408,7 @@ class JobseekerController
             }
         }
 
-        // Create or update jobseeker profile
+        // Create or update jobseeker profile - saving all fields including sex, municipal, barangay
         $result = $this->jobseekerModel->createOrUpdateProfile($_SESSION['user_id'], [
             'first_name' => $data['first_name'],
             'middle_name' => $data['middle_name'] ?? '',
@@ -549,9 +565,9 @@ class JobseekerController
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             $this->jobseekerModel->saveDocument(
                 $jobseeker_id,
-                $file['name'],
                 'uploads/documents/' . $fileName,
-                $type
+                $type,
+                $file['name']
             );
             $success = ucfirst($type) . ' uploaded successfully!';
             return true;
@@ -700,13 +716,13 @@ class JobseekerController
 
         require_once __DIR__ . '/../models/SavedJobs.php';
         $savedJobsModel = new SavedJobs();
-        
+
         $savedJobs = $savedJobsModel->getSavedJobs($jobseeker['jobseeker_id']);
-        
+
         // Check application status for each saved job
         require_once __DIR__ . '/../models/JobApplication.php';
         $jobApplicationModel = new JobApplication();
-        
+
         foreach ($savedJobs as &$job) {
             $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
         }
@@ -719,13 +735,13 @@ class JobseekerController
         // Ensure clean output
         ob_clean();
         header('Content-Type: application/json');
-        
+
         try {
             if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
                 echo json_encode(['success' => false, 'message' => 'Please log in as a jobseeker to save jobs']);
                 exit;
             }
-            
+
             $job_id = $_POST['job_id'] ?? null;
             if (!$job_id) {
                 echo json_encode(['success' => false, 'message' => 'Job ID is required']);
@@ -741,15 +757,15 @@ class JobseekerController
 
             require_once __DIR__ . '/../models/SavedJobs.php';
             $savedJobsModel = new SavedJobs();
-            
+
             // Check if already saved before attempting to save
             if ($savedJobsModel->isSaved($jobseeker['jobseeker_id'], $job_id)) {
                 echo json_encode(['success' => false, 'message' => 'Job is already saved']);
                 exit;
             }
-            
+
             $result = $savedJobsModel->saveJob($jobseeker['jobseeker_id'], $job_id);
-            
+
             if ($result) {
                 echo json_encode(['success' => true, 'message' => 'Job saved successfully']);
             } else {
@@ -767,7 +783,7 @@ class JobseekerController
         // Ensure clean output
         ob_clean();
         header('Content-Type: application/json');
-        
+
         try {
             if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
                 echo json_encode(['success' => false, 'message' => 'Please log in as a jobseeker']);
@@ -789,9 +805,9 @@ class JobseekerController
 
             require_once __DIR__ . '/../models/SavedJobs.php';
             $savedJobsModel = new SavedJobs();
-            
+
             $result = $savedJobsModel->unsaveJob($jobseeker['jobseeker_id'], $job_id);
-            
+
             if ($result) {
                 echo json_encode(['success' => true, 'message' => 'Job removed from saved jobs']);
             } else {

@@ -18,6 +18,25 @@ switch ($step) {
     case 1:
         $documents = $jobseekerModel->getDocuments($_SESSION['user_id']);
         if ($documents === false) $documents = [];
+
+        // Process documents by type for easy access in views
+        $resumeDoc = null;
+        $cvDoc = null;
+        foreach ($documents as $doc) {
+            if ($doc['file_type'] === 'resume') {
+                $resumeDoc = $doc;
+            } elseif ($doc['file_type'] === 'cv') {
+                $cvDoc = $doc;
+            }
+        }
+        break;
+    case 2:
+        // Process address field for municipal and barangay display
+        if ($jobseeker && !empty($jobseeker['address'])) {
+            $addressParts = explode(' ', $jobseeker['address'], 2);
+            $jobseeker['municipal'] = $addressParts[0] ?? '';
+            $jobseeker['barangay'] = $addressParts[1] ?? '';
+        }
         break;
     case 4:
         $education = $jobseekerModel->getEducation($_SESSION['user_id']);
@@ -43,4 +62,3 @@ if ($completionPercentage === false) $completionPercentage = 0;
 
 // Include the specific step
 include __DIR__ . '/profile-completion/complete-profile-step' . $step . '.php';
-?>

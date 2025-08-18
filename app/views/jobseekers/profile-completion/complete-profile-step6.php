@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Skills & Expertise
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 6/8 - Highlight your capabilities
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Showcase your core skills and proficiency levels
             </p>
@@ -109,8 +106,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             </label>
                             <div class="mt-1">
                                 <input id="skills_0" name="skills[]" type="text"
-                                       placeholder="e.g., JavaScript, Communication, Project Management"
-                                       class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                    placeholder="e.g., JavaScript, Communication, Project Management"
+                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                             </div>
                         </div>
 
@@ -119,15 +116,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 Proficiency Level
                             </label>
                             <div class="flex mt-1">
-                                <select id="proficiency_0" name="proficiency[]" 
-                                        class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                <select id="proficiency_0" name="proficiency[]"
+                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                     <option value="Beginner">Beginner</option>
                                     <option value="Intermediate">Intermediate</option>
                                     <option value="Advanced">Advanced</option>
                                     <option value="Expert">Expert</option>
                                 </select>
-                                <button type="button" onclick="this.closest('.skill-row').remove()" 
-                                        class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
+                                <button type="button" onclick="this.closest('.skill-row').remove()"
+                                    class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
@@ -138,8 +135,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 </div>
 
                 <div class="flex justify-center">
-                    <button type="button" id="add-skill" 
-                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <button type="button" id="add-skill"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
@@ -155,8 +152,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step6"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        <?php echo (!empty($skills) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -168,16 +165,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let skillCount = 1;
-    const addSkillBtn = document.getElementById('add-skill');
-    const skillsContainer = document.getElementById('skills-container');
+    document.addEventListener('DOMContentLoaded', function() {
+        let skillCount = 1;
+        const addSkillBtn = document.getElementById('add-skill');
+        const skillsContainer = document.getElementById('skills-container');
 
-    addSkillBtn.addEventListener('click', function() {
-        if (skillCount < 10) { // Limit to 10 skills
-            const skillRow = document.createElement('div');
-            skillRow.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
-            skillRow.innerHTML = `
+        addSkillBtn.addEventListener('click', function() {
+            if (skillCount < 10) { // Limit to 10 skills
+                const skillRow = document.createElement('div');
+                skillRow.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
+                skillRow.innerHTML = `
                 <div>
                     <label for="skills_${skillCount}" class="block mb-1 text-xs font-medium text-gray-500">
                         Skill Name
@@ -210,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
-            skillsContainer.appendChild(skillRow);
-            skillCount++;
-        }
+                skillsContainer.appendChild(skillRow);
+                skillCount++;
+            }
+        });
     });
-});
 </script>

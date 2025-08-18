@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Personal Information
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 2/5 - Basic personal details
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Provide your name, contact information, and other personal details
             </p>
@@ -273,7 +270,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </a>
                     <button type="submit" name="submit_step2"
                         class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
+                        <?php echo ($jobseeker && (!empty($jobseeker['first_name']) || !empty($jobseeker['last_name'])) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

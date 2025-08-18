@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Upload Your Documents
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 1/5 - Resume and CV
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Upload your resume and CV to help employers discover you
             </p>
@@ -147,12 +144,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <div class="flex items-center justify-center">
                             <?php if (!empty($resumeDoc)): ?>
                                 <div class="text-center">
-                                    <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md">
-                                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <p class="mt-1 text-xs text-gray-500">Current resume</p>
+                                    <a href="view-document.php?doc_id=<?php echo $resumeDoc['document_id']; ?>" target="_blank" class="block transition-transform hover:scale-105">
+                                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md hover:bg-red-200">
+                                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p class="mt-1 text-xs text-blue-600 underline hover:text-blue-800">View Resume</p>
+                                    </a>
                                 </div>
                             <?php else: ?>
                                 <div class="flex items-center justify-center w-16 h-16 border-2 border-gray-300 border-dashed rounded-md">
@@ -197,12 +196,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <div class="flex items-center justify-center">
                             <?php if (!empty($cvDoc)): ?>
                                 <div class="text-center">
-                                    <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md">
-                                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <p class="mt-1 text-xs text-gray-500">Current CV</p>
+                                    <a href="view-document.php?doc_id=<?php echo $cvDoc['document_id']; ?>" target="_blank" class="block transition-transform hover:scale-105">
+                                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md hover:bg-red-200">
+                                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p class="mt-1 text-xs text-blue-600 underline hover:text-blue-800">View CV</p>
+                                    </a>
                                 </div>
                             <?php else: ?>
                                 <div class="flex items-center justify-center w-16 h-16 border-2 border-gray-300 border-dashed rounded-md">

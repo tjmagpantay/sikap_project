@@ -2,9 +2,7 @@
 include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
 <?php
-// Get existing work experience
-$jobseekerModel = new Jobseeker();
-$workExperience = $jobseekerModel->getWorkExperience($_SESSION['user_id']);
+// Use data from controller instead of direct model calls
 $currentWork = !empty($workExperience) ? $workExperience[0] : null;
 ?>
 
@@ -21,9 +19,6 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Employment Status
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 3/5 - Current employment situation
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Help us tailor opportunities by sharing your current employment status
             </p>
@@ -107,40 +102,40 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                 </div>
             </div>
 
-            <!-- Show existing data if available -->
-            <?php if ($currentWork): ?>
-                <div class="p-4 mb-6 border border-blue-200 rounded-md bg-blue-50">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h4 class="text-sm font-medium text-blue-800">Current Employment Information</h4>
-                            <div class="grid grid-cols-1 gap-3 mt-2 text-sm md:grid-cols-2">
-                                <div>
-                                    <span class="text-blue-600">Job Title:</span>
-                                    <span class="font-medium"><?php echo htmlspecialchars($currentWork['job_title']); ?></span>
-                                </div>
-                                <div>
-                                    <span class="text-blue-600">Company:</span>
-                                    <span class="font-medium"><?php echo htmlspecialchars($currentWork['company_name']); ?></span>
-                                </div>
-                                <div>
-                                    <span class="text-blue-600">Type:</span>
-                                    <span class="font-medium"><?php echo htmlspecialchars(ucfirst($currentWork['employment_type'])); ?></span>
-                                </div>
-                                <div>
-                                    <span class="text-blue-600">Status:</span>
-                                    <span class="font-medium"><?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Working' : 'Previous Job'; ?></span>
-                                </div>
-                            </div>
-                            <p class="mt-2 text-xs text-blue-600">You can update this information below.</p>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
+<?php if ($currentWork): ?>
+    <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">Current Employment</h3>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $currentWork['currently_working'] === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
+                <?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Working' : 'Previous Job'; ?>
+            </span>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2">
+            <div class="p-3 rounded-md bg-gray-50">
+                <p class="text-xs font-medium text-gray-500">Job Title</p>
+                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['job_title']); ?></p>
+            </div>
+            
+            <div class="p-3 rounded-md bg-gray-50">
+                <p class="text-xs font-medium text-gray-500">Company</p>
+                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['company_name']); ?></p>
+            </div>
+            
+            <div class="p-3 rounded-md bg-gray-50">
+                <p class="text-xs font-medium text-gray-500">Employment Type</p>
+                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars(ucfirst($currentWork['employment_type'])); ?></p>
+            </div>
+            
+            <div class="p-3 rounded-md bg-gray-50">
+                <p class="text-xs font-medium text-gray-500">Status</p>
+                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Employed' : 'Previous Employment'; ?></p>
+            </div>
+        </div>
+        
+        <p class="mt-4 text-xs text-gray-500">You can update this information below.</p>
+    </div>
+<?php endif; ?>
 
             <!-- Error Messages -->
             <?php if (!empty($error)): ?>

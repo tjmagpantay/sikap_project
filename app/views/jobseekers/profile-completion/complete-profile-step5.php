@@ -14,9 +14,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Work Experience
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 5/8 - Professional background
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 List your relevant professional experience (optional)
             </p>
@@ -108,8 +105,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="job_title" name="job_title" type="text"
-                               placeholder="Job Title"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            placeholder="Job Title"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -120,8 +117,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="company_name" name="company_name" type="text"
-                               placeholder="Company/Organization Name"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            placeholder="Company/Organization Name"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -132,10 +129,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             Start Year
                         </label>
                         <div class="mt-1">
-                            <select id="start_year" name="start_year" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="start_year" name="start_year"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">Start Year</option>
-                                <?php for($year = date('Y'); $year >= 1980; $year--): ?>
+                                <?php for ($year = date('Y'); $year >= 1980; $year--): ?>
                                     <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -147,10 +144,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             End Year
                         </label>
                         <div class="mt-1">
-                            <select id="end_year" name="end_year" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="end_year" name="end_year"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">End Year</option>
-                                <?php for($year = date('Y'); $year >= 1980; $year--): ?>
+                                <?php for ($year = date('Y'); $year >= 1980; $year--): ?>
                                     <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -165,8 +162,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <textarea id="responsibilities" name="responsibilities" rows="4"
-                                  placeholder="Describe your key responsibilities and achievements..."
-                                  class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"></textarea>
+                            placeholder="Describe your key responsibilities and achievements..."
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"></textarea>
                     </div>
                 </div>
 
@@ -178,8 +175,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step5"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        <?php echo (count($workExperience) > 1 ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

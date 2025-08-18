@@ -16,9 +16,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Educational Background
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 4/5 - Academic qualifications
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Provide details about your educational background (optional)
             </p>
@@ -27,80 +24,80 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
     <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-<!-- Progress bar with steps -->
-<div class="mb-6">
-    <!-- Step indicators -->
-    <div class="flex items-center justify-between w-full mb-4">
-        <!-- Step 1 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=1" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">1</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Documents</span>
-        </div>
+            <!-- Progress bar with steps -->
+            <div class="mb-6">
+                <!-- Step indicators -->
+                <div class="flex items-center justify-between w-full mb-4">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=1" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">1</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Documents</span>
+                    </div>
 
-        <!-- Step 2 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=2" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">2</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Basic Info</span>
-        </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=2" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">2</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Basic Info</span>
+                    </div>
 
-        <!-- Step 3 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">3</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Employment</span>
-        </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">3</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Employment</span>
+                    </div>
 
-        <!-- Step 4 -->
-        <div class="flex flex-col items-center">
-            <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
-                <span class="text-sm font-semibold">4</span>
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
+                            <span class="text-sm font-semibold">4</span>
+                        </div>
+                        <span class="mt-1 text-xs text-gray-600">Education</span>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">5</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">6</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Skills</span>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">7</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="flex flex-col items-center">
+                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
+                            <span class="text-sm font-semibold">8</span>
+                        </a>
+                        <span class="mt-1 text-xs text-gray-500">Review</span>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="w-full h-2 bg-gray-200 rounded">
+                    <div class="h-2 rounded bg-primary" style="width: 50%"></div>
+                </div>
             </div>
-            <span class="mt-1 text-xs text-gray-600">Education</span>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">5</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Experience</span>
-        </div>
-
-        <!-- Step 6 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">6</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Skills</span>
-        </div>
-
-        <!-- Step 7 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">7</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Portfolio</span>
-        </div>
-
-        <!-- Step 8 -->
-        <div class="flex flex-col items-center">
-            <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                <span class="text-sm font-semibold">8</span>
-            </a>
-            <span class="mt-1 text-xs text-gray-500">Review</span>
-        </div>
-    </div>
-
-    <!-- Progress bar -->
-    <div class="w-full h-2 bg-gray-200 rounded">
-        <div class="h-2 rounded bg-primary" style="width: 50%"></div>
-    </div>
-</div>
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=4">
                 <!-- Institution Name -->
@@ -110,8 +107,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </label>
                     <div class="mt-1">
                         <input id="school_name" name="school_name" type="text"
-                               placeholder="Institution Name"
-                               class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            placeholder="Institution Name"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                     </div>
                 </div>
 
@@ -121,8 +118,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Degree / Program
                     </label>
                     <div class="mt-1">
-                        <select id="education_level" name="education_level" 
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                        <select id="education_level" name="education_level"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                             <option value="">Select Degree/Program</option>
                             <option value="High School">High School</option>
                             <option value="Associate">Associate Degree</option>
@@ -140,8 +137,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Field of Study
                     </label>
                     <div class="mt-1">
-                        <select id="field_of_study" name="field_of_study" 
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                        <select id="field_of_study" name="field_of_study"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                             <option value="">Select Field of Study</option>
                             <option value="Information Technology">Information Technology</option>
                             <option value="Computer Science">Computer Science</option>
@@ -165,10 +162,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             Start Year
                         </label>
                         <div class="mt-1">
-                            <select id="start_year" name="start_year" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="start_year" name="start_year"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">Start Year</option>
-                                <?php for($year = date('Y'); $year >= 1950; $year--): ?>
+                                <?php for ($year = date('Y'); $year >= 1950; $year--): ?>
                                     <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -180,10 +177,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             End Year
                         </label>
                         <div class="mt-1">
-                            <select id="end_year" name="end_year" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <select id="end_year" name="end_year"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
                                 <option value="">End Year</option>
-                                <?php for($year = date('Y') + 10; $year >= 1950; $year--): ?>
+                                <?php for ($year = date('Y') + 10; $year >= 1950; $year--): ?>
                                     <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -199,8 +196,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step4"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        Next Step
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        <?php echo (!empty($education) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

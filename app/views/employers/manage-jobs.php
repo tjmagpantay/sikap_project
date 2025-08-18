@@ -20,7 +20,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         class="relative py-2 px-3 text-base font-medium border-b-2 transition-colors duration-200
                            <?php echo ($activeTab == $status)
                                 ? 'border-blue-600 text-primary bg-blue-50 rounded-t'
-                                : 'border-transparent text-gray-500 hover:text-blue-600'; ?>">
+                                : 'border-transparent  hover:text-blue-600'; ?>">
                         <?php echo $label; ?>
                         <?php if ($activeTab == $status): ?>
                             <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-600 rounded"></span>
