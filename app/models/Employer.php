@@ -757,4 +757,63 @@ class Employer
             return false;
         }
     }
+
+    public function getTopCompaniesForLanding($limit = 4)
+    {
+        try {
+            $sql = "SELECT DISTINCT
+                        e.employer_id,
+                        e.user_id,
+                        e.status,
+                        eb.business_name,
+                        eb.business_logo,
+                        eb.business_industry,
+                        eb.business_type,
+                        eb.business_desc,
+                        eb.business_address,
+                        eb.business_website,
+                        eb.facebook_url,
+                        eb.twitter_url,
+                        eb.instagram_url,
+                        eb.youtube_url,
+                        COALESCE(job_count.active_jobs, 0) as active_jobs_count
+                    FROM employer e
+                    INNER JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN (
+                        SELECT employer_id, COUNT(*) as active_jobs
+                        FROM job_post 
+                        WHERE job_status = 'open' 
+                        GROUP BY employer_id
+                    ) job_count ON e.employer_id = job_count.employer_id
+                    WHERE e.status = 'verified'
+                        AND eb.business_name IS NOT NULL
+                        AND eb.business_name != ''
+                    ORDER BY job_count.active_jobs DESC, e.created_at DESC
+                    LIMIT :limit";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Process logo paths
+            foreach ($results as &$employer) {
+                if (!empty($employer['business_logo'])) {
+                    // Ensure proper path format
+                    if (
+                        !str_starts_with($employer['business_logo'], 'http') &&
+                        !str_starts_with($employer['business_logo'], 'uploads/')
+                    ) {
+                        $employer['business_logo'] = 'uploads/' . ltrim($employer['business_logo'], '/');
+                    }
+                }
+            }
+
+            return $results;
+        } catch (PDOException $e) {
+            error_log('Error getting top companies for landing: ' . $e->getMessage());
+            return [];
+        }
+    }
 }

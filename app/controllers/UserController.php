@@ -8,7 +8,7 @@ use App\Models\Mailer;
 class UserController
 {
     private $userModel;
-    private $jobseekerModel; 
+    private $jobseekerModel;
     private $employerModel;
 
     public function __construct()
@@ -32,7 +32,17 @@ class UserController
                 $_SESSION['role_name'] = $user['role_name'] ?? 'unknown'; // Use role_name from JOIN
                 $_SESSION['email'] = $user['email'];
 
-                // Redirect based on role ID
+                // Check for redirect after login
+                $redirectUrl = $_SESSION['redirect_after_login'] ?? null;
+                unset($_SESSION['redirect_after_login']); // Clear the redirect URL
+
+                // If there's a redirect URL, use it (for non-logged-in users trying to access restricted content)
+                if ($redirectUrl) {
+                    header('Location: ' . $redirectUrl);
+                    exit;
+                }
+
+                // Otherwise, redirect based on role ID
                 if ($user['role_id'] == User::ROLE_ADMIN) {
                     header('Location: ?page=admin-dashboard');
                 } elseif ($user['role_id'] == User::ROLE_EMPLOYER) {
@@ -83,7 +93,7 @@ class UserController
                 // Create user with selected role
                 $role_id = ($role === 'employer') ? User::ROLE_EMPLOYER : User::ROLE_JOBSEEKER;
                 $status = ($role === 'employer') ? 'pending' : 'active'; // Employers need approval
-                
+
                 $user_id = $this->userModel->create($email, $hashed, $role_id, $status);
 
                 if ($user_id) {
@@ -109,195 +119,201 @@ class UserController
 
     //NEWWWWWWWWWWWWWWWWWWWWWWWW
 
-    
-// -----------------------------------------------
+
+    // -----------------------------------------------
 
 
-public function forgotPassword() {
-    include __DIR__ . '/../views/pages/forgot-password.php';
-}
-
-public function forgotPasswordRequest() {
-    $email = $_POST['email'] ?? '';
-    
-    if (!$email) {
-        $_SESSION['error'] = 'Email is required';
-        header('Location: ?page=forgot-password');
-        exit;
+    public function forgotPassword()
+    {
+        include __DIR__ . '/../views/pages/forgot-password.php';
     }
 
-    $user = $this->userModel->findUserByEmail($email);
-    
-    if (!$user) {
-        $_SESSION['error'] = 'Email not found';
-        header('Location: ?page=forgot-password');
-        exit;
-    }
+    public function forgotPasswordRequest()
+    {
+        $email = $_POST['email'] ?? '';
 
-    // Generate OTP
-    $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-    
-    // Store in session
-    $_SESSION['reset_email'] = $email;
-    $_SESSION['reset_user_id'] = $user['user_id'];
-    $_SESSION['reset_user_type'] = $user['user_type'];
-    $_SESSION['otp'] = $otp;
-    $_SESSION['otp_expires'] = time() + 300; // 5 minutes
-    $_SESSION['otp_cooldown'] = time() + 300;
-
-    // Send email
-    if (Mailer::sendOTP($email, $otp)) {
-        $_SESSION['success'] = 'OTP has been sent to your email';
-        header('Location: ?page=verify-forgotpassword');
-    } else {
-        $_SESSION['error'] = 'Failed to send OTP';
-        header('Location: ?page=forgot-password');
-    }
-    exit;
-}
-
-public function verifyForgotPasswordOtp() {
-    // Debug: show session id and otp_verified
-    $_SESSION['debug']['session_id'] = session_id();
-    $_SESSION['debug']['otp_verified_before'] = isset($_SESSION['otp_verified']) ? $_SESSION['otp_verified'] : 'NOT SET';
-    // Check if OTP session exists for both GET and POST
-    if (!isset($_SESSION['otp']) || !isset($_SESSION['otp_expires'])) {
-        $_SESSION['error'] = 'No OTP session found. Please start the password reset process again.';
-        header('Location: ?page=forgot-password');
-        exit;
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $inputOtp = isset($_POST['otp']) ? trim((string)$_POST['otp']) : '';
-        $storedOtp = isset($_SESSION['otp']) ? (string)$_SESSION['otp'] : '';
-        $expires = $_SESSION['otp_expires'] ?? 0;
-
-        if ($inputOtp === '') {
-            $_SESSION['error'] = 'OTP is required.';
-            header('Location: ?page=verify-forgotpassword');
-            exit;
-        }
-
-        if ($inputOtp !== $storedOtp) {
-            $_SESSION['error'] = 'Invalid OTP.';
-            header('Location: ?page=verify-forgotpassword');
-            exit;
-        }
-
-        if (time() > $expires) {
-            $_SESSION['error'] = 'OTP has expired.';
-            header('Location: ?page=verify-forgotpassword');
-            exit;
-        }
-
-        // OTP is correct, unset OTP so it can't be reused
-        unset($_SESSION['otp'], $_SESSION['otp_expires'], $_SESSION['otp_cooldown']);
-        $_SESSION['otp_verified'] = true;
-        unset($_SESSION['debug']); // Remove debug info for production
-        $_SESSION['success'] = 'OTP verified, you may now reset your password.';
-        header('Location: ?page=reset-password');
-        exit;
-    }
-
-    include __DIR__ . '/../views/pages/verify-forgotpassword.php';
-}
-
-public function resendOtp() {
-    $cooldown = $_SESSION['otp_cooldown'] ?? 0;
-    
-    if (time() < $cooldown) {
-        $_SESSION['error'] = 'Please wait before requesting another OTP';
-        header('Location: ?page=verify-forgotpassword');
-        exit;
-    }
-
-    $email = $_SESSION['reset_email'] ?? '';
-    if (!$email) {
-        $_SESSION['error'] = 'Please start the password reset process again';
-        header('Location: ?page=forgot-password');
-        exit;
-    }
-
-    $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-    $_SESSION['otp'] = $otp;
-    $_SESSION['otp_expires'] = time() + 300;
-    $_SESSION['otp_cooldown'] = time() + 300;
-
-    if (Mailer::sendOTP($email, $otp)) {
-        $_SESSION['success'] = 'New OTP has been sent to your email';
-    } else {
-        $_SESSION['error'] = 'Failed to send new OTP';
-    }
-    
-    header('Location: ?page=verify-forgotpassword');
-    exit;
-}
-
-public function resetPassword() {
-    // Remove debug code and use new session keys for modal compatibility
-    if (empty($_SESSION['otp_verified'])) {
-        $_SESSION['error'] = 'Please verify your OTP first.';
-        header('Location: ?page=forgot-password');
-        exit;
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $password = $_POST['password'] ?? '';
-        $confirm = $_POST['confirm_password'] ?? '';
-        
-        if (strlen($password) < 8) {
-            $_SESSION['error'] = 'Password must be at least 8 characters long';
-            header('Location: ?page=reset-password');
-            exit;
-        }
-
-        if ($password !== $confirm) {
-            $_SESSION['error'] = 'Passwords do not match';
-            header('Location: ?page=reset-password');
-            exit;
-        }
-
-        $userId = $_SESSION['reset_user_id'] ?? null;
-        $userType = $_SESSION['reset_user_type'] ?? '';
-        
-        if (!$userId) {
-            $_SESSION['error'] = 'Invalid reset attempt';
+        if (!$email) {
+            $_SESSION['error'] = 'Email is required';
             header('Location: ?page=forgot-password');
             exit;
         }
 
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        if ($this->userModel->updatePassword($userId, $hashedPassword)) {
-            // Clear all reset-related session variables
-            unset(
-                $_SESSION['reset_email'],
-                $_SESSION['reset_user_id'],
-                $_SESSION['reset_user_type'],
-                $_SESSION['otp'],
-                $_SESSION['otp_expires'],
-                $_SESSION['otp_cooldown'],
-                $_SESSION['otp_verified']
-            );
+        $user = $this->userModel->findUserByEmail($email);
 
-            // Redirect to the correct login page based on user type
-            if ($userType === 'employer' || $userType == User::ROLE_EMPLOYER) {
-                $_SESSION['success'] = 'Password has been reset successfully';
-                header('Location: ?page=login-employer');
-            } else {
-                $_SESSION['success'] = 'Password has been reset successfully';
-                header('Location: ?page=login-jobseeker');
-            }
+        if (!$user) {
+            $_SESSION['error'] = 'Email not found';
+            header('Location: ?page=forgot-password');
+            exit;
+        }
+
+        // Generate OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store in session
+        $_SESSION['reset_email'] = $email;
+        $_SESSION['reset_user_id'] = $user['user_id'];
+        $_SESSION['reset_user_type'] = $user['user_type'];
+        $_SESSION['otp'] = $otp;
+        $_SESSION['otp_expires'] = time() + 300; // 5 minutes
+        $_SESSION['otp_cooldown'] = time() + 300;
+
+        // Send email
+        if (Mailer::sendOTP($email, $otp)) {
+            $_SESSION['success'] = 'OTP has been sent to your email';
+            header('Location: ?page=verify-forgotpassword');
         } else {
-            $_SESSION['error'] = 'Failed to reset password';
-            header('Location: ?page=reset-password');
+            $_SESSION['error'] = 'Failed to send OTP';
+            header('Location: ?page=forgot-password');
         }
         exit;
     }
 
-    include __DIR__ . '/../views/pages/reset-password.php';
-}
+    public function verifyForgotPasswordOtp()
+    {
+        // Debug: show session id and otp_verified
+        $_SESSION['debug']['session_id'] = session_id();
+        $_SESSION['debug']['otp_verified_before'] = isset($_SESSION['otp_verified']) ? $_SESSION['otp_verified'] : 'NOT SET';
+        // Check if OTP session exists for both GET and POST
+        if (!isset($_SESSION['otp']) || !isset($_SESSION['otp_expires'])) {
+            $_SESSION['error'] = 'No OTP session found. Please start the password reset process again.';
+            header('Location: ?page=forgot-password');
+            exit;
+        }
 
-    public function handleGoogleLogin() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $inputOtp = isset($_POST['otp']) ? trim((string)$_POST['otp']) : '';
+            $storedOtp = isset($_SESSION['otp']) ? (string)$_SESSION['otp'] : '';
+            $expires = $_SESSION['otp_expires'] ?? 0;
+
+            if ($inputOtp === '') {
+                $_SESSION['error'] = 'OTP is required.';
+                header('Location: ?page=verify-forgotpassword');
+                exit;
+            }
+
+            if ($inputOtp !== $storedOtp) {
+                $_SESSION['error'] = 'Invalid OTP.';
+                header('Location: ?page=verify-forgotpassword');
+                exit;
+            }
+
+            if (time() > $expires) {
+                $_SESSION['error'] = 'OTP has expired.';
+                header('Location: ?page=verify-forgotpassword');
+                exit;
+            }
+
+            // OTP is correct, unset OTP so it can't be reused
+            unset($_SESSION['otp'], $_SESSION['otp_expires'], $_SESSION['otp_cooldown']);
+            $_SESSION['otp_verified'] = true;
+            unset($_SESSION['debug']); // Remove debug info for production
+            $_SESSION['success'] = 'OTP verified, you may now reset your password.';
+            header('Location: ?page=reset-password');
+            exit;
+        }
+
+        include __DIR__ . '/../views/pages/verify-forgotpassword.php';
+    }
+
+    public function resendOtp()
+    {
+        $cooldown = $_SESSION['otp_cooldown'] ?? 0;
+
+        if (time() < $cooldown) {
+            $_SESSION['error'] = 'Please wait before requesting another OTP';
+            header('Location: ?page=verify-forgotpassword');
+            exit;
+        }
+
+        $email = $_SESSION['reset_email'] ?? '';
+        if (!$email) {
+            $_SESSION['error'] = 'Please start the password reset process again';
+            header('Location: ?page=forgot-password');
+            exit;
+        }
+
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $_SESSION['otp'] = $otp;
+        $_SESSION['otp_expires'] = time() + 300;
+        $_SESSION['otp_cooldown'] = time() + 300;
+
+        if (Mailer::sendOTP($email, $otp)) {
+            $_SESSION['success'] = 'New OTP has been sent to your email';
+        } else {
+            $_SESSION['error'] = 'Failed to send new OTP';
+        }
+
+        header('Location: ?page=verify-forgotpassword');
+        exit;
+    }
+
+    public function resetPassword()
+    {
+        // Remove debug code and use new session keys for modal compatibility
+        if (empty($_SESSION['otp_verified'])) {
+            $_SESSION['error'] = 'Please verify your OTP first.';
+            header('Location: ?page=forgot-password');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $password = $_POST['password'] ?? '';
+            $confirm = $_POST['confirm_password'] ?? '';
+
+            if (strlen($password) < 8) {
+                $_SESSION['error'] = 'Password must be at least 8 characters long';
+                header('Location: ?page=reset-password');
+                exit;
+            }
+
+            if ($password !== $confirm) {
+                $_SESSION['error'] = 'Passwords do not match';
+                header('Location: ?page=reset-password');
+                exit;
+            }
+
+            $userId = $_SESSION['reset_user_id'] ?? null;
+            $userType = $_SESSION['reset_user_type'] ?? '';
+
+            if (!$userId) {
+                $_SESSION['error'] = 'Invalid reset attempt';
+                header('Location: ?page=forgot-password');
+                exit;
+            }
+
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            if ($this->userModel->updatePassword($userId, $hashedPassword)) {
+                // Clear all reset-related session variables
+                unset(
+                    $_SESSION['reset_email'],
+                    $_SESSION['reset_user_id'],
+                    $_SESSION['reset_user_type'],
+                    $_SESSION['otp'],
+                    $_SESSION['otp_expires'],
+                    $_SESSION['otp_cooldown'],
+                    $_SESSION['otp_verified']
+                );
+
+                // Redirect to the correct login page based on user type
+                if ($userType === 'employer' || $userType == User::ROLE_EMPLOYER) {
+                    $_SESSION['success'] = 'Password has been reset successfully';
+                    header('Location: ?page=login-employer');
+                } else {
+                    $_SESSION['success'] = 'Password has been reset successfully';
+                    header('Location: ?page=login-jobseeker');
+                }
+            } else {
+                $_SESSION['error'] = 'Failed to reset password';
+                header('Location: ?page=reset-password');
+            }
+            exit;
+        }
+
+        include __DIR__ . '/../views/pages/reset-password.php';
+    }
+
+    public function handleGoogleLogin()
+    {
         require_once __DIR__ . '/../../config/google_oauth.php';
         $config = require __DIR__ . '/../../config/google_oauth.php';
         $clientId = $config['client_id'];
@@ -421,7 +437,8 @@ public function resetPassword() {
         exit;
     }
 
-    private function verifyGoogleToken($credential, $clientId) {
+    private function verifyGoogleToken($credential, $clientId)
+    {
         // Use Google API to verify JWT
         $parts = explode('.', $credential);
         if (count($parts) !== 3) return false;
@@ -441,4 +458,3 @@ public function resetPassword() {
         exit;
     }
 }
-

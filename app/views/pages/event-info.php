@@ -35,84 +35,84 @@ include_once __DIR__ . '/../components/navbar.php';
     <!-- Event Details -->
     <div class="min-h-screen py-8 bg-gray-50">
         <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
-                <div class="relative overflow-hidden event-banner">
-        <div class="absolute inset-0">
-            <?php if (!empty($event['image'])): ?>
-                <img src="<?php echo htmlspecialchars($event['image']); ?>"
-                    alt="Event Banner"
-                    class="object-cover w-full h-full opacity-20">
-            <?php endif; ?>
-        </div>
-        <div class="relative z-10 px-4 py-16 sm:px-6 md:px-16 lg:px-24">
-            <div class="mx-auto sm:max-w-2xl">
-                <div class="p-6 glass-effect rounded-xl sm:p-8">
-                    <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                        <div class="flex-1">
-                            <!-- Event Type Badge -->
-                            <div class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium text-white bg-white rounded-full bg-opacity-20">
-                                <?php
-                                $typeConfig = [
-                                    'program' => ['icon' => 'fas fa-graduation-cap'],
-                                    'jobfair' => ['icon' => 'fas fa-briefcase'],
-                                    'local recruitment' => ['icon' => 'fas fa-users']
-                                ];
-                                $config = $typeConfig[$event['type']] ?? ['icon' => 'fas fa-calendar'];
-                                ?>
-                                <i class="<?php echo $config['icon']; ?> mr-2"></i>
-                                <?php echo ucwords(htmlspecialchars($event['type'])); ?>
-                            </div>
+            <div class="relative overflow-hidden event-banner">
+                <div class="absolute inset-0">
+                    <?php if (!empty($event['image'])): ?>
+                        <img src="<?php echo htmlspecialchars($event['image']); ?>"
+                            alt="Event Banner"
+                            class="object-cover w-full h-full opacity-20">
+                    <?php endif; ?>
+                </div>
+                <div class="relative z-10 px-4 py-16 sm:px-6 md:px-16 lg:px-24">
+                    <div class="mx-auto sm:max-w-2xl">
+                        <div class="p-6 glass-effect rounded-xl sm:p-8">
+                            <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                                <div class="flex-1">
+                                    <!-- Event Type Badge -->
+                                    <div class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium text-white bg-white rounded-full bg-opacity-20">
+                                        <?php
+                                        $typeConfig = [
+                                            'program' => ['icon' => 'fas fa-graduation-cap'],
+                                            'jobfair' => ['icon' => 'fas fa-briefcase'],
+                                            'local recruitment' => ['icon' => 'fas fa-users']
+                                        ];
+                                        $config = $typeConfig[$event['type']] ?? ['icon' => 'fas fa-calendar'];
+                                        ?>
+                                        <i class="<?php echo $config['icon']; ?> mr-2"></i>
+                                        <?php echo ucwords(htmlspecialchars($event['type'])); ?>
+                                    </div>
 
-                            <h1 class="mb-4 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
-                                <?php echo htmlspecialchars($event['title']); ?>
-                            </h1>
+                                    <h1 class="mb-4 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
+                                        <?php echo htmlspecialchars($event['title']); ?>
+                                    </h1>
 
-                            <div class="flex flex-wrap items-center gap-4 text-sm text-white">
-                                <div class="flex items-center">
-                                    <i class="mr-2 fas fa-calendar-alt"></i>
-                                    <?php echo date('F j, Y', strtotime($event['time_start'])); ?>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-white">
+                                        <div class="flex items-center">
+                                            <i class="mr-2 fas fa-calendar-alt"></i>
+                                            <?php echo date('F j, Y', strtotime($event['time_start'])); ?>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="mr-2 fas fa-clock"></i>
+                                            <?php
+                                            echo date('g:i A', strtotime($event['time_start'])) . ' - ' .
+                                                date('g:i A', strtotime($event['time_end']));
+                                            ?>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center">
-                                    <i class="mr-2 fas fa-clock"></i>
+
+                                <div class="flex flex-col gap-3">
                                     <?php
-                                    echo date('g:i A', strtotime($event['time_start'])) . ' - ' .
-                                        date('g:i A', strtotime($event['time_end']));
+                                    $now = new DateTime();
+                                    $start = new DateTime($event['time_start']);
+                                    $end = new DateTime($event['time_end']);
+                                    if ($now < $start) {
+                                        $status = 'upcoming';
+                                        $statusClass = 'bg-yellow-500 text-white';
+                                        $statusText = 'Upcoming';
+                                        $statusIcon = 'fa-clock';
+                                    } elseif ($now >= $start && $now <= $end) {
+                                        $status = 'ongoing';
+                                        $statusClass = 'bg-green-500 text-white';
+                                        $statusText = 'Ongoing';
+                                        $statusIcon = 'fa-play';
+                                    } else {
+                                        $status = 'completed';
+                                        $statusClass = 'bg-gray-500 text-white';
+                                        $statusText = 'Completed';
+                                        $statusIcon = 'fa-check';
+                                    }
                                     ?>
+                                    <span class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm <?php echo $statusClass; ?>">
+                                        <i class="fas <?php echo $statusIcon; ?> mr-2"></i>
+                                        <?php echo $statusText; ?>
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="flex flex-col gap-3">
-                            <?php
-                            $now = new DateTime();
-                            $start = new DateTime($event['time_start']);
-                            $end = new DateTime($event['time_end']);
-                            if ($now < $start) {
-                                $status = 'upcoming';
-                                $statusClass = 'bg-yellow-500 text-white';
-                                $statusText = 'Upcoming';
-                                $statusIcon = 'fa-clock';
-                            } elseif ($now >= $start && $now <= $end) {
-                                $status = 'ongoing';
-                                $statusClass = 'bg-green-500 text-white';
-                                $statusText = 'Ongoing';
-                                $statusIcon = 'fa-play';
-                            } else {
-                                $status = 'completed';
-                                $statusClass = 'bg-gray-500 text-white';
-                                $statusText = 'Completed';
-                                $statusIcon = 'fa-check';
-                            }
-                            ?>
-                            <span class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm <?php echo $statusClass; ?>">
-                                <i class="fas <?php echo $statusIcon; ?> mr-2"></i>
-                                <?php echo $statusText; ?>
-                            </span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
             <div class="flex flex-col gap-8 lg:flex-row">
                 <!-- Main Content -->
                 <div class="w-full lg:w-2/3">

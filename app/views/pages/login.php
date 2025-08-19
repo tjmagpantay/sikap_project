@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="/assets/css/output.css" rel="stylesheet">
 </head>
+
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
     <form class="w-full max-w-sm p-8 bg-white rounded shadow-md" method="POST" action="?page=login">
         <h2 class="mb-6 text-2xl font-bold text-center">Login</h2>
+        <?php if (!empty($_SESSION['login_message'])) : ?>
+            <div class="mb-4 p-3 text-sm text-center text-blue-600 bg-blue-50 rounded border border-blue-200">
+                <?php echo htmlspecialchars($_SESSION['login_message']); ?>
+                <?php unset($_SESSION['login_message']); ?>
+            </div>
+        <?php endif; ?>
         <?php if (!empty($error)) : ?>
             <div class="mb-4 text-sm text-center text-red-600"><?php echo $error; ?></div>
         <?php endif; ?>
@@ -22,9 +30,10 @@
         </div>
         <button class="w-full py-2 text-white bg-blue-600 rounded hover:bg-blue-700" type="submit">Login</button>
         <p class="mt-4 text-sm text-center">
-          Don't have an account?
-          <a href="?page=signup-jobseeker" class="text-blue-600 hover:underline">Sign up as Jobseeker</a>
+            Don't have an account?
+            <a href="?page=signup-jobseeker" class="text-blue-600 hover:underline">Sign up as Jobseeker</a>
         </p>
     </form>
 </body>
+
 </html>

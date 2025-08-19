@@ -39,12 +39,20 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/event-info.php';
             break;
 
+        case 'view-company':
+            include __DIR__ . '/../app/views/pages/view-company.php';
+            break;
+
+        case 'view-all-companies':
+            include __DIR__ . '/../app/views/pages/view-all-companies.php';
+            break;
+
         // case 'updateStatus':
         //     require_once __DIR__ . '/../app/controllers/UserManagementController.php';
         //     $controller = new UserManagementController();
         //     $controller->updateStatus();
         //     break;
-        
+
         case 'update-employer-status':
             require_once __DIR__ . '/../app/controllers/UserManagementController.php';
             $controller = new UserManagementController();
@@ -341,8 +349,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Complete Profile Routes
         case 'complete-employer-profile':
-            // This is now the choice page
-            include __DIR__ . '/../app/views/employers/complete-profile.php';
+            // Call the controller method to properly set variables
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->completeProfile();
             break;
 
         case 'employer-personal-profile':

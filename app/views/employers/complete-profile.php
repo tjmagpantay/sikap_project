@@ -88,7 +88,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <?php if ($personalCompleted): ?>
                             <a href="?page=employer-personal-profile"
                                 class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors border border-gray-300 bg-blue-50 hover:bg-gray-50">
-                               
+
                                 Edit Profile
                             </a>
                         <?php else: ?>

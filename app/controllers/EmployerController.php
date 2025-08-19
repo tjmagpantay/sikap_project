@@ -157,26 +157,23 @@ class EmployerController
         if (!empty($employer)) {
             $personalCompleted = !empty($employer['first_name']) &&
                 !empty($employer['last_name']) &&
-                !empty($employer['position']);
+                !empty($employer['position']) &&
+                !empty($employer['contact_no']);
         }
 
         // Calculate business completion status
         if (!empty($employer) && isset($employer['employer_id'])) {
             $business = $this->employerModel->getBusiness($employer['employer_id']);
-            $documents = $this->employerModel->getDocuments($employer['employer_id']);
-
+            
             // Check if business profile has essential fields completed
             if ($business) {
                 $businessCompleted = !empty($business['business_name']) &&
                     !empty($business['business_desc']) &&
                     !empty($business['business_type']) &&
-                    !empty($business['business_industry']);
-
-                // Also check if at least some documents are uploaded
-                if ($businessCompleted && is_array($documents)) {
-                    $documentCount = count(array_filter($documents));
-                    $businessCompleted = $businessCompleted && $documentCount > 0;
-                }
+                    !empty($business['business_industry']) &&
+                    !empty($business['business_address']);
+            } else {
+                $businessCompleted = false;
             }
         }
 
