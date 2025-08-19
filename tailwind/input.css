@@ -171,6 +171,10 @@
     background-color: #F3AF0E;
   }
 
+  .text-grayMain {
+    color: #303030;
+  }
+
   /* Hero Card Specific Gradients */
   .hero-gradient {
     background: linear-gradient(135deg, #092C4C 0%, #F3AF0E 100%);
