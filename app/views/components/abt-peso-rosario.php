@@ -1,6 +1,5 @@
 <section class="relative flex flex-col items-center justify-between w-full min-h-screen gap-16 py-20 mx-auto bg-gradient-to-br from-gray-50 via-blue-50/30 to-white md:flex-row max-w-7xl">
-
-    <!-- Left Content Section -->
+<!-- Left Content Section -->
     <div class="flex flex-col items-start justify-center w-full md:w-1/2">
         <h2 class="mb-4 text-4xl font-bold leading-tight text-grayMain sm:text-4xl lg:text-4xl">
             Discover How to Apply for
@@ -15,16 +14,20 @@
 
         <!-- Steps with improved design -->
         <div class="w-full space-y-6">
-            <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg group">
-                <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-primary"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
-                    <!-- Outer white border circle -->
-                    <div class="absolute inset-0 border-2 rounded-full border-primary"></div>
+            <!-- Step 1: Create Account -->
+            <div class="relative flex items-center gap-4 px-6 py-4 transition-all duration-300 bg-gray-100 rounded-lg group hover:bg-gray-50">
+                <!-- Connecting line -->
+                <div class="absolute top-20 left-8 w-0.5 h-12 bg-primary opacity-30"></div>
+                
+                <!-- Circle container -->
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12">
                     <!-- Primary background circle -->
-                    <div class="absolute rounded-full inset-1 bg-primary"></div>
-                    <!-- Number with white text -->
-                    <span class="relative z-10 text-xl font-bold text-white">1</span>
+                    <div class="flex items-center justify-center w-12 h-12 border-2 border-white rounded-full shadow-lg bg-primary">
+                        <!-- Number with white text -->
+                        <span class="text-lg font-bold text-white">1</span>
+                    </div>
                 </div>
+                
                 <div class="flex-1">
                     <h3 class="mb-2 text-xl font-bold text-grayMain">Create Account</h3>
                     <p class="text-sm leading-relaxed text-gray-600">
@@ -34,18 +37,19 @@
             </div>
 
             <!-- Step 2: Browse Job Offers -->
-            <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg">
-                <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-gradient-to-b from-primary to-blue-400 opacity-20 group-hover:opacity-100"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
-                    <!-- Outer white border circle -->
-                    <div class="absolute inset-0 border-2 border-white rounded-full"></div>
-                    <!-- Primary background circle -->
-                    <div class="absolute rounded-full inset-1 bg-primary"></div>
-                    <!-- Number with white text -->
-                    <span class="relative z-10 text-xl font-bold text-white">2</span>
-                    <!-- Hover effect overlay -->
-                    <div class="absolute transition-opacity duration-300 bg-blue-700 rounded-full opacity-0 inset-1 group-hover:opacity-100"></div>
+            <div class="relative flex items-center gap-4 px-6 py-4 transition-all duration-300 bg-gray-100 rounded-lg group hover:bg-gray-50">
+                <!-- Connecting line -->
+                <div class="absolute top-20 left-8 w-0.5 h-12 bg-primary opacity-30"></div>
+                
+                <!-- Circle container -->
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12">
+                    <!-- Primary background circle with hover effect -->
+                    <div class="flex items-center justify-center w-12 h-12 transition-all duration-300 border-2 border-white rounded-full shadow-lg bg-secondary group-hover:bg-blue-700">
+                        <!-- Number with white text -->
+                        <span class="text-lg font-bold text-white">2</span>
+                    </div>
                 </div>
+                
                 <div class="flex-1">
                     <h3 class="mb-2 text-xl font-bold text-grayMain">Browse Job Offers</h3>
                     <p class="text-sm leading-relaxed text-gray-600">
@@ -55,18 +59,16 @@
             </div>
 
             <!-- Step 3: Apply Job -->
-            <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg">
-                <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-gradient-to-b from-primary to-blue-400 opacity-20 group-hover:opacity-100"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
-                    <!-- Outer white border circle -->
-                    <div class="absolute inset-0 border-2 border-white rounded-full"></div>
-                    <!-- Primary background circle -->
-                    <div class="absolute rounded-full inset-1 bg-primary"></div>
-                    <!-- Number with white text -->
-                    <span class="relative z-10 text-xl font-bold text-white">3</span>
-                    <!-- Hover effect overlay -->
-                    <div class="absolute transition-opacity duration-300 bg-blue-700 rounded-full opacity-0 inset-1 group-hover:opacity-100"></div>
+            <div class="relative flex items-center gap-4 px-6 py-4 transition-all duration-300 bg-gray-100 rounded-lg group hover:bg-gray-50">
+                <!-- Circle container -->
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 ">
+                    <!-- Primary background circle with hover effect -->
+                    <div class="flex items-center justify-center w-12 h-12 transition-all duration-300 border-2 border-white rounded-full shadow-lg bg-primary group-hover:bg-blue-700">
+                        <!-- Number with white text -->
+                        <span class="text-lg font-bold text-white">3</span>
+                    </div>
                 </div>
+                
                 <div class="flex-1">
                     <h3 class="mb-2 text-xl font-bold text-grayMain">Apply for Jobs</h3>
                     <p class="text-sm leading-relaxed text-gray-600">
@@ -76,19 +78,19 @@
             </div>
         </div>
 
-        <!-- Enhanced CTA Button
+        <!-- Enhanced CTA Button -->
         <div class="mt-16">
-            <a href="?page=register" class="inline-flex items-center px-10 py-5 text-lg font-bold text-white transition-all duration-300 transform shadow-xl group bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-2xl hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 hover:shadow-2xl hover:-translate-y-1 hover:scale-105">
-                <span class="mr-3">Get Started Today</span>
-                <svg class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="?page=register" class="relative inline-flex items-center px-10 py-5 overflow-hidden text-lg font-bold text-white transition-all duration-300 transform shadow-xl group bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-2xl hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 hover:shadow-2xl hover:-translate-y-1 hover:scale-105">
+                <span class="relative z-10 mr-3">Get Started Today</span>
+                <svg class="relative z-10 w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
-                <div class="absolute inset-0 transition-opacity duration-300 opacity-0 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 group-hover:opacity-100 -z-10"></div>
+                <div class="absolute inset-0 transition-opacity duration-300 opacity-0 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 group-hover:opacity-20"></div>
             </a>
-        </div> -->
+        </div>
     </div>
 
-    <!-- Right Image Section with Enhanced Design -->
+<!-- Right Image Section with Enhanced Design -->
     <div class="relative flex items-center justify-center w-full md:w-1/2">
         <!-- Background Decorative Elements -->
         <div class="absolute inset-0 opacity-10">
@@ -126,12 +128,10 @@
                 </div>
             </div> -->
         </div>
-    </div>
 
 </section>
 
 <!-- AOS Animation Library -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({

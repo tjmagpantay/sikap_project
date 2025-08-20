@@ -1,6 +1,6 @@
-<section class="px-6 py-20 bg-white ">
+<section class="px-6 py-20 bg-white">
   <div class="mx-auto max-w-7xl">
-    <div class="flex items-start justify-between mb-6">
+    <div class="flex items-start justify-between mb-8">
       <div class="flex flex-col">
         <h2 class="mb-4 text-4xl font-bold leading-tight text-grayMain sm:text-4xl lg:text-4xl">
           Top Jobs for You to Explore
@@ -11,92 +11,183 @@
         </p>
       </div>
 
-      <a href="#" class="flex items-center gap-1 btn-outline">
-        View All
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
+<a href="?page=view-all-companies" 
+   class="flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm">
+  View All
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  </svg>
+</a>git 
+
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
       <?php
-        $jobs = [
-          [
-            "title" => "Technical Support Specialist",
-            "type" => "PART-TIME",
-            "salary" => "Php20,000 - Php25,000",
-            "company" => "Google Inc.",
-            "location" => "Dhaka, Bangladesh",
-            "logo" => "google.png"
-          ],
-          [
-            "title" => "Technical Support Specialist",
-            "type" => "PART-TIME",
-            "salary" => "Php30,000 - Php50,000",
-            "company" => "Atlassian Inc.",
-            "location" => "Manila, Philippines",
-            "logo" => "atlassian.png"
-          ],
-          [
-            "title" => "Factory Worker",
-            "type" => "PART-TIME",
-            "salary" => "Php20,000 - Php25,000",
-            "company" => "Lipton Inc.",
-            "location" => "Rosario, Batangas",
-            "logo" => "lipton.png"
-          ],
-          [
-            "title" => "Manager",
-            "type" => "FULL-TIME",
-            "salary" => "Php30,000 - Php35,000",
-            "company" => "Mc Donalds",
-            "location" => "Rosario, Batangas",
-            "logo" => "mcdonalds.png"
-          ],
-          [
-            "title" => "Service Crew",
-            "type" => "PART-TIME",
-            "salary" => "Php12,000 - Php15,000",
-            "company" => "Greenwich",
-            "location" => "Rosario, Batangas",
-            "logo" => "greenwich.png"
-          ],
-          [
-            "title" => "Security Guard",
-            "type" => "PART-TIME",
-            "salary" => "Php18,000 - Php20,000",
-            "company" => "Watsons",
-            "location" => "Rosario, Batangas",
-            "logo" => "watsons.png"
-          ]
-        ];
+      $jobs = [
+        [
+          "title" => "Technical Support Specialist",
+          "type" => "part-time",
+          "salary" => "Php20,000 - Php25,000",
+          "company" => "Google Inc.",
+          "location" => "Dhaka, Bangladesh",
+          "urgent" => false,
+          "category" => "IT Support",
+          "posted_date" => "2024-08-15"
+        ],
+        [
+          "title" => "Technical Support Specialist",
+          "type" => "full-time",
+          "salary" => "Php30,000 - Php50,000",
+          "company" => "Atlassian Inc.",
+          "location" => "Manila, Philippines",
+          "urgent" => true,
+          "category" => "Software",
+          "posted_date" => "2024-08-18"
+        ],
+        [
+          "title" => "Factory Worker",
+          "type" => "part-time",
+          "salary" => "Php20,000 - Php25,000",
+          "company" => "Lipton Inc.",
+          "location" => "Rosario, Batangas",
 
-        foreach ($jobs as $job): ?>
-          <div class="job-card">
-            <div class="flex items-start justify-between mb-2">
-              <h3 class="text-sm font-semibold text-gray-900"><?php echo $job['title']; ?></h3>
-              <button class="text-gray-400 hover:text-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-            </div>
+          "urgent" => false,
+          "category" => "Manufacturing",
+          "posted_date" => "2024-08-10"
+        ],
+        [
+          "title" => "Manager",
+          "type" => "full-time",
+          "salary" => "Php30,000 - Php35,000",
+          "company" => "Mc Donalds",
+          "location" => "Rosario, Batangas",
+          "logo" => "logo",
+          "urgent" => true,
+          "category" => "Management",
+          "posted_date" => "2024-08-19"
+        ],
+        [
+          "title" => "Service Crew",
+          "type" => "part-time",
+          "salary" => "Php12,000 - Php15,000",
+          "company" => "Greenwich",
+          "location" => "Rosario, Batangas",
+          "logo" => "logo",
+          "urgent" => false,
+          "category" => "Food Service",
+          "posted_date" => "2024-08-12"
+        ],
+        [
+          "title" => "Security Guard",
+          "type" => "part-time",
+          "salary" => "Php18,000 - Php20,000",
+          "company" => "Watsons",
+          "location" => "Rosario, Batangas",
+          "logo" => "logo",
+          "urgent" => false,
+          "category" => "Security",
+          "posted_date" => "2024-08-14"
+        ]
+      ];
 
-            <span class="job-type <?php echo strtolower($job['type']) === 'full-time' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'; ?>">
-              <?php echo $job['type']; ?>
-            </span>
-            <span class="block mt-1 mb-2 text-xs text-gray-600">Salary: <?php echo $job['salary']; ?></span>
+      foreach ($jobs as $job): ?>
+        <div class="p-6 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card"
+          onclick="viewJobDetails('<?php echo $job['title']; ?>')">
 
-            <div class="flex items-center gap-2">
-              <img src="assets/logos/<?php echo $job['logo']; ?>" alt="<?php echo $job['company']; ?>" class="w-6 h-6 rounded-md">
+          <!-- Row 1: Business Profile + Job Title + Business Name + Urgent + Saved Icon -->
+          <div class="flex items-start justify-between">
+            <div class="flex items-start gap-2">
+              <!-- Business Profile Image -->
+              <div class="flex items-center justify-center p-1 overflow-hidden rounded-md w-9 h-9 bg-primary">
+                <img src="./assets/images/google-hero-img.png"
+                  alt="<?php echo $job['company']; ?> Logo"
+                  class="object-cover w-full h-full">
+              </div>
+
+              <!-- Job Title and Business Name -->
               <div>
-                <p class="text-xs font-medium text-gray-800"><?php echo $job['company']; ?></p>
-                <p class="text-xs text-gray-500"><?php echo $job['location']; ?></p>
+                <h3 class="text-base font-medium leading-tight text-gray-900"><?php echo htmlspecialchars($job['title']); ?></h3>
+                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($job['company']); ?></p>
               </div>
             </div>
+
+            <div class="flex items-center ">
+              <!-- Urgent Badge (if applicable) -->
+              <?php if ($job['urgent']): ?>
+                <span class="px-2 py-1 text-xs text-white rounded bg-primary">
+                  Urgent
+                </span>
+              <?php endif; ?>
+
+            </div>
           </div>
+
+          <!-- Row 2: Location with Icon -->
+          <div class="flex items-center py-2">
+            <!-- Location Marker SVG Icon -->
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span class="ml-1.5 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
+          </div>
+
+          <!-- Row 4: Tags for Job Info -->
+          <div class="flex items-center gap-2 mb-4">
+            <!-- Job Type Tag -->
+            <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
+              <?php echo htmlspecialchars(ucfirst($job['type'])); ?>
+            </span>
+
+            <!-- Job Category -->
+            <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
+              <?php echo htmlspecialchars($job['category']); ?>
+            </span>
+          </div>
+
+          <!-- Row 5: Posted Date + Best Matches Info -->
+          <div class="flex items-center justify-between text-xs text-gray-400">
+            <span>
+              Posted <?php echo date('M j, Y', strtotime($job['posted_date'])); ?>
+            </span>
+
+            <span class="flex items-center gap-1 text-primary">
+              Best Match:
+
+              <!-- Smaller Circle with check -->
+              <span class="flex items-center justify-center w-4 h-4 rounded-full bg-primary">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  class="w-2.5 h-2.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="white"
+                  stroke-width="">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+
+              <span class="text-sm font-medium text-primary">95%</span>
+            </span>
+
+
+          </div>
+        </div>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+
+<script>
+  function viewJobDetails(jobTitle) {
+    // For landing page users, redirect to login if not authenticated
+    // You can customize this behavior based on your requirements
+    alert('Please register or login to view job details for: ' + jobTitle);
+    // window.location.href = '?page=login';
+  }
+
+  function handleSaveJob(jobTitle) {
+    // For landing page users, redirect to registration
+    alert('Please register or login to save jobs: ' + jobTitle);
+    // window.location.href = '?page=register';
+  }
+</script>

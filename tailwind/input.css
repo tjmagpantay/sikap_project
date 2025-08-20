@@ -66,6 +66,10 @@
     @apply w-full;
   }
 
+  .border-primary {
+    @apply border border-primary;
+
+  }
     /* PROGRESS STEPPER COMPONENTS
   .progress-stepper {
     @apply flex items-center justify-between mb-10;
