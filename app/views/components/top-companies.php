@@ -5,7 +5,7 @@ $landingController = new LandingPageController();
 $companies = $landingController->getTopCompanies(4);
 ?>
 
-<section class="bg-[#F1F8FF] px-6 py-20">
+<section class="px-6 py-20 bg-gray-50">
   <div class="mx-auto max-w-7xl">
     <div class="flex items-start justify-between mb-8">
       <div class="flex flex-col">
@@ -63,9 +63,9 @@ $companies = $landingController->getTopCompanies(4);
               <!-- Company Content -->
               <div class="flex flex-col flex-1">
                 <?php if (!empty($company['business_address'])): ?>
-                  <div class="flex items-center mb-4 text-sm text-gray-600 gap-2">
+                  <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
                     <p class="text-sm text-primary "> Location:
-                      <span class="text-sm text-gray-600 font-normal"><?php echo htmlspecialchars($company['business_address']); ?></span>
+                      <span class="text-sm font-normal text-gray-600"><?php echo htmlspecialchars($company['business_address']); ?></span>
                     </p>
 
                   </div>
@@ -85,7 +85,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['facebook_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['facebook_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center h-7 gap-1 py-2 px-2 transition-colors duration-200  text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
                         onclick="event.stopPropagation();">
                         <!-- Facebook SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +98,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['twitter_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['twitter_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center h-7 gap-1 py-2 px-2 transition-colors duration-200  text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
                         onclick="event.stopPropagation();">
                         <!-- Twitter/X SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +111,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['instagram_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['instagram_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center h-7 gap-1 py-2 px-2 transition-colors duration-200  text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
                         onclick="event.stopPropagation();">
                         <!-- Instagram SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -127,7 +127,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['youtube_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['youtube_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center h-7 gap-1 py-2 px-2 transition-colors duration-200  text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
                         onclick="event.stopPropagation();">
                         <!-- YouTube SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

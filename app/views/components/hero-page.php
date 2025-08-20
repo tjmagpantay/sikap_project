@@ -1,11 +1,7 @@
 <section
   class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[650px] flex items-center"
   style="
-background: linear-gradient(
-    rgba(150, 155, 165, 0.55),
-    rgba(150, 155, 165, 0.55)
-  ),
-  url('assets/images/hero-page-bg.png');
+background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, #092C4C 67%), url('assets/images/hero-page-bg.png');
     background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
@@ -53,7 +49,7 @@ background: linear-gradient(
             </button>
           </div>
         </form>
-        <h5 class="mb-6 text-xs text-white">Search thousands of jobs and opportunities</h5>
+        <h5 class="mb-6 text-xs text-primary">Search thousands of jobs and opportunities</h5>
       </div>
 
       <!-- Right Side (Image & Stat Cards) -->

@@ -1,5 +1,5 @@
 <!-- footer.php -->
-<footer class="bg-[#092C4C] text-white pt-16">
+<footer class="bg-[#092C4C] text-white pt-16 mt-20">
   <div class="grid grid-cols-1 gap-2 px-4 py-10 mx-auto text-sm max-w-7xl md:grid-cols-6">
     <div class="md:col-span-2">
       <div class="flex items-center gap-2 mb-4">
@@ -11,7 +11,7 @@
       <p class="text-gray-400">R6W4+7FH, Rosario - Ibaan Rd, Rosario, Batangas</p>
     </div>
     <div>
-      <h4 class="mb-3 font-semibold">Quick Link</h4>
+      <h4 class="mb-3 font-medium">Quick Link</h4>
       <ul class="space-y-4 text-gray-400">
         <li><a href="#">About</a></li>
         <li><a href="#">Contact</a></li>
@@ -23,7 +23,7 @@
 
     <!-- Candidate -->
     <div>
-      <h4 class="mb-3 font-semibold">Candidate</h4>
+      <h4 class="mb-3 font-medium">Candidate</h4>
       <ul class="space-y-4 text-gray-400">
         <li><a href="#">Browse Jobs</a></li>
         <li><a href="#">Browse Employers</a></li>
@@ -34,7 +34,7 @@
 
     <!-- Employers -->
     <div>
-      <h4 class="mb-3 font-semibold">Employers</h4>
+      <h4 class="mb-3 font-medium">Employers</h4>
       <ul class="space-y-4 text-gray-400">
         <li><a href="#">Post a Job</a></li>
         <li><a href="#">Browse Candidates</a></li>
@@ -45,7 +45,7 @@
 
     <!-- Support -->
     <div>
-      <h4 class="mb-3 font-semibold">Support</h4>
+      <h4 class="mb-3 font-medium">Support</h4>
       <ul class="space-y-4 text-gray-400">
         <li><a href="#">FAQs</a></li>
         <li><a href="#">Privacy Policy</a></li>
