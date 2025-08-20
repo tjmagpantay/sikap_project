@@ -1,8 +1,17 @@
-<section class="px-6 py-10 bg-white">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-4">Popular Jobs</h2>
-      <a href="#" class="btn-outline flex items-center gap-1">
+<section class="px-6 py-20 bg-white ">
+  <div class="mx-auto max-w-7xl">
+    <div class="flex items-start justify-between mb-6">
+      <div class="flex flex-col">
+        <h2 class="mb-4 text-4xl font-bold leading-tight text-grayMain sm:text-4xl lg:text-4xl">
+          Top Jobs for You to Explore
+        </h2>
+
+        <p class="text-sm leading-relaxed text-gray-600">
+          Check out the most popular and in-demand job opportunities that <br> could be the perfect fit your career.
+        </p>
+      </div>
+
+      <a href="#" class="flex items-center gap-1 btn-outline">
         View All
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -10,7 +19,7 @@
       </a>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
       <?php
         $jobs = [
           [
@@ -65,7 +74,7 @@
 
         foreach ($jobs as $job): ?>
           <div class="job-card">
-            <div class="flex justify-between items-start mb-2">
+            <div class="flex items-start justify-between mb-2">
               <h3 class="text-sm font-semibold text-gray-900"><?php echo $job['title']; ?></h3>
               <button class="text-gray-400 hover:text-blue-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +86,7 @@
             <span class="job-type <?php echo strtolower($job['type']) === 'full-time' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'; ?>">
               <?php echo $job['type']; ?>
             </span>
-            <span class="text-xs text-gray-600 block mt-1 mb-2">Salary: <?php echo $job['salary']; ?></span>
+            <span class="block mt-1 mb-2 text-xs text-gray-600">Salary: <?php echo $job['salary']; ?></span>
 
             <div class="flex items-center gap-2">
               <img src="assets/logos/<?php echo $job['logo']; ?>" alt="<?php echo $job['company']; ?>" class="w-6 h-6 rounded-md">

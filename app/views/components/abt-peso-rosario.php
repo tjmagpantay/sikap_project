@@ -1,4 +1,4 @@
-<section class="relative flex flex-col items-center justify-between w-full min-h-screen gap-16 px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white md:flex-row sm:px-6 md:px-16 lg:px-24">
+<section class="relative flex flex-col items-center justify-between w-full min-h-screen gap-16 py-20 mx-auto bg-gradient-to-br from-gray-50 via-blue-50/30 to-white md:flex-row max-w-7xl">
 
     <!-- Left Content Section -->
     <div class="flex flex-col items-start justify-center w-full md:w-1/2">
@@ -15,17 +15,15 @@
 
         <!-- Steps with improved design -->
         <div class="w-full space-y-6">
-            <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg">
-                <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-gradient-to-b from-primary to-blue-400 opacity-20 group-hover:opacity-100"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-14 h-14">
+            <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg group">
+                <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-primary"></div>
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
                     <!-- Outer white border circle -->
-                    <div class="absolute inset-0 border-2 border-white rounded-full"></div>
+                    <div class="absolute inset-0 border-2 rounded-full border-primary"></div>
                     <!-- Primary background circle -->
                     <div class="absolute rounded-full inset-1 bg-primary"></div>
                     <!-- Number with white text -->
                     <span class="relative z-10 text-xl font-bold text-white">1</span>
-                    <!-- Hover effect overlay -->
-                    <div class="absolute transition-opacity duration-300 bg-blue-700 rounded-full opacity-0 inset-1 group-hover:opacity-100"></div>
                 </div>
                 <div class="flex-1">
                     <h3 class="mb-2 text-xl font-bold text-grayMain">Create Account</h3>
@@ -38,7 +36,7 @@
             <!-- Step 2: Browse Job Offers -->
             <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg">
                 <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-gradient-to-b from-primary to-blue-400 opacity-20 group-hover:opacity-100"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-14 h-14">
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
                     <!-- Outer white border circle -->
                     <div class="absolute inset-0 border-2 border-white rounded-full"></div>
                     <!-- Primary background circle -->
@@ -59,7 +57,7 @@
             <!-- Step 3: Apply Job -->
             <div class="relative flex items-start gap-6 p-4 transition-all duration-300 bg-gray-100 rounded-lg">
                 <div class="absolute top-0 w-1 h-full transition-opacity duration-300 rounded-full left-8 bg-gradient-to-b from-primary to-blue-400 opacity-20 group-hover:opacity-100"></div>
-                <div class="relative flex items-center justify-center flex-shrink-0 w-14 h-14">
+                <div class="relative flex items-center justify-center flex-shrink-0 w-12 h-12 p-4">
                     <!-- Outer white border circle -->
                     <div class="absolute inset-0 border-2 border-white rounded-full"></div>
                     <!-- Primary background circle -->
