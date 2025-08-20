@@ -164,7 +164,7 @@ class EmployerController
         // Calculate business completion status
         if (!empty($employer) && isset($employer['employer_id'])) {
             $business = $this->employerModel->getBusiness($employer['employer_id']);
-            
+
             // Check if business profile has essential fields completed
             if ($business) {
                 $businessCompleted = !empty($business['business_name']) &&
