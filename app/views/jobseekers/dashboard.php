@@ -6,7 +6,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 <div class="min-h-screen">
     <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
         <!-- Hero Search Section -->
-        <div class="relative px-6 py-6 mb-8 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
+        <div class="relative px-6 py-6 mb-2 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
             <!-- Background Image and Gradient Overlay (below content) -->
             <div class="absolute inset-0 z-0">
                 <img src="assets/images/hero-page-bg.png"
@@ -17,6 +17,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     style="background: linear-gradient(to right, var(--color-primary, #092C4C) 0%, transparent 100%); opacity: 0.85;">
                 </div>
             </div>
+
             <!-- Content (above gradient) -->
             <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto md:flex-row md:items-center md:justify-between" style="min-height:70px;">
                 <!-- Left: Headline -->
@@ -61,6 +62,136 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
             </div>
         </div>
+
+        <!-- Job Filtering Section -->
+        <div class="relative z-10 w-full mx-auto mt-4 mb-6">
+            <div class="p-5 bg-white border border-gray-200 rounded-sm shadow-sm">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+
+                    <!-- Search Jobs (Much Wider) -->
+                    <div class="w-full lg:w-56">
+                        <div class="relative">
+                            <input type="text" id="jobSearch"
+                                placeholder="Search for jobs..."
+                                class="w-full py-3 pl-3 pr-12 text-xs text-gray-400 transition-all border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+
+                            <!-- Search Icon (Right Side) -->
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Location -->
+                    <div class="w-full lg:w-34">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                            <select id="locationFilter"
+                                class="w-full py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer pl-9 focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                <option value="">Location</option>
+                                <option value="manila">Manila</option>
+                                <option value="quezon-city">Quezon City</option>
+                                <option value="makati">Makati</option>
+                                <option value="taguig">Taguig</option>
+                                <option value="pasig">Pasig</option>
+                                <option value="cebu">Cebu</option>
+                                <option value="davao">Davao</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Job Type -->
+                    <div class="w-full lg:w-36">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                            <select id="jobTypeFilter"
+                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                <option value="">Job Type</option>
+                                <option value="full-time">Full-time</option>
+                                <option value="part-time">Part-time</option>
+                                <option value="contract">Contract</option>
+                                <option value="temporary">Temporary</option>
+                                <option value="internship">Internship</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Industry -->
+                    <div class="w-full lg:w-40">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                            <select id="industryFilter"
+                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                <option value="">Industry</option>
+                                <option value="technology">Technology</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="finance">Finance</option>
+                                <option value="retail">Retail</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="hospitality">Hospitality</option>
+                                <option value="construction">Construction</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Workplace -->
+                    <div class="w-full lg:w-36">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                            <select id="workplaceFilter"
+                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                <option value="">Workplace</option>
+                                <option value="on-site">On-site</option>
+                                <option value="remote">Remote</option>
+                                <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter/Clear Buttons -->
+                    <div class="flex gap-2 lg:flex-shrink-0">
+                        <button type="button" id="applyFilters"
+                            class="px-5 py-3 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 hover:shadow-md">
+                            Apply
+                        </button>
+                        <button type="button" id="clearFilters"
+                            class="px-5 py-3 text-sm font-medium text-gray-600 transition-all bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 hover:shadow-md">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Main Dashboard Content -->
         <div class="flex flex-col gap-6 lg:flex-row">
@@ -277,7 +408,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <span class="px-3 py-2 text-xs   <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-green-800'; ?>">
                                     <?php echo strtoupper($selectedJob['job_type']); ?>
                                 </span>
-                                
+
                                 <?php if (!empty($selectedJob['category_name'])): ?>
                                     <span class="px-3 py-2 text-xs text-secondary bg-yellow-50">
                                         <?php echo htmlspecialchars($selectedJob['category_name']); ?>
@@ -493,4 +624,164 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             jobCountElement.textContent = `${visibleJobs} jobs`;
         }
     }
+
+    // Advanced Filtering System
+    function initializeFilters() {
+        const searchInput = document.getElementById('jobSearch');
+        const locationFilter = document.getElementById('locationFilter');
+        const jobTypeFilter = document.getElementById('jobTypeFilter');
+        const industryFilter = document.getElementById('industryFilter');
+        const workplaceFilter = document.getElementById('workplaceFilter');
+        const applyButton = document.getElementById('applyFilters');
+        const clearButton = document.getElementById('clearFilters');
+
+        // Apply filters function
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedLocation = locationFilter.value.toLowerCase();
+            const selectedJobType = jobTypeFilter.value.toLowerCase();
+            const selectedIndustry = industryFilter.value.toLowerCase();
+            const selectedWorkplace = workplaceFilter.value.toLowerCase();
+
+            const jobCards = document.querySelectorAll('.job-card');
+            let visibleCount = 0;
+
+            jobCards.forEach(card => {
+                let shouldShow = true;
+
+                // Search filter (job title, company name)
+                if (searchTerm) {
+                    const jobTitle = card.querySelector('h3').textContent.toLowerCase();
+                    const companyName = card.querySelector('p').textContent.toLowerCase();
+                    if (!jobTitle.includes(searchTerm) && !companyName.includes(searchTerm)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Location filter
+                if (selectedLocation && shouldShow) {
+                    const locationText = card.querySelector('.text-gray-600').textContent.toLowerCase();
+                    if (!locationText.includes(selectedLocation)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Job type filter
+                if (selectedJobType && shouldShow) {
+                    const jobTypeElement = card.querySelector('.text-primary');
+                    if (jobTypeElement && !jobTypeElement.textContent.toLowerCase().includes(selectedJobType)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Industry filter (based on category)
+                if (selectedIndustry && shouldShow) {
+                    const categoryElements = card.querySelectorAll('.text-primary');
+                    let hasMatchingCategory = false;
+                    categoryElements.forEach(element => {
+                        if (element.textContent.toLowerCase().includes(selectedIndustry)) {
+                            hasMatchingCategory = true;
+                        }
+                    });
+                    if (!hasMatchingCategory) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Show/hide card
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update job count
+            updateJobCount(visibleCount);
+
+            // Show message if no results
+            showNoResultsMessage(visibleCount === 0);
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            searchInput.value = '';
+            locationFilter.value = '';
+            jobTypeFilter.value = '';
+            industryFilter.value = '';
+            workplaceFilter.value = '';
+
+            // Show all job cards
+            const jobCards = document.querySelectorAll('.job-card');
+            jobCards.forEach(card => {
+                card.style.display = 'block';
+            });
+
+            updateJobCount(jobCards.length);
+            showNoResultsMessage(false);
+        }
+
+        // Update job count display
+        function updateJobCount(count) {
+            const countElements = document.querySelectorAll('.text-gray-400');
+            countElements.forEach(element => {
+                if (element.textContent.includes('jobs')) {
+                    element.textContent = `(${count} jobs)`;
+                }
+            });
+        }
+
+        // Show/hide no results message
+        function showNoResultsMessage(show) {
+            let noResultsMessage = document.getElementById('noResultsMessage');
+
+            if (show && !noResultsMessage) {
+                const jobContainer = document.querySelector('.space-y-3');
+                noResultsMessage = document.createElement('div');
+                noResultsMessage.id = 'noResultsMessage';
+                noResultsMessage.className = 'p-8 text-center text-gray-500';
+                noResultsMessage.innerHTML = `
+                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0012 15c-2.137 0-4.146-.832-5.657-2.343"></path>
+                    </svg>
+                    <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs found</h3>
+                    <p class="text-sm">Try adjusting your filters or search terms</p>
+                `;
+                jobContainer.appendChild(noResultsMessage);
+            } else if (!show && noResultsMessage) {
+                noResultsMessage.remove();
+            }
+        }
+
+        // Event listeners
+        applyButton.addEventListener('click', applyFilters);
+        clearButton.addEventListener('click', clearFilters);
+
+        // Real-time search
+        searchInput.addEventListener('input', debounce(applyFilters, 300));
+
+        // Auto-apply on filter change
+        [locationFilter, jobTypeFilter, industryFilter, workplaceFilter].forEach(filter => {
+            filter.addEventListener('change', applyFilters);
+        });
+    }
+
+    // Debounce function for search input
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Initialize filters when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeFilters();
+    });
 </script>

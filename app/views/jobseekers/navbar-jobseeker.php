@@ -14,8 +14,8 @@ if ($jobseeker === false) {
 }
 ?>
 
-<nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
-  <div class="flex flex-wrap items-center justify-between">
+<nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24 ">
+  <div class="flex flex-wrap items-center justify-between mx-auto max-w-7xl">
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
       <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">

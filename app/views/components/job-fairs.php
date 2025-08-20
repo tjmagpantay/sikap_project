@@ -2,7 +2,7 @@
   <div class="px-4 mx-auto text-center max-w-7xl">
     <h2 class="mb-4 text-3xl font-bold text-gray-800 sm:text-4xl">Programs and Events</h2>
     <p class="max-w-3xl mx-auto mb-12 text-sm text-gray-600">
-      Join meaningful events and programs that can help you build skills, connect with others, and advance your career.
+      Join meaningful events and programs that can help you build skills, connect <br> with others, and advance your career.
     </p>
 
     <!-- Filter Tabs -->
