@@ -3,8 +3,8 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen">
-    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
+<div class="min-h-screen ">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Hero Search Section -->
         <div class="relative px-6 py-6 mb-2 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
             <!-- Background Image and Gradient Overlay (below content) -->
