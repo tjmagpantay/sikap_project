@@ -129,19 +129,19 @@ include_once __DIR__ . '/../components/navbar.php';
                 img.classList.remove('opacity-100', 'scale-100');
                 img.classList.add('opacity-0', 'scale-105');
             });
-            
+
             // Reset all dots with smooth animation
             dots.forEach((dot, i) => {
                 dot.classList.remove('bg-white', 'scale-110', 'shadow-lg');
                 dot.classList.add('bg-white/60', 'scale-100');
             });
-            
+
             // Show current image with smooth transition
             setTimeout(() => {
                 images[index].classList.remove('opacity-0', 'scale-105');
                 images[index].classList.add('opacity-100', 'scale-100');
             }, 50);
-            
+
             // Animate current dot
             dots[index].classList.remove('bg-white/50', 'scale-100');
             dots[index].classList.add('bg-white', 'scale-110', 'shadow-lg');

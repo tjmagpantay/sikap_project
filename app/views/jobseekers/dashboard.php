@@ -3,7 +3,7 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen ">
+<div class="min-h-screen sm:px-6 md:px-16 lg:px-24 ">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Hero Search Section -->
         <div class="relative px-6 py-6 mb-2 overflow-hidden sm:px-8 sm:py-12 lg:px-12 lg:py-16 rounded-xl">
@@ -29,81 +29,31 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         Apply job that match you.
                     </p>
                 </div>
-                <!-- Right: Search Form -->
-                <div class="flex-1">
-                    <form class="w-full max-w-md ml-auto md:max-w-lg lg:max-w-xl">
-                        <div class="flex flex-col gap-2 p-3 bg-white rounded-md shadow md:flex-row md:flex-nowrap">
-                            <!-- Job Title Field -->
-                            <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
-                                <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
-                                <input
-                                    type="text"
-                                    placeholder="Job title"
-                                    class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-                            </div>
-                            <!-- Separator -->
-                            <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
-                            <!-- Location Field -->
-                            <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
-                                <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
-                                    <img src="assets/icons/location-information-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
-                                    <input
-                                        type="text"
-                                        placeholder="Location"
-                                        class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-                                </div>
-                            </div>
-                            <!-- Search Button -->
-                            <button type="submit" class="w-full min-w-0 mt-2 btn-primary md:w-auto md:mt-0 md:ml-2">
-                                Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
+
             </div>
         </div>
 
         <!-- Job Filtering Section -->
         <div class="relative z-10 w-full mx-auto mt-4 mb-6">
-            <div class="p-5 bg-white border border-gray-200 rounded-sm shadow-sm">
+            <div class="p-5 bg-white border border-gray-200 rounded-md shadow-sm">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
 
                     <!-- Search Jobs (Much Wider) -->
-                    <div class="w-full lg:w-56">
-                        <div class="relative">
+                    <div class="w-full lg:w-80">
+                        <div class="flex items-center gap-2 px-3 py-3 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50 transition-all">
+                            <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Search Icon" />
                             <input type="text" id="jobSearch"
                                 placeholder="Search for jobs..."
-                                class="w-full py-3 pl-3 pr-12 text-xs text-gray-400 transition-all border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
-
-                            <!-- Search Icon (Right Side) -->
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
+                                class="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700">
                         </div>
                     </div>
 
-
                     <!-- Location -->
-                    <div class="w-full lg:w-34">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
+                    <div class="w-full lg:w-40">
+                        <div class="flex items-center gap-2 px-3 py-3 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50 transition-all">
+                            <img src="assets/icons/location-information-svgrepo-com.svg" class="w-4 h-4 text-gray-500" alt="Location Icon" />
                             <select id="locationFilter"
-                                class="w-full py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer pl-9 focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                class="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700 appearance-none cursor-pointer">
                                 <option value="">Location</option>
                                 <option value="manila">Manila</option>
                                 <option value="quezon-city">Quezon City</option>
@@ -113,19 +63,17 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <option value="cebu">Cebu</option>
                                 <option value="davao">Davao</option>
                             </select>
+                            <svg class="w-4 h-4 text-primary pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Job Type -->
                     <div class="w-full lg:w-36">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
+                        <div class="flex items-center gap-2 px-3 py-3 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50 transition-all">
                             <select id="jobTypeFilter"
-                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                class="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700 appearance-none cursor-pointer">
                                 <option value="">Job Type</option>
                                 <option value="full-time">Full-time</option>
                                 <option value="part-time">Part-time</option>
@@ -133,19 +81,17 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <option value="temporary">Temporary</option>
                                 <option value="internship">Internship</option>
                             </select>
+                            <svg class="w-4 h-4 text-primary pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Industry -->
                     <div class="w-full lg:w-40">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
+                        <div class="flex items-center gap-2 px-3 py-3 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50 transition-all">
                             <select id="industryFilter"
-                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                class="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700 appearance-none cursor-pointer">
                                 <option value="">Industry</option>
                                 <option value="technology">Technology</option>
                                 <option value="healthcare">Healthcare</option>
@@ -156,24 +102,25 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <option value="hospitality">Hospitality</option>
                                 <option value="construction">Construction</option>
                             </select>
+                            <svg class="w-4 h-4 text-primary pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Workplace -->
                     <div class="w-full lg:w-36">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
+                        <div class="flex items-center gap-2 px-3 py-3 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50 transition-all">
                             <select id="workplaceFilter"
-                                class="w-full px-4 py-3 pr-10 text-sm transition-all bg-white border border-gray-300 rounded-lg appearance-none cursor-pointer focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-primary/50">
+                                class="flex-1 text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-700 appearance-none cursor-pointer">
                                 <option value="">Workplace</option>
                                 <option value="on-site">On-site</option>
                                 <option value="remote">Remote</option>
                                 <option value="hybrid">Hybrid</option>
                             </select>
+                            <svg class="w-4 h-4 text-primary pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </div>
 
@@ -221,12 +168,14 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <?php if (!empty($jobs)): ?>
                             <div class="space-y-3">
                                 <?php foreach ($jobs as $job): ?>
-                                    <div class="p-6 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
+                                    <div class="relative p-6 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
                                         onclick="window.location.href='?page=jobseeker-dashboard&job_id=<?php echo $job['job_id']; ?>'">
 
-                                        <!-- Row 1: Business Profile + Job Title + Business Name + Urgent + Saved Icon -->
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center gap-2">
+
+
+                                        <!-- Row 1: Business Profile + Job Title + Business Name + Urgent Tag -->
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="flex items-center gap-2 flex-1">
                                                 <!-- Business Profile Image -->
                                                 <div class="flex items-center justify-center w-12 h-12 p-1 overflow-hidden rounded-md bg-primary">
                                                     <?php if (!empty($job['business_logo'])): ?>
@@ -234,46 +183,27 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                             alt="<?php echo htmlspecialchars($job['company_name'] ?? 'Company'); ?> Logo"
                                                             class="object-cover w-full h-full">
                                                     <?php else: ?>
-                                                        <i class="text-gray-500 fas fa-building"></i>
+                                                        <i class="text-white fas fa-building"></i>
                                                     <?php endif; ?>
                                                 </div>
 
                                                 <!-- Job Title and Business Name -->
-                                                <div>
+                                                <div class="flex-1">
                                                     <h3 class="text-base font-semibold leading-tight text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
-                                                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?></p>
+                                                    <p class="text-sm text-gray-500"><?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?></p>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center space-x-2">
-                                                <!-- Urgent Badge (if applicable) -->
-                                                <?php if (isset($job['is_urgent']) && $job['is_urgent']): ?>
-                                                    <span class="px-2 py-1 text-xs font-medium text-red-600 bg-red-100 rounded">
-                                                        Urgent
-                                                    </span>
-                                                <?php endif; ?>
-
-                                                <!-- Saved Icon -->
-                                                <?php if ($hasProfile): ?>
-                                                    <button onclick="event.stopPropagation(); toggleSaveJob(<?php echo $job['job_id']; ?>, this)"
-                                                        class=" text-secondary save-btn hover:text-yellow-500"
-                                                        data-job-id="<?php echo $job['job_id']; ?>"
-                                                        data-saved="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'true' : 'false'; ?>"
-                                                        title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
-                                                        <!-- Bookmark SVG Icon -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20"
-                                                            fill="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'currentColor' : 'none'; ?>"
-                                                            stroke="currentColor"
-                                                            stroke-width="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? '0' : '1.5'; ?>">
-                                                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                                        </svg>
-                                                    </button>
-                                                <?php endif; ?>
+                                            <!-- Urgent Tag - Right Side of First Row (Placeholder for all cards) -->
+                                            <div class="flex-shrink-0">
+                                                <span class="px-2 py-1 text-xs font-medium text-white rounded-sm bg-primary">
+                                                    Urgent
+                                                </span>
                                             </div>
                                         </div>
 
                                         <!-- Row 2: Location with Icon -->
-                                        <div class="flex items-center mb-1">
+                                        <div class="flex items-center py-2">
                                             <!-- Location Marker SVG Icon -->
                                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -282,21 +212,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             <span class="ml-2 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
                                         </div>
 
-                                        <!-- Row 3: Pay Range with Icon -->
-                                        <?php if (!empty($job['pay_range'])): ?>
-                                            <div class="flex items-center mb-2">
-                                                <!-- Dollar Sign SVG Icon -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 13C7 11.1144 7 10.1716 7.58579 9.58579C8.17157 9 9.11438 9 11 9H14H17C18.8856 9 19.8284 9 20.4142 9.58579C21 10.1716 21 11.1144 21 13V14V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H14H11C9.11438 19 8.17157 19 7.58579 18.4142C7 17.8284 7 16.8856 7 15V14V13Z" stroke-linejoin="round"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 15V15C5.11438 15 4.17157 15 3.58579 14.4142C3.58579 14.4142 3.58579 14.4142 3.58579 14.4142C3 13.8284 3 12.8856 3 11L3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5L13 5C14.8856 5 15.8284 5 16.4142 5.58579C17 6.17157 17 7.11438 17 9V9" stroke-linejoin="round"></path>
-                                                    <path d="M16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14C12 12.8954 12.8954 12 14 12C15.1046 12 16 12.8954 16 14Z"></path>
-                                                </svg>
-                                                <span class="text-sm text-gray-600"><?php echo htmlspecialchars($job['pay_range']); ?></span>
-                                            </div>
-                                        <?php endif; ?>
+
 
                                         <!-- Row 4: Tags for Job Info -->
-                                        <div class="flex items-center gap-2 mb-2">
+                                        <div class="flex items-center gap-2 mb-4">
                                             <!-- Job Type Tag -->
                                             <span class="px-3 py-2 text-xs bg-gray-100 rounded-sm text-primary">
                                                 <?php echo htmlspecialchars(ucfirst($job['job_type'])); ?>
@@ -322,14 +241,28 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         </div>
 
                                         <!-- Row 5: Posted Date + Best Matches Info -->
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
+                                        <div class="flex items-center justify-between text-xs text-gray-400">
                                             <span>
                                                 Posted <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                                             </span>
 
-                                            <span>Best Match:
-                                                <!-- Checkmark in Circle -->
-                                                <span class="text-sm font-semibold text-primary"><?php echo htmlspecialchars($currentJob['match_percentage'] ?? '95'); ?>%</span> </span>
+                                            <span class="flex items-center gap-1 text-primary">
+                                                Best Matches: <span class="text-gray-">1 to 10</span>
+
+                                                <!-- Smaller Circle with check -->
+                                                <span class="flex items-center justify-center w-4 h-4 rounded-full bg-primary">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-2.5 h-2.5"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="white"
+                                                        stroke-width="">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </span>
+
+                                                <span class="text-sm font-medium text-primary">95%</span>
+                                            </span>
 
                                         </div>
                                     </div>
@@ -347,9 +280,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             <!-- Right Side - Job Details Preview -->
             <div class="w-full lg:w-[75%] xl:w-[75%]">
-                <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
-                    <!-- Job Details Card -->
-                    <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
+                <!-- AJAX Container for job details -->
+                <div id="job-details-container">
+                    <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
+                        <!-- Job Details Card -->
+                        <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
                         <div class="flex items-start justify-between">
                             <div class="flex items-start space-x-4">
                                 <!-- Business Logo/Profile -->
@@ -365,18 +300,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <div>
                                     <h2 class="text-lg font-bold text-gray-900"><?php echo htmlspecialchars($selectedJob['job_title']); ?></h2>
                                     <div class="flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4">
-                                        <p class="flex items-center text-gray-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                            </svg>
-                                            <span class="text-sm"><?php echo htmlspecialchars($selectedJob['company_name'] ?? $selectedJob['business_name'] ?? 'Company'); ?></span>
+                                        <p class="flex items-center text-gray-500">
+
+                                            <span class="text-sm text-gray-500"><?php echo htmlspecialchars($selectedJob['company_name'] ?? $selectedJob['business_name'] ?? 'Company'); ?></span>
                                         </p>
-                                        <p class="flex items-center text-gray-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="text-sm"><?php echo htmlspecialchars($selectedJob['location']); ?></span>
+                                        <p class="flex items-center text-gray-500">
+
+                                            <span class="text-sm text-gray-500"><?php echo htmlspecialchars($selectedJob['location']); ?></span>
                                         </p>
                                     </div>
                                 </div>
@@ -387,9 +317,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         class="p-2 rounded-full text-secondary hover:bg-gray-100 hover:text-yellow-500"
                                         title="<?php echo (isset($selectedJob['is_saved']) && $selectedJob['is_saved']) ? 'Remove from saved' : 'Save job'; ?>">
                                         <!-- Bookmark SVG Icon -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20" fill="<?php echo (isset($selectedJob['is_saved']) && $selectedJob['is_saved']) ? 'currentColor' : 'none'; ?>" stroke="currentColor" stroke-width="2">
-                                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                        <svg class="w-6 h-6" fill="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'currentColor' : 'none'; ?>"
+                                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
                                         </svg>
+
                                     </button>
                                 <?php endif; ?>
                                 <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
@@ -435,7 +368,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             <!-- Application Timeline -->
                             <?php if (!empty($selectedJob['application_start']) || !empty($selectedJob['application_deadline'])): ?>
                                 <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50">
-                                    <h4 class="mb-3 text-sm font-semibold text-gray-900">Application Timeline</h4>
+
                                     <div class="space-y-2">
                                         <?php if (!empty($selectedJob['application_start'])): ?>
                                             <div class="flex items-center text-sm text-gray-600">
@@ -467,7 +400,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                             <div class="mb-6">
                                 <h3 class="mb-3 text-lg font-semibold text-gray-900">Job Description</h3>
-                                <div class="text-sm prose-sm prose text-gray-700 max-w-none">
+                                <div class="text-sm prose-sm prose text-gray-600 max-w-none font-normal">
                                     <?php echo nl2br(htmlspecialchars($selectedJob['job_summary'])); ?>
                                 </div>
                             </div>
