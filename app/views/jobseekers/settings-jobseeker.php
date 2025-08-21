@@ -8,7 +8,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Page Header -->
             <div class="mb-8">
                 <div class="flex items-center mb-2 space-x-3">
-                    
+                    <a href="?page=profile-jobseeker" class="text-gray-500 transition-colors hover:text-primary">
+                        
+                    </a>
                     <h1 class="text-2xl font-bold text-gray-900">Account Settings</h1>
                 </div>
                 <p class="text-gray-600">Manage your account security and preferences</p>
@@ -17,43 +19,38 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Settings Content -->
             <div class="space-y-6">
                 <!-- Change Password -->
-                <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
-                    <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div class="flex items-start flex-1 gap-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
-                                <i class="text-lg fas fa-key text-primary"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
-                                <p class="mt-1 text-sm text-gray-600">Update your password to keep your account secure</p>
-                            </div>
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
+                            <p class="mt-1 text-sm text-gray-600">Update your password to keep your account secure</p>
                         </div>
                         <button onclick="togglePasswordForm()"
-                            class="flex items-center px-4 py-2 text-sm font-medium transition-all border rounded-lg border-primary text-primary bg-blue-50 hover:bg-blue-100 hover:shadow-sm">
+                            class="flex items-center px-4 py-2 text-sm font-medium transition-colors border rounded-md border-primary text-primary bg-blue-50 hover:bg-blue-100">
                             <i class="mr-2 fas fa-edit"></i>
                             Change Password
                         </button>
                     </div>
 
                     <!-- Password Change Form (Hidden by default) -->
-                    <div id="password-form" class="hidden pt-6 mt-6 border-t border-gray-200">
-                        <form class="w-full max-w-md space-y-4">
+                    <div id="password-form" class="hidden pt-6 mt-4 border-t border-gray-200">
+                        <form class="max-w-md mt-2 space-y-4">
                             <div>
                                 <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
                                 <input type="password" id="current-password" name="current_password"
-                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                             </div>
                             <div>
                                 <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
                                 <input type="password" id="new-password" name="new_password"
-                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                             </div>
                             <div>
                                 <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
                                 <input type="password" id="confirm-password" name="confirm_password"
-                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                                    class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                             </div>
-                            <div class="flex flex-col gap-3 sm:flex-row sm:space-x-3">
+                            <div class="flex space-x-3">
                                 <button type="submit"
                                     class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                     Update Password
@@ -68,39 +65,44 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <!-- Email Preferences -->
-                <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
-                    <div class="flex items-start gap-3 mb-6">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-50">
-                            <i class="text-lg text-green-600 fas fa-envelope"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900">Email Preferences</h3>
-                            <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
-                        </div>
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-900">Email Preferences</h3>
+                        <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
                     </div>
 
                     <div class="space-y-6">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Job Recommendations</h4>
-                                <p class="text-sm text-gray-500">Receive personalized job recommendations based on your profile</p>
+                                <p class="text-xs text-gray-500">Receive personalized job recommendations based on your profile</p>
                             </div>
-                           
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
 
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Application Updates</h4>
-                                <p class="text-sm text-gray-500">Get notified when employers respond to your applications</p>
+                                <p class="text-xs text-gray-500">Get notified when employers respond to your applications</p>
                             </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
 
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Newsletter</h4>
-                                <p class="text-sm text-gray-500">Receive weekly updates about new features and job market insights</p>
+                                <p class="text-xs text-gray-500">Receive weekly updates about new features and job market insights</p>
                             </div>
-
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
                     </div>
 
@@ -112,40 +114,44 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <!-- Privacy Settings -->
-                <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
-                    <div class="flex items-start gap-3 mb-6">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-50">
-                            <i class="text-lg text-purple-600 fas fa-shield-alt"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900">Privacy Settings</h3>
-                            <p class="mt-1 text-sm text-gray-600">Control who can see your profile and contact information</p>
-                        </div>
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-900">Privacy Settings</h3>
+                        <p class="mt-1 text-sm text-gray-600">Control who can see your profile and contact information</p>
                     </div>
 
                     <div class="space-y-6">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Profile Visibility</h4>
-                                <p class="text-sm text-gray-500">Allow employers to find and view your profile</p>
+                                <p class="text-xs text-gray-500">Allow employers to find and view your profile</p>
                             </div>
-                             
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
 
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
-                                <p class="text-sm text-gray-500">Show your contact details to potential employers</p>
+                                <p class="text-xs text-gray-500">Show your contact details to potential employers</p>
                             </div>
-                             
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
 
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <h4 class="text-sm font-medium text-gray-900">Resume Download</h4>
-                                <p class="text-sm text-gray-500">Allow employers to download your resume</p>
+                                <p class="text-xs text-gray-500">Allow employers to download your resume</p>
                             </div>
-                             
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
                         </div>
                     </div>
 
@@ -200,31 +206,26 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <!-- Danger Zone -->
-                <div class="p-4 transition-shadow bg-white border border-l-4 border-gray-100 rounded-lg shadow-sm border-l-red-400 sm:p-6 hover:shadow-md">
-                    <div class="flex items-start gap-3 mb-6">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-red-50">
-                            <i class="text-lg text-red-600 fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-red-900">Danger Zone</h3>
-                            <p class="mt-1 text-sm text-red-700">These actions cannot be undone</p>
-                        </div>
+                <div class="p-6 bg-white border-l-4 border-red-400 rounded-lg shadow">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-red-900">Danger Zone</h3>
+                        <p class="mt-1 text-sm text-red-700">These actions cannot be undone and will affect your jobseeker account</p>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="flex flex-col gap-3 p-4 rounded-lg sm:flex-row sm:items-center sm:justify-between bg-red-50">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                            <div>
                                 <h4 class="text-sm font-medium text-red-900">Deactivate Account</h4>
                                 <p class="text-xs text-red-600">Temporarily disable your account (can be reactivated)</p>
                             </div>
                             <button onclick="confirmDeactivation()"
-                                class="px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md hover:bg-red-50">
+                                class="px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md hover:bg-red-100">
                                 Deactivate
                             </button>
                         </div>
 
-                        <div class="flex flex-col gap-3 p-4 rounded-lg sm:flex-row sm:items-center sm:justify-between bg-red-50">
-                            <div class="flex-1">
+                        <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                            <div>
                                 <h4 class="text-sm font-medium text-red-900">Delete Account</h4>
                                 <p class="text-xs text-red-600">Permanently delete your account and all associated data</p>
                             </div>

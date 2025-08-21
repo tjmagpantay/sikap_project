@@ -24,16 +24,16 @@ include_once __DIR__ . '/../components/navbar.php';
                 </div>
                 <div class="mt-2">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <div class="relative">
+                    <div class="relative mt-1">
                         <input id="password" name="password" type="password" required
-                            class="block w-full px-3 py-2 pr-10 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            class="block w-full px-3 py-2 pr-10 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"> 
                         <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
                             <i id="password-icon" class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
                 <div class="flex justify-end mt-2">
-                    <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a>
+                    <a href="?page=forgot-password" class="text-sm text-primary hover:underline">Forgot Password?</a> 
                 </div>
                 <button type="submit"
                     class="justify-end w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
@@ -76,13 +76,13 @@ include_once __DIR__ . '/../components/navbar.php';
                 <div id="carousel" class="relative w-full h-full">
                     <img src="../public/assets/images/login-img-1.webp"
                         alt="Jobseekers 1"
-                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-100 transform scale-100" />
+                        class="absolute inset-0 object-cover w-full h-full transition-all ease-in-out transform scale-100 opacity-100 carousel-img duration-1500" />
                     <img src="../public/assets/images/login-img-2.png"
                         alt="Jobseekers 2"
-                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-0 transform scale-105" />
+                        class="absolute inset-0 object-cover w-full h-full transition-all ease-in-out transform scale-105 opacity-0 carousel-img duration-1500" />
                     <img src="../public/assets/images/login-img-3.png"
                         alt="Jobseekers 3"
-                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-0 transform scale-105" />
+                        class="absolute inset-0 object-cover w-full h-full transition-all ease-in-out transform scale-105 opacity-0 carousel-img duration-1500" />
                 </div>
 
                 <!-- Gradient Overlay -->
@@ -91,10 +91,10 @@ include_once __DIR__ . '/../components/navbar.php';
                 </div>
 
                 <!-- Optional: Carousel Indicators -->
-                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
-                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
-                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
+                <div class="absolute z-20 flex gap-2 transform -translate-x-1/2 bottom-4 left-1/2">
+                    <div class="w-3 h-3 transition-all duration-500 ease-in-out rounded-full cursor-pointer carousel-dot bg-white/80 hover:bg-white"></div>
+                    <div class="w-3 h-3 transition-all duration-500 ease-in-out rounded-full cursor-pointer carousel-dot bg-white/80 hover:bg-white"></div>
+                    <div class="w-3 h-3 transition-all duration-500 ease-in-out rounded-full cursor-pointer carousel-dot bg-white/80 hover:bg-white"></div>
                 </div>
             </div>
         </div>
@@ -133,7 +133,7 @@ include_once __DIR__ . '/../components/navbar.php';
             // Reset all dots with smooth animation
             dots.forEach((dot, i) => {
                 dot.classList.remove('bg-white', 'scale-110', 'shadow-lg');
-                dot.classList.add('bg-white/60', 'scale-100');
+                dot.classList.add('bg-white/80', 'scale-100');
             });
 
             // Show current image with smooth transition
@@ -143,7 +143,7 @@ include_once __DIR__ . '/../components/navbar.php';
             }, 50);
 
             // Animate current dot
-            dots[index].classList.remove('bg-white/50', 'scale-100');
+            dots[index].classList.remove('bg-white/80', 'scale-100');
             dots[index].classList.add('bg-white', 'scale-110', 'shadow-lg');
         }
 

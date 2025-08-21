@@ -1,7 +1,8 @@
 <section
   class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[650px] flex items-center"
   style="
-background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, #092C4C 67%), url('assets/images/hero-page-bg.png');
+background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)), 
+            url('assets/images/hero-page-bg.png');
     background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
@@ -73,7 +74,7 @@ background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, #092C4C 67%), url('
               <p class="text-xs text-gray-600">Explore Open jobs</p>
             </div>
           </div>
-        
+
           <div class="absolute flex items-center gap-2 px-4 py-2 text-sm text-black bg-white rounded-lg shadow-md bottom-4 right-4 w-[200px] opacity-30">
             <div class="flex flex-col items-start leading-tight">
               <p class="text-xs text-primary">Hi!</p>
