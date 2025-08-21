@@ -3,10 +3,10 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/../components/navbar.php';
 ?>
 
-<div class="flex items-center justify-center px-2 py-8 bg-gray-50">
-    <div class="flex flex-col-reverse max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
+<div class="flex items-center justify-center px-4 py-8 ">
+    <div class="flex flex-col-reverse w-full max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
         <!-- Left: Login Card -->
-        <div class="flex flex-col justify-center w-full px-6 py-8 md:w-1/2">
+        <div class="flex flex-col justify-center w-full px-6 py-8 md:w-1/2 lg:px-12">
             <h2 class="mb-4 text-3xl font-bold text-gray-900">Login</h2>
             <p class="mb-6 text-sm text-gray-600">Sign in to your jobseeker account</p>
             <?php if (!empty($error)): ?>
@@ -70,12 +70,102 @@ include_once __DIR__ . '/../components/navbar.php';
 
         <!-- Right: Image Carousel -->
         <div class="items-center justify-center hidden bg-gray-100 md:flex md:w-1/2">
-            <div class="flex items-center justify-center w-full h-full">
-                <!-- Simple carousel (static for demo, replace with JS carousel if needed) -->
-                <div class="flex items-center justify-center w-full h-full">
-                    <img src="../public/assets/images/hero-page-img.png" alt="Jobseekers" class="object-cover w-full h-full rounded-r-xl" />
+            <div class="relative w-full h-full min-h-[500px] overflow-hidden rounded-r-xl">
+
+                <!-- Carousel Images -->
+                <div id="carousel" class="relative w-full h-full">
+                    <img src="../public/assets/images/login-img-1.webp"
+                        alt="Jobseekers 1"
+                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-100 transform scale-100" />
+                    <img src="../public/assets/images/login-img-2.png"
+                        alt="Jobseekers 2"
+                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-0 transform scale-105" />
+                    <img src="../public/assets/images/login-img-3.png"
+                        alt="Jobseekers 3"
+                        class="carousel-img absolute inset-0 object-cover w-full h-full transition-all duration-1500 ease-in-out opacity-0 transform scale-105" />
+                </div>
+
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 z-10"
+                    style="background: linear-gradient(to top, #092C4C -20%, rgba(255,255,255,0.2) 100%);">
+                </div>
+
+                <!-- Optional: Carousel Indicators -->
+                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
+                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
+                    <div class="carousel-dot w-3 h-3 rounded-full bg-white/50 transition-all duration-500 ease-in-out cursor-pointer hover:bg-white/80"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const passwordIcon = document.getElementById('password-icon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordIcon.classList.remove('fa-eye');
+            passwordIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            passwordIcon.classList.remove('fa-eye-slash');
+            passwordIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Image Carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.carousel-img');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let currentIndex = 0;
+
+        function showImage(index) {
+            // Hide all images with smooth transition
+            images.forEach((img, i) => {
+                img.classList.remove('opacity-100', 'scale-100');
+                img.classList.add('opacity-0', 'scale-105');
+            });
+            
+            // Reset all dots with smooth animation
+            dots.forEach((dot, i) => {
+                dot.classList.remove('bg-white', 'scale-110', 'shadow-lg');
+                dot.classList.add('bg-white/60', 'scale-100');
+            });
+            
+            // Show current image with smooth transition
+            setTimeout(() => {
+                images[index].classList.remove('opacity-0', 'scale-105');
+                images[index].classList.add('opacity-100', 'scale-100');
+            }, 50);
+            
+            // Animate current dot
+            dots[index].classList.remove('bg-white/50', 'scale-100');
+            dots[index].classList.add('bg-white', 'scale-110', 'shadow-lg');
+        }
+
+        function nextImage() {
+            currentIndex = (currentIndex + 1) % images.length;
+            showImage(currentIndex);
+        }
+
+        // Initialize first dot
+        showImage(0);
+
+        // Auto-change images every 4 seconds (increased for smoother experience)
+        setInterval(nextImage, 4000);
+
+        // Click dots to change image with smooth transition
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (currentIndex !== index) {
+                    currentIndex = index;
+                    showImage(currentIndex);
+                }
+            });
+        });
+    });
+</script>
