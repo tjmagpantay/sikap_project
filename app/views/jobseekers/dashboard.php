@@ -190,8 +190,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                 </div>
                                             </div>
 
-                                            <!-- Urgent Tag - Right Side of First Row (Placeholder for all cards) -->
-                                            <div class="flex-shrink-0">
+                                            <!-- Right side: Save button + Urgent Tag -->
+                                            <div class="flex items-center flex-shrink-0 gap-2">
+                                           
+
                                                 <span class="px-2 py-1 text-xs font-medium text-white rounded-sm bg-primary">
                                                     Urgent
                                                 </span>
@@ -543,45 +545,54 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Same JavaScript functions as before
         function toggleSaveJob(jobId, button) {
-            const isSaved = button.querySelector('i').classList.contains('fas');
-            const action = isSaved ? 'unsave-job' : 'save-job';
+            const isSaved = button.querySelector('svg').getAttribute('fill') === 'currentColor';
+            const action = isSaved ? 'unsave' : 'save';
 
-            fetch('ajax/job-actions.php', {
+            // Show loading state
+            button.disabled = true;
+            const svg = button.querySelector('svg');
+            svg.classList.add('animate-pulse');
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+
+            const endpoint = isSaved ? '?page=unsave-job' : '?page=save-job';
+
+            fetch(endpoint, {
                     method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        action: action,
-                        job_id: jobId
-                    })
+                    }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Expected JSON but got:', text);
+                            throw new Error('Server returned non-JSON response');
+                        });
+                    }
+
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        const icon = button.querySelector('i');
+                        // Update the button state
                         if (isSaved) {
-                            icon.classList.remove('fas', 'text-yellow-500');
-                            icon.classList.add('far');
+                            svg.setAttribute('fill', 'none');
+                            button.title = 'Save job';
                         } else {
-                            icon.classList.remove('far');
-                            icon.classList.add('fas', 'text-yellow-500');
+                            svg.setAttribute('fill', 'currentColor');
+                            button.title = 'Remove from saved';
                         }
-                        showToast(isSaved ? 'Job removed from saved' : 'Job saved successfully', 'success');
 
-                        // Update the card in the list if it exists
-                        const cardBtn = document.querySelector(`.job-card[onclick*="job_id=${jobId}"] button`);
-                        if (cardBtn) {
-                            const cardIcon = cardBtn.querySelector('i');
-                            if (isSaved) {
-                                cardIcon.classList.remove('fas', 'text-yellow-500');
-                                cardIcon.classList.add('far');
-                            } else {
-                                cardIcon.classList.remove('far');
-                                cardIcon.classList.add('fas', 'text-yellow-500');
-                            }
-                        }
+                        showToast(data.message || (isSaved ? 'Job removed from saved' : 'Job saved successfully'), 'success');
                     } else {
                         showToast('Action failed: ' + (data.message || 'Please try again'), 'error');
                     }
@@ -589,6 +600,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 .catch(error => {
                     console.error('Error:', error);
                     showToast('An error occurred. Please try again.', 'error');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    svg.classList.remove('animate-pulse');
                 });
         }
 
@@ -664,7 +679,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             const jobTypeFilter = document.getElementById('jobTypeFilter');
             const industryFilter = document.getElementById('industryFilter');
             const workplaceFilter = document.getElementById('workplaceFilter');
-            const applyButton = document.getElementById('applyFilters');
             const clearButton = document.getElementById('clearFilters');
 
             // Apply filters function
@@ -787,13 +801,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             }
 
             // Event listeners
-            applyButton.addEventListener('click', applyFilters);
             clearButton.addEventListener('click', clearFilters);
 
-            // Real-time search
+            // Real-time search with debounce
             searchInput.addEventListener('input', debounce(applyFilters, 300));
 
-            // Auto-apply on filter change
+            // Auto-apply filters immediately when dropdowns change
             [locationFilter, jobTypeFilter, industryFilter, workplaceFilter].forEach(filter => {
                 filter.addEventListener('change', applyFilters);
             });
