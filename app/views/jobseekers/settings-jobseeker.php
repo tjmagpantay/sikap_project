@@ -11,9 +11,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     <a href="?page=profile-jobseeker" class="text-gray-500 transition-colors hover:text-primary">
                         
                     </a>
-                    <h1 class="text-2xl font-bold text-gray-900">Account Settings</h1>
+                    <h1 class="text-3xl font-bold text-mainGray">Account Settings</h1>
                 </div>
-                <p class="text-gray-600">Manage your account security and preferences</p>
+                <p class="mt-2 text-sm text-gray-600">Manage your account security and preferences</p>
             </div>
 
             <!-- Settings Content -->

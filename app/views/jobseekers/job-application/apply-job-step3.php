@@ -269,12 +269,17 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 <!-- Information Box -->
                 <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
                     <div class="flex">
-                        <svg class="w-5 h-5 mt-0.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        <svg class="w-6 h-6 mt-0.5 text-primary"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
                         </svg>
                         <div class="ml-3">
                             <h4 class="text-sm font-medium text-blue-900">Why we ask this information</h4>
-                            <p class="mt-1 text-sm text-blue-700">
+                            <p class="mt-1 text-sm text-primary">
                                 This information helps employers and government agencies provide appropriate support,
                                 priority consideration, and ensure inclusive hiring practices. All information is kept confidential.
                             </p>

@@ -383,11 +383,25 @@ class JobApplication
         try {
             $sql = "DELETE FROM application_attachments 
                     WHERE application_id = :application_id 
-                    AND file_type IN ('Resume', 'CV', 'resume', 'cv')";
+                    AND file_type IN ('Resume', 'resume')";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute(['application_id' => $application_id]);
         } catch (PDOException $e) {
             error_log('Error clearing resume attachments: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function clearCvAttachments($application_id)
+    {
+        try {
+            $sql = "DELETE FROM application_attachments 
+                    WHERE application_id = :application_id 
+                    AND file_type IN ('CV', 'cv')";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute(['application_id' => $application_id]);
+        } catch (PDOException $e) {
+            error_log('Error clearing CV attachments: ' . $e->getMessage());
             return false;
         }
     }

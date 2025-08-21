@@ -9,7 +9,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <div class="mx-auto max-w-7xl">
             <!-- Page Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Explore Companies</h1>
+                <h1 class="text-3xl font-bold text-mainGray">Explore Companies</h1>
                 <p class="mt-2 text-sm text-gray-600">Discover amazing companies and explore their job opportunities</p>
             </div>
 

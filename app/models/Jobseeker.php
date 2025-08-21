@@ -411,4 +411,36 @@ class Jobseeker
             return null;
         }
     }
+
+    public function findDocumentByType($jobseeker_id, $file_type)
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents 
+                    WHERE jobseeker_id = :jobseeker_id AND file_type = :file_type";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_type' => $file_type]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding document by type: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateDocument($document_id, $file_path, $file_name)
+    {
+        try {
+            $sql = "UPDATE jobseeker_documents 
+                    SET file_path = :file_path, file_name = :file_name, updated_at = NOW() 
+                    WHERE id = :document_id";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                'file_path' => $file_path,
+                'file_name' => $file_name,
+                'document_id' => $document_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error updating document: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

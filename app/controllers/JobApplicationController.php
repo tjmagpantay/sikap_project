@@ -242,54 +242,67 @@ class JobApplicationController
                 }
             }
 
-            // Clear existing resume attachments only if user has made new selections
-            // This allows navigation back/forth without losing data
-            $hasNewSelections = (!empty($_POST['selected_resumes']) ||
-                !empty($_FILES['new_resume']['name']) ||
-                !empty($_POST['selected_cvs']) ||
-                !empty($_FILES['new_cv']['name']));
+            // Get current attachments to check what's already attached
+            $currentAttachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
+            $currentResumeAttached = false;
+            $currentCvAttached = false;
+            $currentResumeInfo = null;
+            $currentCvInfo = null;
 
-            // Check if there are existing resume/CV attachments
-            $existingAttachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
-            $hasExistingResumes = false;
-            foreach ($existingAttachments as $attachment) {
-                if (in_array(strtolower($attachment['file_type']), ['resume', 'cv'])) {
-                    $hasExistingResumes = true;
-                    break;
+            foreach ($currentAttachments as $attachment) {
+                if ($attachment['file_type'] === 'resume') {
+                    $currentResumeAttached = true;
+                    $currentResumeInfo = $attachment;
+                }
+                if ($attachment['file_type'] === 'cv') {
+                    $currentCvAttached = true;
+                    $currentCvInfo = $attachment;
                 }
             }
 
-            if ($hasNewSelections) {
-                $this->jobApplicationModel->clearResumeAttachments($application_id);
-            }
+            $resumeHandled = false;
+            $cvHandled = false;
 
-            // Handle multiple resume selection
-            $resumeHandled = $hasExistingResumes && !$hasNewSelections; // If has existing and no new selections, consider handled
-
-            // Handle selected existing resumes
+            // Handle Resume (only allow one)
             if (!empty($_POST['selected_resumes'])) {
-                foreach ($_POST['selected_resumes'] as $resumePath) {
+                // Use the first selected resume only
+                $resumePath = $_POST['selected_resumes'][0];
+
+                // Check if this is the same resume already attached
+                $isAlreadyAttached = false;
+                if ($currentResumeAttached && $currentResumeInfo) {
+                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $resumePath);
+                    if (
+                        $profileDoc &&
+                        (($currentResumeInfo['file_path'] === $resumePath) ||
+                            (!empty($currentResumeInfo['profile_document_id']) &&
+                                $currentResumeInfo['profile_document_id'] == $profileDoc['document_id']))
+                    ) {
+                        $isAlreadyAttached = true;
+                        $resumeHandled = true; // Already handled, no need to re-attach
+                    }
+                }
+
+                if (!$isAlreadyAttached) {
+                    // Clear existing resume attachment first
+                    $this->jobApplicationModel->clearResumeAttachments($application_id);
+
                     $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $resumePath);
                     if ($profileDoc) {
-                        // Determine if it's CV or Resume based on file_type
-                        $fileType = ucfirst($profileDoc['file_type']); // 'resume' becomes 'Resume', 'cv' becomes 'Cv'
-                        if (strtolower($fileType) === 'cv') {
-                            $fileType = 'CV';
-                        }
-
                         // Create reference to existing profile document
                         $this->jobApplicationModel->saveApplicationAttachmentReference(
                             $application_id,
                             $profileDoc['document_id'],
-                            $fileType
+                            'Resume'
                         );
                         $resumeHandled = true;
                     }
                 }
-            }
+            } elseif (!empty($_FILES['new_resume']['name'])) {
+                // Clear existing resume attachment first
+                $this->jobApplicationModel->clearResumeAttachments($application_id);
 
-            // Handle new resume upload
-            if (!empty($_FILES['new_resume']['name'])) {
+                // Upload new resume and replace any existing one
                 $resumePath = $this->handleResumeUpload($_FILES['new_resume']);
                 if ($resumePath) {
                     // Save as application attachment
@@ -298,19 +311,48 @@ class JobApplicationController
 
                     // Optionally save to profile documents for future use
                     if (isset($_POST['save_resume_to_profile']) && $_POST['save_resume_to_profile'] == '1') {
-                        $this->saveToProfile(
-                            $jobseeker['jobseeker_id'],
-                            $resumePath,
-                            'resume',
-                            $_FILES['new_resume']['name']
-                        );
+                        // Check if user already has a resume in profile, update it instead of creating new
+                        $existingResume = $this->jobseekerModel->findDocumentByType($jobseeker['jobseeker_id'], 'resume');
+                        if ($existingResume) {
+                            // Update existing resume
+                            $this->jobseekerModel->updateDocument($existingResume['document_id'], $resumePath, $_FILES['new_resume']['name']);
+                        } else {
+                            // Create new profile document
+                            $this->jobseekerModel->saveDocument($jobseeker['jobseeker_id'], $resumePath, 'resume', $_FILES['new_resume']['name']);
+                        }
                     }
+                }
+            } else {
+                // If no resume selected/uploaded but one is currently attached, keep it
+                if ($currentResumeAttached) {
+                    $resumeHandled = true;
                 }
             }
 
-            // Handle selected existing CVs
+            // Handle CV (only allow one)
             if (!empty($_POST['selected_cvs'])) {
-                foreach ($_POST['selected_cvs'] as $cvPath) {
+                // Use the first selected CV only
+                $cvPath = $_POST['selected_cvs'][0];
+
+                // Check if this is the same CV already attached
+                $isAlreadyAttached = false;
+                if ($currentCvAttached && $currentCvInfo) {
+                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $cvPath);
+                    if (
+                        $profileDoc &&
+                        (($currentCvInfo['file_path'] === $cvPath) ||
+                            (!empty($currentCvInfo['profile_document_id']) &&
+                                $currentCvInfo['profile_document_id'] == $profileDoc['document_id']))
+                    ) {
+                        $isAlreadyAttached = true;
+                        $cvHandled = true; // Already handled, no need to re-attach
+                    }
+                }
+
+                if (!$isAlreadyAttached) {
+                    // Clear existing CV attachment first
+                    $this->jobApplicationModel->clearCvAttachments($application_id);
+
                     $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $cvPath);
                     if ($profileDoc) {
                         // Create reference to existing profile document
@@ -319,36 +361,46 @@ class JobApplicationController
                             $profileDoc['document_id'],
                             'CV'
                         );
-                        $resumeHandled = true;
+                        $cvHandled = true;
                     }
                 }
-            }
+            } elseif (!empty($_FILES['new_cv']['name'])) {
+                // Clear existing CV attachment first
+                $this->jobApplicationModel->clearCvAttachments($application_id);
 
-            // Handle new CV upload
-            if (!empty($_FILES['new_cv']['name'])) {
+                // Upload new CV and replace any existing one
                 $cvPath = $this->handleResumeUpload($_FILES['new_cv']);
                 if ($cvPath) {
                     // Save as application attachment
                     $this->jobApplicationModel->saveApplicationAttachment($application_id, $cvPath, 'CV');
-                    $resumeHandled = true;
+                    $cvHandled = true;
 
                     // Optionally save to profile documents for future use
                     if (isset($_POST['save_cv_to_profile']) && $_POST['save_cv_to_profile'] == '1') {
-                        $this->saveToProfile(
-                            $jobseeker['jobseeker_id'],
-                            $cvPath,
-                            'cv',
-                            $_FILES['new_cv']['name']
-                        );
+                        // Check if user already has a CV in profile, update it instead of creating new
+                        $existingCV = $this->jobseekerModel->findDocumentByType($jobseeker['jobseeker_id'], 'cv');
+                        if ($existingCV) {
+                            // Update existing CV
+                            $this->jobseekerModel->updateDocument($existingCV['document_id'], $cvPath, $_FILES['new_cv']['name']);
+                        } else {
+                            // Create new CV document
+                            $this->jobseekerModel->saveDocument($jobseeker['jobseeker_id'], $cvPath, 'cv', $_FILES['new_cv']['name']);
+                        }
                     }
+                }
+            } else {
+                // If no CV selected/uploaded but one is currently attached, keep it
+                if ($currentCvAttached) {
+                    $cvHandled = true;
                 }
             }
 
-            if (!$resumeHandled) {
+            // Require at least one document (resume or CV)
+            if (!$resumeHandled && !$cvHandled) {
                 throw new Exception('Please select at least one existing document or upload a new resume/CV');
             }
 
-            // Handle additional attachments
+            // Handle additional attachments (these can be multiple)
             if (!empty($_FILES['attachments']['name'][0])) {
                 foreach ($_FILES['attachments']['name'] as $index => $filename) {
                     if (!empty($filename)) {
