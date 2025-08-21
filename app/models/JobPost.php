@@ -646,7 +646,8 @@ class JobPost
             $sql = "SELECT jp.*, jc.category_name,
                        e.first_name as employer_first_name, 
                        e.last_name as employer_last_name,
-                       eb.business_name as company_name";
+                       eb.business_name as company_name,
+                       eb.business_logo";
 
             // Add application check if jobseeker_id is provided
             if ($jobseeker_id) {
@@ -659,7 +660,9 @@ class JobPost
                       LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
                       LEFT JOIN employer e ON jp.employer_id = e.employer_id
                       LEFT JOIN (
-                          SELECT employer_id, MIN(business_name) as business_name
+                          SELECT employer_id, 
+                                 MIN(business_name) as business_name,
+                                 MIN(business_logo) as business_logo
                           FROM employers_business
                           GROUP BY employer_id
                       ) eb ON e.employer_id = eb.employer_id";

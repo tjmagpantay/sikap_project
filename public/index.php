@@ -8,7 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-2vWTFzTx5TkQ0CKg5sG3rMd8W2jcJGkX+9L5wz1tCwLmfIu5FgDf0uB/hgsWmPB0wDCaY6FUVuLuqm+ne+0hMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="./assets/css/output.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="./assets/images/sikap-logo.png">
     <title>Sikap - PESO Rosario Emplyment Platform</title>
@@ -571,6 +571,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/UserController.php';
             $controller = new UserController();
             $controller->resetPassword();
+            break;
+
+        case 'get-job-details-ajax':
+            // Clear any output buffers before AJAX response
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            require_once __DIR__ . '/../app/controllers/JobDetailsAjaxController.php';
+            $controller = new JobDetailsAjaxController();
+            $controller->getJobDetails();
+            exit; // Prevent any further output
             break;
     }
     ?>
