@@ -49,10 +49,13 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             $hiredCount = count(array_filter($applications, function ($app) {
                 return $app['application_status'] === 'hired';
             }));
+            $interviewCount = count(array_filter($applications, function ($app) {
+                return !empty($app['interview_date']) && $app['interview_date'] !== '0000-00-00 00:00:00';
+            }));
             ?>
 
             <!-- Summary Cards - Single Row Layout -->
-            <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 md:gap-6">
+            <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 md:gap-6">
                 <!-- Card 1: Total Applications -->
                 <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
                     <div class="text-center">
@@ -69,7 +72,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </div>
                 </div>
 
-                <!-- Card 3: Shortlisted -->
+                <!-- Card 3: Interviews -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-purple-600 md:text-3xl"><?php echo $interviewCount; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Interviews</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Shortlisted -->
                 <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
                     <div class="text-center">
                         <span class="text-2xl font-bold text-blue-600 md:text-3xl"><?php echo $shortlistedCount; ?></span>
@@ -77,7 +88,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </div>
                 </div>
 
-                <!-- Card 4: Hired -->
+                <!-- Card 5: Hired -->
                 <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
                     <div class="text-center">
                         <span class="text-2xl font-bold text-green-600 md:text-3xl"><?php echo $hiredCount; ?></span>
@@ -85,7 +96,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </div>
                 </div>
 
-                <!-- Card 5: Rejected -->
+                <!-- Card 6: Rejected -->
                 <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
                     <div class="text-center">
                         <span class="text-2xl font-bold text-red-600 md:text-3xl"><?php echo $rejectedCount; ?></span>
@@ -142,6 +153,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     </th>
                                     <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
                                         STATUS
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
+                                        INTERVIEW
                                     </th>
                                     <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
                                         APPLIED DATE
@@ -223,6 +237,35 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                             </div>
                                         </td>
 
+                                        <!-- Interview Status Column -->
+                                        <td class="px-6 py-5">
+                                            <?php if (!empty($application['interview_date']) && $application['interview_date'] !== '0000-00-00 00:00:00'): ?>
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
+                                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-green-600">Scheduled</div>
+                                                        <div class="text-xs text-gray-500"><?php echo date('M j, Y g:i A', strtotime($application['interview_date'])); ?></div>
+                                                        <?php if (!empty($application['interview_location'])): ?>
+                                                            <div class="text-xs text-gray-500">📍 <?php echo htmlspecialchars($application['interview_location']); ?></div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-300 rounded-full">
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">Pending</span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+
                                         <!-- Applied Date Column -->
                                         <td class="px-6 py-5">
                                             <div class="text-sm text-gray-900"><?php echo date('M j, Y', strtotime($application['applied_at'])); ?></div>
@@ -235,10 +278,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 <!-- View Application Button -->
                                                 <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
                                                     class="inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
+                                                    
                                                     View
                                                 </a>
 

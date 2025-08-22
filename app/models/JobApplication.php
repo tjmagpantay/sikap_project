@@ -170,11 +170,13 @@ class JobApplication
         try {
             $sql = "SELECT ja.*, jp.job_title, jp.job_summary, jp.job_type, jp.location, jp.salary, jp.show_pay,
                            e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name, eb.business_desc, eb.business_logo
+                           eb.business_name as company_name, eb.business_desc, eb.business_logo,
+                           jam.interview_date, jam.interview_location, jam.notes
                     FROM job_application ja
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    LEFT JOIN job_application_management jam ON ja.application_id = jam.application_id
                     WHERE ja.application_id = :application_id";
 
             if ($jobseeker_id) {

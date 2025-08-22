@@ -3,8 +3,8 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen sm:px-6 md:px-16 lg:px-24 ">
-    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
+<div class="px-6 py-8 sm:px-6 md:px-16 lg:px-24">
+    <div class="mx-auto max-w-7xl">
 
         <!-- Page Header
         <div class="mb-8">

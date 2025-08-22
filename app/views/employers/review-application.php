@@ -4,9 +4,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
 <div class="min-h-screen bg-gray-50">
-    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Header with breadcrumbs -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-6">
             <div>
                 <!-- Breadcrumb Navigation -->
                 <nav class="flex mb-4" aria-label="Breadcrumb">
@@ -36,32 +36,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         </li>
                     </ol>
                 </nav>
-                <h1 class="text-2xl font-bold text-gray-900">Review Application</h1>
+                
             </div>
-            <span class="px-3 py-1 text-xs font-medium  
-                <?php
-                switch ($application['application_status']) {
-                    case 'pending':
-                        echo 'bg-yellow-100 text-yellow-800';
-                        break;
-                    case 'reviewed':
-                        echo 'bg-blue-100 text-blue-800';
-                        break;
-                    case 'shortlisted':
-                        echo 'bg-purple-100 text-purple-800';
-                        break;
-                    case 'rejected':
-                        echo 'bg-red-100 text-red-800';
-                        break;
-                    case 'hired':
-                        echo 'bg-green-100 text-green-800';
-                        break;
-                    default:
-                        echo 'bg-gray-100 text-gray-800';
-                }
-                ?>">
-                <?php echo ucfirst($application['application_status']); ?>
-            </span>
+
         </div>
 
         <!-- Main Flex Layout -->

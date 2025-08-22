@@ -20,10 +20,14 @@ if (!empty($business['business_socials'])) {
 // Document types for display
 $documentTypes = [
     'letter_of_intent' => 'Letter of Intent',
-    'company_profile' => 'Company Profile',
+    'company_profile' => 'Company Profile', 
     'business_permit' => 'Business Permit',
     'cert_of_no_pending_case' => 'Certificate of No Pending Case',
-    'dole_registration' => 'DOLE Registration'
+    'dole_registration' => 'DOLE Registration',
+    'cert_no_objection' => 'Certificate of No Objection',
+    'poea_reg' => 'POEA Registration',
+    'job_vaccancies_qual' => 'Job Vacancies & Qualifications',
+    'phil_jobnet_reg' => 'PhilJobNet Registration'
 ];
 
 // Count uploaded documents
@@ -52,7 +56,7 @@ $personalCompletion = ($personalCompleted / count($personalFields)) * 100;
 
 // Business completion (out of 100%)
 $businessCompleted = 0;
-$totalBusinessItems = 8; // Adjust based on your business requirements
+$totalBusinessItems = 13; // 4 business fields + 9 documents
 
 if ($business) {
     $businessFields = ['business_name', 'business_type', 'business_industry', 'business_desc'];
@@ -62,17 +66,15 @@ if ($business) {
         }
     }
 
-    // Check for documents (count as 4 items)
-    if ($uploadedDocs > 0) {
-        $businessCompleted += min($uploadedDocs, 4);
-    }
+    // Check for documents (count all 9 documents)
+    $businessCompleted += $uploadedDocs;
 }
 
 $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 ?>
 
 <div class="min-h-screen">
-    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <div class="flex flex-col gap-8 md:flex-row">
             <!-- Sidebar - Personal Profile -->
             <div class="w-full md:w-1/3">
@@ -196,19 +198,19 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <div class="w-full mt-6 space-y-3">
                             <!-- Profile Setup -->
                             <a href="?page=complete-employer-profile" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors bg-white border-2 border-gray-200 rounded-lg text-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <i class="mr-2 fas fa-plus"></i>
+
                                 Profile and Busines Setup
                             </a>
 
                             <!-- Quick Actions -->
                             <?php if ($canPostJobs): ?>
                                 <a href="?page=post-job" class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                    <i class="mr-2 fas fa-plus"></i>
+
                                     Post New Job
                                 </a>
                             <?php else: ?>
                                 <button disabled class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-gray-500 bg-gray-300 rounded-lg cursor-not-allowed">
-                                    <i class="mr-2 fas fa-lock"></i>
+
                                     Complete Profile to Post Jobs
                                 </button>
                             <?php endif; ?>
@@ -235,20 +237,15 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         </div>
                     </div>
                 <?php endif; ?>
-
                 <!-- Business Profile Card -->
-                <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="flex items-center font-semibold text-primary text-md">
-                            <i class="mr-2 text-blue-600 fas fa-building"></i>
-                            Business Profile
-                        </h3>
-                        <a href="?page=complete-employer-business&step=1" class="text-blue-600 hover:text-blue-700">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </div>
+                <div class="relative p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
+                    <!-- Edit Icon (top-right) -->
+                    <a href="?page=complete-employer-business&step=1"
+                        class="absolute text-gray-400 top-4 right-4 hover:text-blue-700">
+                        <i class="fas fa-edit"></i>
+                    </a>
 
-                    <div class="flex items-center w-full ">
+                    <div class="flex items-center w-full">
                         <!-- Business Logo -->
                         <div class="relative flex-shrink-0 mr-4">
                             <img src="<?php
@@ -263,7 +260,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 
                             <!-- Verification Badge -->
                             <?php if ($isVerified): ?>
-                                <div class="absolute flex items-center justify-center w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-sm -bottom-1 -right-1 ">
+                                <div class="absolute flex items-center justify-center w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-sm -bottom-1 -right-1">
                                     <svg class="w-2.5 h-2.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -315,9 +312,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Business Stats -->
+                    </div> <!-- Business Stats -->
                     <div class="flex justify-between p-3 mt-4 rounded-lg bg-gray-50">
                         <div class="flex-1 text-center">
                             <div class="text-xl font-bold text-primary"><?php echo round($businessCompletion); ?>%</div>
@@ -332,6 +327,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <div class="text-xs text-gray-500">Active Jobs</div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- About Section -->
@@ -340,7 +336,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <h3 class="flex items-center font-semibold text-primary text-md">
                             About <?php echo !empty($business['business_name']) ? htmlspecialchars($business['business_name']) : 'Us'; ?>
                         </h3>
-                        <a href="?page=complete-employer-business&step=1" class="text-blue-600 hover:text-blue-700">
+                        <a href="?page=complete-employer-business&step=1" class="text-gray-400 hover:text-blue-700">
                             <i class="fas fa-edit"></i>
                         </a>
                     </div>
@@ -356,14 +352,14 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <h3 class="flex items-center font-semibold text-primary text-md">
                                 Business Information
                             </h3>
-                            <a href="?page=complete-employer-business&step=2" class="text-blue-600 hover:text-blue-700">
+                            <a href="?page=complete-employer-business&step=2" class="text-gray-400 hover:text-blue-700">
                                 <i class="fas fa-edit"></i>
                             </a>
                         </div>
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
                             <?php if (!empty($business['business_type'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                                    <i class="mr-3 text-gray-500 fas fa-building"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Organization Type</p>
                                         <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_type']); ?></p>
@@ -372,7 +368,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <?php endif; ?>
                             <?php if (!empty($business['business_industry'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                                    <i class="mr-3 text-gray-500 fas fa-industry"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Industry</p>
                                         <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_industry']); ?></p>
@@ -390,7 +386,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <?php endif; ?>
                             <?php if (!empty($business['business_established_year'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                                    <i class="mr-3 text-gray-500 fas fa-calendar"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Established</p>
                                         <p class="text-sm font-medium text-gray-800"><?php echo date('Y', strtotime($business['business_established_year'])); ?></p>
@@ -399,7 +395,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <?php endif; ?>
                             <?php if (!empty($business['business_website'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                                    <i class="mr-3 text-gray-500 fas fa-globe"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Website</p>
                                         <a href="<?php echo htmlspecialchars($business['business_website']); ?>" target="_blank"
@@ -411,7 +407,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                             <?php endif; ?>
                             <?php if (!empty($business['business_contact'])): ?>
                                 <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                                    <i class="mr-3 text-gray-500 fas fa-phone"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Business Contact</p>
                                         <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($business['business_contact']); ?></p>
@@ -422,7 +418,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <?php if (!empty($business['business_address'])): ?>
                             <div class="p-3 mt-4 rounded-lg bg-gray-50">
                                 <div class="flex items-start">
-                                    <i class="mt-1 mr-3 text-gray-500 fas fa-map-marker-alt"></i>
+
                                     <div>
                                         <p class="text-xs text-gray-500">Address</p>
                                         <p class="text-sm font-medium text-gray-800 break-words"><?php echo nl2br(htmlspecialchars($business['business_address'])); ?></p>
@@ -438,10 +434,10 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                     <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="flex items-center font-semibold text-primary text-md">
-                                <i class="mr-2 text-blue-600 fas fa-share-alt"></i>
+
                                 Social Media
                             </h3>
-                            <a href="?page=complete-employer-business&step=3" class="text-blue-600 hover:text-blue-700">
+                            <a href="?page=complete-employer-business&step=3" class="text-gray-400 hover:text-blue-700">
                                 <i class="fas fa-edit"></i>
                             </a>
                         </div>
@@ -462,15 +458,15 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="flex items-center font-semibold text-primary text-md">
-                            <i class="mr-2 text-blue-600 fas fa-file-alt"></i>
+                           
                             Required Documents
                             <span class="ml-2 text-sm text-gray-500">(<?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?>)</span>
                         </h3>
-                        <a href="?page=complete-employer-business&step=4" class="text-blue-600 hover:text-blue-700">
+                        <a href="?page=complete-employer-business&step=4" class="text-gray-400 hover:text-blue-700">
                             <i class="fas fa-upload"></i>
                         </a>
                     </div>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         <?php foreach ($documentTypes as $type => $label): ?>
                             <div class="flex items-center justify-between p-3 border rounded-lg <?php echo !empty($documents[$type]) ? 'bg-blue-50' : 'border-gray-200 bg-gray-50'; ?>">
                                 <div class="flex items-center">
@@ -524,12 +520,12 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                 <!-- Recent Activity -->
                 <div class="p-6 mb-4 bg-white border border-gray-200 shadow rounded-xl">
                     <h3 class="flex items-center mb-4 text-lg font-semibold text-gray-800">
-                        <i class="mr-2 text-blue-600 fas fa-clock"></i>
+                     
                         Recent Activity
                     </h3>
                     <div class="space-y-3">
                         <div class="flex items-center p-3 rounded-lg bg-gray-50">
-                            <i class="mr-3 text-blue-600 fas fa-user-plus"></i>
+                           
                             <div>
                                 <p class="text-sm font-medium text-gray-800">Profile created</p>
                                 <p class="text-xs text-gray-500"><?php echo date('M j, Y', strtotime($employer['created_at'] ?? 'now')); ?></p>
@@ -547,6 +543,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                         <?php endif; ?>
                     </div>
                 </div>
+
 
             </div>
         </div>
