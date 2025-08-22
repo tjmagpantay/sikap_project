@@ -50,7 +50,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <input type="password" id="confirm-password" name="confirm_password"
                                     class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="flex gap-3">
                                 <button type="submit"
                                     class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                     Update Password
@@ -197,7 +197,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Profile Status</p>
-                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-primary">
                                 <i class="mr-1 fas fa-check-circle"></i>
                                 Active
                             </span>

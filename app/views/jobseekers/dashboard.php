@@ -47,79 +47,226 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
                     </div>
 
-                    <!-- Location -->
+                    <!-- Location Filter -->
                     <div class="w-full lg:w-40">
-                        <div class="flex items-center gap-2 px-3 py-3 transition-all bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
-                            <img src="assets/icons/location-information-svgrepo-com.svg" class="w-4 h-4 text-gray-500" alt="Location Icon" />
-                            <select id="locationFilter"
-                                class="flex-1 text-sm text-gray-700 bg-transparent border-none outline-none appearance-none cursor-pointer focus:ring-0">
-                                <option value="">Location</option>
-                                <option value="manila">Manila</option>
-                                <option value="quezon-city">Quezon City</option>
-                                <option value="makati">Makati</option>
-                                <option value="taguig">Taguig</option>
-                                <option value="pasig">Pasig</option>
-                                <option value="cebu">Cebu</option>
-                                <option value="davao">Davao</option>
-                            </select>
-                            <svg class="w-4 h-4 pointer-events-none text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                        <div class="relative" x-data="{ open: false, selected: 'Location' }">
+                            <button @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <div class="flex items-center gap-2">
+                                    <img src="assets/icons/location-information-svgrepo-com.svg" class="w-4 h-4 text-gray-500" alt="Location Icon" />
+                                    <span x-text="selected" class="truncate"></span>
+                                </div>
+                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'Location'; open = false; filterByLocation('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Locations
+                                    </button>
+                                    <button @click="selected = 'Manila'; open = false; filterByLocation('manila')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Manila
+                                    </button>
+                                    <button @click="selected = 'Quezon City'; open = false; filterByLocation('quezon-city')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Quezon City
+                                    </button>
+                                    <button @click="selected = 'Makati'; open = false; filterByLocation('makati')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Makati
+                                    </button>
+                                    <button @click="selected = 'Taguig'; open = false; filterByLocation('taguig')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Taguig
+                                    </button>
+                                    <button @click="selected = 'Pasig'; open = false; filterByLocation('pasig')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Pasig
+                                    </button>
+                                    <button @click="selected = 'Cebu'; open = false; filterByLocation('cebu')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Cebu
+                                    </button>
+                                    <button @click="selected = 'Davao'; open = false; filterByLocation('davao')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Davao
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Job Type -->
+                    <!-- Job Type Filter -->
                     <div class="w-full lg:w-36">
-                        <div class="flex items-center gap-2 px-3 py-3 transition-all bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
-                            <select id="jobTypeFilter"
-                                class="flex-1 text-sm text-gray-700 bg-transparent border-none outline-none appearance-none cursor-pointer focus:ring-0">
-                                <option value="">Job Type</option>
-                                <option value="full-time">Full-time</option>
-                                <option value="part-time">Part-time</option>
-                                <option value="contract">Contract</option>
-                                <option value="temporary">Temporary</option>
-                                <option value="internship">Internship</option>
-                            </select>
-                            <svg class="w-4 h-4 pointer-events-none text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                        <div class="relative" x-data="{ open: false, selected: 'Job Type' }">
+                            <button @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="truncate"></span>
+                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'Job Type'; open = false; filterByJobType('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Types
+                                    </button>
+                                    <button @click="selected = 'Full-time'; open = false; filterByJobType('full-time')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Full-time
+                                    </button>
+                                    <button @click="selected = 'Part-time'; open = false; filterByJobType('part-time')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Part-time
+                                    </button>
+                                    <button @click="selected = 'Contract'; open = false; filterByJobType('contract')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Contract
+                                    </button>
+                                    <button @click="selected = 'Temporary'; open = false; filterByJobType('temporary')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Temporary
+                                    </button>
+                                    <button @click="selected = 'Internship'; open = false; filterByJobType('internship')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Internship
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Industry -->
+                    <!-- Industry Filter -->
                     <div class="w-full lg:w-40">
-                        <div class="flex items-center gap-2 px-3 py-3 transition-all bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
-                            <select id="industryFilter"
-                                class="flex-1 text-sm text-gray-700 bg-transparent border-none outline-none appearance-none cursor-pointer focus:ring-0">
-                                <option value="">Industry</option>
-                                <option value="technology">Technology</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="education">Education</option>
-                                <option value="finance">Finance</option>
-                                <option value="retail">Retail</option>
-                                <option value="manufacturing">Manufacturing</option>
-                                <option value="hospitality">Hospitality</option>
-                                <option value="construction">Construction</option>
-                            </select>
-                            <svg class="w-4 h-4 pointer-events-none text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                        <div class="relative" x-data="{ open: false, selected: 'Industry' }">
+                            <button @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="truncate"></span>
+                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'Industry'; open = false; filterByIndustry('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Industries
+                                    </button>
+                                    <button @click="selected = 'Technology'; open = false; filterByIndustry('technology')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Technology
+                                    </button>
+                                    <button @click="selected = 'Healthcare'; open = false; filterByIndustry('healthcare')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Healthcare
+                                    </button>
+                                    <button @click="selected = 'Education'; open = false; filterByIndustry('education')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Education
+                                    </button>
+                                    <button @click="selected = 'Finance'; open = false; filterByIndustry('finance')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Finance
+                                    </button>
+                                    <button @click="selected = 'Retail'; open = false; filterByIndustry('retail')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Retail
+                                    </button>
+                                    <button @click="selected = 'Manufacturing'; open = false; filterByIndustry('manufacturing')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Manufacturing
+                                    </button>
+                                    <button @click="selected = 'Hospitality'; open = false; filterByIndustry('hospitality')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Hospitality
+                                    </button>
+                                    <button @click="selected = 'Construction'; open = false; filterByIndustry('construction')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Construction
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Workplace -->
+                    <!-- Workplace Filter -->
                     <div class="w-full lg:w-36">
-                        <div class="flex items-center gap-2 px-3 py-3 transition-all bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
-                            <select id="workplaceFilter"
-                                class="flex-1 text-sm text-gray-700 bg-transparent border-none outline-none appearance-none cursor-pointer focus:ring-0">
-                                <option value="">Workplace</option>
-                                <option value="on-site">On-site</option>
-                                <option value="remote">Remote</option>
-                                <option value="hybrid">Hybrid</option>
-                            </select>
-                            <svg class="w-4 h-4 pointer-events-none text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                        <div class="relative" x-data="{ open: false, selected: 'Workplace' }">
+                            <button @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="truncate"></span>
+                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'Workplace'; open = false; filterByWorkplace('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Workplaces
+                                    </button>
+                                    <button @click="selected = 'On-site'; open = false; filterByWorkplace('on-site')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        On-site
+                                    </button>
+                                    <button @click="selected = 'Remote'; open = false; filterByWorkplace('remote')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Remote
+                                    </button>
+                                    <button @click="selected = 'Hybrid'; open = false; filterByWorkplace('hybrid')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Hybrid
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -192,7 +339,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                                             <!-- Right side: Save button + Urgent Tag -->
                                             <div class="flex items-center flex-shrink-0 gap-2">
-                                           
+
 
                                                 <span class="px-2 py-1 text-xs font-medium text-white rounded-sm bg-primary">
                                                     Urgent
@@ -438,6 +585,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
         </div>
     </div>
+
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
         // AJAX function to load job details
@@ -812,6 +962,132 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             });
         }
 
+        // Filter functions for the new dropdown system
+        function filterByLocation(location) {
+            applyAllFilters();
+        }
+
+        function filterByJobType(jobType) {
+            applyAllFilters();
+        }
+
+        function filterByIndustry(industry) {
+            applyAllFilters();
+        }
+
+        function filterByWorkplace(workplace) {
+            applyAllFilters();
+        }
+
+        // Apply all filters function
+        function applyAllFilters() {
+            const searchTerm = document.getElementById('jobSearch').value.toLowerCase().trim();
+
+            // Get selected values from dropdowns
+            const selectedLocation = getDropdownValue('Location');
+            const selectedJobType = getDropdownValue('Job Type');
+            const selectedIndustry = getDropdownValue('Industry');
+            const selectedWorkplace = getDropdownValue('Workplace');
+
+            const jobCards = document.querySelectorAll('.job-card');
+            let visibleCount = 0;
+
+            jobCards.forEach(card => {
+                let shouldShow = true;
+
+                // Search filter (job title, company name)
+                if (searchTerm) {
+                    const jobTitle = card.querySelector('h3').textContent.toLowerCase();
+                    const companyName = card.querySelector('p').textContent.toLowerCase();
+                    if (!jobTitle.includes(searchTerm) && !companyName.includes(searchTerm)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Location filter
+                if (selectedLocation && selectedLocation !== 'Location' && shouldShow) {
+                    const locationText = card.querySelector('.text-gray-600').textContent.toLowerCase();
+                    if (!locationText.includes(selectedLocation.toLowerCase())) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Job type filter
+                if (selectedJobType && selectedJobType !== 'Job Type' && shouldShow) {
+                    const jobTypeElement = card.querySelector('.text-primary');
+                    if (jobTypeElement && !jobTypeElement.textContent.toLowerCase().includes(selectedJobType.toLowerCase())) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Industry filter
+                if (selectedIndustry && selectedIndustry !== 'Industry' && shouldShow) {
+                    const categoryElements = card.querySelectorAll('.text-primary');
+                    let hasMatchingCategory = false;
+                    categoryElements.forEach(element => {
+                        if (element.textContent.toLowerCase().includes(selectedIndustry.toLowerCase())) {
+                            hasMatchingCategory = true;
+                        }
+                    });
+                    if (!hasMatchingCategory) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Show/hide card
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update job count
+            updateJobCount(visibleCount);
+
+            // Show message if no results
+            showNoResultsMessage(visibleCount === 0);
+        }
+
+        // Helper function to get selected value from dropdown
+        function getDropdownValue(defaultValue) {
+            const dropdowns = document.querySelectorAll(`[x-data*="'${defaultValue}'"]`);
+            for (let dropdown of dropdowns) {
+                const button = dropdown.querySelector('button span');
+                if (button && button.textContent.trim() !== defaultValue) {
+                    return button.textContent.trim();
+                }
+            }
+            return '';
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            // Reset search input
+            document.getElementById('jobSearch').value = '';
+
+            // Reset all dropdown texts to default
+            const locationBtn = document.querySelector('[x-data*="Location"] button span');
+            const jobTypeBtn = document.querySelector('[x-data*="Job Type"] button span');
+            const industryBtn = document.querySelector('[x-data*="Industry"] button span');
+            const workplaceBtn = document.querySelector('[x-data*="Workplace"] button span');
+
+            if (locationBtn) locationBtn.textContent = 'Location';
+            if (jobTypeBtn) jobTypeBtn.textContent = 'Job Type';
+            if (industryBtn) industryBtn.textContent = 'Industry';
+            if (workplaceBtn) workplaceBtn.textContent = 'Workplace';
+
+            // Show all job cards
+            const jobCards = document.querySelectorAll('.job-card');
+            jobCards.forEach(card => {
+                card.style.display = 'block';
+            });
+
+            updateJobCount(jobCards.length);
+            showNoResultsMessage(false);
+        }
+
         // Debounce function for search input
         function debounce(func, wait) {
             let timeout;
@@ -827,6 +1103,16 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Initialize filters when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            initializeFilters();
+            // Real-time search with debounce
+            const searchInput = document.getElementById('jobSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(applyAllFilters, 300));
+            }
+
+            // Clear filters button
+            const clearButton = document.getElementById('clearFilters');
+            if (clearButton) {
+                clearButton.addEventListener('click', clearAllFilters);
+            }
         });
     </script>

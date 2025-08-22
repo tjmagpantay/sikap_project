@@ -29,10 +29,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         echo htmlspecialchars($companyName);
                         ?>
                     </p>
-                    <div class="flex flex-wrap gap-4 mt-2 text-sm text-blue-600">
-                        <span><i class="mr-1 fas fa-map-marker-alt"></i><?php echo htmlspecialchars($job['location']); ?></span>
-                        <span><i class="mr-1 fas fa-briefcase"></i><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -404,7 +401,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                 <form method="POST" id="submitForm" style="display: inline;">
                     <button type="submit" id="submitBtn" disabled
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50">
+                        class="inline-flex items-center gap-2 px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50">
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                         </svg>

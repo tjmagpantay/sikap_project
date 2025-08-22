@@ -291,7 +291,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                             <div class="flex items-center justify-between">
                                                 <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($doc['file_name']); ?></p>
                                                 <?php if ($isSelected): ?>
-                                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
+                                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
                                                         Currently Selected
                                                     </span>
                                                 <?php endif; ?>
@@ -401,7 +401,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 <div class="flex items-center justify-between">
                                                     <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($doc['file_name']); ?></p>
                                                     <?php if ($isSelected): ?>
-                                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
+                                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
                                                             Currently Selected
                                                         </span>
                                                     <?php endif; ?>

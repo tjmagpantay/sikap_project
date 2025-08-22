@@ -13,12 +13,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <h1 class="text-2xl font-bold text-gray-900">Saved Jobs</h1>
                 <p class="mt-1 text-sm text-gray-600">Jobs you've bookmarked for later</p>
             </div>
-            <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary-600">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                Browse More Jobs
-            </a>
+
         </div>
 
         <!-- Saved Jobs List -->

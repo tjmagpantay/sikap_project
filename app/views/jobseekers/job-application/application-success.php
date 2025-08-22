@@ -39,13 +39,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
             <!-- Success Header -->
             <div class="mb-8 text-center">
-                <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
+                
                 <h1 class="mb-2 text-2xl font-bold text-primary">Application Submitted Successfully!</h1>
-                <p class="text-gray-600">Your job application has been sent to the employer for review.</p>
+                <p class="text-sm text-gray-600">Your job application has been sent to the employer for review.</p>
             </div>
 
             <!-- Application Details -->
@@ -148,12 +144,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             <!-- Important Notes -->
             <div class="p-4 mb-8 border border-blue-200 rounded-lg bg-blue-50">
                 <div class="flex">
-                    <svg class="w-5 h-5 mt-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-5 h-5 mt-1 text-primary" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                     </svg>
                     <div class="ml-3">
-                        <h4 class="text-sm font-medium text-blue-900">Important Notes</h4>
-                        <ul class="mt-2 space-y-1 text-sm text-blue-700 list-disc list-inside">
+                        <h4 class="text-sm font-medium text-primary ">Important Notes</h4>
+                        <ul class="mt-2 space-y-1 text-sm list-disc li t-inside text-primary">
                             <li>You will receive email notifications for status updates</li>
                             <li>You can track your application status in your dashboard</li>
                             <li>Keep your contact information updated</li>
@@ -173,21 +169,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     View My Applications
                 </a>
 
-                <a href="?page=browse-jobs"
-                    class="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    Browse More Jobs
-                </a>
-
-                <a href="?page=dashboard"
-                    class="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Go to Dashboard
-                </a>
+                
             </div>
         </div>
     </div>

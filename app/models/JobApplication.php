@@ -170,7 +170,7 @@ class JobApplication
         try {
             $sql = "SELECT ja.*, jp.job_title, jp.job_summary, jp.job_type, jp.location, jp.salary, jp.show_pay,
                            e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name, eb.business_desc
+                           eb.business_name as company_name, eb.business_desc, eb.business_logo
                     FROM job_application ja
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     JOIN employer e ON jp.employer_id = e.employer_id
