@@ -64,7 +64,7 @@ include_once __DIR__ . '/../components/navbar.php';
             <div class="mt-4 text-center">
                 <p class="mb-2 text-sm text-gray-600">
                     Don't have an account?
-                    <a href="?page=signup-employer" class="font-medium text-secondary hover:underline">Sign Up as Employer</a>
+                    <a href="?page=signup-employer" class="font-medium text-secondary hover:underline">Sign Up </a>
                 </p>
                 <p class="text-sm text-gray-600">
                     Looking for a job?

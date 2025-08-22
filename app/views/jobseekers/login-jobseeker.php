@@ -162,8 +162,8 @@ include_once __DIR__ . '/../components/navbar.php';
         // Initialize first dot
         showImage(0);
 
-        // Auto-change images every 4 seconds (increased for smoother experience)
-        setInterval(nextImage, 4000);
+        // Auto-change images every 3 seconds (increased for smoother experience)
+        setInterval(nextImage, 3000);
 
         // Click dots to change image with smooth transition
         dots.forEach((dot, index) => {

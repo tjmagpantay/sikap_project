@@ -14,9 +14,9 @@ $endDate = date('M j');
 
 ?>
 
-<div class="min-h-screen ">
+<div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
     <!-- Main Content Container - Match navbar padding -->
-    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
+    <div class="container px-0 py-8 mx-auto max-w-7xl sm:px-2 md:px-4 lg:px-12">
 
         <!-- Greeting Section -->
         <div class="mt-12 mb-12 ">
@@ -630,6 +630,3 @@ $endDate = date('M j');
         </div>
     </div>
 </div>
-
-
-<!-- include_once __DIR__ . '/../components/footer.php'; -->
