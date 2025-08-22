@@ -23,7 +23,7 @@ class JobApplicants
         }
     }
 
-    public function getAllApplicantsGroupedByJob()
+    public function getAllApplicantsGroupedByJob($employer_id = null)
     {
         $sql = "SELECT 
                     ja.application_id,
@@ -39,10 +39,23 @@ class JobApplicants
                 FROM job_application ja
                 JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
                 JOIN users u ON js.user_id = u.user_id
-                JOIN job_post jp ON ja.job_id = jp.job_id
-                ORDER BY jp.job_title, ja.applied_at DESC";
+                JOIN job_post jp ON ja.job_id = jp.job_id";
+
+        // Add WHERE clause if employer_id is provided
+        if ($employer_id !== null) {
+            $sql .= " WHERE jp.employer_id = ?";
+        }
+
+        $sql .= " ORDER BY jp.job_title, ja.applied_at DESC";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
+
+        if ($employer_id !== null) {
+            $stmt->execute([$employer_id]);
+        } else {
+            $stmt->execute();
+        }
+
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Group by job title
@@ -58,7 +71,7 @@ class JobApplicants
         return $grouped;
     }
 
-    public function getAllApplicants()
+    public function getAllApplicants($employer_id = null)
     {
         $sql = "SELECT 
                     ja.application_id,
@@ -70,14 +83,27 @@ class JobApplicants
                     js.last_name,
                     js.profile_picture
                 FROM job_application ja
-                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
-                ORDER BY ja.applied_at DESC";
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id";
+
+        // Add JOIN with job_post if we need to filter by employer
+        if ($employer_id !== null) {
+            $sql .= " JOIN job_post jp ON ja.job_id = jp.job_id WHERE jp.employer_id = ?";
+        }
+
+        $sql .= " ORDER BY ja.applied_at DESC";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
+
+        if ($employer_id !== null) {
+            $stmt->execute([$employer_id]);
+        } else {
+            $stmt->execute();
+        }
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getApplicantsByJob($job_id)
+    public function getApplicantsByJob($job_id, $employer_id = null)
     {
         $sql = "SELECT 
                     ja.application_id,
@@ -88,11 +114,26 @@ class JobApplicants
                     js.last_name,
                     js.profile_picture
                 FROM job_application ja
-                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
-                WHERE ja.job_id = ?
-                ORDER BY ja.applied_at DESC";
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id";
+
+        // Add JOIN with job_post to verify employer ownership
+        if ($employer_id !== null) {
+            $sql .= " JOIN job_post jp ON ja.job_id = jp.job_id
+                     WHERE ja.job_id = ? AND jp.employer_id = ?";
+        } else {
+            $sql .= " WHERE ja.job_id = ?";
+        }
+
+        $sql .= " ORDER BY ja.applied_at DESC";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$job_id]);
+
+        if ($employer_id !== null) {
+            $stmt->execute([$job_id, $employer_id]);
+        } else {
+            $stmt->execute([$job_id]);
+        }
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

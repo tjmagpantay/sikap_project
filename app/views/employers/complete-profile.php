@@ -4,7 +4,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
 <div class="min-h-screen ">
-    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
+    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
         <div class="mb-8 text-center">
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Complete Your Profile

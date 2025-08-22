@@ -72,7 +72,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 ?>
 
 <div class="min-h-screen">
-    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
+    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
         <div class="flex flex-col gap-8 md:flex-row">
             <!-- Sidebar - Personal Profile -->
             <div class="w-full md:w-1/3">

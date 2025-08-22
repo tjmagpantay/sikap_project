@@ -14,51 +14,12 @@ $endDate = date('M j');
 
 ?>
 
-<div class="h-4"></div>
-
-<div class="min-h-screen bg-white">
+<div class="min-h-screen ">
     <!-- Main Content Container - Match navbar padding -->
-    <div class="px-4 py-8 sm:px-6 md:px-16 lg:px-24">
-
-        <!-- Hero Card Section -->
-        <div class="mb-8">
-            <div class="relative overflow-hidden rounded-md shadow-xl" style="background: linear-gradient(135deg, #092C4C 0%, #F3AF0E 100%);">
-                <!-- Background Image with Gradient Overlay -->
-                <div class="absolute inset-0">
-                    <img src="assets/images/hero-page-bg.png"
-                        alt="Hero Background"
-                        class="object-cover w-full h-full opacity-50"
-                        onerror="this.style.display='none'">
-                    <!-- Reduced gradient overlay opacity for better image visibility -->
-                    <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(9, 44, 76, 0.4) 0%, rgba(243, 175, 14, 0.4) 100%);"></div>
-                </div>
-
-                <!-- Hero Content -->
-                <div class="relative px-6 py-8 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-                    <div class="max-w-3xl">
-                        <h1 class="text-3xl font-bold tracking-tight text-white sm:text-3xl lg:text-3xl">
-                            Post a Job That Stands Out
-                        </h1>
-                        <p class="max-w-2xl mt-2 text-sm leading-relaxed text-white sm:mt-3 sm:text-sm">
-                            Create a compelling job post that highlights your needs and attracts the perfect match.
-                        </p>
-                    </div>
-
-                    <!-- Decorative Pattern -->
-                    <div class="absolute top-4 right-4 opacity-20">
-                        <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 100 100">
-                            <pattern id="diagonals" patternUnits="userSpaceOnUse" width="40" height="40">
-                                <path d="M0,40 L40,0 M-10,10 L10,-10 M30,50 L50,30" stroke="currentColor" stroke-width="2" />
-                            </pattern>
-                            <rect width="100" height="100" fill="url(#diagonals)" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
 
         <!-- Greeting Section -->
-        <div class="mt-12 mb-12">
+        <div class="mt-12 mb-12 ">
             <div class="flex items-center justify-between">
                 <!-- Left side: Greeting -->
                 <div>
@@ -372,25 +333,25 @@ $endDate = date('M j');
                                         <a href="?page=manage-jobs"
                                             @click="selected = 'All Jobs'; open = false"
                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="mr-3 text-blue-400 fas fa-briefcase"></i>
+                                   
                                             All Jobs
                                         </a>
                                         <a href="?page=dashboard&sort=recent"
                                             @click="selected = 'Recent'; open = false"
                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="mr-3 text-green-400 fas fa-clock"></i>
+                                            
                                             Recent
                                         </a>
                                         <a href="?page=dashboard&sort=popular"
                                             @click="selected = 'Most Popular'; open = false"
                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="mr-3 text-purple-400 fas fa-star"></i>
+                                           
                                             Most Popular
                                         </a>
                                         <a href="?page=dashboard&sort=expiring"
                                             @click="selected = 'Expiring Soon'; open = false"
                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="mr-3 text-orange-400 fas fa-exclamation-triangle"></i>
+                                           
                                             Expiring Soon
                                         </a>
                                     </div>
@@ -425,7 +386,7 @@ $endDate = date('M j');
                                 <tr>
                                     <td colspan="4" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center">
-                                            <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gray-100 rounded-full">
+                                            <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full">
                                                 <i class="text-2xl text-gray-400 fas fa-briefcase"></i>
                                             </div>
                                             <h3 class="mt-4 text-lg font-medium text-gray-900">No job posts yet</h3>

@@ -3,9 +3,7 @@
     <!-- Left navigation links -->
     <div class="block">
       <ul class="flex flex-row items-center gap-4 font-light">
-        <li class="nav-link-top">
-          <a href="#" class="flex items-center">Home</a>
-        </li>
+
         <li class="nav-link-top">
           <a href="#" class="flex items-center">PESO</a>
         </li>
