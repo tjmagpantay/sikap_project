@@ -4,331 +4,384 @@ include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 ?>
 
-<div class="px-6 py-8 bg-gray-50">
-    <div class="mx-auto max-w-7xl">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">My Applications</h1>
-                    <p class="mt-2 text-sm text-gray-600">Track the status of your job applications</p>
-                </div>
-                <div class="mt-4 sm:mt-0">
-                    <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
-                        <i class="mr-2 fas fa-search"></i>
-                        Browse Jobs
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Messages -->
-        <?php if (!empty($error)): ?>
-            <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($success)): ?>
-            <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
-                <?php echo htmlspecialchars($success); ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Applications Statistics -->
-        <?php
-        $totalApplications = count($applications);
-        $pendingCount = count(array_filter($applications, function ($app) {
-            return $app['application_status'] === 'pending';
-        }));
-        $reviewedCount = count(array_filter($applications, function ($app) {
-            return $app['application_status'] === 'reviewed';
-        }));
-        $shortlistedCount = count(array_filter($applications, function ($app) {
-            return $app['application_status'] === 'shortlisted';
-        }));
-        $rejectedCount = count(array_filter($applications, function ($app) {
-            return $app['application_status'] === 'rejected';
-        }));
-        $hiredCount = count(array_filter($applications, function ($app) {
-            return $app['application_status'] === 'hired';
-        }));
-        ?>
-
-        <div class="grid grid-cols-1 gap-5 mb-8 sm:grid-cols-2 lg:grid-cols-5">
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="text-2xl text-gray-400 fas fa-file-alt"></i>
-                        </div>
-                        <div class="flex-1 w-0 ml-5">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Applications</dt>
-                                <dd class="text-lg font-medium text-gray-900"><?php echo $totalApplications; ?></dd>
-                            </dl>
-                        </div>
+<div class="min-h-screen">
+    <div class="px-6 py-8 ">
+        <div class="mx-auto max-w-7xl">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">My Applications</h1>
+                        <p class="mt-1 text-sm text-gray-600">Track the status of your job applications</p>
                     </div>
+
                 </div>
             </div>
 
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="text-2xl text-yellow-400 fas fa-clock"></i>
-                        </div>
-                        <div class="flex-1 w-0 ml-5">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
-                                <dd class="text-lg font-medium text-gray-900"><?php echo $pendingCount; ?></dd>
-                            </dl>
-                        </div>
-                    </div>
+            <!-- Messages -->
+            <?php if (!empty($error)): ?>
+                <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
+                    <?php echo htmlspecialchars($error); ?>
                 </div>
-            </div>
-
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="text-2xl text-blue-400 fas fa-star"></i>
-                        </div>
-                        <div class="flex-1 w-0 ml-5">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Shortlisted</dt>
-                                <dd class="text-lg font-medium text-gray-900"><?php echo $shortlistedCount; ?></dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="text-2xl text-green-400 fas fa-check-circle"></i>
-                        </div>
-                        <div class="flex-1 w-0 ml-5">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Hired</dt>
-                                <dd class="text-lg font-medium text-gray-900"><?php echo $hiredCount; ?></dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="text-2xl text-red-400 fas fa-times-circle"></i>
-                        </div>
-                        <div class="flex-1 w-0 ml-5">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Rejected</dt>
-                                <dd class="text-lg font-medium text-gray-900"><?php echo $rejectedCount; ?></dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Applications List -->
-        <div class="overflow-hidden bg-white shadow sm:rounded-md">
-            <?php if (empty($applications)): ?>
-                <div class="py-12 text-center">
-                    <i class="mb-4 text-6xl text-primary fas fa-file-alt"></i>
-                    <h3 class="mb-2 text-lg font-medium text-gray-900">No applications yet</h3>
-                    <p class="mb-6 text-gray-500">Start applying for jobs to see your applications here</p>
-                    <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-secondary">
-                        <i class="mr-2 fas fa-search"></i>
-                        Browse Jobs
-                    </a>
-                </div>
-            <?php else: ?>
-                <ul class="divide-y divide-gray-200">
-                    <?php foreach ($applications as $application): ?>
-                        <li class="px-6 py-4 transition hover:bg-primary/10">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center space-x-3">
-                                        <h3 class="text-lg font-bold truncate text-primary">
-                                            <?php echo htmlspecialchars($application['job_title']); ?>
-                                        </h3>
-
-                                        <!-- Save/Unsave Button -->
-                                        <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)"
-                                            class="save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors
-                                                   <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'text-yellow-700 bg-yellow-100 border border-yellow-300' : 'text-secondary bg-secondary/10 border border-secondary hover:bg-yellow-50 hover:text-yellow-600'; ?>"
-                                            data-job-id="<?php echo $application['job_id']; ?>"
-                                            data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>"
-                                            title="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
-                                            <i class="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?> mr-1"></i>
-                                            <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Saved' : 'Save'; ?></span>
-                                        </button>
-
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            <?php
-                                            switch ($application['application_status']) {
-                                                case 'pending':
-                                                    echo 'bg-yellow-100 text-yellow-800';
-                                                    break;
-                                                case 'reviewed':
-                                                    echo 'bg-secondary/10 text-secondary';
-                                                    break;
-                                                case 'shortlisted':
-                                                    echo 'bg-primary/10 text-primary';
-                                                    break;
-                                                case 'rejected':
-                                                    echo 'bg-red-100 text-red-800';
-                                                    break;
-                                                case 'hired':
-                                                    echo 'bg-green-100 text-green-800';
-                                                    break;
-                                                default:
-                                                    echo 'bg-gray-100 text-gray-800';
-                                            }
-                                            ?>">
-                                            <?php echo ucfirst($application['application_status']); ?>
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center mt-1 space-x-4 text-sm text-gray-500">
-                                        <span><i class="mr-1 fas fa-building text-secondary"></i><?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?></span>
-                                        <span><i class="mr-1 fas fa-briefcase text-primary"></i><?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?></span>
-                                        <span><i class="mr-1 fas fa-map-marker-alt text-secondary"></i><?php echo htmlspecialchars($application['location']); ?></span>
-                                        <span><i class="mr-1 fas fa-calendar text-primary"></i>Applied <?php echo date('M j, Y', strtotime($application['applied_at'])); ?></span>
-                                        <?php if ($application['reviewed_at']): ?>
-                                            <span><i class="mr-1 fas fa-eye text-secondary"></i>Reviewed <?php echo date('M j, Y', strtotime($application['reviewed_at'])); ?></span>
-                                        <?php endif; ?>
-                                        <?php if (!empty($application['interview_date'])): ?>
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">
-                                                <i class="mr-1 fas fa-calendar"></i>
-                                                Interview: <?php echo date('M j, Y g:i A', strtotime($application['interview_date'])); ?>
-                                                <?php if (!empty($application['interview_location'])): ?>
-                                                    @ <?php echo htmlspecialchars($application['interview_location']); ?>
-                                                <?php endif; ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center space-x-2">
-                                    <!-- View Application Button -->
-                                    <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition rounded bg-primary hover:bg-secondary"
-                                        title="View Application">
-                                        <i class="mr-2 fas fa-eye"></i>
-                                        View Details
-                                    </a>
-
-                                    <!-- View Job Button -->
-                                    <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium transition rounded text-primary bg-secondary/10 hover:bg-secondary/20"
-                                        title="View Job">
-                                        <i class="mr-2 fas fa-external-link-alt"></i>
-                                        View Job
-                                    </a>
-
-                                    <!-- Withdraw Application (only if pending) -->
-                                    <?php if ($application['application_status'] === 'pending'): ?>
-                                        <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
-                                            onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition bg-red-600 rounded hover:bg-red-700"
-                                            title="Withdraw Application">
-                                            <i class="mr-2 fas fa-times"></i>
-                                            Withdraw
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
             <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
+                    <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Applications Statistics -->
+            <?php
+            $totalApplications = count($applications);
+            $pendingCount = count(array_filter($applications, function ($app) {
+                return $app['application_status'] === 'pending';
+            }));
+            $reviewedCount = count(array_filter($applications, function ($app) {
+                return $app['application_status'] === 'reviewed';
+            }));
+            $shortlistedCount = count(array_filter($applications, function ($app) {
+                return $app['application_status'] === 'shortlisted';
+            }));
+            $rejectedCount = count(array_filter($applications, function ($app) {
+                return $app['application_status'] === 'rejected';
+            }));
+            $hiredCount = count(array_filter($applications, function ($app) {
+                return $app['application_status'] === 'hired';
+            }));
+            ?>
+
+            <!-- Summary Cards - Single Row Layout -->
+            <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 md:gap-6">
+                <!-- Card 1: Total Applications -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-gray-900 md:text-3xl"><?php echo $totalApplications; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Total Applications</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Pending -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-yellow-600 md:text-3xl"><?php echo $pendingCount; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Pending</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Shortlisted -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-blue-600 md:text-3xl"><?php echo $shortlistedCount; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Shortlisted</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Hired -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-green-600 md:text-3xl"><?php echo $hiredCount; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Hired</p>
+                    </div>
+                </div>
+
+                <!-- Card 5: Rejected -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
+                    <div class="text-center">
+                        <span class="text-2xl font-bold text-red-600 md:text-3xl"><?php echo $rejectedCount; ?></span>
+                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Rejected</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications Table -->
+            <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                <!-- Table Header -->
+                <div class="px-6 py-5 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <h3 class="text-xl font-semibold text-gray-900">
+                                All Applications
+                            </h3>
+                            <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <?php echo $totalApplications; ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <?php if (empty($applications)): ?>
+                    <div class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gray-100 rounded-full">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">No applications yet</h3>
+                            <p class="max-w-sm mt-2 text-sm text-gray-500">
+                                Start applying for jobs to see your applications here.
+                            </p>
+                            <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-secondary">
+                                <i class="mr-2 fas fa-search"></i>
+                                Browse Jobs
+                            </a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="w-full overflow-visible">
+                        <table class="w-full divide-y divide-gray-300 table-fixed">
+                            <!-- Table Header -->
+                            <thead class="bg-primary">
+                                <tr>
+                                    <th scope="col" class="w-2/5 px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase">
+                                        JOB POSITION
+                                    </th>
+                                    <th scope="col" class="w-1/5 px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase">
+                                        COMPANY
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
+                                        STATUS
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase w-1/8">
+                                        APPLIED DATE
+                                    </th>
+                                    <th scope="col" class="w-1/5 px-6 py-4 text-sm font-medium tracking-wider text-left text-white uppercase">
+                                        ACTIONS
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-300"><?php foreach ($applications as $application): ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <!-- Job Position Column -->
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($application['job_title']); ?>
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        <?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?> • <?php echo htmlspecialchars($application['location']); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Company Column -->
+                                        <td class="px-6 py-5">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>
+                                            </div>
+                                        </td>
+
+                                        <!-- Status Column -->
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center">
+                                                <?php
+                                                                                    switch ($application['application_status']) {
+                                                                                        case 'pending':
+                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
+                                                            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                        </div>';
+                                                                                            echo '<span class="text-sm font-medium text-yellow-600">Pending</span>';
+                                                                                            break;
+                                                                                        case 'shortlisted':
+                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-blue-600 rounded-full">
+                                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                                            </svg>
+                                                        </div>';
+                                                                                            echo '<span class="text-sm font-medium text-blue-600">Shortlisted</span>';
+                                                                                            break;
+                                                                                        case 'hired':
+                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
+                                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>';
+                                                                                            echo '<span class="text-sm font-medium text-green-600">Hired</span>';
+                                                                                            break;
+                                                                                        case 'rejected':
+                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
+                                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </div>';
+                                                                                            echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
+                                                                                            break;
+                                                                                        default:
+                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
+                                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                        </div>';
+                                                                                            echo '<span class="text-sm font-medium text-gray-600">' . ucfirst($application['application_status']) . '</span>';
+                                                                                    }
+                                                ?>
+                                            </div>
+                                        </td>
+
+                                        <!-- Applied Date Column -->
+                                        <td class="px-6 py-5">
+                                            <div class="text-sm text-gray-900"><?php echo date('M j, Y', strtotime($application['applied_at'])); ?></div>
+                                            <div class="text-xs text-gray-500"><?php echo date('g:i A', strtotime($application['applied_at'])); ?></div>
+                                        </td>
+
+                                        <!-- Actions Column -->
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center space-x-3">
+                                                <!-- View Application Button -->
+                                                <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    View
+                                                </a>
+
+                                                <!-- Three Dots Menu -->
+                                                <div class="relative" x-data="{ open: false }">
+                                                    <button @click="open = !open"
+                                                        @click.away="open = false"
+                                                        class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                                        </svg>
+                                                    </button>
+
+                                                    <!-- Dropdown Menu -->
+                                                    <div x-show="open"
+                                                        x-transition:enter="transition ease-out duration-100"
+                                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                                        x-transition:leave="transition ease-in duration-75"
+                                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                                        class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                                        style="display: none;">
+                                                        <div class="py-1">
+                                                            <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
+                                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                <i class="mr-3 text-blue-400 fas fa-external-link-alt"></i>
+                                                                View Job Details
+                                                            </a>
+
+                                                            <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)"
+                                                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                data-job-id="<?php echo $application['job_id']; ?>"
+                                                                data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>">
+                                                                <i class="mr-3 text-yellow-400 <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
+                                                                <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
+                                                            </button>
+
+                                                            <?php if ($application['application_status'] === 'pending'): ?>
+                                                                <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
+                                                                    onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
+                                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                    <i class="mr-3 text-red-400 fas fa-times"></i>
+                                                                    Withdraw Application
+                                                                </a>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    function toggleSaveJob(jobId, button) {
-        const isSaved = button.getAttribute('data-saved') === 'true';
-        const action = isSaved ? 'unsave-job' : 'save-job';
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-        // Show loading state
-        const icon = button.querySelector('i');
-        const text = button.querySelector('.save-text');
-        const originalIcon = icon.className;
-        const originalText = text.textContent;
+    <script>
+        function toggleSaveJob(jobId, button) {
+            const isSaved = button.getAttribute('data-saved') === 'true';
+            const action = isSaved ? 'unsave-job' : 'save-job';
 
-        icon.className = 'fas fa-spinner fa-spin mr-1';
-        text.textContent = 'Loading...';
-        button.disabled = true;
+            // Show loading state
+            const icon = button.querySelector('i');
+            const text = button.querySelector('.save-text');
+            const originalIcon = icon.className;
+            const originalText = text.textContent;
 
-        const formData = new FormData();
-        formData.append('job_id', jobId);
+            icon.className = 'fas fa-spinner fa-spin mr-3';
+            text.textContent = 'Loading...';
+            button.disabled = true;
 
-        fetch(`?page=${action}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (isSaved) {
-                        // Job was unsaved
-                        button.setAttribute('data-saved', 'false');
-                        button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-gray-600 bg-gray-100 border border-gray-300 hover:bg-yellow-50 hover:text-yellow-600';
-                        icon.className = 'far fa-bookmark mr-1';
-                        text.textContent = 'Save';
-                        button.title = 'Save job for later';
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+
+            fetch(`?page=${action}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (isSaved) {
+                            // Job was unsaved
+                            button.setAttribute('data-saved', 'false');
+                            icon.className = 'far fa-bookmark mr-3 text-yellow-400';
+                            text.textContent = 'Save Job';
+                        } else {
+                            // Job was saved
+                            button.setAttribute('data-saved', 'true');
+                            icon.className = 'fas fa-bookmark mr-3 text-yellow-400';
+                            text.textContent = 'Remove from Saved';
+                        }
+
+                        // Show toast notification
+                        showToast(data.message, 'success');
                     } else {
-                        // Job was saved
-                        button.setAttribute('data-saved', 'true');
-                        button.className = 'save-btn flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors text-yellow-700 bg-yellow-100 border border-yellow-300';
-                        icon.className = 'fas fa-bookmark mr-1';
-                        text.textContent = 'Saved';
-                        button.title = 'Remove from saved jobs';
+                        // Restore original state on error
+                        icon.className = originalIcon;
+                        text.textContent = originalText;
+                        showToast(data.message || 'Error occurred', 'error');
                     }
-
-                    // Show toast notification
-                    showToast(data.message, 'success');
-                } else {
+                })
+                .catch(error => {
                     // Restore original state on error
                     icon.className = originalIcon;
                     text.textContent = originalText;
-                    showToast(data.message || 'Error occurred', 'error');
-                }
-            })
-            .catch(error => {
-                // Restore original state on error
-                icon.className = originalIcon;
-                text.textContent = originalText;
-                console.error('Error:', error);
-                showToast('Error occurred while saving job', 'error');
-            })
-            .finally(() => {
-                button.disabled = false;
-            });
-    }
+                    console.error('Error:', error);
+                    showToast('Error occurred while saving job', 'error');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
+        }
 
-    function showToast(message, type) {
-        const toast = document.createElement('div');
-        toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300 ${
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300 ${
             type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
         }`;
-        toast.textContent = message;
+            toast.textContent = message;
 
-        document.body.appendChild(toast);
+            document.body.appendChild(toast);
 
-        setTimeout(() => {
-            toast.style.opacity = '0';
             setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
-    }
-</script>
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+    </dl>
+</div>
+</div>
+</div>
+
+</div>
+</div>
