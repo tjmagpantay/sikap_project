@@ -21,7 +21,7 @@ $success = $_GET['success'] ?? '';
         <?php include __DIR__ . '/components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <div class="flex flex-col flex-1 overflow-hidden">
+        <div class="flex flex-col flex-1 overflow-hidden lg:ml-80">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
             

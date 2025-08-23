@@ -6,6 +6,7 @@ $success = $_GET['success'] ?? '';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,16 +14,17 @@ $success = $_GET['success'] ?? '';
     <link href="css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
-        
+
         <!-- Main Content -->
-        <div class="flex flex-col flex-1 overflow-hidden">
+        <div class="flex flex-col flex-1 lg:ml-80 overflow-hidden">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
-            
+
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 <div class="p-6">
@@ -72,7 +74,9 @@ $success = $_GET['success'] ?? '';
                                 <div class="ml-4">
                                     <p class="text-sm text-gray-600">Active</p>
                                     <p class="text-2xl font-bold text-gray-900" id="activeCount">
-                                        <?php echo count(array_filter($users, function($user) { return ($user['status'] ?? 'active') === 'active'; })); ?>
+                                        <?php echo count(array_filter($users, function ($user) {
+                                            return ($user['status'] ?? 'active') === 'active';
+                                        })); ?>
                                     </p>
                                 </div>
                             </div>
@@ -85,7 +89,9 @@ $success = $_GET['success'] ?? '';
                                 <div class="ml-4">
                                     <p class="text-sm text-gray-600">From Rosario</p>
                                     <p class="text-2xl font-bold text-gray-900">
-                                        <?php echo count(array_filter($users, function($user) { return stripos($user['address'], 'rosario') !== false; })); ?>
+                                        <?php echo count(array_filter($users, function ($user) {
+                                            return stripos($user['address'], 'rosario') !== false;
+                                        })); ?>
                                     </p>
                                 </div>
                             </div>
@@ -98,7 +104,9 @@ $success = $_GET['success'] ?? '';
                                 <div class="ml-4">
                                     <p class="text-sm text-gray-600">Other Areas</p>
                                     <p class="text-2xl font-bold text-gray-900">
-                                        <?php echo count(array_filter($users, function($user) { return stripos($user['address'], 'rosario') === false; })); ?>
+                                        <?php echo count(array_filter($users, function ($user) {
+                                            return stripos($user['address'], 'rosario') === false;
+                                        })); ?>
                                     </p>
                                 </div>
                             </div>
@@ -116,12 +124,12 @@ $success = $_GET['success'] ?? '';
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                         <i class="text-gray-400 fas fa-search"></i>
                                     </div>
-                                    <input type="text" id="searchInput" 
-                                           class="block w-full py-2 pl-10 pr-3 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                           placeholder="Search by name, contact, or address...">
+                                    <input type="text" id="searchInput"
+                                        class="block w-full py-2 pl-10 pr-3 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Search by name, contact, or address...">
                                 </div>
                             </div>
-                            
+
                             <!-- Address Filter -->
                             <div class="lg:w-48">
                                 <label for="addressFilter" class="block mb-2 text-sm font-medium text-gray-700">Location</label>
@@ -131,7 +139,7 @@ $success = $_GET['success'] ?? '';
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                            
+
                             <!-- Date Range Filter -->
                             <div class="lg:w-48">
                                 <label for="dateFilter" class="block mb-2 text-sm font-medium text-gray-700">Registration Date</label>
@@ -144,12 +152,12 @@ $success = $_GET['success'] ?? '';
                                 </select>
                             </div>
                         </div>
-                        
+
                         <!-- Search Results Summary -->
                         <div class="pt-4 mt-4 border-t border-gray-200">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-gray-600" id="resultsCount">Showing all <?php echo count($users); ?> jobseekers</span>
-                            
+
                             </div>
                         </div>
                     </div>
@@ -176,7 +184,7 @@ $success = $_GET['success'] ?? '';
                                 <i class="mb-4 text-4xl text-gray-400 fas fa-search"></i>
                                 <p class="text-gray-500">No jobseekers match your search criteria</p>
                             </div>
-                            
+
                             <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="jobseekersTable">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
@@ -196,7 +204,7 @@ $success = $_GET['success'] ?? '';
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
                                         <?php foreach ($users as $user): ?>
-                                            <tr class="hover:bg-gray-50" 
+                                            <tr class="hover:bg-gray-50"
                                                 data-name="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'])); ?>"
                                                 data-address="<?php echo htmlspecialchars(strtolower($user['address'])); ?>"
                                                 data-date="<?php echo $user['created_at']; ?>">
@@ -213,7 +221,7 @@ $success = $_GET['success'] ?? '';
                                                         </div>
                                                     </div>
                                                 </td>
-                                                
+
                                                 <!-- Contact column -->
                                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                     <div class="flex items-center">
@@ -221,7 +229,7 @@ $success = $_GET['success'] ?? '';
                                                         <?php echo htmlspecialchars($user['contact_no']); ?>
                                                     </div>
                                                 </td>
-                                                
+
                                                 <!-- Sex column -->
                                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo strtolower($user['sex']) === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'; ?>">
@@ -229,7 +237,7 @@ $success = $_GET['success'] ?? '';
                                                         <?php echo htmlspecialchars($user['sex']); ?>
                                                     </span>
                                                 </td>
-                                                
+
                                                 <!-- Address column -->
                                                 <td class="max-w-xs px-6 py-4 text-sm text-gray-500 truncate whitespace-nowrap" title="<?php echo htmlspecialchars($user['address']); ?>">
                                                     <div class="flex items-center">
@@ -246,8 +254,8 @@ $success = $_GET['success'] ?? '';
                                                         <div class="flex flex-wrap gap-1">
                                                             <?php foreach ($user['job_applications'] as $application): ?>
                                                                 <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full 
-                                                                    <?php 
-                                                                    $statusClass = match($application['application_status']) {
+                                                                    <?php
+                                                                    $statusClass = match ($application['application_status']) {
                                                                         'pending' => 'bg-yellow-100 text-yellow-800',
                                                                         'shortlisted' => 'bg-blue-100 text-blue-800',
                                                                         'interviewed' => 'bg-purple-100 text-purple-800',
@@ -273,24 +281,24 @@ $success = $_GET['success'] ?? '';
                                                         <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
                                                     </div>
                                                 </td>
-                                                
+
                                                 <!-- Actions column -->
                                                 <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                                        <button class="text-gray-600 hover:text-gray-900" disabled title="Block User">
-                                                            <i class="mr-1 fas fa-ban"></i>Disable
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                                    <button class="text-gray-600 hover:text-gray-900" disabled title="Block User">
+                                                        <i class="mr-1 fas fa-ban"></i>Disable
+                                                    </button>
                             </div>
-                        <?php endif; ?>
+                            </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                        </table>
                     </div>
+                <?php endif; ?>
                 </div>
-            </main>
         </div>
+        </main>
+    </div>
     </div>
 
     <!-- Mobile Menu Overlay -->
@@ -311,7 +319,7 @@ $success = $_GET['success'] ?? '';
         function toggleSidebar() {
             const sidebarMobile = document.getElementById('sidebar-mobile');
             const overlay = document.getElementById('mobile-menu-overlay');
-            
+
             if (sidebarMobile) {
                 sidebarMobile.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
@@ -344,7 +352,7 @@ $success = $_GET['success'] ?? '';
             filteredRows = allRows.filter(row => {
                 const text = row.textContent.toLowerCase();
                 const address = row.getAttribute('data-address').toLowerCase();
-                
+
                 // Search filter
                 const searchMatch = !searchValue || text.includes(searchValue);
 
@@ -391,19 +399,19 @@ $success = $_GET['success'] ?? '';
                 case 'today':
                     const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
                     return rowToday.getTime() === today.getTime();
-                    
+
                 case 'week':
                     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
                     return rowDate >= weekAgo;
-                    
+
                 case 'month':
                     const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
                     return rowDate >= monthAgo;
-                    
+
                 case 'year':
                     const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
                     return rowDate >= yearAgo;
-                    
+
                 default:
                     return true;
             }
@@ -412,18 +420,18 @@ $success = $_GET['success'] ?? '';
         function updateCounts() {
             const visibleCount = filteredRows.length;
             const totalCount = allRows.length;
-            
+
             document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-            document.getElementById('resultsCount').textContent = 
-                visibleCount === totalCount ? 
-                `Showing all ${totalCount} jobseekers` : 
+            document.getElementById('resultsCount').textContent =
+                visibleCount === totalCount ?
+                `Showing all ${totalCount} jobseekers` :
                 `Showing ${visibleCount} of ${totalCount} jobseekers`;
         }
 
         function updateResultsMessage() {
             const noResultsMessage = document.getElementById('noResultsMessage');
             const jobseekersTable = document.getElementById('jobseekersTable');
-            
+
             if (filteredRows.length === 0) {
                 noResultsMessage.classList.remove('hidden');
                 jobseekersTable.classList.add('hidden');
@@ -442,18 +450,18 @@ $success = $_GET['success'] ?? '';
 
         // Sorting functionality
         let sortDirection = {};
-        
+
         function sortTable(columnIndex) {
             const tbody = document.getElementById('jobseekersTableBody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
-            
+
             // Get current direction or default to ascending
             sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
             const direction = sortDirection[columnIndex];
 
             const comparer = (a, b) => {
                 let aVal, bVal;
-                
+
                 if (columnIndex === 0) { // Name column
                     aVal = a.getAttribute('data-name');
                     bVal = b.getAttribute('data-name');
@@ -468,9 +476,9 @@ $success = $_GET['success'] ?? '';
                 }
 
                 // String comparison for text
-                return direction === 'asc' 
-                    ? String(aVal).localeCompare(String(bVal))
-                    : String(bVal).localeCompare(String(aVal));
+                return direction === 'asc' ?
+                    String(aVal).localeCompare(String(bVal)) :
+                    String(bVal).localeCompare(String(aVal));
             };
 
             rows.sort(comparer).forEach(row => tbody.appendChild(row));
@@ -520,7 +528,9 @@ $success = $_GET['success'] ?? '';
                 ].join(','))
             ].join('\n');
 
-            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const blob = new Blob([csvContent], {
+                type: 'text/csv'
+            });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -549,7 +559,7 @@ $success = $_GET['success'] ?? '';
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
             }
-            
+
             // Escape to clear filters
             if (e.key === 'Escape') {
                 clearAllFilters();
@@ -557,4 +567,5 @@ $success = $_GET['success'] ?? '';
         });
     </script>
 </body>
+
 </html>
