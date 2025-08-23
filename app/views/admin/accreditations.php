@@ -6,6 +6,7 @@ $success = $_GET['success'] ?? '';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,16 +14,17 @@ $success = $_GET['success'] ?? '';
     <link href="css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
-        
-        <!-- Main Content -->
-        <div class="flex flex-col flex-1 overflow-hidden lg:ml-80">
+
+        <!-- Main Content Area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
-            
+
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 <div class="p-6">
@@ -64,7 +66,7 @@ $success = $_GET['success'] ?? '';
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="p-6 bg-white border border-gray-200 rounded-lg">
                             <div class="flex items-center">
                                 <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
@@ -73,12 +75,14 @@ $success = $_GET['success'] ?? '';
                                 <div class="ml-4">
                                     <p class="text-sm text-gray-600">Approved</p>
                                     <p class="text-2xl font-bold text-gray-900">
-                                        <?php echo count(array_filter($allAccreditations, function($acc) { return $acc['status'] === 'approved'; })); ?>
+                                        <?php echo count(array_filter($allAccreditations, function ($acc) {
+                                            return $acc['status'] === 'approved';
+                                        })); ?>
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="p-6 bg-white border border-gray-200 rounded-lg">
                             <div class="flex items-center">
                                 <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-lg">
@@ -87,7 +91,9 @@ $success = $_GET['success'] ?? '';
                                 <div class="ml-4">
                                     <p class="text-sm text-gray-600">Rejected</p>
                                     <p class="text-2xl font-bold text-gray-900">
-                                        <?php echo count(array_filter($allAccreditations, function($acc) { return $acc['status'] === 'rejected'; })); ?>
+                                        <?php echo count(array_filter($allAccreditations, function ($acc) {
+                                            return $acc['status'] === 'rejected';
+                                        })); ?>
                                     </p>
                                 </div>
                             </div>
@@ -153,18 +159,18 @@ $success = $_GET['success'] ?? '';
                                                 </td>
                                                 <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                                     <div class="flex space-x-3">
-                                                        <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>" 
-                                                           class="text-blue-600 hover:text-blue-700">
+                                                        <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
+                                                            class="text-blue-600 hover:text-blue-700">
                                                             <i class="mr-1 fas fa-eye"></i>Review
                                                         </a>
-                                                        
+
                                                         <button onclick="quickVerify(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                                class="text-green-600 hover:text-green-700">
+                                                            class="text-green-600 hover:text-green-700">
                                                             <i class="mr-1 fas fa-check-circle"></i>Verify
                                                         </button>
-                                                        
+
                                                         <button onclick="quickReject(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                                class="text-red-600 hover:text-red-700">
+                                                            class="text-red-600 hover:text-red-700">
                                                             <i class="mr-1 fas fa-times-circle"></i>Reject
                                                         </button>
                                                     </div>
@@ -215,9 +221,8 @@ $success = $_GET['success'] ?? '';
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                    <?php 
-                                                    echo $acc['status'] === 'approved' ? 'text-green-800 bg-green-100' : 
-                                                        ($acc['status'] === 'rejected' ? 'text-red-800 bg-red-100' : 'text-yellow-800 bg-yellow-100'); 
+                                                    <?php
+                                                    echo $acc['status'] === 'approved' ? 'text-green-800 bg-green-100' : ($acc['status'] === 'rejected' ? 'text-red-800 bg-red-100' : 'text-yellow-800 bg-yellow-100');
                                                     ?>">
                                                     <?php echo ucfirst($acc['status']); ?>
                                                 </span>
@@ -229,8 +234,8 @@ $success = $_GET['success'] ?? '';
                                                 <?php echo date('M j, Y', strtotime($acc['created_at'])); ?>
                                             </td>
                                             <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                                <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>" 
-                                                   class="text-blue-600 hover:text-blue-700">
+                                                <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
+                                                    class="text-blue-600 hover:text-blue-700">
                                                     <i class="mr-1 fas fa-eye"></i>View
                                                 </a>
                                             </td>
@@ -243,9 +248,7 @@ $success = $_GET['success'] ?? '';
                 </div>
             </main>
         </div>
-    </div>
-
-    <!-- Mobile Menu Overlay -->
+    </div>    <!-- Mobile Menu Overlay -->
     <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
     <!-- Quick Action Modals -->
@@ -263,17 +266,17 @@ $success = $_GET['success'] ?? '';
                     <form id="verifyForm" method="POST" action="?page=admin-process-accreditation" class="mt-4">
                         <input type="hidden" name="accreditation_id" id="verifyAccreditationId">
                         <input type="hidden" name="status" value="approved">
-                        <textarea name="notes" placeholder="Optional verification notes..." 
-                                  class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" rows="3"></textarea>
+                        <textarea name="notes" placeholder="Optional verification notes..."
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" rows="3"></textarea>
                     </form>
                 </div>
                 <div class="items-center px-4 py-3">
                     <button onclick="document.getElementById('verifyForm').submit()"
-                            class="w-24 px-4 py-2 mr-2 text-base font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
+                        class="w-24 px-4 py-2 mr-2 text-base font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
                         Verify
                     </button>
                     <button onclick="closeModal('verifyModal')"
-                            class="w-24 px-4 py-2 text-base font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600">
+                        class="w-24 px-4 py-2 text-base font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600">
                         Cancel
                     </button>
                 </div>
@@ -295,17 +298,17 @@ $success = $_GET['success'] ?? '';
                     <form id="rejectForm" method="POST" action="?page=admin-process-accreditation" class="mt-4">
                         <input type="hidden" name="accreditation_id" id="rejectAccreditationId">
                         <input type="hidden" name="status" value="rejected">
-                        <textarea name="notes" placeholder="Reason for rejection (required)..." 
-                                  class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" rows="3" required></textarea>
+                        <textarea name="notes" placeholder="Reason for rejection (required)..."
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" rows="3" required></textarea>
                     </form>
                 </div>
                 <div class="items-center px-4 py-3">
                     <button onclick="document.getElementById('rejectForm').submit()"
-                            class="w-24 px-4 py-2 mr-2 text-base font-medium text-white bg-red-500 rounded-md hover:bg-red-600">
+                        class="w-24 px-4 py-2 mr-2 text-base font-medium text-white bg-red-500 rounded-md hover:bg-red-600">
                         Reject
                     </button>
                     <button onclick="closeModal('rejectModal')"
-                            class="w-24 px-4 py-2 text-base font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600">
+                        class="w-24 px-4 py-2 text-base font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600">
                         Cancel
                     </button>
                 </div>
@@ -318,7 +321,7 @@ $success = $_GET['success'] ?? '';
         function toggleSidebar() {
             const sidebarMobile = document.getElementById('sidebar-mobile');
             const overlay = document.getElementById('mobile-menu-overlay');
-            
+
             if (sidebarMobile) {
                 sidebarMobile.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
@@ -357,4 +360,5 @@ $success = $_GET['success'] ?? '';
         }
     </script>
 </body>
+
 </html>

@@ -20,8 +20,8 @@ $success = $_GET['success'] ?? '';
         <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
 
-        <!-- Main Content -->
-        <div class="flex flex-col flex-1 lg:ml-80 overflow-hidden">
+        <!-- Main Content Area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
 
@@ -296,9 +296,8 @@ $success = $_GET['success'] ?? '';
                     </div>
                 <?php endif; ?>
                 </div>
+            </main>
         </div>
-        </main>
-    </div>
     </div>
 
     <!-- Mobile Menu Overlay -->

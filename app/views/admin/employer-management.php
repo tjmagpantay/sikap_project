@@ -8,6 +8,7 @@ $success = $_GET['success'] ?? '';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,16 +16,17 @@ $success = $_GET['success'] ?? '';
     <link href="css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
-        
-        <!-- Main Content -->
-        <div class="flex flex-col flex-1 overflow-hidden lg:ml-80">
+
+        <!-- Main Content Area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
             <!-- Top Navigation -->
             <?php include __DIR__ . '/components/topbar.php'; ?>
-            
+
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 <div class="p-6">
@@ -34,7 +36,7 @@ $success = $_GET['success'] ?? '';
                         <p class="mt-1 text-gray-600">Manage employer accounts</p>
                     </div>
 
-                    <!-- Messages --> 
+                    <!-- Messages -->
                     <?php if ($error): ?>
                         <div class="p-4 mb-6 text-red-700 bg-red-100 border border-red-200 rounded-lg">
                             <div class="flex items-center">
@@ -75,7 +77,9 @@ $success = $_GET['success'] ?? '';
                                     <div class="ml-3">
                                         <p class="text-xs text-gray-600">Incomplete</p>
                                         <p class="text-lg font-bold text-gray-900" data-stat="incomplete">
-                                            <?php echo count(array_filter($users, function($user) { return $user['status'] === 'incomplete'; })); ?>
+                                            <?php echo count(array_filter($users, function ($user) {
+                                                return $user['status'] === 'incomplete';
+                                            })); ?>
                                         </p>
                                     </div>
                                 </div>
@@ -88,7 +92,9 @@ $success = $_GET['success'] ?? '';
                                     <div class="ml-3">
                                         <p class="text-xs text-gray-600">Pending</p>
                                         <p class="text-lg font-bold text-gray-900" data-stat="pending">
-                                            <?php echo count(array_filter($users, function($user) { return $user['status'] === 'pending verification'; })); ?>
+                                            <?php echo count(array_filter($users, function ($user) {
+                                                return $user['status'] === 'pending verification';
+                                            })); ?>
                                         </p>
                                     </div>
                                 </div>
@@ -101,7 +107,9 @@ $success = $_GET['success'] ?? '';
                                     <div class="ml-3">
                                         <p class="text-xs text-gray-600">Verified</p>
                                         <p class="text-lg font-bold text-gray-900" data-stat="verified">
-                                            <?php echo count(array_filter($users, function($user) { return $user['status'] === 'verified'; })); ?>
+                                            <?php echo count(array_filter($users, function ($user) {
+                                                return $user['status'] === 'verified';
+                                            })); ?>
                                         </p>
                                     </div>
                                 </div>
@@ -114,7 +122,9 @@ $success = $_GET['success'] ?? '';
                                     <div class="ml-3">
                                         <p class="text-xs text-gray-600">Rejected</p>
                                         <p class="text-lg font-bold text-gray-900" data-stat="rejected">
-                                            <?php echo count(array_filter($users, function($user) { return $user['status'] === 'rejected'; })); ?>
+                                            <?php echo count(array_filter($users, function ($user) {
+                                                return $user['status'] === 'rejected';
+                                            })); ?>
                                         </p>
                                     </div>
                                 </div>
@@ -127,7 +137,9 @@ $success = $_GET['success'] ?? '';
                                     <div class="ml-3">
                                         <p class="text-xs text-gray-600">Suspended</p>
                                         <p class="text-lg font-bold text-gray-900" data-stat="suspended">
-                                            <?php echo count(array_filter($users, function($user) { return $user['status'] === 'suspended'; })); ?>
+                                            <?php echo count(array_filter($users, function ($user) {
+                                                return $user['status'] === 'suspended';
+                                            })); ?>
                                         </p>
                                     </div>
                                 </div>
@@ -209,7 +221,7 @@ $success = $_GET['success'] ?? '';
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                        <?php 
+                                                        <?php
                                                         $statusClass = [
                                                             'incomplete' => 'bg-gray-100 text-gray-800',
                                                             'pending verification' => 'bg-yellow-100 text-yellow-800',
@@ -258,7 +270,7 @@ $success = $_GET['success'] ?? '';
         function toggleSidebar() {
             const sidebarMobile = document.getElementById('sidebar-mobile');
             const overlay = document.getElementById('mobile-menu-overlay');
-            
+
             if (sidebarMobile) {
                 sidebarMobile.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
@@ -272,7 +284,7 @@ $success = $_GET['success'] ?? '';
         document.getElementById('searchInput').addEventListener('input', function() {
             const searchValue = this.value.toLowerCase();
             const rows = document.querySelectorAll('#employersTableBody tr');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchValue) ? '' : 'none';
@@ -283,7 +295,7 @@ $success = $_GET['success'] ?? '';
         document.getElementById('statusFilter').addEventListener('change', function() {
             const statusFilter = this.value.toLowerCase();
             const rows = document.querySelectorAll('#employersTableBody tr');
-            
+
             rows.forEach(row => {
                 const rowStatus = row.getAttribute('data-status');
                 row.style.display = !statusFilter || rowStatus === statusFilter ? '' : 'none';
@@ -296,65 +308,65 @@ $success = $_GET['success'] ?? '';
             button.disabled = true;
             const originalText = button.innerHTML;
             button.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i>Processing...';
-            
+
             // Create form data
             const formData = new FormData();
             formData.append('action', action);
             formData.append('user_id', userId);
-            
+
             fetch('index.php?page=update-employer-status', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Update the row status without reloading
-                    const row = button.closest('tr');
-                    const statusCell = row.querySelector('td:nth-child(4) span');
-                    const actionCell = row.querySelector('td:last-child div');
-                    
-                    // Update status badge
-                    statusCell.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update the row status without reloading
+                        const row = button.closest('tr');
+                        const statusCell = row.querySelector('td:nth-child(4) span');
+                        const actionCell = row.querySelector('td:last-child div');
+
+                        // Update status badge
+                        statusCell.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         action === 'suspend' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
                     }`;
-                    statusCell.textContent = action === 'suspend' ? 'Suspended' : 'Verified';
-                    
-                    // Update action button
-                    if (action === 'suspend') {
-                        actionCell.innerHTML = `
+                        statusCell.textContent = action === 'suspend' ? 'Suspended' : 'Verified';
+
+                        // Update action button
+                        if (action === 'suspend') {
+                            actionCell.innerHTML = `
                             <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="${userId}">
                                 <i class="mr-1 fas fa-unlock"></i>Unsuspend
                             </button>
                         `;
-                    } else {
-                        actionCell.innerHTML = `
+                        } else {
+                            actionCell.innerHTML = `
                             <button class="text-red-600 hover:text-red-900 suspend-btn" data-id="${userId}">
                                 <i class="mr-1 fas fa-ban"></i>Suspend
                             </button>
                         `;
+                        }
+
+                        // Update status filter counts
+                        updateStatusCounts();
+
+                        // Reattach event listeners
+                        attachButtonListeners();
+                    } else {
+                        throw new Error(data.error || `Failed to ${action} employer`);
                     }
-                    
-                    // Update status filter counts
-                    updateStatusCounts();
-                    
-                    // Reattach event listeners
-                    attachButtonListeners();
-                } else {
-                    throw new Error(data.error || `Failed to ${action} employer`);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(`An error occurred while updating status. Please try again.`);
-                button.disabled = false;
-                button.innerHTML = originalText;
-            });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`An error occurred while updating status. Please try again.`);
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                });
         }
 
         // Add this function to update status counts
@@ -368,7 +380,7 @@ $success = $_GET['success'] ?? '';
                 rejected: 0,
                 suspended: 0
             };
-            
+
             rows.forEach(row => {
                 const status = row.getAttribute('data-status');
                 if (status === 'incomplete') counts.incomplete++;
@@ -377,7 +389,7 @@ $success = $_GET['success'] ?? '';
                 if (status === 'rejected') counts.rejected++;
                 if (status === 'suspended') counts.suspended++;
             });
-            
+
             // Update the stats cards
             document.querySelector('[data-stat="total"]').textContent = counts.total;
             document.querySelector('[data-stat="incomplete"]').textContent = counts.incomplete;
@@ -414,4 +426,5 @@ $success = $_GET['success'] ?? '';
         });
     </script>
 </body>
+
 </html>

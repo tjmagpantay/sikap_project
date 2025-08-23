@@ -46,10 +46,7 @@
                 <span class="absolute w-2 h-2 bg-red-500 rounded-full -top-1 -right-1"></span>
             </button>
 
-            <!-- Post Job Button -->
-            <button class="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
-                Post A Job
-            </button>
+            
         </div>
     </div>
 </header>
