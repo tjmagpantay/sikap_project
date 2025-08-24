@@ -8,7 +8,7 @@
         data-aos="fade-up"
         data-aos-anchor="#stats-section"
         data-aos-anchor-placement="top-bottom"
-        data-aos-duration="700"
+        data-aos-duration="1000"
         data-aos-offset="60"
         data-aos-delay="0"
       >
@@ -27,7 +27,7 @@
         data-aos="fade-up"
         data-aos-anchor="#stats-section"
         data-aos-anchor-placement="top-bottom"
-        data-aos-duration="700"
+        data-aos-duration="1000"
         data-aos-offset="60"
         data-aos-delay="150"
       >
@@ -46,7 +46,7 @@
         data-aos="fade-up"
         data-aos-anchor="#stats-section"
         data-aos-anchor-placement="top-bottom"
-        data-aos-duration="700"
+        data-aos-duration="1000"
         data-aos-offset="60"
         data-aos-delay="300"
       >
