@@ -5,17 +5,29 @@
 <!-- Desktop Sidebar -->
 <div id="sidebar" class="flex flex-col h-screen transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 w-80 lg:translate-x-0 lg:static lg:transform-none">
     <!-- Logo Section -->
-    <div class="flex items-center flex-shrink-0 px-6 py-6 border-b border-gray-200">
+    <div class="flex items-center justify-between flex-shrink-0 px-6 py-6 border-b border-gray-200 gap-6">
+        <!-- Left: Logos -->
         <div class="flex items-center">
-            <div>
-                <div class="flex items-center gap-2">
-                    <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-8">
-                    <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-8 shadow-sm">
-                    <a href="?page=landing" class="text-xl font-bold text-primary">Sikap <span class="text-secondary">Admin</span></a>
-                </div>
+            <div class="flex items-center gap-2">
+                <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-8">
+                <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-8 shadow-sm">
+                <a href="?page=landing" class="text-xl font-bold text-primary">
+                    Sikap <span class="text-secondary">Admin</span>
+                </a>
             </div>
         </div>
+
+        <!-- Right: Hamburger Menu -->
+        <div class="flex items-center">
+            <button class="p-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none">
+                <!-- Hamburger Icon -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
     </div>
+
 
     <!-- Search Bar -->
     <div class="px-6 py-3 border-b border-gray-200">
@@ -30,7 +42,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-2 overflow-y-auto">
+    <nav class="flex-1 px-6 py-2 overflow-y-auto">
         <ul class="space-y-1">
             <li>
                 <a href="?page=admin-dashboard" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-gray-50">
@@ -193,7 +205,7 @@
     </nav>
 
     <!-- Bottom Section -->
-    <div class="flex-shrink-0 py-6 border-t border-gray-200">
+    <div class="flex-shrink-0 py-6 px-6 border-t border-gray-200">
         <div class="flex items-center gap-2 mb-4">
             <div class="flex items-center justify-center w-8 h-8 bg-red-500 rounded-full">
                 <span class="text-sm font-bold text-white">BA</span>

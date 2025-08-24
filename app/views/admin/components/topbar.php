@@ -10,12 +10,12 @@
             </button>
 
             <!-- Page Info -->
-            <div class="ml-4 lg:ml-0">
-                <div class="flex items-center space-x-2">
+            <div class="lg:ml-0">
+                <div class="flex items-center gap-2">
                     <h1 class="text-lg font-semibold text-gray-900">
-                        <?php 
+                        <?php
                         $page = $_GET['page'] ?? 'admin-dashboard';
-                        switch($page) {
+                        switch ($page) {
                             case 'admin-accreditations':
                                 echo 'Accreditations';
                                 break;
@@ -27,26 +27,25 @@
                         }
                         ?>
                     </h1>
-                    <i class="text-sm text-gray-400 fas fa-chevron-down"></i>
+                    <i class="text-sm text-primary fas fa-chevron-down"></i>
                 </div>
             </div>
         </div>
 
         <!-- Right Section -->
-        <div class="flex items-center space-x-4">
-            <!-- Search -->
-            <div class="relative hidden md:block">
-                <input type="text" placeholder="Search" class="w-64 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                <i class="absolute text-gray-400 transform -translate-y-1/2 fas fa-search left-3 top-1/2"></i>
-            </div>
+        <div class="flex items-center space-x-4 ">
 
             <!-- Notifications -->
             <button class="relative p-2 text-gray-400 transition-colors hover:text-gray-600">
                 <i class="w-5 h-5 fas fa-bell"></i>
-                <span class="absolute w-2 h-2 bg-red-500 rounded-full -top-1 -right-1"></span>
-            </button>
 
-            
+            </button>
+            <button>
+                <a href="?page=view-employer-profile&employer_id=<?php echo $employer['employer_id']; ?>"
+                    class="flex-1 px-4 py-2 text-sm font-medium text-center text-white transition-colors rounded-sm bg-primary hover:bg-secondary">
+                    Logs
+                </a>
+            </button>
         </div>
     </div>
 </header>

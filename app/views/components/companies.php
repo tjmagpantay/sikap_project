@@ -1,9 +1,17 @@
-<section class="py-16 bg-gradient-to-r from-blue-600 to-blue-800">
+<section id="stats-section" class="py-16 bg-gradient-to-r from-blue-600 to-blue-800">
   <div class="max-w-6xl px-4 py-6 mx-auto bg-gradient-to-r from-white/30 to-[#092C4C] rounded-2xl">
     <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
 
       <!-- Statistic 1: Active Jobs -->
-      <div class="text-center text-grayMain">
+      <div
+        class="text-center text-grayMain"
+        data-aos="fade-up"
+        data-aos-anchor="#stats-section"
+        data-aos-anchor-placement="top-bottom"
+        data-aos-duration="700"
+        data-aos-offset="60"
+        data-aos-delay="0"
+      >
         <div class="mb-2">
           <span class="text-3xl font-bold lg:text-4xl">1,847</span>
         </div>
@@ -14,7 +22,15 @@
       </div>
 
       <!-- Statistic 2: Verified Companies -->
-      <div class="text-center text-grayMain">
+      <div
+        class="text-center text-grayMain"
+        data-aos="fade-up"
+        data-aos-anchor="#stats-section"
+        data-aos-anchor-placement="top-bottom"
+        data-aos-duration="700"
+        data-aos-offset="60"
+        data-aos-delay="150"
+      >
         <div class="mb-2">
           <span class="text-3xl font-bold lg:text-4xl">150+</span>
         </div>
@@ -24,8 +40,16 @@
         </p>
       </div>
 
-      <!-- Statistic 3: Example -->
-      <div class="text-center text-grayMain">
+      <!-- Statistic 3: Businesses Listed -->
+      <div
+        class="text-center text-grayMain"
+        data-aos="fade-up"
+        data-aos-anchor="#stats-section"
+        data-aos-anchor-placement="top-bottom"
+        data-aos-duration="700"
+        data-aos-offset="60"
+        data-aos-delay="300"
+      >
         <div class="mb-2">
           <span class="text-3xl font-bold lg:text-4xl">500+</span>
         </div>
