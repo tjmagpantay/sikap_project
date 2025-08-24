@@ -43,12 +43,12 @@ $success = $_GET['success'] ?? '';
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Pending Review</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-orange-600 sm:text-3xl"><?php echo count($pendingAccreditations); ?></span>
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl"><?php echo count($pendingAccreditations); ?></span>
                                 <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
-                                        <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#EA580C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#F3AF0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </g>
                                 </svg>
                             </div>
@@ -63,7 +63,7 @@ $success = $_GET['success'] ?? '';
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Approved</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-green-600 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
                                     <?php echo count(array_filter($allAccreditations, function ($acc) {
                                         return $acc['status'] === 'approved';
                                     })); ?>
@@ -87,7 +87,7 @@ $success = $_GET['success'] ?? '';
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Rejected</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-red-600 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
                                     <?php echo count(array_filter($allAccreditations, function ($acc) {
                                         return $acc['status'] === 'rejected';
                                     })); ?>
@@ -96,7 +96,7 @@ $success = $_GET['success'] ?? '';
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
-                                        <path d="M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.2706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </g>
                                 </svg>
                             </div>
@@ -124,11 +124,11 @@ $success = $_GET['success'] ?? '';
                             <p class="text-gray-500">No pending accreditations</p>
                         </div>
                     <?php else: ?>
-                        <div class="w-full overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm" style="overflow: visible;">
                             <!-- Desktop Table -->
-                            <div class="hidden lg:block">
-                                <div class="overflow-x-auto">
-                                    <table class="w-full table-auto divide-y divide-gray-200">
+                            <div class="hidden lg:block" style="overflow: visible;">
+                                <div class="table-container" style="overflow-x: auto; overflow-y: visible;">
+                                    <table class="w-full divide-y divide-gray-200 table-auto" style="position: relative;">
                                         <thead class="bg-gray-50">
                                             <tr>
                                                 <th class="w-1/4 px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Employer</th>
@@ -138,13 +138,13 @@ $success = $_GET['success'] ?? '';
                                                 <th class="w-1/6 px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
+                                        <tbody class="bg-white">
                                             <?php foreach ($pendingAccreditations as $acc): ?>
-                                                <tr class="hover:bg-gray-50">
+                                                <tr class="border-b-2 border-gray-200 hover:bg-gray-50">
                                                     <td class="px-6 py-4">
                                                         <div class="flex items-center">
-                                                            <div class="flex items-center justify-center w-10 h-10 mr-4 bg-blue-100 rounded-full flex-shrink-0">
-                                                                <span class="text-sm font-medium text-blue-600">
+                                                            <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-4 bg-blue-100 rounded-full">
+                                                                <span class="p-3 text-sm font-medium text-primary ">
                                                                     <?php echo strtoupper(substr($acc['first_name'], 0, 1) . substr($acc['last_name'], 0, 1)); ?>
                                                                 </span>
                                                             </div>
@@ -167,34 +167,61 @@ $success = $_GET['success'] ?? '';
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 text-sm text-gray-500">
-                                                        <?php echo date('M j', strtotime($acc['created_at'])); ?>
+                                                        <?php echo date('M j, Y', strtotime($acc['created_at'])); ?>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="flex items-center justify-center space-x-2">
-                                                            <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
-                                                                class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                                                                title="Review">
-                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                    <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" stroke-width="2" />
-                                                                    <path d="M2.45801 12C3.73228 7.94288 7.52257 5 12.0002 5C16.4778 5 20.2681 7.94291 21.5424 12C20.2681 16.0571 16.4778 19 12.0002 19C7.52256 19 3.73226 16.0571 2.45801 12Z" stroke="currentColor" stroke-width="2" />
-                                                                </svg>
-                                                            </a>
+                                                        <div class="flex items-center justify-center">
+                                                            <!-- Three Dots Menu -->
+                                                            <div class="relative" x-data="{ open: false }">
+                                                                <button @click="open = !open"
+                                                                    @click.away="open = false"
+                                                                    class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                                                    </svg>
+                                                                </button>
 
-                                                            <button onclick="quickVerify(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                                class="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
-                                                                title="Verify">
-                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                                </svg>
-                                                            </button>
+                                                                <!-- Dropdown Menu -->
+                                                                <div x-show="open"
+                                                                    x-transition:enter="transition ease-out duration-100"
+                                                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                                                    x-transition:leave="transition ease-in duration-75"
+                                                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                                                    class="absolute right-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                                                    x-cloak>
+                                                                    <div class="py-1">
+                                                                        <!-- Review Option -->
+                                                                        <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
+                                                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                            <svg class="w-4 h-4 mr-3 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" stroke-width="2" />
+                                                                                <path d="M2.45801 12C3.73228 7.94288 7.52257 5 12.0002 5C16.4778 5 20.2681 7.94291 21.5424 12C20.2681 16.0571 16.4778 19 12.0002 19C7.52256 19 3.73226 16.0571 2.45801 12Z" stroke="currentColor" stroke-width="2" />
+                                                                            </svg>
+                                                                            Review
+                                                                        </a>
 
-                                                            <button onclick="quickReject(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                                class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                                                                title="Reject">
-                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                    <path d="M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                                </svg>
-                                                            </button>
+                                                                        <!-- Verify Option -->
+                                                                        <button onclick="quickVerify(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
+                                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                                            <svg class="w-4 h-4 mr-3 text-green-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                                            </svg>
+                                                                            Verify
+                                                                        </button>
+
+                                                                        <!-- Reject Option -->
+                                                                        <button onclick="quickReject(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
+                                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                                            <svg class="w-4 h-4 mr-3 text-red-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path d="M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.2706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                                            </svg>
+                                                                            Reject
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -211,7 +238,7 @@ $success = $_GET['success'] ?? '';
                                         <div class="p-4 hover:bg-gray-50">
                                             <div class="flex items-start justify-between">
                                                 <div class="flex items-center flex-1 min-w-0">
-                                                    <div class="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-full flex-shrink-0">
+                                                    <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-3 bg-blue-100 rounded-full">
                                                         <span class="text-sm font-medium text-blue-600">
                                                             <?php echo strtoupper(substr($acc['first_name'], 0, 1) . substr($acc['last_name'], 0, 1)); ?>
                                                         </span>
@@ -224,13 +251,13 @@ $success = $_GET['success'] ?? '';
                                                         <div class="flex items-center mt-1 space-x-4 text-xs text-gray-500">
                                                             <span class="truncate"><?php echo htmlspecialchars($acc['business_name'] ?: $acc['company_name'] ?: 'N/A'); ?></span>
                                                             <span>•</span>
-                                                            <span><?php echo date('M j', strtotime($acc['created_at'])); ?></span>
+                                                            <span><?php echo date('M j, Y', strtotime($acc['created_at'])); ?></span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="flex items-center ml-4 space-x-2 flex-shrink-0">
+                                                <div class="flex items-center flex-shrink-0 ml-4 space-x-2">
                                                     <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
-                                                        class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
+                                                        class="p-2 text-blue-600 rounded hover:text-blue-700 hover:bg-blue-50"
                                                         title="Review">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" stroke-width="2" />
@@ -239,7 +266,7 @@ $success = $_GET['success'] ?? '';
                                                     </a>
 
                                                     <button onclick="quickVerify(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                        class="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded"
+                                                        class="p-2 text-green-600 rounded hover:text-green-700 hover:bg-green-50"
                                                         title="Verify">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -247,7 +274,7 @@ $success = $_GET['success'] ?? '';
                                                     </button>
 
                                                     <button onclick="quickReject(<?php echo $acc['accreditation_id']; ?>, '<?php echo htmlspecialchars($acc['first_name'] . ' ' . $acc['last_name']); ?>')"
-                                                        class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
+                                                        class="p-2 text-red-600 rounded hover:text-red-700 hover:bg-red-50"
                                                         title="Reject">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -257,8 +284,12 @@ $success = $_GET['success'] ?? '';
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
+                                    </tbody>
+                                    </table>
                                 </div>
                             </div>
+
+                            <!-- Mobile/Tablet Card Layout remains the same... -->
                         </div>
                     <?php endif; ?>
                 </div>
@@ -266,9 +297,9 @@ $success = $_GET['success'] ?? '';
                 <div>
                     <h2 class="mb-6 text-lg font-semibold text-gray-900">All Accreditations</h2>
 
-                    <div class="w-full overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div class="overflow-x-auto">
-                            <table class="w-full table-auto divide-y divide-gray-200">
+                    <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm" ">
+                        <div class="table-container" style="overflow-x: auto; overflow-y: visible;">
+                            <table class="w-full divide-y divide-gray-200 table-auto" style="position: relative;">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="w-1/5 px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Employer</th>
@@ -279,12 +310,12 @@ $success = $_GET['success'] ?? '';
                                         <th class="w-1/6 px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-white">
                                     <?php foreach ($allAccreditations as $acc): ?>
-                                        <tr class="hover:bg-gray-50">
+                                        <tr class="border-b-2 border-gray-200 hover:bg-gray-50">
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center">
-                                                    <div class="flex items-center justify-center w-10 h-10 mr-4 bg-gray-100 rounded-full flex-shrink-0">
+                                                    <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 p-3 mr-4 bg-gray-100 rounded-full">
                                                         <span class="text-sm font-medium text-gray-600">
                                                             <?php echo strtoupper(substr($acc['first_name'], 0, 1) . substr($acc['last_name'], 0, 1)); ?>
                                                         </span>
@@ -303,10 +334,10 @@ $success = $_GET['success'] ?? '';
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
-                                                        <?php
-                                                        echo $acc['status'] === 'approved' ? 'text-green-800 bg-green-100' : ($acc['status'] === 'rejected' ? 'text-red-800 bg-red-100' : 'text-yellow-800 bg-yellow-100');
-                                                        ?>">
+                                                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-sm 
+                                                <?php
+                                                echo $acc['status'] === 'approved' ? 'text-green-800 bg-green-100' : ($acc['status'] === 'rejected' ? 'text-red-800 bg-red-100' : 'text-yellow-800 bg-yellow-100');
+                                                ?>">
                                                     <?php echo ucfirst($acc['status']); ?>
                                                 </span>
                                             </td>
@@ -318,11 +349,7 @@ $success = $_GET['success'] ?? '';
                                             </td>
                                             <td class="px-6 py-4">
                                                 <a href="?page=admin-review-accreditation&id=<?php echo $acc['accreditation_id']; ?>"
-                                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                                                    <svg class="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" stroke-width="2" />
-                                                        <path d="M2.45801 12C3.73228 7.94288 7.52257 5 12.0002 5C16.4778 5 20.2681 7.94291 21.5424 12C20.2681 16.0571 16.4778 19 12.0002 19C7.52256 19 3.73226 16.0571 2.45801 12Z" stroke="currentColor" stroke-width="2" />
-                                                    </svg>
+                                                    class="inline-flex items-center px-3 py-2 text-xs font-semibold transition-colors bg-blue-100 rounded-sm text-primary hover:text-blue-700 hover:bg-blue-50">
                                                     View
                                                 </a>
                                             </td>
@@ -336,7 +363,9 @@ $success = $_GET['success'] ?? '';
             </div>
         </main>
     </div>
-</div> <!-- Mobile Menu Overlay -->
+</div>
+
+<!-- Mobile Menu Overlay -->
 <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
 <!-- Quick Action Modals -->
@@ -403,6 +432,14 @@ $success = $_GET['success'] ?? '';
         </div>
     </div>
 </div>
+
+<style>
+
+    /* Border styling */
+    .border-b-2 {
+        border-bottom-width: 1px !important;
+    }
+</style>
 
 <script>
     // Mobile menu toggle

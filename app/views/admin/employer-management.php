@@ -201,7 +201,7 @@
                         </div>
                     <?php else: ?>
                         <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-                            <table class="w-full table-auto divide-y divide-gray-200">
+                            <table class="w-full divide-y divide-gray-200 table-auto">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Company</th>
