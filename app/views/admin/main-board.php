@@ -44,9 +44,9 @@
                     </p>
                 </div>
                 <div class="pt-3">
-                    <a href="?page=admin-users" class="flex items-center text-sm text-secondary font-medium">
+                    <a href="?page=admin-users" class="flex items-center text-sm font-medium text-secondary">
                         Manage Users
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </a>
@@ -66,9 +66,9 @@
                     </p>
                 </div>
                 <div class="pt-3">
-                    <a href="?page=admin-jobs" class="flex items-center text-sm text-secondary font-medium">
+                    <a href="?page=admin-jobs" class="flex items-center text-sm font-medium text-secondary">
                         View Jobs
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </a>
@@ -88,9 +88,9 @@
                     </p>
                 </div>
                 <div class="pt-3">
-                    <a href="?page=admin-accreditations" class="flex items-center text-sm text-secondary font-medium">
+                    <a href="?page=admin-accreditations" class="flex items-center text-sm font-medium text-secondary">
                         Review Now
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </a>
@@ -110,9 +110,9 @@
                     </p>
                 </div>
                 <div class="pt-3">
-                    <a href="?page=admin-applications" class="flex items-center text-sm text-secondary font-medium">
+                    <a href="?page=admin-applications" class="flex items-center text-sm font-medium text-secondary">
                         View All
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </a>
@@ -123,13 +123,13 @@
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <!-- Job Statistics Chart (Left) -->
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Card Header -->
             <div class="p-4 pb-2">
                 <h3 class="text-lg font-semibold text-gray-900">Job Statistics</h3>
-                <p class="text-sm text-gray-600 mt-1">Showing job posts and applications for the last 6 months</p>
+                <p class="mt-1 text-sm text-gray-600">Showing job posts and applications for the last 6 months</p>
             </div>
 
             <!-- Card Content -->
@@ -141,16 +141,16 @@
             </div>
 
             <!-- Card Footer -->
-            <div class="px-4 pb-4">
+            <div class="px-4 py-4">
                 <div class="flex items-start gap-2 text-sm">
                     <div class="grid gap-1">
-                        <div class="flex items-center gap-2 leading-none font-medium text-gray-900">
+                        <div class="flex items-center gap-2 font-medium leading-none text-gray-900">
                             Trending up by 5.2% this month
                             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                         </div>
-                        <div class="text-gray-500 leading-none text-xs">
+                        <div class="text-xs leading-none text-gray-500">
                             January - June 2024
                         </div>
                     </div>
@@ -163,7 +163,7 @@
             <!-- Card Header -->
             <div class="p-4 pb-2">
                 <h3 class="text-lg font-semibold text-gray-900">Top Job Categories</h3>
-                <p class="text-sm text-gray-600 mt-1">January - June 2024</p>
+                <p class="mt-1 text-sm text-gray-600">January - June 2024</p>
             </div>
 
             <!-- Card Content -->
@@ -175,15 +175,15 @@
             </div>
 
             <!-- Card Footer -->
-            <div class="px-4 pb-4">
+            <div class="px-4 py-4">
                 <div class="flex flex-col items-start gap-1 text-sm">
-                    <div class="flex gap-2 leading-none font-medium text-gray-900">
+                    <div class="flex gap-2 font-medium leading-none text-gray-900">
                         Trending up by 5.2% this month
                         <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                     </div>
-                    <div class="text-gray-500 leading-none text-xs">
+                    <div class="text-xs leading-none text-gray-500">
                         Showing total job posts for the last 6 months
                     </div>
                 </div>
@@ -194,8 +194,15 @@
     <!-- Chart.js Integration -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Job Statistics Area Chart
+        // Job Statistics Area Chart with Primary/Secondary Colors
         const jobStatsCtx = document.getElementById('jobStatsChart').getContext('2d');
+
+        // Define your primary and secondary colors
+        const primaryColor = '#092C4C'; // Your primary color (dark blue)
+        const primaryColorAlpha = 'rgba(9, 44, 76, 0.1)'; // Primary with transparency
+        const secondaryColor = '#F3AF0E'; // Your secondary color (amber/yellow)
+        const secondaryColorAlpha = 'rgba(243, 175, 14, 0.1)'; // Secondary with transparency
+
         new Chart(jobStatsCtx, {
             type: 'line',
             data: {
@@ -203,15 +210,15 @@
                 datasets: [{
                     label: 'Job Posts',
                     data: [186, 305, 237, 73, 209, 214],
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: primaryColor,
+                    backgroundColor: primaryColorAlpha,
                     fill: true,
                     tension: 0.4
                 }, {
                     label: 'Applications',
                     data: [80, 200, 120, 190, 130, 140],
-                    borderColor: 'rgb(16, 185, 129)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: secondaryColor,
+                    backgroundColor: secondaryColorAlpha,
                     fill: true,
                     tension: 0.4
                 }]
@@ -240,7 +247,15 @@
         });
 
         // Top Job Categories Bar Chart
+        // Top Job Categories Bar Chart with Primary/Secondary Colors
         const topJobsCtx = document.getElementById('topJobsChart').getContext('2d');
+
+        // Define your primary and secondary colors
+        const primary = '#092C4C'; // Your primary color (dark blue)
+        const primaryAlpha = 'rgba(9, 44, 76, 0.8)'; // Primary with transparency
+        const secondary = '#F3AF0E'; // Your secondary color (amber/yellow)
+        const secondaryAlpha = 'rgba(243, 175, 14, 0.8)'; // Secondary with transparency
+
         new Chart(topJobsCtx, {
             type: 'bar',
             data: {
@@ -248,13 +263,13 @@
                 datasets: [{
                     label: 'Job Posts',
                     data: [186, 305, 237, 73, 209, 214],
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    backgroundColor: primaryAlpha,
                     borderRadius: 4,
                     borderSkipped: false,
                 }, {
                     label: 'Applications',
                     data: [80, 200, 120, 190, 130, 140],
-                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    backgroundColor: secondaryAlpha,
                     borderRadius: 4,
                     borderSkipped: false,
                 }]
