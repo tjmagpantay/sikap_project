@@ -17,7 +17,7 @@
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Total Jobseekers</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-blue-600 sm:text-3xl" id="totalCount"><?php echo count($users); ?></span>
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="totalCount"><?php echo count($users); ?></span>
                                 <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -37,7 +37,7 @@
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Active</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-green-600 sm:text-3xl" id="activeCount">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="activeCount">
                                     <?php echo count(array_filter($users, function ($user) {
                                         return ($user['status'] ?? 'active') === 'active';
                                     })); ?>
@@ -63,7 +63,7 @@
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">From Rosario</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-orange-600 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
                                     <?php echo count(array_filter($users, function ($user) {
                                         return stripos($user['address'], 'rosario') !== false;
                                     })); ?>
@@ -88,7 +88,7 @@
                         <div class="mb-4 sm:mb-6">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Other Areas</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-gray-600 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
                                     <?php echo count(array_filter($users, function ($user) {
                                         return stripos($user['address'], 'rosario') === false;
                                     })); ?>
@@ -112,49 +112,153 @@
                 <!-- End Stats Cards -->
 
                 <!-- Search and Filter Section -->
-                <div class="p-4 mb-6 bg-white border border-gray-200 rounded-lg">
-                    <div class="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4 lg:items-end">
-                        <!-- Search Input -->
-                        <div class="flex-1">
-                            <label for="searchInput" class="block mb-2 text-sm font-medium text-gray-700">Search Jobseekers</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <i class="text-gray-400 fas fa-search"></i>
+                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
+                    <div class="flex flex-col gap-6 mx-auto">
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+
+                            <!-- Search Jobseekers (Much Wider) -->
+                            <div class="w-full lg:w-80">
+                                <div class="relative">
+                                    <input type="text" id="searchInput"
+                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                        placeholder="Search .">
+
                                 </div>
-                                <input type="text" id="searchInput"
-                                    class="block w-full py-2 pl-10 pr-3 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="Search by name, contact, or address...">
                             </div>
-                        </div>
 
-                        <!-- Address Filter -->
-                        <div class="lg:w-48">
-                            <label for="addressFilter" class="block mb-2 text-sm font-medium text-gray-700">Location</label>
-                            <select id="addressFilter" class="block w-full py-2 pl-3 pr-10 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Locations</option>
-                                <option value="rosario">Rosario</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
+                            <!-- Location Filter -->
+                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Location' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
 
-                        <!-- Date Range Filter -->
-                        <div class="lg:w-48">
-                            <label for="dateFilter" class="block mb-2 text-sm font-medium text-gray-700">Registration Date</label>
-                            <select id="dateFilter" class="block w-full py-2 pl-3 pr-10 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Time</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                                <option value="year">This Year</option>
-                            </select>
-                        </div>
-                    </div>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'All Locations'; open = false; filterByLocation('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Locations
+                                        </button>
+                                        <button @click="selected = 'Rosario'; open = false; filterByLocation('rosario')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Rosario
+                                        </button>
+                                        <button @click="selected = 'Other Areas'; open = false; filterByLocation('other')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Other Areas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Search Results Summary -->
-                    <div class="pt-4 mt-4 border-t border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600" id="resultsCount">Showing all <?php echo count($users); ?> jobseekers</span>
+                            <!-- Status Filter -->
+                            <div class="w-full lg:w-36" x-data="{ open: false, selected: 'Status' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
 
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'All Status'; open = false; filterByStatus('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Status
+                                        </button>
+                                        <button @click="selected = 'Active'; open = false; filterByStatus('active')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Active
+                                        </button>
+                                        <button @click="selected = 'Inactive'; open = false; filterByStatus('inactive')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Inactive
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date Filter -->
+                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'All Time'; open = false; filterByDate('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Time
+                                        </button>
+                                        <button @click="selected = 'Today'; open = false; filterByDate('today')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Today
+                                        </button>
+                                        <button @click="selected = 'This Week'; open = false; filterByDate('week')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Week
+                                        </button>
+                                        <button @click="selected = 'This Month'; open = false; filterByDate('month')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Month
+                                        </button>
+                                        <button @click="selected = 'This Year'; open = false; filterByDate('year')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Year
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filter/Clear Buttons -->
+                            <div class="flex gap-2 lg:flex-shrink-0">
+                                <button onclick="clearAllFilters()"
+                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Clear
+                                </button>
+                                <button onclick="exportResults('csv')"
+                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    Export
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,7 +268,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-900">All Jobseekers</h2>
                         <div class="flex items-center space-x-2">
-                            <span class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full" id="visibleCount">
+                            <span class="px-3 py-1 text-sm bg-blue-100 rounded-sm text-primary" id="visibleCount">
                                 <?php echo count($users); ?> visible
                             </span>
                         </div>
@@ -183,7 +287,7 @@
                         </div>
 
                         <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="jobseekersTable">
-                            <table class="w-full table-auto divide-y divide-gray-200">
+                            <table class="w-full divide-y divide-gray-200 table-auto">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
@@ -222,24 +326,37 @@
                                             <!-- Contact column -->
                                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <i class="mr-2 text-gray-400 fas fa-phone"></i>
+
                                                     <?php echo htmlspecialchars($user['contact_no']); ?>
                                                 </div>
                                             </td>
 
                                             <!-- Sex column -->
                                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo strtolower($user['sex']) === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'; ?>">
-                                                    <i class="mr-1 fas fa-<?php echo strtolower($user['sex']) === 'male' ? 'mars' : 'venus'; ?>"></i>
-                                                    <?php echo htmlspecialchars($user['sex']); ?>
-                                                </span>
+                                                <?php
+                                                $sex = strtolower($user['sex'] ?? '');
+                                                if ($sex === 'male'): ?>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <i class="mr-1 fas fa-mars"></i>
+                                                        Male
+                                                    </span>
+                                                <?php elseif ($sex === 'female'): ?>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-red-100 text-red-800">
+                                                        <i class="mr-1 fas fa-venus"></i>
+                                                        Female
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-gray-100 text-gray-600">
+                                                        N/A
+                                                    </span>
+                                                <?php endif; ?>
                                             </td>
 
                                             <!-- Address column -->
                                             <td class="max-w-xs px-6 py-4 text-sm text-gray-500 truncate whitespace-nowrap" title="<?php echo htmlspecialchars($user['address']); ?>">
                                                 <div class="flex items-center">
-                                                    <i class="mr-2 text-gray-400 fas fa-map-marker-alt"></i>
-                                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full <?php echo stripos($user['address'], 'rosario') !== false ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'; ?>">
+
+                                                    <span class="inline-flex items-center px-2 py-1 text-sm font-medium rounded-full <?php echo stripos($user['address'], 'rosario') !== false ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'; ?>">
                                                         <?php echo htmlspecialchars($user['address']); ?>
                                                     </span>
                                                 </div>
@@ -274,14 +391,14 @@
                                             <!-- Registered column -->
                                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <i class="mr-2 text-gray-400 fas fa-calendar"></i>
+
                                                     <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
                                                 </div>
                                             </td>
 
                                             <!-- Actions column -->
-                                            <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                                <button class="text-gray-600 hover:text-gray-900" disabled title="Block User">
+                                            <td class="px-6 py-4 text-xs font-medium whitespace-nowrap">
+                                                <button class="px-2 py-2 text-gray-600 bg-gray-100 hover:text-gray-900" disabled title="Block User">
                                                     <i class="mr-1 fas fa-ban"></i>Disable
                                                 </button>
                         </div>
@@ -290,6 +407,34 @@
                     <?php endforeach; ?>
                     </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="py-4 border-t border-gray-200 " id="paginationContainer">
+                    <div class="flex items-center justify-between">
+                        <!-- Left side: Results info -->
+                        <div class="text-sm text-gray-700" id="paginationInfo">
+                            Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($users); ?></span> jobseekers
+                        </div>
+
+                        <!-- Right side: Pagination controls -->
+                        <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
+                            <!-- Previous button -->
+                            <button id="prevBtn" onclick="changePage('prev')"
+                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Previous
+                            </button>
+
+                            <!-- Page numbers will be inserted here by JavaScript -->
+                            <div id="pageNumbers" class="flex space-x-1"></div>
+
+                            <!-- Next button -->
+                            <button id="nextBtn" onclick="changePage('next')"
+                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Next
+                            </button>
+                        </nav>
+                    </div>
                 </div>
             <?php endif; ?>
             </div>
@@ -303,12 +448,23 @@
 <script>
     let allRows = [];
     let filteredRows = [];
+    let currentFilters = {
+        location: '',
+        status: '',
+        date: ''
+    };
+
+    // Pagination variables
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalPages = 1;
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         allRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
         filteredRows = [...allRows];
         updateCounts();
+        initializePagination();
     });
 
     // Mobile menu toggle
@@ -330,20 +486,24 @@
         applyFilters();
     });
 
-    // Address filter
-    document.getElementById('addressFilter').addEventListener('change', function() {
+    // New Alpine.js dropdown filter functions
+    function filterByLocation(location) {
+        currentFilters.location = location;
         applyFilters();
-    });
+    }
 
-    // Date filter
-    document.getElementById('dateFilter').addEventListener('change', function() {
+    function filterByStatus(status) {
+        currentFilters.status = status;
         applyFilters();
-    });
+    }
+
+    function filterByDate(dateRange) {
+        currentFilters.date = dateRange;
+        applyFilters();
+    }
 
     function applyFilters() {
         const searchValue = document.getElementById('searchInput').value.toLowerCase();
-        const addressFilter = document.getElementById('addressFilter').value.toLowerCase();
-        const dateFilter = document.getElementById('dateFilter').value;
 
         filteredRows = allRows.filter(row => {
             const text = row.textContent.toLowerCase();
@@ -352,25 +512,30 @@
             // Search filter
             const searchMatch = !searchValue || text.includes(searchValue);
 
-            // Address filter
-            let addressMatch = true;
-            if (addressFilter === 'rosario') {
-                addressMatch = address.includes('rosario');
-            } else if (addressFilter === 'other') {
-                addressMatch = !address.includes('rosario');
+            // Location filter
+            let locationMatch = true;
+            if (currentFilters.location === 'rosario') {
+                locationMatch = address.includes('rosario');
+            } else if (currentFilters.location === 'other') {
+                locationMatch = !address.includes('rosario');
+            }
+
+            // Status filter (placeholder - you may need to add data-status attributes)
+            let statusMatch = true;
+            if (currentFilters.status) {
+                // Add your status filtering logic here
+                // statusMatch = row.getAttribute('data-status') === currentFilters.status;
             }
 
             // Date filter
-            const dateMatch = !dateFilter || matchesDateFilter(row.getAttribute('data-date'), dateFilter);
+            const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
 
-            return searchMatch && addressMatch && dateMatch;
+            return searchMatch && locationMatch && statusMatch && dateMatch;
         });
 
-        // Show/hide rows
-        allRows.forEach(row => {
-            row.style.display = filteredRows.includes(row) ? '' : 'none';
-        });
-
+        // Reset to first page when filters change
+        currentPage = 1;
+        updatePagination();
         updateCounts();
         updateResultsMessage();
     }
@@ -418,10 +583,128 @@
         const totalCount = allRows.length;
 
         document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-        document.getElementById('resultsCount').textContent =
-            visibleCount === totalCount ?
-            `Showing all ${totalCount} jobseekers` :
-            `Showing ${visibleCount} of ${totalCount} jobseekers`;
+
+        // Update total results for pagination
+        document.getElementById('totalResults').textContent = visibleCount;
+    }
+
+    // Pagination Functions
+    function initializePagination() {
+        updatePagination();
+    }
+
+    function updatePagination() {
+        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+        // Hide/show pagination container based on whether pagination is needed
+        const paginationContainer = document.getElementById('paginationContainer');
+        if (filteredRows.length <= itemsPerPage) {
+            paginationContainer.style.display = 'none';
+        } else {
+            paginationContainer.style.display = 'block';
+        }
+
+        // Show/hide rows based on current page
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            if (filteredRows[i]) {
+                filteredRows[i].style.display = '';
+            }
+        }
+
+        updatePaginationInfo();
+        updatePaginationControls();
+    }
+
+    function updatePaginationInfo() {
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+
+        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
+        document.getElementById('showingEnd').textContent = endIndex;
+    }
+
+    function updatePaginationControls() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        // Update Previous/Next button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Clear existing page numbers
+        pageNumbers.innerHTML = '';
+
+        // Add page number buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust startPage if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            pageNumbers.appendChild(createPageButton(1));
+            if (startPage > 2) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+        }
+
+        // Add visible page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.appendChild(createPageButton(i));
+        }
+
+        // Add ellipsis and last page if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+            pageNumbers.appendChild(createPageButton(totalPages));
+        }
+    }
+
+    function createPageButton(pageNum) {
+        const button = document.createElement('button');
+        button.textContent = pageNum;
+        button.onclick = () => changePage(pageNum);
+
+        if (pageNum === currentPage) {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
+        } else {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
+        }
+
+        return button;
+    }
+
+    function createEllipsis() {
+        const span = document.createElement('span');
+        span.textContent = '...';
+        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
+        return span;
+    }
+
+    function changePage(direction) {
+        if (typeof direction === 'number') {
+            currentPage = direction;
+        } else if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (direction === 'next' && currentPage < totalPages) {
+            currentPage++;
+        }
+
+        updatePagination();
     }
 
     function updateResultsMessage() {
@@ -438,9 +721,35 @@
     }
 
     function clearAllFilters() {
+        // Clear search input
         document.getElementById('searchInput').value = '';
-        document.getElementById('addressFilter').value = '';
-        document.getElementById('dateFilter').value = '';
+
+        // Reset current filters
+        currentFilters = {
+            location: '',
+            status: '',
+            date: ''
+        };
+
+        // Reset pagination
+        currentPage = 1;
+
+        // Reset Alpine.js dropdown selections
+        // You can trigger these by dispatching events or manually updating the dropdown states
+        const locationDropdown = document.querySelector('[x-data*="Location"]');
+        const statusDropdown = document.querySelector('[x-data*="Status"]');
+        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
+
+        if (locationDropdown && locationDropdown._x_dataStack) {
+            locationDropdown._x_dataStack[0].selected = 'Location';
+        }
+        if (statusDropdown && statusDropdown._x_dataStack) {
+            statusDropdown._x_dataStack[0].selected = 'Status';
+        }
+        if (dateDropdown && dateDropdown._x_dataStack) {
+            dateDropdown._x_dataStack[0].selected = 'Date Range';
+        }
+
         applyFilters();
     }
 
@@ -449,7 +758,6 @@
 
     function sortTable(columnIndex) {
         const tbody = document.getElementById('jobseekersTableBody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
 
         // Get current direction or default to ascending
         sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
@@ -477,7 +785,13 @@
                 String(bVal).localeCompare(String(aVal));
         };
 
-        rows.sort(comparer).forEach(row => tbody.appendChild(row));
+        // Sort both allRows and filteredRows to maintain consistency
+        allRows.sort(comparer);
+        filteredRows.sort(comparer);
+
+        // Reset to first page after sorting
+        currentPage = 1;
+        updatePagination();
 
         // Update sort icons
         document.querySelectorAll('th i.fas').forEach(icon => {
@@ -492,6 +806,7 @@
 
     // Export functionality
     function exportResults(format) {
+        // Export all filtered results, not just current page
         const visibleData = filteredRows.map(row => {
             const cells = row.querySelectorAll('td');
             return {
@@ -499,7 +814,7 @@
                 contact: cells[1].textContent.trim(),
                 gender: cells[2].textContent.trim(),
                 address: cells[3].textContent.trim(),
-                registered: cells[4].textContent.trim()
+                registered: cells[5].textContent.trim() // Updated index for registered column
             };
         });
 
