@@ -163,23 +163,109 @@
                     </div>
                 </div>
 
-                <!-- Search and Filter -->
-                <div class="flex flex-col mb-4 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center sm:justify-between">
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="text-gray-400 fas fa-search"></i>
+                <!-- Search and Filter Section -->
+                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
+                    <div class="flex flex-col gap-6 mx-auto">
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+
+                            <!-- Search Employers (Much Wider) -->
+                            <div class="w-full lg:w-80">
+                                <div class="relative">
+                                    <input type="text" id="searchInput"
+                                        class="w-full px-4 py-3 pl-12 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                        placeholder="Search employers by name, company, or representative...">
+                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Status' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Status'; open = false; filterByStatus('')" 
+                                            class="w-full px-4 py-2 text-sm font-normal text-left text-gray-700 hover:bg-gray-100">All Status</button>
+                                        <button @click="selected = 'Incomplete'; open = false; filterByStatus('incomplete')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Incomplete</button>
+                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending verification')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Pending</button>
+                                        <button @click="selected = 'Verified'; open = false; filterByStatus('verified')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Verified</button>
+                                        <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Rejected</button>
+                                        <button @click="selected = 'Suspended'; open = false; filterByStatus('suspended')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Suspended</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date Filter -->
+                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Date Range'; open = false; filterByDate('')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Time</button>
+                                        <button @click="selected = 'Today'; open = false; filterByDate('today')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Today</button>
+                                        <button @click="selected = 'This Week'; open = false; filterByDate('week')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Week</button>
+                                        <button @click="selected = 'This Month'; open = false; filterByDate('month')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Month</button>
+                                        <button @click="selected = 'This Year'; open = false; filterByDate('year')" 
+                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Year</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filter/Clear Buttons -->
+                            <div class="flex gap-2 lg:flex-shrink-0">
+                                <button onclick="clearAllFilters()"
+                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Clear
+                                </button>
+                                <button onclick="exportResults('csv')"
+                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    Export
+                                </button>
+                            </div>
                         </div>
-                        <input type="text" id="searchInput" class="block w-full py-2 pl-10 pr-3 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Search employers...">
-                    </div>
-                    <div class="flex space-x-2">
-                        <select id="statusFilter" class="block w-full py-2 pl-3 pr-10 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:w-40">
-                            <option value="">All Status</option>
-                            <option value="incomplete">Incomplete</option>
-                            <option value="pending verification">Pending</option>
-                            <option value="verified">Verified</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="suspended">Suspended</option>
-                        </select>
                     </div>
                 </div>
 
@@ -188,19 +274,25 @@
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-900">All Employers</h2>
                         <div class="flex items-center space-x-2">
-                            <span class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full">
-                                <?php echo count($users); ?> total
+                            <span class="px-3 py-1 text-sm bg-blue-100 rounded-sm text-primary" id="visibleCount">
+                                <?php echo count($users); ?> visible
                             </span>
                         </div>
                     </div>
 
                     <?php if (empty($users)): ?>
-                        <div class="p-8 text-center bg-white border border-gray-200 rounded-lg">
+                        <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noUsersMessage">
                             <i class="mb-4 text-4xl text-gray-400 fas fa-inbox"></i>
                             <p class="text-gray-500">No employers found</p>
                         </div>
                     <?php else: ?>
-                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <!-- No Results Message (Hidden by default) -->
+                        <div class="hidden p-8 text-center bg-white border border-gray-200 rounded-lg" id="noResultsMessage">
+                            <i class="mb-4 text-4xl text-gray-400 fas fa-search"></i>
+                            <p class="text-gray-500">No employers match your search criteria</p>
+                        </div>
+
+                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
                             <table class="w-full divide-y divide-gray-200 table-auto">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -214,7 +306,11 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="employersTableBody">
                                     <?php foreach ($users as $user): ?>
-                                        <tr class="hover:bg-gray-50" data-status="<?php echo htmlspecialchars(strtolower($user['status'])); ?>">
+                                        <tr class="hover:bg-gray-50" 
+                                            data-status="<?php echo htmlspecialchars(strtolower($user['status'])); ?>"
+                                            data-company="<?php echo htmlspecialchars(strtolower($user['company_name'])); ?>"
+                                            data-representative="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['last_name'])); ?>"
+                                            data-date="<?php echo $user['created_at']; ?>">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     <?php echo htmlspecialchars($user['company_name']); ?>
@@ -236,7 +332,7 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                <span class="inline-flex px-2 py-1 text-xs font-normal rounded-sm 
                                                         <?php
                                                         $statusClass = [
                                                             'incomplete' => 'bg-gray-100 text-gray-800',
@@ -260,7 +356,7 @@
                                                             <i class="mr-1 fas fa-unlock"></i>Unsuspend
                                                         </button>
                                                     <?php else: ?>
-                                                        <button class="text-red-600 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                        <button class="px-2 py-1 text-xs text-gray-600 bg-gray-100 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
                                                             <i class="mr-1 fas fa-ban"></i>Suspend
                                                         </button>
                                                     <?php endif; ?>
@@ -270,6 +366,34 @@
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="px-6 py-4 border-t border-gray-200" id="paginationContainer">
+                            <div class="flex items-center justify-between">
+                                <!-- Left side: Results info -->
+                                <div class="text-sm text-gray-700" id="paginationInfo">
+                                    Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($users); ?></span> employers
+                                </div>
+                                
+                                <!-- Right side: Pagination controls -->
+                                <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
+                                    <!-- Previous button -->
+                                    <button id="prevBtn" onclick="changePage('prev')" 
+                                        class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Previous
+                                    </button>
+                                    
+                                    <!-- Page numbers will be inserted here by JavaScript -->
+                                    <div id="pageNumbers" class="flex space-x-1"></div>
+                                    
+                                    <!-- Next button -->
+                                    <button id="nextBtn" onclick="changePage('next')" 
+                                        class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Next
+                                    </button>
+                                </nav>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -282,6 +406,27 @@
 <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
 <script>
+    let allRows = [];
+    let filteredRows = [];
+    let currentFilters = {
+        status: '',
+        date: ''
+    };
+
+    // Pagination variables
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalPages = 1;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        allRows = Array.from(document.querySelectorAll('#employersTableBody tr'));
+        filteredRows = [...allRows];
+        updateCounts();
+        initializePagination();
+        attachButtonListeners();
+    });
+
     // Mobile menu toggle
     function toggleSidebar() {
         const sidebarMobile = document.getElementById('sidebar-mobile');
@@ -298,25 +443,290 @@
 
     // Search functionality
     document.getElementById('searchInput').addEventListener('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#employersTableBody tr');
+        applyFilters();
+    });
 
-        rows.forEach(row => {
+    // New Alpine.js dropdown filter functions
+    function filterByStatus(status) {
+        currentFilters.status = status;
+        applyFilters();
+    }
+
+    function filterByDate(dateRange) {
+        currentFilters.date = dateRange;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+
+        filteredRows = allRows.filter(row => {
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
-    });
+            const status = row.getAttribute('data-status').toLowerCase();
 
-    // Filter functionality
-    document.getElementById('statusFilter').addEventListener('change', function() {
-        const statusFilter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#employersTableBody tr');
+            // Search filter
+            const searchMatch = !searchValue || text.includes(searchValue);
 
-        rows.forEach(row => {
-            const rowStatus = row.getAttribute('data-status');
-            row.style.display = !statusFilter || rowStatus === statusFilter ? '' : 'none';
+            // Status filter
+            const statusMatch = !currentFilters.status || status === currentFilters.status.toLowerCase();
+
+            // Date filter
+            const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
+
+            return searchMatch && statusMatch && dateMatch;
         });
-    });
+
+        // Reset to first page when filters change
+        currentPage = 1;
+        updatePagination();
+        updateCounts();
+        updateResultsMessage();
+        updateStatusCounts();
+    }
+
+    function matchesDateFilter(dateString, filter) {
+        const rowDate = new Date(dateString);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        switch (filter) {
+            case 'today':
+                const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+                return rowToday.getTime() === today.getTime();
+
+            case 'week':
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return rowDate >= weekAgo;
+
+            case 'month':
+                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+                return rowDate >= monthAgo;
+
+            case 'year':
+                const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+                return rowDate >= yearAgo;
+
+            default:
+                return true;
+        }
+    }
+
+    function updateCounts() {
+        const visibleCount = filteredRows.length;
+        const totalCount = allRows.length;
+
+        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+        
+        // Update total results for pagination
+        document.getElementById('totalResults').textContent = visibleCount;
+    }
+
+    // Pagination Functions
+    function initializePagination() {
+        updatePagination();
+    }
+
+    function updatePagination() {
+        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        
+        // Hide/show pagination container based on whether pagination is needed
+        const paginationContainer = document.getElementById('paginationContainer');
+        if (filteredRows.length <= itemsPerPage) {
+            paginationContainer.style.display = 'none';
+        } else {
+            paginationContainer.style.display = 'block';
+        }
+
+        // Show/hide rows based on current page
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            if (filteredRows[i]) {
+                filteredRows[i].style.display = '';
+            }
+        }
+
+        updatePaginationInfo();
+        updatePaginationControls();
+    }
+
+    function updatePaginationInfo() {
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+        
+        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
+        document.getElementById('showingEnd').textContent = endIndex;
+    }
+
+    function updatePaginationControls() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        // Update Previous/Next button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Clear existing page numbers
+        pageNumbers.innerHTML = '';
+
+        // Add page number buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust startPage if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            pageNumbers.appendChild(createPageButton(1));
+            if (startPage > 2) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+        }
+
+        // Add visible page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.appendChild(createPageButton(i));
+        }
+
+        // Add ellipsis and last page if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+            pageNumbers.appendChild(createPageButton(totalPages));
+        }
+    }
+
+    function createPageButton(pageNum) {
+        const button = document.createElement('button');
+        button.textContent = pageNum;
+        button.onclick = () => changePage(pageNum);
+        
+        if (pageNum === currentPage) {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
+        } else {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
+        }
+        
+        return button;
+    }
+
+    function createEllipsis() {
+        const span = document.createElement('span');
+        span.textContent = '...';
+        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
+        return span;
+    }
+
+    function changePage(direction) {
+        if (typeof direction === 'number') {
+            currentPage = direction;
+        } else if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (direction === 'next' && currentPage < totalPages) {
+            currentPage++;
+        }
+        
+        updatePagination();
+    }
+
+    function updateResultsMessage() {
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const employersTable = document.getElementById('employersTable');
+
+        if (filteredRows.length === 0) {
+            noResultsMessage.classList.remove('hidden');
+            employersTable.classList.add('hidden');
+        } else {
+            noResultsMessage.classList.add('hidden');
+            employersTable.classList.remove('hidden');
+        }
+    }
+
+    function clearAllFilters() {
+        // Clear search input
+        document.getElementById('searchInput').value = '';
+
+        // Reset current filters
+        currentFilters = {
+            status: '',
+            date: ''
+        };
+
+        // Reset pagination
+        currentPage = 1;
+
+        // Reset Alpine.js dropdown selections
+        const statusDropdown = document.querySelector('[x-data*="Status"]');
+        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
+
+        if (statusDropdown && statusDropdown._x_dataStack) {
+            statusDropdown._x_dataStack[0].selected = 'Status';
+        }
+        if (dateDropdown && dateDropdown._x_dataStack) {
+            dateDropdown._x_dataStack[0].selected = 'Date Range';
+        }
+
+        applyFilters();
+    }
+
+    // Export functionality
+    function exportResults(format) {
+        // Export all filtered results, not just current page
+        const visibleData = filteredRows.map(row => {
+            const cells = row.querySelectorAll('td');
+            return {
+                company: cells[0].textContent.trim(),
+                contact: cells[1].textContent.trim(),
+                representative: cells[2].textContent.trim(),
+                status: cells[3].textContent.trim(),
+                registered: cells[4].textContent.trim()
+            };
+        });
+
+        if (format === 'csv') {
+            exportToCSV(visibleData);
+        } else if (format === 'pdf') {
+            // PDF export would require a library like jsPDF
+            alert('PDF export functionality would require additional implementation');
+        }
+    }
+
+    function exportToCSV(data) {
+        const headers = ['Company', 'Contact', 'Representative', 'Status', 'Registered'];
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => [
+                `"${row.company}"`,
+                `"${row.contact}"`,
+                `"${row.representative}"`,
+                `"${row.status}"`,
+                `"${row.registered}"`
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], {
+            type: 'text/csv'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `employers_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }
 
     // Enhanced suspend/unsuspend functionality with proper API endpoint
     function handleStatusChange(action, userId, button) {
@@ -346,6 +756,9 @@
                     const row = button.closest('tr');
                     const statusCell = row.querySelector('td:nth-child(4) span');
                     const actionCell = row.querySelector('td:last-child div');
+
+                    // Update data-status attribute
+                    row.setAttribute('data-status', action === 'suspend' ? 'suspended' : 'verified');
 
                     // Update status badge
                     statusCell.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -436,8 +849,17 @@
         });
     }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        attachButtonListeners();
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+
+        // Escape to clear filters
+        if (e.key === 'Escape') {
+            clearAllFilters();
+        }
     });
 </script>
