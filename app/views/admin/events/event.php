@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events & Programs - SIKAP Admin</title>
-    <link href="css/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-gray-50">
+
     <div class="flex h-screen">
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
         
@@ -77,7 +68,7 @@
                     </div>
 
                     <div class="overflow-hidden bg-white rounded-lg shadow">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
@@ -104,9 +95,9 @@
                                     <tr class="event-row">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 w-10 h-10">
+                                                <div class="flex-shrink-0 w-12 h-12">
                                                     <?php if (!empty($event['image'])): ?>
-                                                        <img class="object-cover w-10 h-10 rounded-full" 
+                                                        <img class="object-cover w-12 h-12 rounded-full" 
                                                              src="<?php echo htmlspecialchars($event['image']); ?>" 
                                                              alt="">
                                                     <?php else: ?>
@@ -301,5 +292,4 @@
             filterEvents();
         });
     </script>
-</body>
-</html>
+
