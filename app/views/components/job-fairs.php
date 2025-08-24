@@ -6,21 +6,26 @@
     </p>
 
     <!-- Filter Tabs -->
-    <div class="flex flex-wrap justify-center gap-4 mb-12">
-      <button class="px-6 py-3 text-sm font-medium text-white transition-all duration-200 rounded-lg filter-btn bg-primary hover:bg-primary/90" onclick="filterEvents('all')" data-category="all">
+    <div class="flex flex-wrap justify-center gap-8 mb-12">
+      <button class="relative px-2 py-3 text-sm font-medium text-blue-600 transition-all duration-200 filter-btn group" onclick="filterEvents('all')" data-category="all">
         All Programs
+        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-100 transition-transform duration-200"></span>
       </button>
-      <button class="px-6 py-3 text-sm font-medium text-gray-600 transition-all duration-200 bg-white rounded-lg filter-btn hover:bg-gray-50" onclick="filterEvents('events')" data-category="events">
+      <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('events')" data-category="events">
         Events
+        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
       </button>
-      <button class="px-6 py-3 text-sm font-medium text-gray-600 transition-all duration-200 bg-white rounded-lg filter-btn hover:bg-gray-50" onclick="filterEvents('seminar')" data-category="seminar">
+      <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('seminar')" data-category="seminar">
         Seminars
+        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
       </button>
-      <button class="px-6 py-3 text-sm font-medium text-gray-600 transition-all duration-200 bg-white rounded-lg filter-btn hover:bg-gray-50" onclick="filterEvents('webinar')" data-category="webinar">
+      <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('webinar')" data-category="webinar">
         Webinars
+        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
       </button>
-      <button class="px-6 py-3 text-sm font-medium text-gray-600 transition-all duration-200 bg-white rounded-lg filter-btn hover:bg-gray-50" onclick="filterEvents('training')" data-category="training">
+      <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('training')" data-category="training">
         Training
+        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
       </button>
     </div>
 
@@ -94,15 +99,22 @@
 
 <script>
   function filterEvents(category) {
-    // Update active button
+    // Update active button with line indicator
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => {
+      const underline = btn.querySelector('span');
       if (btn.dataset.category === category) {
-        btn.classList.remove('text-gray-600', 'bg-white');
-        btn.classList.add('text-white', 'bg-primary');
+        // Active state
+        btn.classList.remove('text-gray-600');
+        btn.classList.add('text-blue-600');
+        underline.classList.remove('scale-x-0');
+        underline.classList.add('scale-x-100');
       } else {
-        btn.classList.remove('text-white', 'bg-primary');
-        btn.classList.add('text-gray-600', 'bg-white');
+        // Inactive state
+        btn.classList.remove('text-blue-600');
+        btn.classList.add('text-gray-600');
+        underline.classList.remove('scale-x-100');
+        underline.classList.add('scale-x-0');
       }
     });
 

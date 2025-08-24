@@ -13,11 +13,10 @@
     <div>
       <h4 class="mb-3 font-medium">Quick Link</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
-        <li><a href="#">Pricing</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">Developer</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Accessibility</a></li>
+        <li><a href="#">Accreditation</a></li>
       </ul>
     </div>
 
@@ -25,10 +24,10 @@
     <div>
       <h4 class="mb-3 font-medium">Candidate</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">Browse Jobs</a></li>
-        <li><a href="#">Browse Employers</a></li>
-        <li><a href="#">Candidate Dashboard</a></li>
-        <li><a href="#">Saved Jobs</a></li
+        <li><a href="#">How to Apply</a></li>
+        <li><a href="#">Resume Tips</a></li>
+        <li><a href="#">Gov't Programs</a></li>
+        <li><a href="#">Career Training</a></li
       </ul>
     </div>
 
@@ -36,10 +35,11 @@
     <div>
       <h4 class="mb-3 font-medium">Employers</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">Post a Job</a></li>
-        <li><a href="#">Browse Candidates</a></li>
-        <li><a href="#">Employer Dashboard</a></li>
-        <li><a href="#">Applications</a></li>
+        <li><a href="#">Post Guide</a></li>
+        <li><a href="#">Registration</a></li>
+        <li><a href="#">Partnerships</a></li>
+        <li><a href="#">Hiring Laws</a></li>
+        <li><a href="#">Reports</a></li>
       </ul>
     </div>
 
@@ -48,9 +48,9 @@
       <h4 class="mb-3 font-medium">Support</h4>
       <ul class="space-y-4 text-gray-400">
         <li><a href="#">FAQs</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms & Conditions</a></li>
-        <li><a href="?page=admin-login">Admin Shortcut</a></li>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Contact Support</a></li>
+        <li><a href="?page=admin-login">Feedback</a></li>
       </ul>
     </div>
   </div>
