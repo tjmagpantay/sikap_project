@@ -36,6 +36,15 @@ include_once __DIR__ . '/../components/navbar.php';
                     </nav>
                 </div>
 
+                <!-- Search Bar - Right side on desktop -->
+                <div class="relative w-full max-w-md">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="w-5 h-5 text-gray-400 fas fa-search"></i>
+                    </div>
+                    <input type="text" id="eventSearch"
+                        class="w-full px-4 py-3 pr-12 text-gray-700 transition-all duration-200 bg-white border border-gray-200 rounded-lg shadow-sm pl-11 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary hover:border-gray-300"
+                        placeholder="Search events...">
+                </div>
             </div>
         </div>
 
