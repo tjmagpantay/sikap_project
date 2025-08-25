@@ -9,23 +9,23 @@
     <div class="flex flex-wrap justify-center gap-8 mb-12">
       <button class="relative px-2 py-3 text-sm font-medium text-blue-600 transition-all duration-200 filter-btn group" onclick="filterEvents('all')" data-category="all">
         All Programs
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-100 transition-transform duration-200"></span>
+        <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-100 bg-blue-600"></span>
       </button>
       <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('events')" data-category="events">
         Events
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
+        <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-0 bg-blue-600 group-hover:scale-x-100"></span>
       </button>
       <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('seminar')" data-category="seminar">
         Seminars
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
+        <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-0 bg-blue-600 group-hover:scale-x-100"></span>
       </button>
       <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('webinar')" data-category="webinar">
         Webinars
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
+        <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-0 bg-blue-600 group-hover:scale-x-100"></span>
       </button>
       <button class="relative px-2 py-3 text-sm font-medium text-gray-600 transition-all duration-200 filter-btn group hover:text-blue-600" onclick="filterEvents('training')" data-category="training">
         Training
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100"></span>
+        <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-0 bg-blue-600 group-hover:scale-x-100"></span>
       </button>
     </div>
 
