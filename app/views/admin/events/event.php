@@ -150,47 +150,44 @@
                                     <input type="text" id="searchInput"
                                         class="w-full px-4 py-3 pl-12 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         placeholder="Search by event title...">
-                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
                                 </div>
                             </div>
 
                             <!-- Event Type Filter -->
-                            <div class="w-full lg:w-48" x-data="{ open: false, selected: 'Event Type' }">
-                                <button @click="open = !open"
-                                    @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                    <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
+<div class="w-full lg:w-48" x-data="{ open: false, selected: 'Event Type' }">
+    <button @click="open = !open"
+        @click.away="open = false"
+        class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+        <span x-text="selected"></span>
+        <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
 
-                                <!-- Dropdown Menu -->
-                                <div x-show="open"
-                                    x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                    x-cloak>
-                                    <div class="py-1">
-                                        <button @click="selected = 'Event Type'; open = false; filterByEventType('')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Events</button>
-                                        <button @click="selected = 'Program'; open = false; filterByEventType('program')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Program</button>
-                                        <button @click="selected = 'Job Fair'; open = false; filterByEventType('jobfair')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Job Fair</button>
-                                        <button @click="selected = 'Local Recruitment'; open = false; filterByEventType('local recruitment')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Local Recruitment</button>
-                                    </div>
-                                </div>
-                            </div>
+    <!-- Dropdown Menu -->
+    <div x-show="open"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
+        class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+        x-cloak>
+        <div class="py-1">
+            <button @click="selected = 'Event Type'; open = false; filterByEventType('')"
+                class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Events</button>
+            <button @click="selected = 'Program'; open = false; filterByEventType('program')"
+                class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Program</button>
+            <button @click="selected = 'Job Fair'; open = false; filterByEventType('jobfair')"
+                class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Job Fair</button>
+            <button @click="selected = 'Local Recruitment'; open = false; filterByEventType('local recruitment')"
+                class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Local Recruitment</button>
+        </div>
+    </div>
+</div>
 
-
+                            
 
                             <!-- Event Status Filter -->
                             <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Event Status' }">
@@ -433,7 +430,7 @@
     let allRows = [];
     let filteredRows = [];
     let currentFilters = {
-        type: '',
+        type: 'program',
         adminStatus: '',
         eventStatus: ''
     };
@@ -462,16 +459,18 @@
         // Initialize pagination
         initializePagination();
 
+        // Initialize tab styles
+        document.querySelectorAll('.event-tab').forEach(tab => {
+            tab.classList.add('text-gray-600', 'bg-gray-100');
+        });
+        document.querySelector('.event-tab[data-type="program"]').classList.remove('text-gray-600', 'bg-gray-100');
+        document.querySelector('.event-tab[data-type="program"]').classList.add('bg-primary', 'text-white');
+
         // Apply initial filter
         filterEvents();
     });
 
     // New Alpine.js dropdown filter functions
-    function filterByEventType(type) {
-        currentFilters.type = type; // Don't default to 'program', allow empty for "All Events"
-        applyFilters();
-    }
-
     function filterByAdminStatus(status) {
         currentFilters.adminStatus = status;
         applyFilters();
@@ -492,7 +491,7 @@
             const eventStatus = row.getAttribute('data-event-status');
 
             const matchesSearch = searchTerm === '' || title.includes(searchTerm);
-            const matchesType = currentFilters.type === '' || type === currentFilters.type;
+            const matchesType = type === currentFilters.type;
             const matchesAdminStatus = currentFilters.adminStatus === '' || adminStatus === currentFilters.adminStatus;
             const matchesEventStatus = currentFilters.eventStatus === '' || eventStatus === currentFilters.eventStatus;
 
@@ -652,8 +651,7 @@
         // Clear search input
         document.getElementById('searchInput').value = '';
 
-        // Reset current filters
-        currentFilters.type = '';
+        // Reset current filters (keep type filter)
         currentFilters.adminStatus = '';
         currentFilters.eventStatus = '';
 
@@ -661,13 +659,9 @@
         currentPage = 1;
 
         // Reset Alpine.js dropdown selections
-        const eventTypeDropdown = document.querySelector('[x-data*="Event Type"]');
         const adminStatusDropdown = document.querySelector('[x-data*="Admin Status"]');
         const eventStatusDropdown = document.querySelector('[x-data*="Event Status"]');
 
-        if (eventTypeDropdown && eventTypeDropdown._x_dataStack) {
-            eventTypeDropdown._x_dataStack[0].selected = 'Event Type';
-        }
         if (adminStatusDropdown && adminStatusDropdown._x_dataStack) {
             adminStatusDropdown._x_dataStack[0].selected = 'Admin Status';
         }
@@ -728,6 +722,20 @@
 
     // Event listeners
     document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    document.querySelectorAll('.event-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.event-tab').forEach(t => {
+                t.classList.remove('bg-primary', 'text-white');
+                t.classList.add('text-gray-600', 'bg-gray-100');
+            });
+            this.classList.remove('text-gray-600', 'bg-gray-100');
+            this.classList.add('bg-primary', 'text-white');
+            currentFilters.type = this.dataset.type;
+            currentPage = 1;
+            applyFilters();
+        });
+    });
 
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {

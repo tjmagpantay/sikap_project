@@ -1,4 +1,4 @@
-<section class="relative flex flex-col items-center justify-between w-full min-h-screen gap-24 py-20 mx-auto bg-gradient-to-br from-gray-50 via-blue-50/30 to-white md:flex-row max-w-7xl">
+<section class="relative flex flex-col items-center justify-between w-full min-h-screen gap-16 py-20 mx-auto bg-gradient-to-br from-gray-50 via-blue-50/30 to-white md:flex-row max-w-7xl">
     <!-- Left Content Section -->
     <div class="flex flex-col items-start justify-center w-full md:w-1/2">
         <h2 class="mb-4 text-4xl font-bold leading-tight text-grayMain sm:text-4xl lg:text-4xl">
@@ -90,8 +90,8 @@
         </div>
     </div>
 
-    <!-- Right Image Section with Enhanced Design - Moved Further Right -->
-    <div class="relative flex items-center justify-end w-full md:w-1/2 md:pl-16 lg:pl-24">
+    <!-- Right Image Section with Enhanced Design -->
+    <div class="relative flex items-center justify-center w-full md:w-1/2">
         <!-- Background Decorative Elements -->
         <div class="absolute inset-0 opacity-10">
             <div class="absolute w-32 h-32 bg-blue-300 rounded-full top-10 right-10 blur-2xl"></div>
@@ -100,7 +100,7 @@
         </div>
 
         <!-- Main Image Container -->
-        <div class="relative z-10 py-8 ml-auto">
+        <div class="relative z-10 py-8">
             <!-- Image with enhanced styling -->
             <div class="relative p-2 overflow-hidden shadow-2xl rounded-3xl bg-gradient-to-br from-white to-gray-50">
                 <img src="./assets/images/job-guide-img.png"
@@ -127,9 +127,11 @@
                         <div class="text-xs text-gray-600">Jobs Filled</div>
                     </div>
                 </div> -->
+
+    
             </div>
         </div>
-    </div>
+
 </section>
 
 <!-- AOS Animation Library CSS -->

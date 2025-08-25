@@ -30,7 +30,7 @@ $companies = $landingController->getTopCompanies(4);
     <?php if (!empty($companies)): ?>
       <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
         <?php foreach ($companies as $company): ?>
-          <div class="overflow-hidden transition-all duration-300 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 h-[480px] flex flex-col"
+          <div class="overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-md hover:-translate-y-2 h-[480px] flex flex-col"
             onclick="viewCompany(<?php echo $company['employer_id']; ?>)">
 
             <!-- Company Header -->
