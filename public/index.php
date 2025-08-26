@@ -305,11 +305,29 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     $controller->manageUsers();
         //     break;
 
-        // case 'admin-jobs':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageJobs();
-        //     break;
+        case 'admin-jobpost-management':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->jobPostManagement();
+            break;
+
+        case 'admin-view-job':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->viewJob();
+            break;
+
+        case 'admin-toggle-job-status':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->toggleJobStatus();
+            break;
+
+        case 'admin-delete-job':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->deleteJob();
+            break;
 
         // case 'admin-reports':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';

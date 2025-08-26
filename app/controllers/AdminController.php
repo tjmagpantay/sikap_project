@@ -2,17 +2,23 @@
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Admin.php';
 require_once __DIR__ . '/../models/Employer.php';
+require_once __DIR__ . '/../models/JobPost.php';
 
-class AdminController {
+class AdminController
+{
     private $adminModel;
     private $employerModel;
+    private $jobPostModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->adminModel = new Admin();
         $this->employerModel = new Employer();
+        $this->jobPostModel = new JobPost();
     }
 
-    public function login() {
+    public function login()
+    {
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,19 +32,19 @@ class AdminController {
                 $error = 'Please fill in all fields.';
             } else {
                 $admin = $this->adminModel->authenticate($email, $password);
-                
+
                 // Debug logging
                 error_log("Authentication result: " . print_r($admin, true));
-                
+
                 if ($admin) {
                     $_SESSION['user_id'] = $admin['user_id'];
                     $_SESSION['admin_id'] = $admin['admin_id'];
                     $_SESSION['role'] = 'admin'; // Hardcode this instead of using $admin['role_name']
                     $_SESSION['admin_name'] = $admin['admin_name'];
-                    
+
                     // Debug logging
                     error_log("Session variables set: " . print_r($_SESSION, true));
-                    
+
                     header('Location: ?page=admin-dashboard');
                     exit;
                 } else {
@@ -48,9 +54,10 @@ class AdminController {
         }
 
         include __DIR__ . '/../views/admin/login-admin.php';
-}
+    }
 
-    public function dashboard() {
+    public function dashboard()
+    {
         // Debug logging
         error_log("Dashboard access - Session: " . print_r($_SESSION, true));
 
@@ -64,7 +71,8 @@ class AdminController {
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    public function accreditations() {
+    public function accreditations()
+    {
         // Change from User::ROLE_ADMIN to 'admin' to match your login method
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
@@ -86,7 +94,8 @@ class AdminController {
         include __DIR__ . '/../views/admin/accreditations.php';
     }
 
-    public function reviewAccreditation() {
+    public function reviewAccreditation()
+    {
         // Change from User::ROLE_ADMIN to 'admin'
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
@@ -112,7 +121,8 @@ class AdminController {
         include __DIR__ . '/../views/admin/review-accreditation.php';
     }
 
-    public function processAccreditation() {
+    public function processAccreditation()
+    {
         // Change from User::ROLE_ADMIN to 'admin'
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             header('Location: ?page=admin-login');
@@ -135,19 +145,206 @@ class AdminController {
 
         // Use adminModel for updating accreditation status
         $result = $this->adminModel->updateAccreditationStatus(
-            $accreditationId, 
-            $status, 
+            $accreditationId,
+            $status,
             $_SESSION['admin_id'], // Use admin_id instead of user_id
             $notes
         );
 
         if ($result) {
-            $message = $status === 'approved' ? 'Employer verified successfully!' : 
-                      ($status === 'rejected' ? 'Application rejected.' : 'Status updated.');
+            $message = $status === 'approved' ? 'Employer verified successfully!' : ($status === 'rejected' ? 'Application rejected.' : 'Status updated.');
             header('Location: ?page=admin-accreditations&success=' . urlencode($message));
         } else {
             header('Location: ?page=admin-accreditations&error=' . urlencode('Failed to update status'));
         }
         exit;
+    }
+
+    public function jobPostManagement()
+    {
+        // Check admin authentication
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        // Get all jobs with employer information
+        $allJobs = $this->jobPostModel->getAllJobs();
+
+        // Get filter parameters
+        $statusFilter = $_GET['status'] ?? 'all';
+        $searchQuery = $_GET['search'] ?? '';
+
+        // Filter jobs based on parameters
+        $jobs = $allJobs;
+        if ($statusFilter !== 'all') {
+            $jobs = array_filter($jobs, function ($job) use ($statusFilter) {
+                return $job['job_status'] === $statusFilter;
+            });
+        }
+
+        if (!empty($searchQuery)) {
+            $jobs = array_filter($jobs, function ($job) use ($searchQuery) {
+                $searchFields = [
+                    $job['job_title'] ?? '',
+                    $job['company_name'] ?? '',
+                    $job['category_name'] ?? '',
+                    $job['location'] ?? ''
+                ];
+                $searchText = implode(' ', $searchFields);
+                return stripos($searchText, $searchQuery) !== false;
+            });
+        }
+
+        // Calculate statistics
+        $stats = [
+            'total' => count($allJobs),
+            'open' => count(array_filter($allJobs, fn($j) => $j['job_status'] === 'open')),
+            'closed' => count(array_filter($allJobs, fn($j) => $j['job_status'] === 'closed')),
+            'draft' => count(array_filter($allJobs, fn($j) => $j['job_status'] === 'draft')),
+            'paused' => count(array_filter($allJobs, fn($j) => $j['job_status'] === 'paused')),
+        ];
+
+        // Get messages
+        $error = $_GET['error'] ?? '';
+        $success = $_GET['success'] ?? '';
+
+        include __DIR__ . '/../views/admin/jobpost-management.php';
+    }
+
+    public function viewJob()
+    {
+        // Check admin authentication
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        $job_id = $_GET['id'] ?? null;
+        if (!$job_id) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Invalid job ID'));
+            exit;
+        }
+
+        // Get job details with full information
+        $job = $this->jobPostModel->getFullJobData($job_id);
+        if (!$job) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Job not found'));
+            exit;
+        }
+
+        // Get job attachments
+        $attachments = $this->jobPostModel->getJobAttachments($job_id);
+
+        // Get screening questions
+        $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job_id);
+
+        // Get application statistics
+        $applicationStats = $this->getJobApplicationStats($job_id);
+
+        include __DIR__ . '/../views/admin/view-job.php';
+    }
+
+    public function toggleJobStatus()
+    {
+        // Check admin authentication
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ?page=admin-jobpost-management');
+            exit;
+        }
+
+        $job_id = $_POST['job_id'] ?? null;
+        $new_status = $_POST['status'] ?? null;
+
+        if (!$job_id || !$new_status) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Invalid request'));
+            exit;
+        }
+
+        // Validate status
+        $allowed_statuses = ['open', 'closed', 'paused', 'draft'];
+        if (!in_array($new_status, $allowed_statuses)) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Invalid status'));
+            exit;
+        }
+
+        // Update job status
+        $result = $this->jobPostModel->updateJobPost($job_id, ['job_status' => $new_status]);
+
+        if ($result) {
+            $message = "Job status updated to " . ucfirst($new_status) . " successfully!";
+            header('Location: ?page=admin-jobpost-management&success=' . urlencode($message));
+        } else {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Failed to update job status'));
+        }
+        exit;
+    }
+
+    public function deleteJob()
+    {
+        // Check admin authentication
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ?page=admin-jobpost-management');
+            exit;
+        }
+
+        $job_id = $_POST['job_id'] ?? null;
+        if (!$job_id) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Invalid job ID'));
+            exit;
+        }
+
+        // Delete the job
+        $result = $this->jobPostModel->deleteJob($job_id);
+
+        if ($result) {
+            header('Location: ?page=admin-jobpost-management&success=' . urlencode('Job deleted successfully!'));
+        } else {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Failed to delete job'));
+        }
+        exit;
+    }
+
+    private function getJobApplicationStats($job_id)
+    {
+        try {
+            // Get application statistics for the job
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+
+            $sql = "SELECT 
+                        COUNT(*) as total_applications,
+                        SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
+                        SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
+                        SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
+                        SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+                        SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired
+                    FROM job_application 
+                    WHERE job_id = ? AND is_finalized = 1";
+
+            $stmt = $this->jobPostModel->getPdo()->prepare($sql);
+            $stmt->execute([$job_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log('Error getting job application stats: ' . $e->getMessage());
+            return [
+                'total_applications' => 0,
+                'pending' => 0,
+                'reviewed' => 0,
+                'shortlisted' => 0,
+                'rejected' => 0,
+                'hired' => 0
+            ];
+        }
     }
 }

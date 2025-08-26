@@ -35,8 +35,8 @@ if ($documents) {
         <?php include __DIR__ . '/components/topbar.php'; ?>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 px-6">
-            <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
+        <main class="flex-1 px-6 overflow-y-auto bg-gray-50">
+            <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
                 <!-- Header with breadcrumbs --> 
                 <div class="mb-8">
                     <!-- Breadcrumb Navigation -->
@@ -71,7 +71,7 @@ if ($documents) {
                 </div>
 
                 <!-- Main Flex Layout -->
-                <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 
          
                         <!-- Left Section - Main Content (8/12 width) -->
@@ -86,7 +86,7 @@ if ($documents) {
                                             <h1 class="text-xl font-semibold text-gray-900">
                                                 <?php echo htmlspecialchars($accreditation['first_name'] . ' ' . $accreditation['last_name']); ?>
                                             </h1>
-                                            <p class="text-sm text-gray-600 mt-1"><?php echo htmlspecialchars($accreditation['email']); ?></p>
+                                            <p class="mt-1 text-sm text-gray-600"><?php echo htmlspecialchars($accreditation['email']); ?></p>
                                             <div class="flex items-center gap-3 mt-2">
                                                 <!-- Status Badge -->
                                                 <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium
@@ -264,9 +264,9 @@ if ($documents) {
                                                 <input type="hidden" name="accreditation_id" value="<?php echo $accreditation['accreditation_id']; ?>">
 
                                                 <div>
-                                                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Review Notes</label>
+                                                    <label for="notes" class="block mb-2 text-sm font-medium text-gray-700">Review Notes</label>
                                                     <textarea id="notes" name="notes" rows="3"
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         placeholder="Add any comments..."></textarea>
                                                 </div>
 
@@ -274,7 +274,7 @@ if ($documents) {
                                                     <!-- Approve Button -->
                                                     <button type="submit" name="status" value="approved"
                                                         onclick="return confirm('Are you sure you want to APPROVE this employer?')"
-                                                        class="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
+                                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
                                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                         </svg>
@@ -284,7 +284,7 @@ if ($documents) {
                                                     <!-- Reject Button -->
                                                     <button type="submit" name="status" value="rejected"
                                                         onclick="return confirm('Are you sure you want to REJECT this application?')"
-                                                        class="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700">
+                                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700">
                                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                         </svg>
@@ -314,17 +314,17 @@ if ($documents) {
                                             <?php if ($accreditation['notes']): ?>
                                                 <div class="mt-4">
                                                     <label class="text-sm font-medium text-gray-500">Review Notes</label>
-                                                    <p class="text-gray-900 bg-gray-50 p-3 rounded text-sm mt-1"><?php echo nl2br(htmlspecialchars($accreditation['notes'])); ?></p>
+                                                    <p class="p-3 mt-1 text-sm text-gray-900 rounded bg-gray-50"><?php echo nl2br(htmlspecialchars($accreditation['notes'])); ?></p>
                                                 </div>
                                             <?php endif; ?>
 
                                             <!-- Option to change status -->
                                             <div class="pt-4 mt-4 border-t">
-                                                <p class="text-xs text-gray-500 mb-3">Change Status</p>
+                                                <p class="mb-3 text-xs text-gray-500">Change Status</p>
                                                 <form method="POST" action="?page=admin-process-accreditation" class="space-y-2">
                                                     <input type="hidden" name="accreditation_id" value="<?php echo $accreditation['accreditation_id']; ?>">
                                                     <textarea name="notes" placeholder="Reason for status change..."
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs" rows="2"></textarea>
+                                                        class="w-full px-3 py-2 text-xs border border-gray-300 rounded-md" rows="2"></textarea>
 
                                                     <div class="space-y-2">
                                                         <!-- Status Buttons -->
@@ -357,7 +357,7 @@ if ($documents) {
                                     <!-- Back to List Button -->
                                     <div>
                                         <button onclick="window.location.href='?page=admin-accreditations'"
-                                            class="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                            class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                             </svg>
