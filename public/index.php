@@ -335,11 +335,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     $controller->reports();
         //     break;
 
-        // case 'admin-applications':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageApplications();
-        //     break;
+        case 'admin-applications':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->applicationManagement();
+            break;
+
+        case 'admin-view-application':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->viewApplication();
+            break;
 
         // case 'admin-announcements':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';

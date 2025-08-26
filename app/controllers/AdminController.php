@@ -318,23 +318,9 @@ class AdminController
     private function getJobApplicationStats($job_id)
     {
         try {
-            // Get application statistics for the job
             require_once __DIR__ . '/../models/JobApplication.php';
             $jobApplicationModel = new JobApplication();
-
-            $sql = "SELECT 
-                        COUNT(*) as total_applications,
-                        SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
-                        SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
-                        SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected,
-                        SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired
-                    FROM job_application 
-                    WHERE job_id = ? AND is_finalized = 1";
-
-            $stmt = $this->jobPostModel->getPdo()->prepare($sql);
-            $stmt->execute([$job_id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $jobApplicationModel->getJobApplicationStats($job_id);
         } catch (Exception $e) {
             error_log('Error getting job application stats: ' . $e->getMessage());
             return [
@@ -346,5 +332,100 @@ class AdminController
                 'hired' => 0
             ];
         }
+    }
+
+    public function applicationManagement()
+    {
+        // Check admin authentication
+        if (!$this->isAdminLoggedIn()) {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        try {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+
+            // Get filters
+            $statusFilter = $_GET['status'] ?? 'all';
+            $searchQuery = $_GET['search'] ?? '';
+            $jobFilter = $_GET['job'] ?? '';
+
+            // Get applications using model method
+            $applications = $jobApplicationModel->getAllApplicationsForAdmin($statusFilter, $searchQuery, $jobFilter);
+
+            // Get application statistics using model method
+            $stats = $jobApplicationModel->getApplicationStatsForAdmin();
+
+            // Get all jobs for filter dropdown using model method
+            $jobs = $jobApplicationModel->getJobsForFilterDropdown();
+
+            require __DIR__ . '/../views/admin/application.php';
+        } catch (Exception $e) {
+            error_log('Error in application management: ' . $e->getMessage());
+            $error = 'Failed to load applications';
+            $applications = [];
+            $stats = ['total' => 0, 'pending' => 0, 'reviewed' => 0, 'shortlisted' => 0, 'rejected' => 0, 'hired' => 0];
+            $jobs = [];
+            require __DIR__ . '/../views/admin/application.php';
+        }
+    }
+
+    public function viewApplication()
+    {
+        // Check admin authentication
+        if (!$this->isAdminLoggedIn()) {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        $application_id = $_GET['id'] ?? null;
+        if (!$application_id) {
+            header('Location: ?page=admin-applications&error=' . urlencode('Invalid application ID'));
+            exit;
+        }
+
+        try {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+
+            // Get detailed application information using model method
+            $application = $jobApplicationModel->getDetailedApplicationForAdmin($application_id);
+
+            if (!$application) {
+                header('Location: ?page=admin-applications&error=' . urlencode('Application not found'));
+                exit;
+            }
+
+            require __DIR__ . '/../views/admin/view-application.php';
+        } catch (Exception $e) {
+            error_log('Error viewing application: ' . $e->getMessage());
+            header('Location: ?page=admin-applications&error=' . urlencode('Failed to load application details'));
+            exit;
+        }
+    }
+
+    private function getApplicationStats()
+    {
+        try {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            return $jobApplicationModel->getApplicationStatsForAdmin();
+        } catch (Exception $e) {
+            error_log('Error getting application stats: ' . $e->getMessage());
+            return [
+                'total' => 0,
+                'pending' => 0,
+                'reviewed' => 0,
+                'shortlisted' => 0,
+                'rejected' => 0,
+                'hired' => 0
+            ];
+        }
+    }
+
+    private function isAdminLoggedIn()
+    {
+        return isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin';
     }
 }
