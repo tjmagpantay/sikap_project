@@ -60,11 +60,11 @@ include_once __DIR__ . '/../components/navbar.php';
                                     <!-- Tags Container -->
                                     <div class="flex gap-2 mb-3">
                                         <!-- Pinned Badge - No background, just border -->
-                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 border border-gray-400 rounded-full">
-                                            PINNED
+                                        <span class="px-3 py-1 text-xs text-gray-700 border border-gray-400 rounded-full">
+                                            Pinned
                                         </span>
                                         <!-- Event Type Badge -->
-                                        <span class="px-3 py-1 text-xs font-medium text-gray-700 border border-gray-400 rounded-full">
+                                        <span class="px-3 py-1 text-xs text-gray-700 border border-gray-400 rounded-full">
                                             <?php echo ucwords(htmlspecialchars($headerEvent['type'])); ?>
                                         </span>
                                     </div>
