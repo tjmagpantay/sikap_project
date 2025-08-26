@@ -1,10 +1,12 @@
 <?php
 
-class EventProgram {
+class EventProgram
+{
     private $db;
     private $table = 'events';
 
-    public function __construct() {
+    public function __construct()
+    {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
@@ -18,7 +20,8 @@ class EventProgram {
         }
     }
 
-    private function validateEventData($title, $description, $type, $timeStart, $timeEnd) {
+    private function validateEventData($title, $description, $type, $timeStart, $timeEnd)
+    {
         $errors = [];
         if (empty($title)) {
             $errors[] = "Title is required";
@@ -39,12 +42,14 @@ class EventProgram {
         return $errors;
     }
 
-    public function getAllEvents() {
+    public function getAllEvents()
+    {
         $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY created_at DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getEventsByType($type) {
+    public function getEventsByType($type)
+    {
         $stmt = $this->db->prepare("
             SELECT * FROM {$this->table} 
             WHERE type = ? AND status = 'show' 
@@ -54,13 +59,15 @@ class EventProgram {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getEventById($id) {
+    public function getEventById($id)
+    {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE event_id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function createEvent($title, $description, $type, $image, $time_start, $time_end, $status) {
+    public function createEvent($title, $description, $type, $image, $time_start, $time_end, $status)
+    {
         $stmt = $this->db->prepare("
             INSERT INTO {$this->table} (title, description, type, image, time_start, time_end, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -68,7 +75,8 @@ class EventProgram {
         return $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status]);
     }
 
-    public function updateEvent($id, $title, $description, $type, $image, $time_start, $time_end, $status) {
+    public function updateEvent($id, $title, $description, $type, $image, $time_start, $time_end, $status)
+    {
         $stmt = $this->db->prepare("
             UPDATE {$this->table}
             SET title = ?, description = ?, type = ?, image = ?, time_start = ?, time_end = ?, status = ?
@@ -77,12 +85,14 @@ class EventProgram {
         return $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status, $id]);
     }
 
-    public function deleteEvent($id) {
+    public function deleteEvent($id)
+    {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE event_id = ?");
         return $stmt->execute([$id]);
     }
 
-    public function searchEvents($query) {
+    public function searchEvents($query)
+    {
         $query = "%{$query}%";
         $stmt = $this->db->prepare("
             SELECT * FROM {$this->table} 
@@ -93,7 +103,8 @@ class EventProgram {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getUpcomingEvents($limit = 5) {
+    public function getUpcomingEvents($limit = 5)
+    {
         $stmt = $this->db->prepare("
             SELECT * FROM {$this->table}
             WHERE time_start >= CURRENT_TIMESTAMP
@@ -104,7 +115,8 @@ class EventProgram {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function updateEventStatus($id, $status) {
+    public function updateEventStatus($id, $status)
+    {
         $stmt = $this->db->prepare("
             UPDATE {$this->table}
             SET status = ?
@@ -113,7 +125,8 @@ class EventProgram {
         return $stmt->execute([$status, $id]);
     }
 
-    public function getActiveEvents() {
+    public function getActiveEvents()
+    {
         $stmt = $this->db->prepare("
             SELECT * FROM {$this->table}
             WHERE status = 'show'
@@ -121,5 +134,44 @@ class EventProgram {
         ");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function togglePin($eventId)
+    {
+        try {
+            // Get current pin status
+            $stmt = $this->db->prepare("SELECT pinned FROM {$this->table} WHERE event_id = ?");
+            $stmt->execute([$eventId]);
+            $currentStatus = $stmt->fetchColumn();
+
+            if ($currentStatus === false) {
+                return false; // Event not found
+            }
+
+            // Toggle the pin status
+            $newStatus = $currentStatus ? 0 : 1;
+            $stmt = $this->db->prepare("UPDATE {$this->table} SET pinned = ? WHERE event_id = ?");
+            return $stmt->execute([$newStatus, $eventId]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function getPinnedEvents()
+    {
+        $stmt = $this->db->prepare("
+            SELECT * FROM {$this->table}
+            WHERE pinned = 1
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function isEventPinned($eventId)
+    {
+        $stmt = $this->db->prepare("SELECT pinned FROM {$this->table} WHERE event_id = ?");
+        $stmt->execute([$eventId]);
+        return (bool) $stmt->fetchColumn();
     }
 }

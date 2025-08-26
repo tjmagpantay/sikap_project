@@ -341,6 +341,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->toggleEventStatus($_GET['id']);
             break;
 
+        case 'admin-event-pin':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->togglePin();
+            break;
+
         case 'events-jobfair':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();

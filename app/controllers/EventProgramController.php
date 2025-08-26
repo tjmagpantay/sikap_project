@@ -2,20 +2,23 @@
 
 require_once __DIR__ . '/../models/EventProgram.php';
 
-class EventProgramController {
+class EventProgramController
+{
     private $model;
     private $uploadDir;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new EventProgram();
         $this->uploadDir = __DIR__ . '/../../public/uploads/events/';
-        
+
         if (!file_exists($this->uploadDir)) {
             mkdir($this->uploadDir, 0777, true);
         }
     }
 
-    public function index() {
+    public function index()
+    {
         if (!isset($_SESSION['admin_id'])) {
             header('Location: index.php?page=admin-login');
             exit;
@@ -24,7 +27,8 @@ class EventProgramController {
         include __DIR__ . '/../views/admin/events/event.php';
     }
 
-    public function create() {
+    public function create()
+    {
         if (!isset($_SESSION['admin_id'])) {
             header('Location: index.php?page=admin-login');
             exit;
@@ -32,11 +36,14 @@ class EventProgramController {
         include __DIR__ . '/../views/admin/events/create.php';
     }
 
-    public function store() {
+    public function store()
+    {
         // Validate inputs
-        if (empty($_POST['title']) || empty($_POST['description']) || 
-            empty($_POST['type']) || empty($_POST['time_start']) || 
-            empty($_POST['time_end']) || empty($_POST['status'])) {
+        if (
+            empty($_POST['title']) || empty($_POST['description']) ||
+            empty($_POST['type']) || empty($_POST['time_start']) ||
+            empty($_POST['time_end']) || empty($_POST['status'])
+        ) {
             header('Location: index.php?page=admin-event-create&error=All fields are required');
             exit;
         }
@@ -45,7 +52,7 @@ class EventProgramController {
         $image_path = '';
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['image'];
-            
+
             // Validate file type
             $allowed_types = ['image/jpeg', 'image/png'];
             if (!in_array($file['type'], $allowed_types)) {
@@ -87,7 +94,8 @@ class EventProgramController {
         exit;
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $event = $this->model->getEventById($id);
         if (!$event) {
             header('Location: index.php?page=admin-events&error=Event not found');
@@ -96,11 +104,14 @@ class EventProgramController {
         include __DIR__ . '/../views/admin/events/edit.php';
     }
 
-    public function update($id) {
+    public function update($id)
+    {
         // Validate inputs
-        if (empty($_POST['title']) || empty($_POST['description']) || 
-            empty($_POST['type']) || empty($_POST['time_start']) || 
-            empty($_POST['time_end']) || empty($_POST['status'])) {
+        if (
+            empty($_POST['title']) || empty($_POST['description']) ||
+            empty($_POST['type']) || empty($_POST['time_start']) ||
+            empty($_POST['time_end']) || empty($_POST['status'])
+        ) {
             header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=All fields are required');
             exit;
         }
@@ -163,7 +174,8 @@ class EventProgramController {
         exit;
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $event = $this->model->getEventById($id);
         if ($event && $event['image']) {
             $image_path = $this->uploadDir . basename($event['image']);
@@ -182,34 +194,40 @@ class EventProgramController {
         exit;
     }
 
-    public function publicView() {
+    public function publicView()
+    {
         // Fix: Use correct type names as stored in database
         $programs = $this->model->getEventsByType('program');
-        $jobFairs = $this->model->getEventsByType('jobfair'); 
+        $jobFairs = $this->model->getEventsByType('jobfair');
         $localRecruitment = $this->model->getEventsByType('local recruitment'); // Add this if needed
         include __DIR__ . '/../views/pages/event-jobfair.php';
     }
 
-    public function getActiveEvents() {
+    public function getActiveEvents()
+    {
         return $this->model->getActiveEvents();
     }
 
-    public function searchEvents($query = '') {
+    public function searchEvents($query = '')
+    {
         if (empty($query)) {
             return $this->model->getAllEvents();
         }
         return $this->model->searchEvents($query);
     }
 
-    public function getUpcomingEvents($limit = 5) {
+    public function getUpcomingEvents($limit = 5)
+    {
         return $this->model->getUpcomingEvents($limit);
     }
 
-    public function getEventById($id) {
+    public function getEventById($id)
+    {
         return $this->model->getEventById($id);
     }
-    
-    public function toggleEventStatus($id) {
+
+    public function toggleEventStatus($id)
+    {
         if (!isset($_SESSION['admin_id'])) {
             header('Location: index.php?page=admin-login');
             exit;
@@ -233,7 +251,44 @@ class EventProgramController {
         exit;
     }
 
-    private function validateImage($file) {
+    public function togglePin()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: index.php?page=admin-login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin-events&error=Invalid request method');
+            exit;
+        }
+
+        if (!isset($_POST['event_id']) || !is_numeric($_POST['event_id'])) {
+            header('Location: index.php?page=admin-events&error=Invalid event ID');
+            exit;
+        }
+
+        $eventId = (int) $_POST['event_id'];
+        $event = $this->model->getEventById($eventId);
+
+        if (!$event) {
+            header('Location: index.php?page=admin-events&error=Event not found');
+            exit;
+        }
+
+        $success = $this->model->togglePin($eventId);
+
+        if ($success) {
+            $action = $event['pinned'] ? 'unpinned' : 'pinned';
+            header('Location: index.php?page=admin-events&success=Event ' . $action . ' successfully');
+        } else {
+            header('Location: index.php?page=admin-events&error=Failed to update pin status');
+        }
+        exit;
+    }
+
+    private function validateImage($file)
+    {
         $errors = [];
         $maxSize = 5 * 1024 * 1024; // 5MB
         $allowedTypes = ['image/jpeg', 'image/png'];
@@ -249,7 +304,8 @@ class EventProgramController {
         return $errors;
     }
 
-    private function handleImageUpload($file, $oldImage = null) {
+    private function handleImageUpload($file, $oldImage = null)
+    {
         $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = uniqid() . '.' . $ext;
         $image_path = 'uploads/events/' . $filename;
