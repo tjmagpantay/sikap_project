@@ -53,8 +53,8 @@ include_once __DIR__ . '/../components/navbar.php';
                             data-type="<?php echo htmlspecialchars($headerEvent['type']); ?>"
                             data-status="<?php echo htmlspecialchars($headerEvent['status']); ?>">
 
-                            <!-- Left Side - Content -->
-                            <div class="flex flex-col justify-between flex-1 p-6">
+                            <!-- Left Side - Content (2/3 width) -->
+                            <div class="flex flex-col justify-between w-2/3 p-6">
                                 <!-- Top Section -->
                                 <div>
                                     <!-- Tags Container -->
@@ -69,21 +69,14 @@ include_once __DIR__ . '/../components/navbar.php';
                                         </span>
                                     </div>
 
-                                    <!-- Featured Label -->
-                                    <div class="mb-3">
-                                        <span class="px-3 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-full">
-                                            FEATURED EVENT
-                                        </span>
-                                    </div>
-
                                     <!-- Title -->
-                                    <h2 class="mb-3 text-xl font-bold leading-tight text-gray-900 sm:text-2xl">
+                                    <h2 class="mb-3 text-xl font-bold leading-tight text-gray-900 sm:text-2xl lg:text-3xl">
                                         <?php echo htmlspecialchars($headerEvent['title']); ?>
                                     </h2>
 
                                     <!-- Description -->
                                     <?php if (!empty($headerEvent['description'])): ?>
-                                        <p class="text-sm text-gray-600 line-clamp-3">
+                                        <p class="text-sm text-gray-600 line-clamp-3 lg:text-base">
                                             <?php echo htmlspecialchars(substr($headerEvent['description'], 0, 200)) . (strlen($headerEvent['description']) > 200 ? '...' : ''); ?>
                                         </p>
                                     <?php endif; ?>
@@ -92,23 +85,23 @@ include_once __DIR__ . '/../components/navbar.php';
                                 <!-- Bottom Section -->
                                 <div class="flex items-center justify-between mt-4">
                                     <!-- Date -->
-                                    <p class="text-sm text-gray-500">
+                                    <p class="text-sm text-gray-500 lg:text-base">
                                         <?php echo date('j F Y', strtotime($headerEvent['time_start'])); ?>
                                     </p>
 
                                     <!-- Learn More Button -->
                                     <a href="?page=event-info&id=<?php echo $headerEvent['event_id']; ?>"
-                                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-700">
+                                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 lg:px-6 lg:py-3 lg:text-base">
                                         Learn More
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                     </a>
                                 </div>
                             </div>
 
-                            <!-- Right Side - Image Container with Fixed Height -->
-                            <div class="w-1/3 overflow-hidden bg-gray-100 h-60">
+                            <!-- Right Side - Image (1/3 width) -->
+                            <div class="w-1/3 overflow-hidden">
                                 <?php if (!empty($headerEvent['image'])): ?>
                                     <img src="<?php echo htmlspecialchars($headerEvent['image']); ?>"
                                         alt="<?php echo htmlspecialchars($headerEvent['title']); ?>"
