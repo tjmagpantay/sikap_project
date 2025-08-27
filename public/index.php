@@ -233,6 +233,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->dashboard();
             break;
 
+        case 'admin-reports':
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+                header('Location: ?page=admin-login');
+                exit;
+            }
+            include __DIR__ . '/../app/views/admin/reports-dashboard.php';
+            break;
+
+        case 'all-reports':
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+                header('Location: ?page=admin-login');
+                exit;
+            }
+            include __DIR__ . '/../app/views/admin/reports-dashboard.php';
+            break;
+
         // Event Management Routes
         case 'admin-events':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
