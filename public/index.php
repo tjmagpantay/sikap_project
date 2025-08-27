@@ -228,8 +228,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->login();
             break;
         case 'admin-dashboard':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
             $controller->dashboard();
             break;
 
