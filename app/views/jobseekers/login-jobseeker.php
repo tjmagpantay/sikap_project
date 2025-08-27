@@ -53,7 +53,7 @@ include_once __DIR__ . '/../components/navbar.php';
 
                     <!-- Or Separator with shadcn style -->
                     <div class="relative py-3 text-sm text-center after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-gray-300">
-                        <span class="relative z-10 px-3 text-gray-500 bg-white">
+                        <span class="relative z-10 px-3 text-gray-600 bg-white">
                             or continue with
                         </span>
                     </div>

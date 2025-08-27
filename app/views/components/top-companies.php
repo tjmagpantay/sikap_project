@@ -30,7 +30,7 @@ $companies = $landingController->getTopCompanies(4);
     <?php if (!empty($companies)): ?>
       <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
         <?php foreach ($companies as $company): ?>
-          <div class="overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-md hover:-translate-y-2 h-[480px] flex flex-col"
+          <div class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-lg hover:scale-[1.02] h-[480px] flex flex-col transform"
             onclick="viewCompany(<?php echo $company['employer_id']; ?>)">
 
             <!-- Company Header -->
@@ -85,7 +85,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['facebook_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['facebook_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-all duration-200 transform h-7 text-primary bg-blue-50 hover:bg-blue-100 hover:scale-105"
                         onclick="event.stopPropagation();">
                         <!-- Facebook SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +98,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['twitter_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['twitter_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-all duration-200 transform h-7 text-primary bg-blue-50 hover:bg-blue-100 hover:scale-105"
                         onclick="event.stopPropagation();">
                         <!-- Twitter/X SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +111,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['instagram_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['instagram_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-all duration-200 transform h-7 text-primary bg-blue-50 hover:bg-blue-100 hover:scale-105"
                         onclick="event.stopPropagation();">
                         <!-- Instagram SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -127,7 +127,7 @@ $companies = $landingController->getTopCompanies(4);
                     <?php if (!empty($company['youtube_url'])): ?>
                       <a href="<?php echo htmlspecialchars($company['youtube_url']); ?>"
                         target="_blank"
-                        class="flex items-center justify-center gap-1 px-2 py-2 transition-colors duration-200 h-7 text-primary bg-blue-50 hover:bg-blue-100"
+                        class="flex items-center justify-center gap-1 px-2 py-2 transition-all duration-200 transform h-7 text-primary bg-blue-50 hover:bg-blue-100 hover:scale-105"
                         onclick="event.stopPropagation();">
                         <!-- YouTube SVG -->
                         <svg class="flex-shrink-0" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -179,6 +179,7 @@ $companies = $landingController->getTopCompanies(4);
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
