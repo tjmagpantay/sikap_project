@@ -24,8 +24,16 @@ class JobSeekerDashboardController
 
     public function dashboard()
     {
+        // Debug logging
+        error_log("JobSeekerDashboardController Debug:");
+        error_log("Session user_id: " . ($_SESSION['user_id'] ?? 'NOT SET'));
+        error_log("Session role: " . ($_SESSION['role'] ?? 'NOT SET'));
+        error_log("User::ROLE_JOBSEEKER constant: " . User::ROLE_JOBSEEKER);
+        error_log("Role comparison result: " . (($_SESSION['role'] ?? null) == User::ROLE_JOBSEEKER ? 'TRUE' : 'FALSE'));
+        
         // Authentication check
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            error_log("Auth failed - redirecting to login-jobseeker");
             header('Location: ?page=login-jobseeker');
             exit;
         }
