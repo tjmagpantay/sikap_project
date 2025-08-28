@@ -3,6 +3,7 @@
 
 // Get existing settings if editing
 $existingSettings = $jobData ?? [];
+include_once __DIR__ . '/../components/employer_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../components/navbar-employer.php';
 ?>

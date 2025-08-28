@@ -1,5 +1,5 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\setting-employer.php
+include_once __DIR__ . '/components/employer_auth_check.php';
 require_once __DIR__ . '/../../models/Employer.php';
 
 $employerModel = new Employer();

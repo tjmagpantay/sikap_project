@@ -1,5 +1,5 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\views\employers\post-job\job-post-success.php
+include_once __DIR__ . '/../components/employer_auth_check.php';
 
 $job_id = $_GET['job_id'] ?? null;
 if (!$job_id) {

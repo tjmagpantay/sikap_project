@@ -1,6 +1,5 @@
 <?php
-
-// Split the full name from signup if it exists
+include_once __DIR__ . '/../components/employer_auth_check.php';
 $fullName = $user['name'] ?? '';
 $nameParts = explode(' ', trim($fullName));
 $autoFirstName = $nameParts[0] ?? '';
