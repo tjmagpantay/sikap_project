@@ -1,5 +1,5 @@
 <?php
-// Check if user is logged in and is admin
+include_once __DIR__ . '/components/admin_auth_check.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: ?page=admin-login');
     exit;

@@ -1,3 +1,7 @@
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar - Fixed Left -->

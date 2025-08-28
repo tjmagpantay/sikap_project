@@ -1,5 +1,5 @@
 <?php
-// Create file: app/views/admin/review-accreditation.php
+include_once __DIR__ . '/components/admin_auth_check.php';
 
 // Document types
 $documentTypes = [

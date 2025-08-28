@@ -1,7 +1,9 @@
 <body class="bg-gray-50">
     <div class="flex h-screen">
         <!-- Sidebar - Fixed Left -->
-        <?php include __DIR__ . '/components/sidebar.php'; ?>
+        <?php
+        include_once __DIR__ . '/components/admin_auth_check.php';
+        include __DIR__ . '/components/sidebar.php'; ?>
 
         <!-- Main Content Area - Right Side -->
         <div class="flex flex-col flex-1 overflow-hidden">

@@ -9,7 +9,9 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen">
-        <?php include __DIR__ . '/../components/sidebar.php'; ?>
+        <?php
+        include_once __DIR__ . '/../components/admin_auth_check.php';
+        include __DIR__ . '/../components/sidebar.php'; ?>
         
         <div class="flex flex-col flex-1 overflow-hidden">
             <?php include __DIR__ . '/../components/topbar.php'; ?>

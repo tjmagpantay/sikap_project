@@ -1,5 +1,5 @@
 <?php
-// filepath: app/views/admin/accreditations.php
+include_once __DIR__ . '/components/admin_auth_check.php';
 $error = $_GET['error'] ?? '';
 $success = $_GET['success'] ?? '';
 ?>

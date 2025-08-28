@@ -1,3 +1,7 @@
+<?php
+include_once __DIR__ . '/../components/admin_auth_check.php';
+?>
+
 <div class="p-6 bg-white border border-gray-200 rounded-lg">
     <h3 class="mb-6 text-lg font-semibold text-gray-900">Applicants Summary</h3>
     

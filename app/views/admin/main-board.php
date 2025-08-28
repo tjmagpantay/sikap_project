@@ -1,3 +1,7 @@
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+
 <div class="p-6">
     <!-- Greeting Section -->
     <div class="mb-8">
