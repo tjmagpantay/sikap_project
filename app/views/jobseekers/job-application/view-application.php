@@ -1,5 +1,5 @@
 <?php
-// filepath: app/views/jobseekers/job-application/view-application.php
+include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 ?>

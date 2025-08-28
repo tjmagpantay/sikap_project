@@ -62,3 +62,4 @@ if ($completionPercentage === false) $completionPercentage = 0;
 
 // Include the specific step
 include __DIR__ . '/profile-completion/complete-profile-step' . $step . '.php';
+

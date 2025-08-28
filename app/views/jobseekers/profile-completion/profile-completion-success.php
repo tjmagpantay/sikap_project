@@ -1,4 +1,6 @@
-<?php include_once __DIR__ . '/../../components/navbar-top.php';
+<?php
+include_once __DIR__ . '/../components/jobseeker_auth_check.php';
+include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';?>
 
 <div class="min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">

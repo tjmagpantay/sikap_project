@@ -1,5 +1,5 @@
 <?php
-// Ensure clean output - no whitespace before PHP tag
+include_once __DIR__ . '/components/jobseeker_auth_check.php';
 if (!isset($selectedJob) || empty($selectedJob)) {
     echo '<div class="p-8 text-center text-red-500">Error: Job data not available</div>';
     return;

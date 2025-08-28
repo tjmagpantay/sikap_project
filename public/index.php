@@ -1,4 +1,29 @@
 <?php
+// Prevent caching issues
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+// Session configuration
+ini_set('session.cookie_lifetime', 0); // Session cookies expire when browser closes
+ini_set('session.gc_maxlifetime', 3600); // Sessions expire after 1 hour of inactivity
+ini_set('session.cookie_httponly', 1); // Prevent JavaScript access to session cookies
+ini_set('session.use_strict_mode', 1); // Use strict session mode
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Regenerate session ID periodically for security
+if (!isset($_SESSION['regenerated'])) {
+    session_regenerate_id(true);
+    $_SESSION['regenerated'] = time();
+} elseif (time() - $_SESSION['regenerated'] > 300) { // Regenerate every 5 minutes
+    session_regenerate_id(true);
+    $_SESSION['regenerated'] = time();
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 ?>
 <!DOCTYPE html>
@@ -17,7 +42,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 <body class="font-inter">
     <?php
-    session_start();
     $page = $_GET['page'] ?? 'landing';
 
     switch ($page) {
@@ -443,9 +467,25 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Logout
         case 'logout':
+            // Start session if not started
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            // Clear all session data
+            $_SESSION = array();
+
+            // Delete the session cookie
+            if (isset($_COOKIE[session_name()])) {
+                setcookie(session_name(), '', time() - 3600, '/');
+            }
+
+            // Destroy the session
             session_destroy();
-            header('Location: ?page=landing');
-            exit;
+
+            // Redirect to login
+            header('Location: ?page=login-jobseeker');
+            exit();
             break;
 
         // New Employer Routes

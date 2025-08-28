@@ -1,5 +1,5 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\views\jobseekers\saved-jobs.php
+include_once __DIR__ . '/components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>

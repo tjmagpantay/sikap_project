@@ -1,5 +1,5 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\views\jobseekers\profile-jobseeker.php
+include_once __DIR__ . '/components/jobseeker_auth_check.php';
 require_once __DIR__ . '/../../models/Jobseeker.php';
 
 // Get jobseeker data with error handling
