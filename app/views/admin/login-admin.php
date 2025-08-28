@@ -1,9 +1,9 @@
 <?php
 include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/../components/navbar.php';
+include_once __DIR__ . '/components/navbar-admin.php';
 ?>
 
-<div class="flex items-center justify-center px-4 py-8 ">
+<div class="flex items-center justify-center px-4 py-16 ">
     <div class="flex flex-col-reverse w-full max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
         <!-- Left: Login Card -->
         <div class="flex flex-col justify-center w-full px-6 py-8 md:w-1/2 lg:px-12">
