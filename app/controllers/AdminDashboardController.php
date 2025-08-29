@@ -55,9 +55,6 @@ class AdminDashboardController
         }
     }
 
-    /**
-     * Get recent activity for dashboard
-     */
     public function getRecentActivity()
     {
         // Check if user is logged in and is admin
@@ -79,9 +76,6 @@ class AdminDashboardController
         }
     }
 
-    /**
-     * Get top job categories
-     */
     public function getTopJobCategories()
     {
         // Check if user is logged in and is admin

@@ -54,7 +54,15 @@ class SavedJobs
         try {
             $sql = "DELETE FROM jobseeker_saved_jobs WHERE jobseeker_id = ? AND job_id = ?";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([$jobseeker_id, $job_id]);
+            $result = $stmt->execute([$jobseeker_id, $job_id]);
+
+            if ($result && $stmt->rowCount() > 0) {
+                error_log("DEBUG: Successfully unsaved job $job_id for jobseeker $jobseeker_id");
+                return true;
+            } else {
+                error_log("DEBUG: No rows affected when trying to unsave job $job_id for jobseeker $jobseeker_id");
+                return false;
+            }
         } catch (PDOException $e) {
             error_log('Error unsaving job: ' . $e->getMessage());
             return false;

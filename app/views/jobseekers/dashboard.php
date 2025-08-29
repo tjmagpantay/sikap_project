@@ -438,41 +438,45 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
-                    return response.text();
+                    // Check content type
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Expected JSON but got:', text);
+                            throw new Error('Server returned non-JSON response');
+                        });
+                    }
+
+                    return response.json();
                 })
-                .then(text => {
-                    console.log('Raw response length:', text.length);
-                    console.log('Raw response (first 500 chars):', text.substring(0, 500));
+                .then(data => {
+                    console.log('Parsed response data:', data);
 
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('Parsed response data:', data);
+                    if (data.success) {
+                        container.innerHTML = data.html;
 
-                        if (data.success) {
-                            container.innerHTML = data.html;
-                        } else {
-                            container.innerHTML = `
-                            <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                                <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
-                                <h3 class="mt-4 text-lg font-medium text-gray-900">Error loading job details</h3>
-                                <p class="mt-1 text-xs text-gray-500">${data.message || 'Please try again'}</p>
-                            </div>
-                        `;
-                        }
-                    } catch (e) {
-                        console.error('JSON parse error:', e);
-                        console.error('Raw response text that failed to parse:', text);
-
-                        // Show the raw response in case it's helpful for debugging
+                        // Force refresh of any event listeners on the new content
+                        setTimeout(() => {
+                            // Re-attach any event listeners if needed
+                            const saveButtons = container.querySelectorAll('button[onclick*="toggleSaveJob"]');
+                            saveButtons.forEach(btn => {
+                                // Ensure the button has the correct state
+                                const icon = btn.querySelector('i');
+                                if (icon) {
+                                    // Force a visual refresh
+                                    btn.style.opacity = '0.9';
+                                    setTimeout(() => {
+                                        btn.style.opacity = '1';
+                                    }, 10);
+                                }
+                            });
+                        }, 100);
+                    } else {
                         container.innerHTML = `
                         <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
                             <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
-                            <h3 class="mt-4 text-lg font-medium text-gray-900">Invalid Response</h3>
-                            <p class="mt-1 text-xs text-gray-500">Server returned invalid JSON</p>
-                            <details class="mt-2 text-left">
-                                <summary class="text-xs text-red-500 cursor-pointer">Show raw response</summary>
-                                <pre class="max-w-md p-2 mt-2 overflow-auto text-xs bg-gray-100 rounded">${text.substring(0, 1000)}</pre>
-                            </details>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Error loading job details</h3>
+                            <p class="mt-1 text-xs text-gray-500">${data.message || 'Please try again'}</p>
                         </div>
                     `;
                     }
@@ -494,7 +498,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 });
         }
 
-        // Same JavaScript functions as before
+        // Updated toggleSaveJob function with better error handling and real-time updates
         function toggleSaveJob(jobId, button) {
             console.log('Toggling save for job:', jobId);
 
@@ -504,6 +508,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             // Show loading state
             const originalIcon = icon.className;
+            const originalTitle = button.title;
+            const originalClasses = button.className;
+
             icon.className = 'text-sm fas fa-spinner fa-spin';
             button.disabled = true;
 
@@ -521,30 +528,55 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers.get('content-type'));
+
+                    // Check if response is ok
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Expected JSON but got:', text);
+                            throw new Error('Server returned non-JSON response');
+                        });
+                    }
+
+                    return response.json();
+                })
                 .then(data => {
                     console.log('Save/unsave response:', data);
 
                     if (data.success) {
-                        // Update button state
+                        // Update button state immediately
                         if (currentlySaved) {
                             // Was saved, now unsaved
                             icon.className = 'text-sm far fa-bookmark';
                             button.title = 'Save job';
-                            button.classList.remove('text-yellow-500', 'bg-yellow-50', 'border-yellow-300');
-                            button.classList.add('text-gray-500', 'bg-gray-50');
+                            button.className = 'flex items-center justify-center w-8 h-8 transition-colors border border-gray-400 rounded-lg text-primary bg-gray-50 hover:bg-gray-100';
                             showToast('Job removed from saved jobs', 'success');
                         } else {
                             // Was not saved, now saved
                             icon.className = 'text-sm fas fa-bookmark';
                             button.title = 'Remove from saved';
-                            button.classList.remove('text-gray-500', 'bg-gray-50');
-                            button.classList.add('text-yellow-500', 'bg-yellow-50', 'border-yellow-300');
+                            button.className = 'flex items-center justify-center w-8 h-8 transition-colors border border-gray-400 rounded-lg text-yellow-500 bg-yellow-50 border-yellow-300 hover:bg-gray-100 text-primary';
                             showToast('Job saved successfully', 'success');
                         }
+
+                        // Force the UI to refresh immediately
+                        button.style.display = 'none';
+                        button.offsetHeight; // Trigger reflow
+                        button.style.display = 'flex';
+
                     } else {
                         // Restore original state on error
                         icon.className = originalIcon;
+                        button.title = originalTitle;
+                        button.className = originalClasses;
                         showToast(data.message || 'Failed to save/unsave job', 'error');
                     }
                 })
@@ -552,6 +584,8 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     console.error('Error:', error);
                     // Restore original state on error
                     icon.className = originalIcon;
+                    button.title = originalTitle;
+                    button.className = originalClasses;
                     showToast('Network error occurred', 'error');
                 })
                 .finally(() => {
@@ -559,6 +593,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 });
         }
 
+        // Enhanced showToast function
         function showToast(message, type) {
             // Remove any existing toasts first
             const existingToasts = document.querySelectorAll('.toast-notification');
@@ -566,15 +601,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             const toast = document.createElement('div');
             toast.className = `toast-notification fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                type === 'success' ? 'bg-green-500 text-primary' : 'bg-red-500 text-primary'
             }`;
             toast.textContent = message;
 
+            // Add to DOM
             document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            }, 10);
 
             // Auto remove after 3 seconds
             setTimeout(() => {
                 toast.style.transform = 'translateX(100%)';
+                toast.style.opacity = '0';
                 setTimeout(() => {
                     if (toast.parentNode) {
                         toast.parentNode.removeChild(toast);

@@ -99,15 +99,15 @@ if (!isset($selectedJob) || empty($selectedJob)) {
         <div class="flex items-center justify-between mt-4">
             <!-- Job Tags -->
             <div class="flex flex-wrap items-center gap-2">
-                <span class="px-3 py-2 text-xs font-medium bg-gray-100 rounded-sm text-primary">
+                <span class="px-3 py-2 text-sm bg-gray-100 rounded-sm text-primary">
                     <?php echo htmlspecialchars(ucfirst($selectedJob['job_type'])); ?>
                 </span>
                 <?php if (!empty($selectedJob['category_name'])): ?>
-                    <span class="px-3 py-2 text-xs font-medium bg-gray-100 rounded-sm text-primary">
+                    <span class="px-3 py-2 text-sm bg-gray-100 rounded-sm text-primary">
                         <?php echo htmlspecialchars($selectedJob['category_name']); ?>
                     </span>
                 <?php endif; ?>
-                <span class="px-3 py-2 text-xs font-medium bg-gray-100 rounded-sm text-primary">
+                <span class="px-3 py-2 text-sm bg-gray-100 rounded-sm text-primary">
                     <?php echo ucfirst($selectedJob['workplace_option'] ?? 'Onsite'); ?>
                 </span>
             </div>

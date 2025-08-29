@@ -463,8 +463,6 @@ class EmployerController
 
     private function handleBusinessStep3($employer_id, $data, &$error, &$success)
     {
-        // Debug to see what data is being received
-        error_log("DEBUG: Step 3 data received: " . print_r($data, true));
 
         // Check if form was submitted
         if (!isset($data['submit_step3'])) {
