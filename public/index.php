@@ -203,6 +203,24 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->resendOtp();
             break;
 
+        // Jobseeker Programs Routes
+        case 'programs-jobseeker':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $eventController = new EventProgramController();
+            $allEvents = $eventController->getActiveEvents();
+            include __DIR__ . '/../app/views/jobseekers/programs-jobseeker.php';
+            break;
+
+        case 'event-info-jobseeker':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $eventController = new EventProgramController();
+            $event = null;
+            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+                $event = $eventController->getEventById($_GET['id']);
+            }
+            include __DIR__ . '/../app/views/jobseekers/event-info-jobseeker.php';
+            break;
+
 
         // Employer Routes
         case 'login-employer':

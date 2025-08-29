@@ -27,7 +27,7 @@ if ($jobseeker === false) {
       <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
         <li><a href="?page=jobseeker-dashboard" class="nav-link">Home</a></li>
         <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
-        <li><a href="#" class="nav-link">Programs</a></li>
+        <li><a href="?page=programs-jobseeker" class="nav-link">Programs</a></li>
         <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
       </ul>
     </div>
@@ -173,20 +173,18 @@ if ($jobseeker === false) {
       class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
       style="display: none;">
       <ul class="flex flex-col gap-4 mt-8">
-        <li><a href="#" class="nav-link">Job Search</a></li>
-        <li><a href="#" class="nav-link">Programs</a></li>
-        <li><a href="#" class="nav-link">Explore Companies</a></li>
+        <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
+        <li><a href="?page=jobseeker-programs" class="nav-link">Programs</a></li>
+        <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
         <li><a href="#" class="nav-link">Community</a></li>
         <li><a href="#" class="nav-link">Notifications</a></li>
-        <li><a href="#" class="nav-link">Saved Jobs</a></li>
-        <li><a href="#" class="nav-link">Applied Jobs</a></li>
-        <li><a href="#" class="nav-link">Settings</a></li>
+        <li><a href="?page=saved-jobs" class="nav-link">Saved Jobs</a></li>
+        <li><a href="?page=my-applications" class="nav-link">Applied Jobs</a></li>
+        <li><a href="?page=settings-jobseeker" class="nav-link">Settings</a></li>
         <li class="flex flex-col gap-2 mt-4">
           <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
         </li>
       </ul>
     </div>
-
-
-
+  </div>
 </nav>
