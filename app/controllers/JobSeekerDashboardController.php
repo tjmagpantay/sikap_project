@@ -24,16 +24,8 @@ class JobSeekerDashboardController
 
     public function dashboard()
     {
-        // Debug logging
-        error_log("JobSeekerDashboardController Debug:");
-        error_log("Session user_id: " . ($_SESSION['user_id'] ?? 'NOT SET'));
-        error_log("Session role: " . ($_SESSION['role'] ?? 'NOT SET'));
-        error_log("User::ROLE_JOBSEEKER constant: " . User::ROLE_JOBSEEKER);
-        error_log("Role comparison result: " . (($_SESSION['role'] ?? null) == User::ROLE_JOBSEEKER ? 'TRUE' : 'FALSE'));
-        
         // Authentication check
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            error_log("Auth failed - redirecting to login-jobseeker");
             header('Location: ?page=login-jobseeker');
             exit;
         }
@@ -64,10 +56,17 @@ class JobSeekerDashboardController
         // Select job for preview (maintaining existing functionality)
         $selectedJobId = $_GET['job_id'] ?? ($jobs[0]['job_id'] ?? null);
         $selectedJob = null;
-        foreach ($jobs as $job) {
-            if ($job['job_id'] == $selectedJobId) {
-                $selectedJob = $job;
-                break;
+        
+        // Get full job data for selected job
+        if ($selectedJobId) {
+            $selectedJob = $this->jobPostModel->getFullJobData($selectedJobId);
+            // Add application count for this specific job
+            if ($selectedJob) {
+                $selectedJob['has_applied'] = false;
+                if ($jobseeker_id) {
+                    $hasApplied = $this->jobApplicationModel->hasApplied($jobseeker_id, $selectedJobId);
+                    $selectedJob['has_applied'] = $hasApplied;
+                }
             }
         }
 

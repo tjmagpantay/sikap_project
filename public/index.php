@@ -608,14 +608,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->uploadBusinessLogo();
             break;
         case 'save-job':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
+            require_once __DIR__ . '/../app/controllers/SaveJobController.php';
+            $controller = new SaveJobController();
             $controller->saveJob();
             break;
 
         case 'unsave-job':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
+            require_once __DIR__ . '/../app/controllers/SaveJobController.php';
+            $controller = new SaveJobController();
             $controller->unsaveJob();
             break;
 

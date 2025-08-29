@@ -154,24 +154,10 @@ class JobseekerController
             } elseif ($inputOtp == $otpData['otp']) {
                 // OTP correct, log in user
                 $user = $_SESSION['pending_user'];
-                
-                // Debug logging
-                error_log("JobseekerController OTP Login Debug:");
-                error_log("User data: " . print_r($user, true));
-                error_log("Role ID: " . $user['role_id']);
-                error_log("User::ROLE_JOBSEEKER constant: " . User::ROLE_JOBSEEKER);
-                
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['role'] = $user['role_id'];
                 $_SESSION['role_name'] = $user['role_name'];
                 $_SESSION['email'] = $user['email'];
-                
-                // Debug session data
-                error_log("Session after setting:");
-                error_log("Session user_id: " . $_SESSION['user_id']);
-                error_log("Session role: " . $_SESSION['role']);
-                error_log("Session role_name: " . $_SESSION['role_name']);
-                
                 unset($_SESSION['login_otp'], $_SESSION['pending_user']);
                 header('Location: ?page=jobseeker-dashboard');
                 exit;

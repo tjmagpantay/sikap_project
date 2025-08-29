@@ -30,6 +30,7 @@ module.exports = {
         gray6: '#5E6670',
         lightBlue: '#EFF7FD',
         grayMain: '#303030',
+        tagsBg: '#EDEEF1'
       },
       borderRadius: {
         md: '0.5rem',

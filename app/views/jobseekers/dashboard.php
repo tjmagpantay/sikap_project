@@ -33,20 +33,18 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
         </div>
 
-
-
         <!-- Job Filtering Section - Same Width as Hero, White Background -->
-        <div class="relative py-4 sm:px-8 lg:px-12 ">
+        <div class="relative py-4 mb-4 sm:px-8 lg:px-12 ">
             <div class="flex flex-col max-w-5xl gap-6 mx-auto">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
 
                     <!-- Search Jobs (Much Wider) -->
-                    <div class="flex-1 lg:flex-[3] lg:max-w-lg">
+                    <div class="flex-1 lg:!flex-[5] lg:!max-w-none lg:!min-w-0">
                         <div class="flex items-center gap-3 px-4 py-3 transition-all bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
                             <input type="text" id="jobSearch"
                                 placeholder="Search Jobs"
-                                class="flex-1 text-sm text-gray-700 placeholder-gray-500 bg-transparent border-none outline-none focus:ring-0">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex-1 text-sm text-gray-800 placeholder-gray-500 bg-transparent border-none outline-none focus:ring-0">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
@@ -59,7 +57,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 @click.away="open = false"
                                 class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -119,7 +117,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 @click.away="open = false"
                                 class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -183,7 +181,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 @click.away="open = false"
                                 class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -231,22 +229,21 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
         </div>
 
-
         <!-- Main Dashboard Content -->
         <div class="flex flex-col gap-6 lg:flex-row">
-            <!-- Left Side - Job Cards (Scrollable) -->
-            <div class="w-full lg:w-[25%] xl:w-[25%]">
+            <!-- Left Side - Job Cards -->
+            <div class="w-full lg:!w-1/3 lg:max-w-md">
                 <div class="">
                     <div>
                         <p class="text-lg font-semibold text-grayMain">Jobs you might like</p>
                     </div>
                     <!-- Filter Buttons -->
-                    <div class="flex items-start w-full mb-4 border-b border-gray-200">
-                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary active-filter"
+                    <div class="flex items-start w-full mb-2 border-b border-gray-200">
+                        <button class="flex-1 py-4 text-sm font-medium transition-colors border-b-2 text-grayMain border-primary active-filter"
                             data-filter="all" onclick="filterJobs('all', this)">
                             <div class="flex flex-col items-start">
-                                <span>All Jobs</span>
-                                <span class="text-xs font-normal text-gray-400 whitespace-nowrap">(<?php echo count($jobs); ?> jobs)</span>
+                                <span>All Jobs
+                                    <span class="text-xs font-normal text-gray-400 whitespace-nowrap">(2 jobs)</span> </span>
                             </div>
                         </button>
 
@@ -264,20 +261,17 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             </div>
                         </button>
                     </div>
-
                     <!-- Job Post Card -->
                     <div class="overflow-y-auto " style="max-height: 600px; ">
                         <?php if (!empty($jobs)): ?>
-                            <div class="space-y-3">
+                            <div class="space-y-6">
                                 <?php foreach ($jobs as $job): ?>
                                     <div class="relative p-6 transition-all border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-md job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5' : ''); ?>"
                                         onclick="loadJobDetails(<?php echo $job['job_id']; ?>, this)"
                                         data-job-id="<?php echo $job['job_id']; ?>">
 
-
-
                                         <!-- Row 1: Business Profile + Job Title + Business Name + Urgent Tag -->
-                                        <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-start justify-between gap-2">
                                             <div class="flex items-center flex-1 gap-2">
                                                 <!-- Business Profile Image -->
                                                 <div class="flex items-center justify-center w-12 h-12 p-1 overflow-hidden rounded-md bg-primary">
@@ -298,9 +292,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             </div>
 
                                             <!-- Right side: Save button + Urgent Tag -->
-                                            <div class="flex items-center flex-shrink-0 gap-2">
-
-
+                                            <div class="flex items-center flex-shrink-0 gap-2 mt-2">
                                                 <span class="px-2 py-1 text-xs font-medium text-white rounded-sm bg-primary">
                                                     Urgent
                                                 </span>
@@ -316,9 +308,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             </svg>
                                             <span class="ml-2 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
                                         </div>
-
-
-
                                         <!-- Row 4: Tags for Job Info -->
                                         <div class="flex items-center gap-2 mb-4">
                                             <!-- Job Type Tag -->
@@ -384,163 +373,15 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
 
             <!-- Right Side - Job Details Preview -->
-            <div class="w-full lg:w-[75%] xl:w-[75%]">
+            <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">
                 <!-- AJAX Container for job details -->
                 <div id="job-details-container">
-                    <?php if (isset($_GET['job_id']) && !empty($selectedJob)): ?>
-                        <!-- Job Details Card -->
-                        <div class="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-start space-x-4">
-                                    <!-- Business Logo/Profile -->
-                                    <div class="flex items-center justify-center w-16 h-16 overflow-hidden border-gray-200 rounded-md">
-                                        <?php if (!empty($selectedJob['business_logo'])): ?>
-                                            <img src="<?php echo htmlspecialchars($selectedJob['business_logo']); ?>" alt="Company Logo"
-                                                class="object-cover w-full h-full min-w-full min-h-full border-2 border-gray-200 rounded-md">
-                                        <?php else: ?>
-                                            <i class="text-2xl text-gray-500 fas fa-building"></i>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div>
-                                        <h2 class="text-lg font-bold text-gray-900"><?php echo htmlspecialchars($selectedJob['job_title']); ?></h2>
-                                        <div class="flex flex-col sm:flex-row sm:space-y-0 sm:space-x-4">
-                                            <p class="flex items-center text-gray-500">
-
-                                                <span class="text-sm text-gray-500"><?php echo htmlspecialchars($selectedJob['company_name'] ?? $selectedJob['business_name'] ?? 'Company'); ?></span>
-                                            </p>
-                                            <p class="flex items-center text-gray-500">
-
-                                                <span class="text-sm text-gray-500"><?php echo htmlspecialchars($selectedJob['location']); ?></span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2 space-x-2">
-                                    <?php if ($hasProfile): ?>
-                                        <button onclick="toggleSaveJob(<?php echo $selectedJob['job_id']; ?>, this)"
-                                            class="p-2 rounded-full text-secondary hover:bg-gray-100 hover:text-yellow-500"
-                                            title="<?php echo (isset($selectedJob['is_saved']) && $selectedJob['is_saved']) ? 'Remove from saved' : 'Save job'; ?>">
-                                            <!-- Bookmark SVG Icon -->
-                                            <svg class="w-6 h-6" fill="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'currentColor' : 'none'; ?>"
-                                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
-                                            </svg>
-
-                                        </button>
-                                    <?php endif; ?>
-                                    <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
-                                        class="p-2 rounded-full text-primary hover:bg-gray-100 hover:text-primary"
-                                        title="View Full Details">
-                                        <!-- External Link SVG Icon -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <div class="flex flex-wrap items-center gap-2 mb-4">
-                                    <span class="px-3 py-2 text-xs   <?php echo strtolower($selectedJob['job_type']) === 'full-time' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-green-800'; ?>">
-                                        <?php echo strtoupper($selectedJob['job_type']); ?>
-                                    </span>
-
-                                    <?php if (!empty($selectedJob['category_name'])): ?>
-                                        <span class="px-3 py-2 text-xs text-secondary bg-yellow-50">
-                                            <?php echo htmlspecialchars($selectedJob['category_name']); ?>
-                                        </span>
-                                    <?php endif; ?>
-
-                                    <?php if (!empty($selectedJob['pay_range'])): ?>
-                                        <span class="flex items-center px-3 py-2 text-xs text-gray-600 bg-gray-100 ">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <?php echo htmlspecialchars($selectedJob['pay_range']); ?>
-                                        </span>
-                                    <?php endif; ?>
-
-                                    <span class="flex items-center px-3 py-2 text-xs text-gray-600 bg-gray-100 ">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Posted <?php echo date('M j, Y', strtotime($selectedJob['created_at'])); ?>
-                                    </span>
-                                </div>
-
-                                <!-- Application Timeline -->
-                                <?php if (!empty($selectedJob['application_start']) || !empty($selectedJob['application_deadline'])): ?>
-                                    <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50">
-
-                                        <div class="space-y-2">
-                                            <?php if (!empty($selectedJob['application_start'])): ?>
-                                                <div class="flex items-center text-sm text-gray-600">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                    <span class="font-medium">Applications Open:</span>
-                                                    <span class="ml-2"><?php echo date('M j, Y g:i A', strtotime($selectedJob['application_start'])); ?></span>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if (!empty($selectedJob['application_deadline'])): ?>
-                                                <div class="flex items-center text-sm text-gray-600">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    <span class="font-medium">Application Deadline:</span>
-                                                    <span class="ml-2 <?php echo (strtotime($selectedJob['application_deadline']) < time()) ? 'text-red-600 font-semibold' : ''; ?>">
-                                                        <?php echo date('M j, Y g:i A', strtotime($selectedJob['application_deadline'])); ?>
-                                                    </span>
-                                                    <?php if (strtotime($selectedJob['application_deadline']) < time()): ?>
-                                                        <span class="px-2 py-1 ml-2 text-xs font-medium text-red-700 bg-red-100 rounded">EXPIRED</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-
-                                <div class="mb-6">
-                                    <h3 class="mb-3 text-lg font-semibold text-gray-900">Job Description</h3>
-                                    <div class="text-sm font-normal prose-sm prose text-gray-600 max-w-none">
-                                        <?php echo nl2br(htmlspecialchars($selectedJob['job_summary'])); ?>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col gap-3 mt-8 sm:flex-row">
-                                    <?php if (!$hasProfile): ?>
-                                        <a href="?page=complete-jobseeker-profile"
-                                            class="w-full px-4 py-3 text-sm font-medium text-center text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-700">
-                                            Complete Profile to Apply
-                                        </a>
-                                    <?php elseif (isset($selectedJob['has_applied']) && $selectedJob['has_applied']): ?>
-                                        <span class="w-full px-4 py-3 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-lg">
-                                            <i class="mr-1 fas fa-check-circle"></i> Applied
-                                        </span>
-                                    <?php else: ?>
-                                        <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&step=1"
-                                            class="w-full px-4 py-3 text-sm font-medium text-center text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
-                                            <i class="mr-1 fas fa-paper-plane"></i> Apply Now
-                                        </a>
-                                    <?php endif; ?>
-                                    <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
-                                        class="w-full px-4 py-3 text-sm font-medium text-center transition-colors bg-white border rounded-lg text-primary border-primary hover:bg-primary/5">
-                                        View Full Details
-                                    </a>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <!-- Empty State -->
-                            <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                                <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
-                                <h3 class="mt-4 text-lg font-medium text-gray-900">Select a job to view details</h3>
-                                <p class="mt-1 text-xs text-gray-500">Click on any job from the list to see its full details</p>
-                            </div>
-                        <?php endif; ?>
-                        </div>
+                    <!-- Empty State -->
+                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                        <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Select a job to view details</h3>
+                        <p class="mt-1 text-xs text-gray-500">Click on any job from the list to see its full details</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -620,7 +461,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         }
                     } catch (e) {
                         console.error('JSON parse error:', e);
-                        console.error('Raw text that failed to parse:', text);
+                        console.error('Raw response text that failed to parse:', text);
 
                         // Show the raw response in case it's helpful for debugging
                         container.innerHTML = `
@@ -655,19 +496,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Same JavaScript functions as before
         function toggleSaveJob(jobId, button) {
-            const isSaved = button.querySelector('svg').getAttribute('fill') === 'currentColor';
-            const action = isSaved ? 'unsave' : 'save';
+            console.log('Toggling save for job:', jobId);
+
+            // Get current state from button
+            const icon = button.querySelector('i');
+            const currentlySaved = icon.classList.contains('fas');
 
             // Show loading state
+            const originalIcon = icon.className;
+            icon.className = 'text-sm fas fa-spinner fa-spin';
             button.disabled = true;
-            const svg = button.querySelector('svg');
-            svg.classList.add('animate-pulse');
 
             // Prepare form data
             const formData = new FormData();
             formData.append('job_id', jobId);
 
-            const endpoint = isSaved ? '?page=unsave-job' : '?page=save-job';
+            // Choose endpoint based on current state
+            const endpoint = currentlySaved ? '?page=unsave-job' : '?page=save-job';
 
             fetch(endpoint, {
                     method: 'POST',
@@ -676,58 +521,64 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        return response.text().then(text => {
-                            console.error('Expected JSON but got:', text);
-                            throw new Error('Server returned non-JSON response');
-                        });
-                    }
-
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Update the button state
-                        if (isSaved) {
-                            svg.setAttribute('fill', 'none');
-                            button.title = 'Save job';
-                        } else {
-                            svg.setAttribute('fill', 'currentColor');
-                            button.title = 'Remove from saved';
-                        }
+                    console.log('Save/unsave response:', data);
 
-                        showToast(data.message || (isSaved ? 'Job removed from saved' : 'Job saved successfully'), 'success');
+                    if (data.success) {
+                        // Update button state
+                        if (currentlySaved) {
+                            // Was saved, now unsaved
+                            icon.className = 'text-sm far fa-bookmark';
+                            button.title = 'Save job';
+                            button.classList.remove('text-yellow-500', 'bg-yellow-50', 'border-yellow-300');
+                            button.classList.add('text-gray-500', 'bg-gray-50');
+                            showToast('Job removed from saved jobs', 'success');
+                        } else {
+                            // Was not saved, now saved
+                            icon.className = 'text-sm fas fa-bookmark';
+                            button.title = 'Remove from saved';
+                            button.classList.remove('text-gray-500', 'bg-gray-50');
+                            button.classList.add('text-yellow-500', 'bg-yellow-50', 'border-yellow-300');
+                            showToast('Job saved successfully', 'success');
+                        }
                     } else {
-                        showToast('Action failed: ' + (data.message || 'Please try again'), 'error');
+                        // Restore original state on error
+                        icon.className = originalIcon;
+                        showToast(data.message || 'Failed to save/unsave job', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('An error occurred. Please try again.', 'error');
+                    // Restore original state on error
+                    icon.className = originalIcon;
+                    showToast('Network error occurred', 'error');
                 })
                 .finally(() => {
                     button.disabled = false;
-                    svg.classList.remove('animate-pulse');
                 });
         }
 
         function showToast(message, type) {
+            // Remove any existing toasts first
+            const existingToasts = document.querySelectorAll('.toast-notification');
+            existingToasts.forEach(toast => toast.remove());
+
             const toast = document.createElement('div');
-            toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded-md shadow-lg text-sm font-medium text-white transition-opacity duration-300 ease-in-out
-                      ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-            toast.innerText = message;
+            toast.className = `toast-notification fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            toast.textContent = message;
+
             document.body.appendChild(toast);
 
+            // Auto remove after 3 seconds
             setTimeout(() => {
-                toast.classList.add('opacity-0');
+                toast.style.transform = 'translateX(100%)';
                 setTimeout(() => {
-                    document.body.removeChild(toast);
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
                 }, 300);
             }, 3000);
         }
@@ -899,7 +750,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     noResultsMessage.className = 'p-8 text-center text-gray-500';
                     noResultsMessage.innerHTML = `
                     <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0012 15c-2.137 0-4.146-.832-5.657-2.343"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0012 15c-2.137 0-4.146-.832-5.657-2.343"></path>
                     </svg>
                     <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs found</h3>
                     <p class="text-sm">Try adjusting your filters or search terms</p>

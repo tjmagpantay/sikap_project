@@ -1,6 +1,9 @@
 <?php
 // filepath: c:\xampp\htdocs\sikap\app\models\JobseekerDashboard.php
 require_once __DIR__ . '/../../config/sikap_db.php';
+require_once __DIR__ . '/JobPost.php';
+require_once __DIR__ . '/SavedJobs.php';
+require_once __DIR__ . '/JobApplication.php';
 
 class JobseekerDashboard
 {
@@ -465,6 +468,69 @@ class JobseekerDashboard
         } catch (PDOException $e) {
             error_log('Error fetching filtered jobs: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * Get application count for a specific job
+     */
+    public function getJobApplicationCount($job_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) as count 
+                FROM job_application 
+                WHERE job_id = ? AND is_finalized = 1
+            ");
+            $stmt->execute([$job_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] ?? 0;
+        } catch (PDOException $e) {
+            error_log("Error getting application count for job {$job_id}: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get full job details with additional jobseeker-specific data
+     */
+    public function getJobDetailsForJobseeker($job_id, $jobseeker_id = null)
+    {
+        try {
+            // Get basic job data
+            $jobPost = new JobPost();
+            $job = $jobPost->getFullJobData($job_id);
+
+            if (!$job) {
+                return null;
+            }
+
+            // Add application count
+            $job['application_count'] = $this->getJobApplicationCount($job_id);
+
+            // Add jobseeker-specific data if jobseeker_id provided
+            if ($jobseeker_id) {
+                // Check if job is saved
+                $savedJobs = new SavedJobs();
+                $job['is_saved'] = $savedJobs->isSaved($jobseeker_id, $job_id);
+
+                // Check if user has applied - let's debug this
+                $jobApplication = new JobApplication();
+                $hasApplied = $jobApplication->hasApplied($jobseeker_id, $job_id);
+
+                // Debug logging
+                error_log("DEBUG - JobseekerDashboard: jobseeker_id={$jobseeker_id}, job_id={$job_id}, hasApplied=" . ($hasApplied ? 'true' : 'false'));
+
+                $job['has_applied'] = $hasApplied;
+            } else {
+                $job['is_saved'] = false;
+                $job['has_applied'] = false;
+            }
+
+            return $job;
+        } catch (Exception $e) {
+            error_log("Error getting job details for jobseeker: " . $e->getMessage());
+            return null;
         }
     }
 
