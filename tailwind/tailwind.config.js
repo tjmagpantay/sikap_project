@@ -3,6 +3,7 @@ module.exports = {
     "./app/views/**/*.php",
     "./public/**/*.{html,js,php}",
     "./public/assets/js/**/*.js",
+    "./**/*.php"
   ],
   theme: {
     extend: {
@@ -33,7 +34,7 @@ module.exports = {
         tagsBg: '#EDEEF1'
       },
       borderRadius: {
-        md: '0.5rem',
+        md: '0.3rem', // Change this value
       },
     },
   },

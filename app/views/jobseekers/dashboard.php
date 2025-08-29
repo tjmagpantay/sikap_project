@@ -7,7 +7,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 <div class="min-h-screen sm:px-6 md:px-16 lg:px-24 ">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Hero Section with Background -->
-        <div class="relative px-6 py-4 overflow-hidden rounded-xl sm:px-8 sm:py-12 lg:px-12 lg:py-16">
+        <div class="relative px-6 py-4 overflow-hidden rounded-lg sm:px-8 sm:py-12 lg:px-12 lg:py-16">
             <!-- Background Image and Gradient Overlay (below content) -->
             <div class="absolute inset-0 z-0 rounded-t-xl">
                 <img src="assets/images/hero-page-bg.png"

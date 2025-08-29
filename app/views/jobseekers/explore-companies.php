@@ -7,10 +7,129 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 <div class="min-h-screen bg-gray-50">
     <div class="px-6 py-8">
         <div class="mx-auto max-w-7xl">
-            <!-- Page Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-mainGray">Explore Companies</h1>
-                <p class="mt-2 text-sm text-gray-600">Discover amazing companies and explore their job opportunities</p>
+            <!-- Page Header with Filters -->
+            <div class="flex items-center justify-between mb-8">
+                <!-- Left: Page Title -->
+                <div>
+                    <h1 class="text-3xl font-bold text-mainGray">Explore Companies</h1>
+                    <p class="mt-2 text-sm text-gray-600">Discover amazing companies and explore their job opportunities
+                    </p>
+                </div>
+
+                <!-- Right: Filtering Section -->
+                <div class="flex items-center gap-4">
+                    <!-- Sort Order Filter -->
+                    <div class="relative" x-data="{ open: false, selected: 'Name (A-Z)' }">
+                        <button @click="open = !open" @click.away="open = false"
+                            class="flex items-center justify-between w-40 px-3 py-2 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <span x-text="selected" class="text-gray-700 truncate"></span>
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1">
+                                <button @click="selected = 'Name (A-Z)'; open = false; sortCompanies('name_asc')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Name (A-Z)
+                                </button>
+                                <button @click="selected = 'Name (Z-A)'; open = false; sortCompanies('name_desc')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Name (Z-A)
+                                </button>
+                                <button @click="selected = 'Most Jobs'; open = false; sortCompanies('jobs_desc')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Most Jobs
+                                </button>
+                                <button @click="selected = 'Least Jobs'; open = false; sortCompanies('jobs_asc')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Least Jobs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Industry/Category Filter -->
+                    <div class="relative" x-data="{ open: false, selected: 'All Industries' }">
+                        <button @click="open = !open" @click.away="open = false"
+                            class="flex items-center justify-between w-48 px-3 py-2 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <span x-text="selected" class="text-gray-700 truncate"></span>
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1 overflow-y-auto max-h-64">
+                                <button @click="selected = 'All Industries'; open = false; filterByIndustry('')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    All Industries
+                                </button>
+                                <button @click="selected = 'Technology'; open = false; filterByIndustry('technology')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Technology
+                                </button>
+                                <button @click="selected = 'Healthcare'; open = false; filterByIndustry('healthcare')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Healthcare
+                                </button>
+                                <button @click="selected = 'Finance'; open = false; filterByIndustry('finance')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Finance
+                                </button>
+                                <button @click="selected = 'Education'; open = false; filterByIndustry('education')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Education
+                                </button>
+                                <button @click="selected = 'Retail'; open = false; filterByIndustry('retail')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Retail
+                                </button>
+                                <button @click="selected = 'Manufacturing'; open = false; filterByIndustry('manufacturing')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Manufacturing
+                                </button>
+                                <button @click="selected = 'Hospitality'; open = false; filterByIndustry('hospitality')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Hospitality
+                                </button>
+                                <button @click="selected = 'Construction'; open = false; filterByIndustry('construction')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Construction
+                                </button>
+                                <button @click="selected = 'Marketing'; open = false; filterByIndustry('marketing')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Marketing
+                                </button>
+                                <button @click="selected = 'Real Estate'; open = false; filterByIndustry('real estate')"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Real Estate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Companies Grid -->
@@ -18,14 +137,18 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <div class="py-12 text-center">
                     <i class="mb-4 text-6xl text-gray-400 fas fa-building"></i>
                     <h3 class="mb-2 text-lg font-medium text-gray-900">No verified companies found</h3>
-                    <p class="text-gray-500">Companies must complete their profiles and verification process before appearing here. Check back later for new companies joining our platform.</p>
+                    <p class="text-gray-500">Companies must complete their profiles and verification process before appearing
+                        here. Check back later for new companies joining our platform.</p>
                 </div>
             <?php else: ?>
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div id="companiesContainer" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <?php foreach ($employers as $employer): ?>
-                        <div class="overflow-hidden transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg">
+                        <div class="overflow-hidden transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow company-card-filter hover:shadow-lg"
+                            data-company-name="<?php echo strtolower(htmlspecialchars($employer['business_name'])); ?>"
+                            data-industry="<?php echo strtolower(htmlspecialchars($employer['business_industry'] ?? '')); ?>"
+                            data-jobs-count="<?php echo $employer['active_jobs_count']; ?>">
                             <!-- Company Header -->
-                            <div class="p-6 border-b border-gray-100 bg-gray-50">
+                            <div class="p-6 border-b border-gray-100 rounded-t-lg bg-gray-50">
                                 <div class="flex items-start space-x-4">
                                     <!-- Company Logo -->
                                     <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
@@ -75,9 +198,14 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <?php if (!empty($employer['business_address'])): ?>
                                     <div class="flex items-center mb-3 text-sm text-gray-500">
                                         <!-- Location/Map Marker SVG -->
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+                                            </path>
                                         </svg>
                                         <span class="truncate"><?php echo htmlspecialchars($employer['business_address']); ?></span>
                                     </div>
@@ -86,11 +214,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <?php if (!empty($employer['business_website'])): ?>
                                     <div class="flex items-center mb-3 text-sm">
                                         <!-- Globe/Website SVG -->
-                                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
+                                            </path>
                                         </svg>
-                                        <a href="<?php echo htmlspecialchars($employer['business_website']); ?>"
-                                            target="_blank"
+                                        <a href="<?php echo htmlspecialchars($employer['business_website']); ?>" target="_blank"
                                             class="truncate text-primary hover:text-secondary hover:underline">
                                             <?php echo htmlspecialchars($employer['business_website']); ?>
                                         </a>
@@ -101,11 +231,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <?php if (!empty($employer['facebook_url']) || !empty($employer['twitter_url']) || !empty($employer['instagram_url']) || !empty($employer['youtube_url'])): ?>
                                     <div class="flex gap-2">
                                         <?php if (!empty($employer['facebook_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($employer['facebook_url']); ?>"
-                                                target="_blank"
+                                            <a href="<?php echo htmlspecialchars($employer['facebook_url']); ?>" target="_blank"
                                                 class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-700">
                                                 <!-- Facebook SVG -->
-                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                                 </svg>
                                                 <p class="text-xs text-primary">Facebook</p>
@@ -113,11 +243,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <?php endif; ?>
 
                                         <?php if (!empty($employer['twitter_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($employer['twitter_url']); ?>"
-                                                target="_blank"
+                                            <a href="<?php echo htmlspecialchars($employer['twitter_url']); ?>" target="_blank"
                                                 class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-700">
                                                 <!-- Twitter/X SVG -->
-                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                                                 </svg>
                                                 <p class="text-xs text-primary">Twitter</p>
@@ -125,11 +255,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <?php endif; ?>
 
                                         <?php if (!empty($employer['instagram_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($employer['instagram_url']); ?>"
-                                                target="_blank"
+                                            <a href="<?php echo htmlspecialchars($employer['instagram_url']); ?>" target="_blank"
                                                 class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-700">
                                                 <!-- Instagram SVG -->
-                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.014 5.367 18.647.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.393-3.433-1.035-.985-.642-1.594-1.507-1.829-2.594-.235-1.088-.235-2.246 0-3.334.235-1.087.844-1.952 1.829-2.594.985-.642 2.136-1.035 3.433-1.035s2.448.393 3.433 1.035c.985.642 1.594 1.507 1.829 2.594.235 1.088.235 2.246 0 3.334-.235 1.087-.844 1.952-1.829 2.594-.985.642-2.136 1.035-3.433 1.035z" />
                                                     <path d="M12 16c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm0-6c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2z" />
                                                     <circle cx="16.5" cy="7.5" r="1.5" />
@@ -140,11 +270,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <?php endif; ?>
 
                                         <?php if (!empty($employer['youtube_url'])): ?>
-                                            <a href="<?php echo htmlspecialchars($employer['youtube_url']); ?>"
-                                                target="_blank"
+                                            <a href="<?php echo htmlspecialchars($employer['youtube_url']); ?>" target="_blank"
                                                 class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-700">
                                                 <!-- YouTube SVG -->
-                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                                                 </svg>
                                                 <p class="text-xs text-primary">YouTube</p>
@@ -183,6 +313,107 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         </div>
     </div>
 </div>
+
+<!-- Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+    // Global variables for filtering and sorting
+    let allCompanies = [];
+    let filteredCompanies = [];
+    let currentIndustryFilter = '';
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeFiltering();
+    });
+
+    function initializeFiltering() {
+        // Store all company cards for filtering
+        allCompanies = Array.from(document.querySelectorAll('.company-card-filter'));
+        filteredCompanies = [...allCompanies];
+
+        console.log('Found', allCompanies.length, 'company cards');
+    }
+
+    // Sort companies function
+    function sortCompanies(sortType) {
+        const container = document.getElementById('companiesContainer');
+        let companiesToSort = [...filteredCompanies];
+
+        switch (sortType) {
+            case 'name_asc':
+                companiesToSort.sort((a, b) => {
+                    const nameA = a.getAttribute('data-company-name');
+                    const nameB = b.getAttribute('data-company-name');
+                    return nameA.localeCompare(nameB);
+                });
+                break;
+
+            case 'name_desc':
+                companiesToSort.sort((a, b) => {
+                    const nameA = a.getAttribute('data-company-name');
+                    const nameB = b.getAttribute('data-company-name');
+                    return nameB.localeCompare(nameA);
+                });
+                break;
+
+            case 'jobs_desc':
+                companiesToSort.sort((a, b) => {
+                    const jobsA = parseInt(a.getAttribute('data-jobs-count')) || 0;
+                    const jobsB = parseInt(b.getAttribute('data-jobs-count')) || 0;
+                    return jobsB - jobsA;
+                });
+                break;
+
+            case 'jobs_asc':
+                companiesToSort.sort((a, b) => {
+                    const jobsA = parseInt(a.getAttribute('data-jobs-count')) || 0;
+                    const jobsB = parseInt(b.getAttribute('data-jobs-count')) || 0;
+                    return jobsA - jobsB;
+                });
+                break;
+        }
+
+        // Reorder in DOM
+        companiesToSort.forEach(company => {
+            container.appendChild(company);
+        });
+
+        console.log('Companies sorted by:', sortType);
+    }
+
+    // Filter by industry function
+    function filterByIndustry(industry) {
+        currentIndustryFilter = industry.toLowerCase();
+
+        if (industry === '') {
+            // Show all companies
+            filteredCompanies = [...allCompanies];
+            allCompanies.forEach(company => {
+                company.style.display = 'block';
+            });
+        } else {
+            // Filter companies by industry
+            filteredCompanies = allCompanies.filter(company => {
+                const companyIndustry = company.getAttribute('data-industry') || '';
+                return companyIndustry.includes(currentIndustryFilter);
+            });
+
+            // Show/hide companies
+            allCompanies.forEach(company => {
+                const companyIndustry = company.getAttribute('data-industry') || '';
+                if (industry === '' || companyIndustry.includes(currentIndustryFilter)) {
+                    company.style.display = 'block';
+                } else {
+                    company.style.display = 'none';
+                }
+            });
+        }
+
+        console.log('Filtered by industry:', industry, 'Found:', filteredCompanies.length, 'companies');
+    }
+</script>
 
 <style>
     .line-clamp-3 {
