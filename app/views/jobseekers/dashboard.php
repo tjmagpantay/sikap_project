@@ -7,7 +7,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 <div class="min-h-screen sm:px-6 md:px-16 lg:px-24 ">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Hero Section with Background -->
-        <div class="relative px-6 py-6 mb-2 overflow-hidden rounded-xl sm:px-8 sm:py-12 lg:px-12 lg:py-16">
+        <div class="relative px-6 py-4 overflow-hidden rounded-xl sm:px-8 sm:py-12 lg:px-12 lg:py-16">
             <!-- Background Image and Gradient Overlay (below content) -->
             <div class="absolute inset-0 z-0 rounded-t-xl">
                 <img src="assets/images/hero-page-bg.png"
@@ -15,50 +15,51 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     class="object-cover w-full h-full opacity-20 rounded-t-xl"
                     onerror="this.style.display='none'">
                 <div class="absolute inset-0 rounded-t-xl"
-                    style="background: linear-gradient(to right, var(--color-primary, #092C4C) 0%, transparent 100%); opacity: 0.85;">
+                    style="background: color #F8F8FA; opacity: 0.85;">
                 </div>
             </div>
 
             <!-- Hero Content Only -->
             <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto rounded-t-xl" style="min-height:70px;">
                 <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
-                    <h1 class="w-full mb-1 text-2xl font-bold text-white text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
-                        Find Your Dream Job Today
-                    </h1>
-                    <p class="max-w-2xl mt-2 text-sm leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-sm">
-                        Apply job that match you.
+                    <p class="max-w-2xl mt-2 text-xs leading-relaxed text-center text-gray-600 md:text-left sm:mt-3 sm:text-xs">
+                        LEARN HOW TO GET STARTED
                     </p>
+                    <h1 class="w-full mb-1 text-xl font-bold text-mainGray text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
+                        Sikap 101 will guide you through the <br> basics of the platform
+                    </h1>
+
                 </div>
             </div>
         </div>
 
 
+
         <!-- Job Filtering Section - Same Width as Hero, White Background -->
-        <div class="relative px-6 py-6 mb-6 bg-white shadow-sm sm:px-8 lg:px-12 rounded-xl">
+        <div class="relative py-4 sm:px-8 lg:px-12 ">
             <div class="flex flex-col max-w-5xl gap-6 mx-auto">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
 
                     <!-- Search Jobs (Much Wider) -->
-                    <div class="w-full lg:w-80">
-                        <div class="flex items-center gap-2 px-3 py-3 transition-all bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
-                            <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Search Icon" />
+                    <div class="flex-1 lg:flex-[3] lg:max-w-lg">
+                        <div class="flex items-center gap-3 px-4 py-3 transition-all bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
                             <input type="text" id="jobSearch"
-                                placeholder="Search for jobs..."
-                                class="flex-1 text-sm text-gray-700 bg-transparent border-none outline-none focus:ring-0">
+                                placeholder="Search Jobs"
+                                class="flex-1 text-sm text-gray-700 placeholder-gray-500 bg-transparent border-none outline-none focus:ring-0">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Location Filter -->
-                    <div class="w-full lg:w-40">
+                    <div class="flex-1 lg:flex-none lg:w-32">
                         <div class="relative" x-data="{ open: false, selected: 'Location' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <div class="flex items-center gap-2">
-                                    <img src="assets/icons/location-information-svgrepo-com.svg" class="w-4 h-4 text-gray-500" alt="Location Icon" />
-                                    <span x-text="selected" class="truncate"></span>
-                                </div>
-                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="text-gray-500 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -111,66 +112,14 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
                     </div>
 
-                    <!-- Job Type Filter -->
-                    <div class="w-full lg:w-36">
-                        <div class="relative" x-data="{ open: false, selected: 'Job Type' }">
-                            <button @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="truncate"></span>
-                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-
-                            <!-- Dropdown Menu -->
-                            <div x-show="open"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-                                x-cloak>
-                                <div class="py-1">
-                                    <button @click="selected = 'Job Type'; open = false; filterByJobType('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        All Types
-                                    </button>
-                                    <button @click="selected = 'Full-time'; open = false; filterByJobType('full-time')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Full-time
-                                    </button>
-                                    <button @click="selected = 'Part-time'; open = false; filterByJobType('part-time')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Part-time
-                                    </button>
-                                    <button @click="selected = 'Contract'; open = false; filterByJobType('contract')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Contract
-                                    </button>
-                                    <button @click="selected = 'Temporary'; open = false; filterByJobType('temporary')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Temporary
-                                    </button>
-                                    <button @click="selected = 'Internship'; open = false; filterByJobType('internship')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Internship
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Industry Filter -->
-                    <div class="w-full lg:w-40">
+                    <div class="flex-1 lg:flex-none lg:w-32">
                         <div class="relative" x-data="{ open: false, selected: 'Industry' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="truncate"></span>
-                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="text-gray-500 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -228,13 +177,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     </div>
 
                     <!-- Workplace Filter -->
-                    <div class="w-full lg:w-36">
+                    <div class="flex-1 lg:flex-none lg:w-32">
                         <div class="relative" x-data="{ open: false, selected: 'Workplace' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="truncate"></span>
-                                <svg class="w-4 h-4 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="text-gray-500 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
@@ -252,7 +201,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                 <div class="py-1">
                                     <button @click="selected = 'Workplace'; open = false; filterByWorkplace('')"
                                         class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        All Workplaces
+                                        All Types
                                     </button>
                                     <button @click="selected = 'On-site'; open = false; filterByWorkplace('on-site')"
                                         class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
@@ -271,11 +220,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
                     </div>
 
-                    <!-- Filter/Clear Buttons -->
+                    <!-- Apply Filter Button -->
                     <div class="flex gap-2 lg:flex-shrink-0">
                         <button type="button" id="clearFilters"
-                            class="px-4 py-3 text-sm font-medium text-gray-600 transition-all bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 hover:shadow-md">
-                            Clear
+                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
+                            Apply Filter
                         </button>
                     </div>
                 </div>
@@ -288,21 +237,31 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Left Side - Job Cards (Scrollable) -->
             <div class="w-full lg:w-[25%] xl:w-[25%]">
                 <div class="">
-
+                    <div>
+                        <p class="text-lg font-semibold text-grayMain">Jobs you might like</p>
+                    </div>
                     <!-- Filter Buttons -->
-                    <div class="flex gap-2 mb-4">
-                        <button class="flex-1 px-3 py-4 text-sm font-medium text-white transition-colors rounded-md bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    <div class="flex items-start w-full mb-4 border-b border-gray-200">
+                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary active-filter"
                             data-filter="all" onclick="filterJobs('all', this)">
-                            All Jobs
-                            <span class="text-sm font-normal text-gray-400 whitespace-nowrap">(<?php echo count($jobs); ?> jobs)</span>
+                            <div class="flex flex-col items-start">
+                                <span>All Jobs</span>
+                                <span class="text-xs font-normal text-gray-400 whitespace-nowrap">(<?php echo count($jobs); ?> jobs)</span>
+                            </div>
                         </button>
-                        <button class="flex-1 px-3 py-4 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+
+                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
                             data-filter="recent" onclick="filterJobs('recent', this)">
-                            Most Recent
+                            <div class="flex flex-col items-center">
+                                <span>Most Recent</span>
+                            </div>
                         </button>
-                        <button class="flex-1 px-3 py-4 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+
+                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
                             data-filter="matches" onclick="filterJobs('matches', this)">
-                            Best Matches
+                            <div class="flex flex-col items-end">
+                                <span>Best Matches</span>
+                            </div>
                         </button>
                     </div>
 
@@ -778,13 +737,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             // Update button states
             const filterButtons = document.querySelectorAll('[data-filter]');
             filterButtons.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
+                btn.classList.remove('active-filter');
+                btn.classList.add('text-gray-400');
             });
 
             // Set active button
-            button.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
-            button.classList.add('bg-primary', 'text-white');
+            button.classList.remove('text-gray-400');
+            button.classList.add('active-filter');
 
             // Get all job cards
             const jobCards = document.querySelectorAll('.job-card');
@@ -817,9 +776,9 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             // Update job count
             const visibleJobs = document.querySelectorAll('.job-card[style="display: block"], .job-card:not([style*="display: none"])').length;
-            const jobCountElement = document.querySelector('.text-gray-500');
-            if (jobCountElement) {
-                jobCountElement.textContent = `${visibleJobs} jobs`;
+            const jobCountElement = document.querySelector('.text-gray-400');
+            if (jobCountElement && filterType === 'all') {
+                jobCountElement.textContent = `(${visibleJobs} jobs)`;
             }
         }
 
