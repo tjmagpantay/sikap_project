@@ -19,14 +19,16 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <!-- Right: Filtering Section -->
                 <div class="flex items-center gap-4">
                     <!-- Sort Order Filter -->
-                    <div class="relative" x-data="{ open: false, selected: 'Name (A-Z)' }">
+                    <div class="relative" x-data="{ open: false, selected: 'Filter' }">
                         <button @click="open = !open" @click.away="open = false"
-                            class="flex items-center justify-between w-40 px-3 py-2 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            class="flex items-center gap-2 px-6 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
                             <span x-text="selected" class="text-gray-700 truncate"></span>
-                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 4h18M6 10h12M10 16h4" />
                             </svg>
+
                         </button>
 
                         <!-- Dropdown Menu -->
@@ -63,7 +65,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     <!-- Industry/Category Filter -->
                     <div class="relative" x-data="{ open: false, selected: 'All Industries' }">
                         <button @click="open = !open" @click.away="open = false"
-                            class="flex items-center justify-between w-48 px-3 py-2 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
                             <span x-text="selected" class="text-gray-700 truncate"></span>
                             <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +153,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             <div class="p-6 border-b border-gray-100 rounded-t-lg bg-gray-50">
                                 <div class="flex items-start space-x-4">
                                     <!-- Company Logo -->
-                                    <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
+                                    <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
                                         <?php if (!empty($employer['business_logo'])): ?>
                                             <img src="<?php echo htmlspecialchars($employer['business_logo']); ?>"
                                                 alt="<?php echo htmlspecialchars($employer['business_name']); ?> Logo"
@@ -171,20 +173,20 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                 <?php echo htmlspecialchars($employer['business_industry']); ?>
                                             </p>
                                         <?php endif; ?>
-
-                                        <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                                            <span class="flex items-center">
-                                                <i class="mr-1 fas fa-briefcase"></i>
-                                                <?php echo $employer['active_jobs_count']; ?> Active Jobs
-                                            </span>
-                                            <?php if (!empty($employer['business_type'])): ?>
-                                                <span class="flex items-center">
-                                                    <i class="mr-1 fas fa-tag"></i>
-                                                    <?php echo ucfirst(htmlspecialchars($employer['business_type'])); ?>
-                                                </span>
-                                            <?php endif; ?>
-                                        </div>
                                     </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                                    <span class="flex items-center">
+                                        <i class="mr-1 fas fa-briefcase"></i>
+                                        <?php echo $employer['active_jobs_count']; ?> Active Jobs
+                                    </span>
+                                    <?php if (!empty($employer['business_type'])): ?>
+                                        <span class="flex items-center">
+                                            <i class="mr-1 fas fa-tag"></i>
+                                            <?php echo ucfirst(htmlspecialchars($employer['business_type'])); ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -207,7 +209,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
                                             </path>
                                         </svg>
-                                        <span class="truncate"><?php echo htmlspecialchars($employer['business_address']); ?></span>
+                                        <span class="text-gray-600 truncate"><?php echo htmlspecialchars($employer['business_address']); ?></span>
                                     </div>
                                 <?php endif; ?>
 
@@ -232,7 +234,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     <div class="flex gap-2">
                                         <?php if (!empty($employer['facebook_url'])): ?>
                                             <a href="<?php echo htmlspecialchars($employer['facebook_url']); ?>" target="_blank"
-                                                class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-700">
+                                                class="flex items-center justify-center h-8 gap-2 px-2 transition-colors duration-200 rounded-sm text-primary bg-blue-50 w-28 hover:bg-blue-400">
                                                 <!-- Facebook SVG -->
                                                 <svg class="flex-shrink-0" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"
                                                     xmlns="http://www.w3.org/2000/svg">
