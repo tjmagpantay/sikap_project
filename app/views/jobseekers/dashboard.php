@@ -10,7 +10,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <div class="relative px-6 py-4 overflow-hidden rounded-lg sm:px-8 sm:py-12 lg:px-12 lg:py-16">
             <!-- Background Image and Gradient Overlay (below content) -->
             <div class="absolute inset-0 z-0 rounded-t-xl">
-                <img src="assets/images/hero-page-bg.png"
+                <img src="assets/images/header-bg.png"
                     alt="Hero Background"
                     class="object-cover w-full h-full opacity-20 rounded-t-xl"
                     onerror="this.style.display='none'">
@@ -22,10 +22,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Hero Content Only -->
             <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto rounded-t-xl" style="min-height:70px;">
                 <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
-                    <p class="max-w-2xl mt-2 text-xs leading-relaxed text-center text-gray-600 md:text-left sm:mt-3 sm:text-xs">
+                    <p class="max-w-2xl mt-2 text-xs leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-xs">
                         LEARN HOW TO GET STARTED
                     </p>
-                    <h1 class="w-full mb-1 text-xl font-bold text-mainGray text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
+                    <h1 class="w-full mb-1 text-xl font-bold text-white text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
                         Sikap 101 will guide you through the <br> basics of the platform
                     </h1>
 
@@ -256,10 +256,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                         <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
                             data-filter="matches" onclick="filterJobs('matches', this)">
-                            <div class="flex flex-col items-end">
+                            <div class="flex flex-col items-end w-full text-right">
                                 <span>Best Matches</span>
                             </div>
                         </button>
+
                     </div>
                     <!-- Job Post Card -->
                     <div class="overflow-y-auto " style="max-height: 600px; ">

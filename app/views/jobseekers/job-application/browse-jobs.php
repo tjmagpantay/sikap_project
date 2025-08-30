@@ -20,7 +20,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         </nav>
 
         <!-- Job Filtering Section -->
-        <div class="relative py-4 mb-6 sm:px-8 lg:px-12">
+        <div class="relative py-2 mb-2 sm:px-8 lg:px-12">
             <div class="flex flex-col gap-6 mx-auto max-w-7xl">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
 
@@ -216,7 +216,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         </div>
 
         <!-- Results Summary and Best Matches Button -->
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-8">
             <!-- Results Text -->
             <div class="flex flex-col">
                 <div class="flex gap-2 ">
