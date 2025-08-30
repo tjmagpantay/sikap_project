@@ -2,6 +2,9 @@
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
+
+// Fix: Define currentStatus variable
+$currentStatus = $application['application_status'] ?? 'pending';
 ?>
 
 <div class="min-h-screen">
@@ -320,87 +323,143 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                             </div>
                         </div>
 
-                        <!-- Application Timeline -->
+                        <!-- Enhanced Application Timeline -->
                         <div class="mb-6 sm:mb-8">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900">Application Timeline</h3>
-                            <div class="space-y-4">
-                                <!-- Applied -->
-                                <div class="flex items-start gap-3">
-                                    <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                                        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Application Submitted</p>
-                                        <p class="text-xs text-gray-500"><?php echo date('F j, Y \a\t g:i A', strtotime($application['applied_at'])); ?></p>
-                                    </div>
-                                </div>
 
-                                <!-- Interview/Review Status -->
-                                <?php if (!empty($application['interview_date']) && $application['interview_date'] !== '0000-00-00 00:00:00'): ?>
-                                    <div class="flex items-start gap-3">
-                                        <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full">
-                                            <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- Timeline Container with Connecting Lines -->
+                            <div class="relative">
+                                <!-- Vertical connecting line -->
+                                <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+
+                                <!-- Timeline Events -->
+                                <div class="relative space-y-6">
+                                    <!-- Step 1: Application Submitted -->
+                                    <div class="flex items-start">
+                                        <div class="relative z-10 flex items-center justify-center w-8 h-8 border-4 border-white rounded-full shadow-sm bg-primary">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0 ml-4">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <p class="text-sm font-semibold text-gray-900">Application Submitted</p>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium  text-gray-700">
+                                                    <?php echo date('M j, Y g:i A', strtotime($application['applied_at'])); ?>
+                                                </span>
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500">Your application has been successfully submitted.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2: Application Review -->
+                                    <?php
+                                    $reviewedAt = !empty($application['reviewed_at']) ? date('M j, Y g:i A', strtotime($application['reviewed_at'])) : null;
+                                    $reviewBadgeClass = $reviewedAt ? 'text-gray-700' : 'bg-yellow-50 text-yellow-700 border border-yellow-200';
+                                    $reviewBadgeText  = $reviewedAt ? $reviewedAt : 'Pending';
+                                    ?>
+                                    <div class="flex items-start">
+                                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full <?php echo in_array($currentStatus, ['reviewed', 'shortlisted', 'hired', 'rejected']) ? 'bg-primary' : 'bg-gray-300'; ?> border-4 border-white shadow-sm">
+                                            <svg class="w-4 h-4 <?php echo in_array($currentStatus, ['reviewed', 'shortlisted', 'hired', 'rejected']) ? 'text-white' : 'text-gray-500'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0 ml-4">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <p class="text-sm font-semibold text-gray-900">Application Reviewed</p>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo $reviewBadgeClass; ?>">
+                                                    <?php echo $reviewBadgeText; ?>
+                                                </span>
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500">
+                                                <?php echo $reviewedAt ? 'The employer has reviewed your application and qualifications.' : 'Waiting for employer to review your application.'; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3: Interview -->
+                                    <?php
+                                    $hasInterview = !empty($application['interview_date']) && $application['interview_date'] !== '0000-00-00 00:00:00';
+                                    $interviewDateText = $hasInterview ? date('M j, Y g:i A', strtotime($application['interview_date'])) : 'Pending';
+                                    $interviewBadgeClass = $hasInterview ? 'text-gray-700' : 'bg-yellow-50 text-yellow-700 border border-yellow-200';
+                                    ?>
+                                    <div class="flex items-start">
+                                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full <?php echo $hasInterview ? 'bg-secondary' : (in_array($currentStatus, ['shortlisted']) ? 'bg-yellow-400' : 'bg-gray-300'); ?> border-4 border-white shadow-sm">
+                                            <svg class="w-4 h-4 <?php echo $hasInterview ? 'text-white' : 'text-white'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">Interview Scheduled</p>
-                                            <p class="text-xs text-gray-500"><?php echo date('F j, Y \a\t g:i A', strtotime($application['interview_date'])); ?></p>
-                                            <?php if (!empty($application['interview_location'])): ?>
-                                                <p class="mt-1 text-xs text-gray-500">📍 <?php echo htmlspecialchars($application['interview_location']); ?></p>
+                                        <div class="flex-1 min-w-0 ml-4">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <p class="text-sm font-semibold text-gray-900">
+                                                    <?php echo $hasInterview ? 'Interview Scheduled' : 'Interview'; ?>
+                                                </p>
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo $interviewBadgeClass; ?>">
+                                                    <?php echo $interviewDateText; ?>
+                                                </span>
+                                            </div>
+
+                                            <?php if ($hasInterview): ?>
+                                                <!-- Date, Time, and Location all in one row -->
+                                                <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-500">
+                                                    <span><?php echo date('l, F j, Y', strtotime($application['interview_date'])); ?></span>
+                                                    <span class="text-gray-400">|</span>
+                                                    <span><?php echo date('g:i A', strtotime($application['interview_date'])); ?></span>
+                                                    <?php if (!empty($application['interview_location'])): ?>
+                                                        <span class="text-gray-400">|</span>
+                                                        <span><?php echo htmlspecialchars($application['interview_location']); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <p class="mt-1 text-xs text-gray-500">
+                                                    <?php echo in_array($currentStatus, ['shortlisted']) ? 'Interview date will be announced soon.' : 'Awaiting review completion.'; ?>
+                                                </p>
                                             <?php endif; ?>
                                         </div>
-                                    </div>
-                                <?php elseif (in_array($application['application_status'], ['shortlisted', 'hired'])): ?>
-                                    <div class="flex items-start gap-3">
-                                        <div class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-500">Interview Pending</p>
-                                            <p class="text-xs text-gray-400">Date to be announced</p>
-                                        </div>
-                                    </div>
-                                <?php elseif (!empty($application['reviewed_at'])): ?>
-                                    <div class="flex items-start gap-3">
-                                        <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">Application Reviewed</p>
-                                            <p class="text-xs text-gray-500"><?php echo date('F j, Y \a\t g:i A', strtotime($application['reviewed_at'])); ?></p>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
 
-                                <!-- Final Status -->
-                                <?php if (in_array($application['application_status'], ['hired', 'rejected'])): ?>
-                                    <div class="flex items-start gap-3">
-                                        <div class="flex items-center justify-center w-8 h-8 <?php echo $application['application_status'] === 'hired' ? 'bg-green-100' : 'bg-red-100'; ?> rounded-full">
-                                            <?php if ($application['application_status'] === 'hired'): ?>
-                                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+
+                                    </div>
+
+                                    <!-- Step 4: Final Decision -->
+                                    <?php
+                                    $decisionAt = $application['decision_at'] ?? ($application['reviewed_at'] ?? ($application['applied_at'] ?? null));
+                                    $decisionText = in_array($currentStatus, ['hired', 'rejected']) && $decisionAt ? date('M j, Y g:i A', strtotime($decisionAt)) : 'Pending';
+                                    $decisionBadgeClass = in_array($currentStatus, ['hired', 'rejected']) ? ' text-gray-700' : ' text-gray-700';
+                                    $decisionDotClass = $currentStatus === 'hired' ? 'bg-primary' : ($currentStatus === 'rejected' ? 'bg-red-500' : 'bg-gray-300');
+                                    ?>
+                                    <div class="flex items-start">
+                                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-4 border-white shadow-sm <?php echo $currentStatus === 'hired' ? 'bg-primary' : ($currentStatus === 'rejected' ? 'bg-red-500' : 'bg-gray-300'); ?>">
+                                            <?php if ($currentStatus === 'hired'): ?>
+                                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
                                                 </svg>
-                                            <?php else: ?>
-                                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <?php elseif ($currentStatus === 'rejected'): ?>
+                                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
+                                            <?php else: ?>
+                                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                                                </svg>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">
-                                                <?php echo $application['application_status'] === 'hired' ? 'Congratulations! You\'re Hired' : 'Application Not Selected'; ?>
+                                        <div class="flex-1 min-w-0 ml-4">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <p class="text-sm font-semibold text-gray-900">
+                                                    <?php echo $currentStatus === 'hired' ? 'Hired' : ($currentStatus === 'rejected' ? 'Not Selected' : 'Final Decision'); ?>
+                                                </p>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo $decisionBadgeClass; ?>">
+                                                    <?php echo $decisionText; ?>
+                                                </span>
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500">
+                                                <?php echo $currentStatus === 'hired' ? 'Welcome to the team! Further instructions will follow.' : ($currentStatus === 'rejected' ? 'Thank you for your interest. We encourage you to apply for other positions.' : 'Awaiting final decision from employer.'); ?>
                                             </p>
-                                            <p class="text-xs text-gray-500">Final decision</p>
                                         </div>
                                     </div>
-                                <?php endif; ?>
+                                </div>
                             </div>
                         </div>
 
@@ -428,31 +487,37 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         </div>
 
                         <!-- Quick Actions -->
-                        <div class="space-y-3">
+                        <div class="flex w-full gap-3">
                             <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
-                                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                 </svg>
                                 View Job Posting
                             </a>
 
                             <button onclick="window.print()"
-                                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 Print Application
                             </button>
 
-                            <button onclick="navigator.share ? navigator.share({title: 'My Job Application - <?php echo htmlspecialchars($application['job_title']); ?>', url: window.location.href}) : alert('Share feature not supported')"
-                                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                            <button
+                                onclick="navigator.share ? navigator.share({title: 'My Job Application - <?php echo htmlspecialchars($application['job_title']); ?>', url: window.location.href}) : alert('Share feature not supported')"
+                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                 </svg>
                                 Share Application
                             </button>
                         </div>
+
+
                     </div>
                 </div>
             </div>

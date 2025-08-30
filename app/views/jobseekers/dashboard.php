@@ -34,7 +34,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         </div>
 
         <!-- Job Filtering Section - Same Width as Hero, White Background -->
-        <div class="relative py-4 mb-4 sm:px-8 lg:px-12 ">
+        <div class="relative py-4 mb-6 sm:px-8 lg:px-12 ">
             <div class="flex flex-col max-w-5xl gap-6 mx-auto">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
 
