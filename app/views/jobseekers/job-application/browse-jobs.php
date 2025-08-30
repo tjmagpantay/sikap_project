@@ -207,7 +207,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     <!-- Apply Filter Button -->
                     <div class="flex gap-2 lg:flex-shrink-0">
                         <button type="button" id="clearFilters"
-                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
+                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
                             Clear Filters
                         </button>
                     </div>
@@ -219,26 +219,44 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         <div class="flex items-start justify-between mb-8">
             <!-- Results Text -->
             <div class="flex flex-col">
-                <div class="flex gap-2 ">
+                <div class="flex gap-2">
                     <h2 class="text-lg font-semibold text-gray-900">
                         Results: <span id="resultsCount"><?php echo isset($jobs) ? count($jobs) : 0; ?></span> jobs found
                     </h2>
                 </div>
                 <!-- Active Filters Display -->
-                <div id="activeFilters" class="flex flex-wrap gap-2">
+                <div id="activeFilters" class="flex flex-wrap gap-2 mt-2">
+                    <!-- Default "All Jobs" display (shown when no filters are active) -->
+                    <span id="allJobsTag" class="inline-flex items-center text-xs font-medium text-gray-400 ">
+                        All Jobs
+                    </span>
                     <!-- Filters will be dynamically added here -->
                 </div>
             </div>
 
-            <!-- Best Matches Button -->
-            <button id="bestMatchesBtn"
-                onclick="sortByBestMatches()"
-                class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                </svg>
-                Best Matches
-            </button>
+            <!-- Filter Buttons -->
+            <div class="flex gap-2">
+                <!-- Best Matches Button -->
+                <button id="bestMatchesBtn"
+                    onclick="sortByBestMatches()"
+                    class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    Best Matches
+                </button>
+
+                <!-- A-Z / Z-A Sort Button -->
+                <button id="sortAlphaBtn"
+                    onclick="toggleAlphabetSort()"
+                    class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md"
+                    data-sort-order="asc">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                    </svg>
+                    <span id="sortAlphaText">A-Z</span>
+                </button>
+            </div>
         </div>
 
         <!-- Job Listings -->
@@ -570,7 +588,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
         Object.entries(activeFilters).forEach(([key, value]) => {
             const filterTag = document.createElement('span');
-            filterTag.className = 'inline-flex  gap-1  py-1 text-xs bg-primary/10 text-gray-400 rounded-full';
+            filterTag.className = 'inline-flex  gap-1 text-xs bg-primary/10 text-gray-400 rounded-full';
 
             let displayValue = value;
             if (key === 'search') {
@@ -739,5 +757,34 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 svgIcon.classList.remove('animate-pulse');
                 button.disabled = false;
             });
+    }
+
+    // Toggle alphabetic sort
+    function toggleAlphabetSort() {
+        const button = document.getElementById('sortAlphaBtn');
+        const currentOrder = button.getAttribute('data-sort-order');
+        const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+
+        button.setAttribute('data-sort-order', newOrder);
+
+        const sortedJobs = Array.from(filteredJobs).sort((a, b) => {
+            const titleA = a.getAttribute('data-job-title')?.toLowerCase() || '';
+            const titleB = b.getAttribute('data-job-title')?.toLowerCase() || '';
+
+            if (newOrder === 'asc') {
+                return titleA.localeCompare(titleB);
+            } else {
+                return titleB.localeCompare(titleA);
+            }
+        });
+
+        const container = document.getElementById('jobListingsContainer');
+        sortedJobs.forEach(job => container.appendChild(job));
+
+        // Update button text
+        document.getElementById('sortAlphaText').textContent = newOrder === 'asc' ? 'Z-A' : 'A-Z';
+
+        // Show visual feedback
+        showToast('Jobs sorted ' + (newOrder === 'asc' ? 'A-Z' : 'Z-A'), 'success');
     }
 </script>
