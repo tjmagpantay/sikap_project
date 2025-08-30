@@ -20,7 +20,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
 
             <!-- Hero Content Only -->
-            <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto rounded-t-xl" style="min-height:70px;">
+            <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto rounded-t-xl" style="min-height:80px;">
                 <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
                     <p class="max-w-2xl mt-2 text-xs leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-xs">
                         LEARN HOW TO GET STARTED
