@@ -1,4 +1,4 @@
-<section class="px-6 py-20 bg-white">
+<section class="px-4 py-20 bg-white sm:px-6 md:px-16 lg:px-24">
   <div class="mx-auto max-w-7xl">
     <div class="flex items-start justify-between mb-8">
       <div class="flex flex-col">
@@ -11,13 +11,13 @@
         </p>
       </div>
 
-        <a href="?page=view-all-companies"
-          class="flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
-          View All
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+      <a href="?page=view-all-companies"
+        class="flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
+        View All
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
 
     </div>
 

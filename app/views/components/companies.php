@@ -1,6 +1,6 @@
-<section id="stats-section" class="py-16 bg-gradient-to-r from-blue-600 to-blue-800">
-  <div class="max-w-6xl px-4 py-6 mx-auto bg-gradient-to-r from-white/30 to-[#092C4C] rounded-2xl">
-    <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
+<section class="px-4 py-20 bg-white sm:px-6 md:px-16 lg:px-24">
+  <div class="mx-auto max-w-7xl">
+    <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4 ">
 
       <!-- Statistic 1: Active Jobs -->
       <div

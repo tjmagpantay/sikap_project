@@ -16,7 +16,7 @@ $localRecruitment = array_filter($allEvents, function ($event) {
 });
 ?>
 
-<section class="w-full py-20">
+<section class="w-full py-20 sm:px-6 md:px-16 lg:px-24">
   <div class="px-4 mx-auto text-center max-w-7xl">
     <h2 class="mb-4 text-3xl font-bold text-gray-800 sm:text-4xl">Programs and Events</h2>
     <p class="max-w-3xl mx-auto mb-12 text-sm text-gray-600">
