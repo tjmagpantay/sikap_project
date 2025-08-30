@@ -40,7 +40,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                     <!-- Search Jobs (Much Wider) -->
                     <div class="flex-1 lg:!flex-[5] lg:!max-w-none lg:!min-w-0">
-                        <div class="flex items-center gap-3 px-4 py-3 transition-all bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
+                        <div class="flex items-center gap-3 px-4 py-3 transition-all bg-white border border-gray-300 rounded-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
                             <input type="text" id="jobSearch"
                                 placeholder="Search Jobs"
                                 class="flex-1 text-sm text-gray-800 placeholder-gray-500 bg-transparent border-none outline-none focus:ring-0">
@@ -55,7 +55,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <div class="relative" x-data="{ open: false, selected: 'Location' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm appearance-none shadow-smm hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
                                 <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -115,7 +115,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <div class="relative" x-data="{ open: false, selected: 'Industry' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
                                 <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -179,7 +179,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <div class="relative" x-data="{ open: false, selected: 'Workplace' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
                                 <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -221,7 +221,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     <!-- Apply Filter Button -->
                     <div class="flex gap-2 lg:flex-shrink-0">
                         <button type="button" id="clearFilters"
-                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
+                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
                             Apply Filter
                         </button>
                     </div>

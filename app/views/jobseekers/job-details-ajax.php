@@ -6,10 +6,10 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 }
 ?>
 <!-- Job Details Card (AJAX Template) -->
-<div class="bg-white border border-gray-200 shadow-sm rounded-xl">
+<div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
 
     <!-- Card Header with Background -->
-    <div class="p-8 rounded-t-xl bg-gray-50">
+    <div class="p-8 rounded-t-lg bg-gray-50 ">
         <div class="flex items-start justify-between">
             <div class="flex items-center space-x-4">
                 <!-- Business Logo -->

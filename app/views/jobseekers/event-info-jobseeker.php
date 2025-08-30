@@ -14,10 +14,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 ?>
 
 <?php if (!$event): ?>
-    <div class="min-h-screen py-8 bg-gray-50">
-        <div class="mx-auto max-w-7xl">
+    <div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
+        <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
             <!-- Event Not Found -->
-            <div class="flex items-center justify-center min-h-screen bg-gray-50">
+            <div class="flex items-center justify-center min-h-screen">
                 <div class="max-w-md p-8 text-center bg-white rounded-lg shadow-lg">
                     <div class="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full">
                         <i class="text-3xl text-gray-400 fas fa-exclamation-triangle"></i>
@@ -43,8 +43,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 <?php else: ?>
 
     <!-- Event Details -->
-    <div class="min-h-screen py-8 bg-gray-50">
-        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
+        <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
             <!-- Breadcrumbs -->
             <nav class="mb-6">
                 <div class="flex items-center space-x-2 text-sm">
@@ -64,15 +64,16 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 </div>
             </nav>
 
+            <!-- Main Dashboard Content -->
             <div class="flex flex-col gap-8 lg:flex-row">
-                <!-- Main Content (Left Section) -->
-                <div class="w-full lg:w-2/3">
+                <!-- Left Side - Content (2/3) -->
+                <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">
                     <!-- Event Image -->
                     <div class="mb-6 overflow-hidden bg-white rounded-2xl">
                         <?php if (!empty($event['image'])): ?>
                             <img src="<?php echo htmlspecialchars($event['image']); ?>"
                                 alt="<?php echo htmlspecialchars($event['title']); ?>"
-                                class="object-cover w-full h-64 rounded-lg sm:h-80 lg:h-96">
+                                class="object-cover w-full h-48 rounded-lg sm:h-48 lg:h-48">
                         <?php else: ?>
                             <img src="./assets/images/programs-img.png"
                                 alt="<?php echo htmlspecialchars($event['title']); ?>"
@@ -81,14 +82,14 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                     </div>
 
                     <!-- Event Content -->
-                    <div class="space-y-4">
+                    <div class="">
                         <!-- Date -->
                         <p class="text-xs font-normal tracking-wide text-gray-500 uppercase">
                             <?php echo date('M jS Y', strtotime($event['time_start'])); ?>
                         </p>
 
                         <!-- Title -->
-                        <h1 class="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl">
+                        <h1 class="mt-2 mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl">
                             <?php echo htmlspecialchars($event['title']); ?>
                         </h1>
 
@@ -113,11 +114,12 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                         </div>
                     </div>
                 </div>
-                <!-- Sidebar (Right Section) -->
-                <div class="w-full lg:w-1/3">
+
+                <!-- Right Side - Sidebar (1/3) -->
+                <div class="w-full lg:!w-1/3 lg:max-w-md">
                     <div class="sticky top-8">
                         <!-- Event Information Card -->
-                        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+                        <div class="px-6 ">
                             <h3 class="mb-6 text-lg font-semibold text-gray-900">Event Information</h3>
 
                             <div class="space-y-4">
@@ -129,9 +131,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">Date:
-                                            <span class="text-sm text-gray-600"><?php echo date('F j, Y', strtotime($event['time_start'])); ?></span>
-                                        </p>
+                                        <p class="text-sm font-medium text-gray-900">Date</p>
+                                        <span class="text-sm text-gray-600"><?php echo date('F j, Y', strtotime($event['time_start'])); ?></span>
                                     </div>
                                 </div>
 
@@ -143,14 +144,13 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">Time:
-                                            <span class="text-sm text-gray-600">
-                                                <?php
-                                                echo date('g:i A', strtotime($event['time_start'])) . ' - ' .
-                                                    date('g:i A', strtotime($event['time_end']));
-                                                ?>
-                                            </span>
-                                        </p>
+                                        <p class="text-sm font-medium text-gray-900">Time</p>
+                                        <span class="text-sm text-gray-600">
+                                            <?php
+                                            echo date('g:i A', strtotime($event['time_start'])) . ' - ' .
+                                                date('g:i A', strtotime($event['time_end']));
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
 
@@ -162,9 +162,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">Event Type:
-                                            <span class="text-sm text-gray-600"><?php echo ucwords(htmlspecialchars($event['type'])); ?></span>
-                                        </p>
+                                        <p class="text-sm font-medium text-gray-900">Event Type</p>
+                                        <span class="text-sm text-gray-600"><?php echo ucwords(htmlspecialchars($event['type'])); ?></span>
                                     </div>
                                 </div>
 
@@ -176,24 +175,26 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">Status:
-                                            <?php
-                                            $now = new DateTime();
-                                            $start = new DateTime($event['time_start']);
-                                            $end = new DateTime($event['time_end']);
-                                            if ($now < $start) {
-                                                $status = 'upcoming';
-                                                $statusText = 'Upcoming';
-                                            } elseif ($now >= $start && $now <= $end) {
-                                                $status = 'ongoing';
-                                                $statusText = 'Ongoing';
-                                            } else {
-                                                $status = 'completed';
-                                                $statusText = 'Completed';
-                                            }
-                                            ?>
-                                            <span class="text-sm text-gray-600"><?php echo $statusText; ?></span>
-                                        </p>
+                                        <p class="text-sm font-medium text-gray-900">Status</p>
+                                        <?php
+                                        $now = new DateTime();
+                                        $start = new DateTime($event['time_start']);
+                                        $end = new DateTime($event['time_end']);
+                                        if ($now < $start) {
+                                            $status = 'upcoming';
+                                            $statusText = 'Upcoming';
+                                            $statusColor = 'text-blue-600';
+                                        } elseif ($now >= $start && $now <= $end) {
+                                            $status = 'ongoing';
+                                            $statusText = 'Ongoing';
+                                            $statusColor = 'text-green-600';
+                                        } else {
+                                            $status = 'completed';
+                                            $statusText = 'Completed';
+                                            $statusColor = 'text-gray-600';
+                                        }
+                                        ?>
+                                        <span class="text-sm <?php echo $statusColor; ?> font-medium"><?php echo $statusText; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -203,9 +204,41 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                 <button onclick="shareEvent()" class="px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-gray-100 rounded-xl hover:bg-gray-200">
                                     Share Event
                                 </button>
-                                <button onclick="saveEvent()" class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 bg-gray-900 rounded-xl hover:bg-gray-800">
+                                <button onclick="saveEvent()" class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 bg-primary rounded-xl hover:bg-primary/90">
                                     Save Event
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Related Events Card -->
+                        <div class="p-6 mt-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+                            <h3 class="mb-4 text-lg font-semibold text-gray-900">Related Events</h3>
+                            <div class="space-y-3">
+                                <?php
+                                // Get other events of the same type
+                                $allEvents = $eventController->getActiveEvents();
+                                $relatedEvents = array_filter($allEvents, function ($e) use ($event) {
+                                    return $e['type'] === $event['type'] && $e['event_id'] !== $event['event_id'];
+                                });
+                                $relatedEvents = array_slice($relatedEvents, 0, 3);
+                                ?>
+                                <?php if (!empty($relatedEvents)): ?>
+                                    <?php foreach ($relatedEvents as $relatedEvent): ?>
+                                        <div class="pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
+                                            <a href="?page=event-info-jobseeker&id=<?php echo $relatedEvent['event_id']; ?>"
+                                                class="block transition-colors hover:text-primary">
+                                                <h4 class="text-sm font-medium text-gray-900 line-clamp-1">
+                                                    <?php echo htmlspecialchars($relatedEvent['title']); ?>
+                                                </h4>
+                                                <p class="text-xs text-gray-500">
+                                                    <?php echo date('M j, Y - g:i A', strtotime($relatedEvent['time_start'])); ?>
+                                                </p>
+                                            </a>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="text-sm text-gray-500">No related events found.</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
