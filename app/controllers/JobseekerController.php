@@ -210,29 +210,15 @@ class JobseekerController
             exit;
         }
 
-        // Get jobseeker profile
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $hasProfile = $jobseeker !== null;
+        // Get jobseeker profile for navbar AND dashboard
+        $jobseeker = $this->getJobseekerData();
+        $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
 
         // Get recent job listings for the dashboard
         try {
-            // Use getAllActiveJobs instead of getOpenJobs for consistency
             $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
             $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-
-            error_log('=== DASHBOARD DEBUG ===');
-            error_log('Jobs from getAllActiveJobs: ' . count($jobs));
-            foreach ($jobs as $job) {
-                error_log("Job ID: {$job['job_id']}, Title: {$job['job_title']}");
-            }
-            error_log('=== END DASHBOARD DEBUG ===');
-
-            // Limit to recent 6 jobs for dashboard
             $jobs = array_slice($jobs, 0, 6);
-
-            // The has_applied field is already set by getAllActiveJobs method
-            // No need to check again if jobseeker_id was provided
-
         } catch (Exception $e) {
             error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
             $jobs = [];
@@ -287,7 +273,7 @@ class JobseekerController
         }
 
         // Get existing profile data - Controller loads all data
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        $jobseeker = $this->getJobseekerData(); // This provides data for navbar
         $user = $this->userModel->findById($_SESSION['user_id']);
 
         // Load all existing data for the profile steps
@@ -300,14 +286,28 @@ class JobseekerController
         // Process documents by type for easy access in views
         $resumeDoc = null;
         $cvDoc = null;
-        foreach ($documents as $doc) {
-            if ($doc['file_type'] === 'resume') {
-                $resumeDoc = $doc;
-            } elseif ($doc['file_type'] === 'cv') {
-                $cvDoc = $doc;
+        if ($documents !== false) {
+            foreach ($documents as $doc) {
+                if ($doc['file_type'] === 'resume') {
+                    $resumeDoc = $doc;
+                } elseif ($doc['file_type'] === 'cv') {
+                    $cvDoc = $doc;
+                }
             }
         }
 
+        // Process address field for municipal and barangay display (Step 2)
+        if ($jobseeker && !empty($jobseeker['address'])) {
+            $addressParts = explode(' ', $jobseeker['address'], 2);
+            $jobseeker['municipal'] = $addressParts[0] ?? '';
+            $jobseeker['barangay'] = $addressParts[1] ?? '';
+        }
+
+        // Calculate completion percentage
+        $completionPercentage = $this->jobseekerModel->calculateProfileCompletion($_SESSION['user_id']);
+        if ($completionPercentage === false) $completionPercentage = 0;
+
+        // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleStepSubmission($step, $error, $success);
         }
@@ -606,6 +606,27 @@ class JobseekerController
             exit;
         }
 
+        // Get jobseeker profile data - ALL data for the view
+        $jobseeker = $this->getJobseekerData();
+        $user = $this->userModel->findById($_SESSION['user_id']);
+
+        // Get all profile data for display
+        $education = $this->jobseekerModel->getEducation($_SESSION['user_id']);
+        $workExperience = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']);
+        $skills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
+        $certificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']);
+
+        // Convert false results to empty arrays to prevent errors
+        if ($education === false) $education = [];
+        if ($workExperience === false) $workExperience = [];
+        if ($skills === false) $skills = [];
+        if ($certificates === false) $certificates = [];
+
+        // Calculate profile completion percentage
+        $completionPercentage = $this->jobseekerModel->calculateProfileCompletion($_SESSION['user_id']);
+        if ($completionPercentage === false) $completionPercentage = 0;
+
+        // Include the profile view with all data
         include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
     }
 
@@ -707,9 +728,9 @@ class JobseekerController
             exit;
         }
 
-        // Get jobseeker info
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        if (!$jobseeker) {
+        // Get jobseeker info for navbar AND functionality
+        $jobseeker = $this->getJobseekerData();
+        if (!$jobseeker || empty($jobseeker['first_name'])) {
             header('Location: ?page=jobseeker-dashboard&error=' . urlencode('Please complete your profile first.'));
             exit;
         }
@@ -818,5 +839,22 @@ class JobseekerController
             echo json_encode(['success' => false, 'message' => 'An error occurred while removing the job']);
         }
         exit;
+    }
+
+    // Add this method to load jobseeker data for all views
+    private function getJobseekerData()
+    {
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+        // Ensure jobseeker data is available for navbar
+        if ($jobseeker === false) {
+            $jobseeker = [
+                'first_name' => '',
+                'last_name' => '',
+                'profile_picture' => ''
+            ];
+        }
+
+        return $jobseeker;
     }
 }

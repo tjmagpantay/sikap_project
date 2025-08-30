@@ -98,7 +98,7 @@
           <div class="flex items-start justify-between">
             <div class="flex items-start gap-2">
               <!-- Business Profile Image -->
-              <div class="flex items-center justify-center p-1 overflow-hidden rounded-md w-9 h-9 bg-primary">
+              <div class="flex items-center justify-center p-1 overflow-hidden rounded-md w-9 h-9 ">
                 <img src="./assets/images/google-hero-img.png"
                   alt="<?php echo $job['company']; ?> Logo"
                   class="object-cover w-full h-full">

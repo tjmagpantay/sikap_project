@@ -1,17 +1,6 @@
 <?php
-// Get jobseeker data for profile display
-require_once __DIR__ . '/../../models/Jobseeker.php';
-$jobseekerModel = new Jobseeker();
-$jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-
-// Ensure jobseeker data is available
-if ($jobseeker === false) {
-  $jobseeker = [
-    'first_name' => '',
-    'last_name' => '',
-    'profile_picture' => ''
-  ];
-}
+// Remove direct model access - data should come from controller
+// All jobseeker data is now passed from the controller
 ?>
 
 <nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24 ">
@@ -126,9 +115,6 @@ if ($jobseeker === false) {
             style="display: none;">
 
             <div class="py-1">
-              <!-- User Info Header -->
-
-
               <a href="?page=profile-jobseeker"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                 Profile

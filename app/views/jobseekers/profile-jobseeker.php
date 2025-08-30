@@ -1,25 +1,16 @@
 <?php
+// Remove direct model access - data should come from controller
+// All jobseeker data is now passed from the controller
 include_once __DIR__ . '/components/jobseeker_auth_check.php';
-require_once __DIR__ . '/../../models/Jobseeker.php';
 
-// Get jobseeker data with error handling
-$jobseekerModel = new Jobseeker();
-$jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+// Convert false results to empty arrays to prevent errors (defensive programming)
+if (!isset($education) || $education === false) $education = [];
+if (!isset($workExperience) || $workExperience === false) $workExperience = [];
+if (!isset($skills) || $skills === false) $skills = [];
+if (!isset($certificates) || $certificates === false) $certificates = [];
 
-// Add error handling for all data retrieval
-$education = $jobseekerModel->getEducation($_SESSION['user_id']);
-$workExperience = $jobseekerModel->getWorkExperience($_SESSION['user_id']);
-$skills = $jobseekerModel->getSkills($_SESSION['user_id']);
-$certificates = $jobseekerModel->getCertificates($_SESSION['user_id']);
-
-// Convert false results to empty arrays to prevent errors
-if ($education === false) $education = [];
-if ($workExperience === false) $workExperience = [];
-if ($skills === false) $skills = [];
-if ($certificates === false) $certificates = [];
-
-// Ensure jobseeker data is available
-if ($jobseeker === false) {
+// Ensure jobseeker data is available (defensive programming)
+if (!isset($jobseeker) || $jobseeker === false) {
   $jobseeker = [
     'first_name' => '',
     'last_name' => '',
@@ -28,13 +19,15 @@ if ($jobseeker === false) {
     'date_of_birth' => null,
     'sex' => '',
     'address' => '',
-    'contact_no' => ''
+    'contact_no' => '',
+    'profile_picture' => ''
   ];
 }
 
-// Calculate profile completion percentage
-$completionPercentage = $jobseekerModel->calculateProfileCompletion($_SESSION['user_id']);
-if ($completionPercentage === false) $completionPercentage = 0;
+// Ensure completion percentage is set
+if (!isset($completionPercentage) || $completionPercentage === false) {
+  $completionPercentage = 0;
+}
 ?>
 
 <?php include_once __DIR__ . '/../components/navbar-top.php';
