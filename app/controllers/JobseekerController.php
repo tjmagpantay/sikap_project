@@ -267,8 +267,8 @@ class JobseekerController
         $success = '';
         $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 
-        // Validate step range
-        if ($step < 1 || $step > 8) {
+        // Validate step range - NOW 7 STEPS TOTAL
+        if ($step < 1 || $step > 7) {
             $step = 1;
         }
 
@@ -342,9 +342,6 @@ class JobseekerController
             case 7:
                 $this->handleStep7($data, $error, $success);
                 break;
-            case 8:
-                $this->handleStep8($data, $error, $success);
-                break;
             default:
                 $error = 'Invalid step.';
         }
@@ -352,6 +349,7 @@ class JobseekerController
 
     private function handleStep1($data, &$error, &$success)
     {
+        // Documents Upload - Step 1
         // Get the actual jobseeker record first
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
 
@@ -399,6 +397,7 @@ class JobseekerController
 
     private function handleStep2($data, &$error, &$success)
     {
+        // Basic Information - Step 2
         // Personal Information - including sex (gender) as required
         $required = ['first_name', 'last_name', 'date_of_birth', 'sex', 'contact_no'];
         foreach ($required as $field) {
@@ -430,31 +429,13 @@ class JobseekerController
 
     private function handleStep3($data, &$error, &$success)
     {
+        // Education - Step 3
         // Get jobseeker_id
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Employment Status
-        $workData = [
-            'job_title' => $data['job_title'] ?? 'N/A',
-            'company_name' => $data['company_name'] ?? 'N/A',
-            'employment_type' => $data['employment_type'] ?? 'N/A',
-            'start_date' => $data['start_date'] ?? null,
-            'end_date' => isset($data['currently_working']) && $data['currently_working'] === 'Yes' ? null : ($data['end_date'] ?? null),
-            'currently_working' => $data['currently_working'] ?? 'No',
-            'responsibilities' => 'N/A'
-        ];
-
-        $this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData);
-        header('Location: ?page=complete-jobseeker-profile&step=4');
-        exit;
-    }
-
-    private function handleStep4($data, &$error, &$success)
-    {
-        // Get jobseeker_id
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $jobseeker_id = $jobseeker['jobseeker_id'];
+        // Check if education data already exists
+        $existingEducation = $this->jobseekerModel->getEducation($_SESSION['user_id']);
 
         // Educational Background
         $eduData = [
@@ -465,38 +446,109 @@ class JobseekerController
             'end_date' => $data['end_year'] ? $data['end_year'] . '-12-31' : null
         ];
 
-        $this->jobseekerModel->saveEducation($jobseeker_id, $eduData);
-        header('Location: ?page=complete-jobseeker-profile&step=5');
+        if (!empty($existingEducation)) {
+            // Update existing education record
+            $this->jobseekerModel->updateEducation($jobseeker_id, $eduData, $existingEducation[0]['education_id']);
+        } else {
+            // Create new education record
+            $this->jobseekerModel->saveEducation($jobseeker_id, $eduData);
+        }
+
+        header('Location: ?page=complete-jobseeker-profile&step=4');
         exit;
+    }
+
+    private function handleStep4($data, &$error, &$success)
+    {
+        // Work Experience (Combined Current + Previous) - Step 4
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        $jobseeker_id = $jobseeker['jobseeker_id'];
+
+        // Handle delete action
+        if (isset($data['delete_experience'])) {
+            $experience_id = $data['experience_id'];
+            if ($this->jobseekerModel->deleteWorkExperience($jobseeker_id, $experience_id)) {
+                $success = 'Work experience deleted successfully!';
+            } else {
+                $error = 'Failed to delete work experience.';
+            }
+            return;
+        }
+
+        // Handle update action
+        if (isset($data['update_experience'])) {
+            $experience_id = $data['experience_id'];
+            $experienceType = $data['experience_type'] ?? 'previous';
+
+            $workData = [
+                'job_title' => $data['job_title'] ?? 'N/A',
+                'company_name' => $data['company_name'] ?? 'N/A',
+                'employment_type' => $data['employment_type'] ?? 'N/A',
+                'start_date' => $data['start_date'] ?? null,
+                'end_date' => $experienceType === 'current' ? null : ($data['end_date'] ?? null),
+                'currently_working' => $experienceType === 'current' ? 'Yes' : 'No',
+                'experience_type' => $experienceType,
+                'responsibilities' => $data['responsibilities'] ?? 'N/A'
+            ];
+
+            // Validate current job limit
+            if ($experienceType === 'current' && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
+                // Check if we're updating a different experience to current
+                $currentJob = $this->jobseekerModel->getCurrentJob($jobseeker_id);
+                if ($currentJob['experience_id'] != $experience_id) {
+                    $error = 'You can only have one current job. Please update your existing current job instead.';
+                    return;
+                }
+            }
+
+            if ($this->jobseekerModel->updateWorkExperience($jobseeker_id, $workData, $experience_id)) {
+                $success = 'Work experience updated successfully!';
+            } else {
+                $error = 'Failed to update work experience.';
+            }
+            return;
+        }
+
+        // Handle add new experience
+        $experienceType = $data['experience_type'] ?? 'previous';
+
+        // Validate current job limit for new entries
+        if ($experienceType === 'current' && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
+            $error = 'You already have a current job. You can only have one current job at a time.';
+            return;
+        }
+
+        $workData = [
+            'job_title' => $data['job_title'] ?? 'N/A',
+            'company_name' => $data['company_name'] ?? 'N/A',
+            'employment_type' => $data['employment_type'] ?? 'N/A',
+            'start_date' => $data['start_date'] ?? null,
+            'end_date' => $experienceType === 'current' ? null : ($data['end_date'] ?? null),
+            'currently_working' => $experienceType === 'current' ? 'Yes' : 'No',
+            'experience_type' => $experienceType,
+            'responsibilities' => $data['responsibilities'] ?? 'N/A'
+        ];
+
+        if ($this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
+            $success = 'Work experience added successfully!';
+            if (!isset($data['add_another'])) {
+                header('Location: ?page=complete-jobseeker-profile&step=5');
+                exit;
+            }
+        } else {
+            $error = 'Failed to save work experience.';
+        }
     }
 
     private function handleStep5($data, &$error, &$success)
     {
+        // Skills - Step 5
         // Get jobseeker_id
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Work Experience (Additional)
-        $workData = [
-            'job_title' => $data['job_title'] ?? 'N/A',
-            'company_name' => $data['company_name'] ?? 'N/A',
-            'start_date' => $data['start_year'] ? $data['start_year'] . '-01-01' : null,
-            'end_date' => $data['end_year'] ? $data['end_year'] . '-12-31' : null,
-            'responsibilities' => $data['responsibilities'] ?? 'N/A',
-            'employment_type' => 'N/A',
-            'currently_working' => 'No'
-        ];
-
-        $this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData);
-        header('Location: ?page=complete-jobseeker-profile&step=6');
-        exit;
-    }
-
-    private function handleStep6($data, &$error, &$success)
-    {
-        // Get jobseeker_id
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $jobseeker_id = $jobseeker['jobseeker_id'];
+        // Delete existing skills before adding new ones
+        $this->jobseekerModel->deleteSkills($jobseeker_id);
 
         // Skills & Expertise
         if (isset($data['skills']) && is_array($data['skills'])) {
@@ -510,22 +562,26 @@ class JobseekerController
                 }
             }
         } else {
-            // Save N/A skill
+            // Save N/A skill if no skills provided
             $this->jobseekerModel->saveSkill($jobseeker_id, [
                 'skill_name' => 'N/A',
                 'proficiency_level' => 'Beginner'
             ]);
         }
 
-        header('Location: ?page=complete-jobseeker-profile&step=7');
+        header('Location: ?page=complete-jobseeker-profile&step=6');
         exit;
     }
 
-    private function handleStep7($data, &$error, &$success)
+    private function handleStep6($data, &$error, &$success)
     {
+        // Certificates - Step 6
         // Get jobseeker_id
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
+
+        // Check if certificate data already exists
+        $existingCertificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']);
 
         // Certificates & Licenses
         $certData = [
@@ -534,8 +590,24 @@ class JobseekerController
             'date_issued' => $data['date_issued'] ?? null
         ];
 
-        $this->jobseekerModel->saveCertificate($jobseeker_id, $certData);
-        header('Location: ?page=complete-jobseeker-profile&step=8');
+        if (!empty($existingCertificates)) {
+            // Update the first/latest certificate
+            $this->jobseekerModel->updateCertificate($jobseeker_id, $certData, $existingCertificates[0]['certificate_id']);
+        } else {
+            // Create new certificate record
+            $this->jobseekerModel->saveCertificate($jobseeker_id, $certData);
+        }
+
+        header('Location: ?page=complete-jobseeker-profile&step=7');
+        exit;
+    }
+
+    private function handleStep7($data, &$error, &$success)
+    {
+        // Review & Complete - Step 7
+        // Mark profile as completed and redirect to success page
+        $this->jobseekerModel->markProfileComplete($_SESSION['user_id']);
+        header('Location: ?page=profile-completion-success');
         exit;
     }
 
@@ -575,14 +647,6 @@ class JobseekerController
             $error = 'Failed to upload file.';
             return false;
         }
-    }
-
-    private function handleStep8($data, &$error, &$success)
-    {
-        // Mark profile as completed and redirect to success page
-        $this->jobseekerModel->markProfileComplete($_SESSION['user_id']);
-        header('Location: ?page=profile-completion-success');
-        exit;
     }
 
     public function profileCompletionSuccess()
@@ -856,5 +920,68 @@ class JobseekerController
         }
 
         return $jobseeker;
+    }
+
+    // Add these new methods for AJAX operations
+    public function deleteWorkExperience()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        $experience_id = $_POST['experience_id'] ?? null;
+        if (!$experience_id) {
+            echo json_encode(['success' => false, 'message' => 'Experience ID is required']);
+            exit;
+        }
+
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
+            exit;
+        }
+
+        $result = $this->jobseekerModel->deleteWorkExperience($jobseeker['jobseeker_id'], $experience_id);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Work experience deleted successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete work experience']);
+        }
+        exit;
+    }
+
+    public function getWorkExperience()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        $experience_id = $_GET['experience_id'] ?? null;
+        if (!$experience_id) {
+            echo json_encode(['success' => false, 'message' => 'Experience ID is required']);
+            exit;
+        }
+
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
+            exit;
+        }
+
+        $experience = $this->jobseekerModel->getWorkExperienceById($jobseeker['jobseeker_id'], $experience_id);
+
+        if ($experience) {
+            echo json_encode(['success' => true, 'data' => $experience]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Work experience not found']);
+        }
+        exit;
     }
 }

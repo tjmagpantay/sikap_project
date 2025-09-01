@@ -3,26 +3,23 @@ include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
-<?php
-// Use data from controller instead of direct model calls
-$currentWork = !empty($workExperience) ? $workExperience[0] : null;
-?>
-
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
             <div class="flex justify-center mb-4">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
                     </svg>
                 </div>
             </div>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
-                Employment Status
+                Educational Background
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
-                Help us tailor opportunities by sharing your current employment status
+                Provide details about your educational background (optional)
             </p>
         </div>
     </div>
@@ -54,7 +51,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                         <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
                             <span class="text-sm font-semibold">3</span>
                         </div>
-                        <span class="mt-1 text-xs text-gray-600">Employment</span>
+                        <span class="mt-1 text-xs text-gray-600">Education</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -62,7 +59,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                         <a href="?page=complete-jobseeker-profile&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Education</span>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
                     </div>
 
                     <!-- Step 5 -->
@@ -70,7 +67,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                         <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">5</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                        <span class="mt-1 text-xs text-gray-500">Skills</span>
                     </div>
 
                     <!-- Step 6 -->
@@ -78,7 +75,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                         <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">6</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Skills</span>
+                        <span class="mt-1 text-xs text-gray-500">Certificates</span>
                     </div>
 
                     <!-- Step 7 -->
@@ -86,171 +83,115 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                         <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">7</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
-                    </div>
-
-                    <!-- Step 8 -->
-                    <div class="flex flex-col items-center">
-                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                            <span class="text-sm font-semibold">8</span>
-                        </a>
                         <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
 
                 <!-- Progress bar -->
                 <div class="w-full h-2 bg-gray-200 rounded">
-                    <div class="h-2 rounded bg-primary" style="width: 37.5%"></div>
+                    <div class="h-2 rounded bg-primary" style="width: 42.86%"></div>
                 </div>
             </div>
-
-<?php if ($currentWork): ?>
-    <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="flex items-center justify-between">
-            <h3 class="text-lg font-medium text-gray-900">Current Employment</h3>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $currentWork['currently_working'] === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
-                <?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Working' : 'Previous Job'; ?>
-            </span>
-        </div>
-        
-        <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2">
-            <div class="p-3 rounded-md bg-gray-50">
-                <p class="text-xs font-medium text-gray-500">Job Title</p>
-                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['job_title']); ?></p>
-            </div>
-            
-            <div class="p-3 rounded-md bg-gray-50">
-                <p class="text-xs font-medium text-gray-500">Company</p>
-                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['company_name']); ?></p>
-            </div>
-            
-            <div class="p-3 rounded-md bg-gray-50">
-                <p class="text-xs font-medium text-gray-500">Employment Type</p>
-                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars(ucfirst($currentWork['employment_type'])); ?></p>
-            </div>
-            
-            <div class="p-3 rounded-md bg-gray-50">
-                <p class="text-xs font-medium text-gray-500">Status</p>
-                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo $currentWork['currently_working'] === 'Yes' ? 'Currently Employed' : 'Previous Employment'; ?></p>
-            </div>
-        </div>
-        
-        <p class="mt-4 text-xs text-gray-500">You can update this information below.</p>
-    </div>
-<?php endif; ?>
-
-            <!-- Error Messages -->
-            <?php if (!empty($error)): ?>
-                <div class="p-4 mb-4 border border-red-200 rounded-md bg-red-50">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-red-600"><?php echo htmlspecialchars($error); ?></p>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=3">
-                <!-- Current Status -->
+                <!-- Institution Name -->
                 <div>
-                    <label for="current_status" class="block mb-1 text-xs font-medium text-gray-500">
-                        Current Status
+                    <label for="school_name" class="block mb-1 text-xs font-medium text-gray-500">
+                        Institution Name
                     </label>
                     <div class="mt-1">
-                        <select id="current_status" name="current_status"
+                        <input id="school_name" name="school_name" type="text"
+                            value="<?php echo htmlspecialchars(!empty($education) ? $education[0]['school_name'] : ''); ?>"
+                            placeholder="Institution Name"
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                            <option value="">Select Status</option>
-                            <option value="employed">Currently Employed</option>
-                            <option value="unemployed">Unemployed</option>
-                            <option value="student">Student</option>
-                            <option value="freelancer">Freelancer</option>
+                    </div>
+                </div>
+
+                <!-- Degree/Program -->
+                <div>
+                    <label for="education_level" class="block mb-1 text-xs font-medium text-gray-500">
+                        Degree / Program
+                    </label>
+                    <div class="mt-1">
+                        <select id="education_level" name="education_level"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <option value="">Select Degree/Program</option>
+                            <?php
+                            $currentEducationLevel = !empty($education) ? $education[0]['education_level'] : '';
+                            $educationLevels = ['High School', 'Associate', 'Bachelor', 'Master', 'Doctorate', 'Other'];
+                            foreach ($educationLevels as $level):
+                            ?>
+                                <option value="<?php echo $level; ?>" <?php echo $currentEducationLevel === $level ? 'selected' : ''; ?>>
+                                    <?php echo $level === 'Associate' ? 'Associate Degree' : ($level === 'Bachelor' ? "Bachelor's Degree" : ($level === 'Master' ? "Master's Degree" : $level)); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
 
-                <!-- Job Title -->
+                <!-- Field of Study -->
                 <div>
-                    <label for="job_title" class="block mb-1 text-xs font-medium text-gray-500">
-                        Job Title
+                    <label for="field_of_study" class="block mb-1 text-xs font-medium text-gray-500">
+                        Field of Study
                     </label>
                     <div class="mt-1">
-                        <input id="job_title" name="job_title" type="text"
-                            value="<?php echo htmlspecialchars($currentWork['job_title'] ?? $_POST['job_title'] ?? ''); ?>"
-                            placeholder="Job Title"
+                        <select id="field_of_study" name="field_of_study"
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
-                </div>
-
-                <!-- Company Name -->
-                <div>
-                    <label for="company_name" class="block mb-1 text-xs font-medium text-gray-500">
-                        Company/Organization Name
-                    </label>
-                    <div class="mt-1">
-                        <input id="company_name" name="company_name" type="text"
-                            value="<?php echo htmlspecialchars($currentWork['company_name'] ?? $_POST['company_name'] ?? ''); ?>"
-                            placeholder="Company/Organization Name"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
-                </div>
-
-                <!-- Employment Type -->
-                <div>
-                    <label for="employment_type" class="block mb-1 text-xs font-medium text-gray-500">
-                        Employment Type
-                    </label>
-                    <div class="mt-1">
-                        <select id="employment_type" name="employment_type"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                            <option value="">Select Type</option>
-                            <option value="full-time" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'full-time' ? 'selected' : ''; ?>>Full-time</option>
-                            <option value="part-time" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'part-time' ? 'selected' : ''; ?>>Part-time</option>
-                            <option value="contract" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'contract' ? 'selected' : ''; ?>>Contract</option>
-                            <option value="freelance" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'freelance' ? 'selected' : ''; ?>>Freelance</option>
-                            <option value="internship" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'internship' ? 'selected' : ''; ?>>Internship</option>
-                            <option value="other" <?php echo ($currentWork['employment_type'] ?? $_POST['employment_type'] ?? '') === 'other' ? 'selected' : ''; ?>>Other</option>
+                            <option value="">Select Field of Study</option>
+                            <?php
+                            $currentFieldOfStudy = !empty($education) ? $education[0]['field_of_study'] : '';
+                            $fields = ['Information Technology', 'Computer Science', 'Engineering', 'Business Administration', 'Education', 'Health Sciences', 'Hospitality', 'Social Sciences', 'Arts and Design', 'Law', 'Other'];
+                            foreach ($fields as $field):
+                            ?>
+                                <option value="<?php echo $field; ?>" <?php echo $currentFieldOfStudy === $field ? 'selected' : ''; ?>>
+                                    <?php echo $field; ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
 
-                <!-- Date Range -->
+                <!-- Year Range -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="start_date" class="block mb-1 text-xs font-medium text-gray-500">
-                            Start Date
+                        <label for="start_year" class="block mb-1 text-xs font-medium text-gray-500">
+                            Start Year
                         </label>
                         <div class="mt-1">
-                            <input id="start_date" name="start_date" type="date"
-                                value="<?php echo htmlspecialchars($currentWork['start_date'] ?? $_POST['start_date'] ?? ''); ?>"
+                            <select id="start_year" name="start_year"
                                 class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                <option value="">Start Year</option>
+                                <?php
+                                $currentStartYear = !empty($education) && $education[0]['start_date'] ? date('Y', strtotime($education[0]['start_date'])) : '';
+                                for ($year = date('Y'); $year >= 1950; $year--):
+                                ?>
+                                    <option value="<?php echo $year; ?>" <?php echo $currentStartYear == $year ? 'selected' : ''; ?>>
+                                        <?php echo $year; ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
                         </div>
                     </div>
 
                     <div>
-                        <label for="end_date" class="block mb-1 text-xs font-medium text-gray-500">
-                            End Date
+                        <label for="end_year" class="block mb-1 text-xs font-medium text-gray-500">
+                            End Year
                         </label>
                         <div class="mt-1">
-                            <input id="end_date" name="end_date" type="date"
-                                value="<?php echo ($currentWork['currently_working'] ?? '') === 'Yes' ? '' : htmlspecialchars($currentWork['end_date'] ?? $_POST['end_date'] ?? ''); ?>"
+                            <select id="end_year" name="end_year"
                                 class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                <option value="">End Year</option>
+                                <?php
+                                $currentEndYear = !empty($education) && $education[0]['end_date'] ? date('Y', strtotime($education[0]['end_date'])) : '';
+                                for ($year = date('Y') + 10; $year >= 1950; $year--):
+                                ?>
+                                    <option value="<?php echo $year; ?>" <?php echo $currentEndYear == $year ? 'selected' : ''; ?>>
+                                        <?php echo $year; ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
                         </div>
                     </div>
-                </div>
-
-                <!-- Currently Working Checkbox -->
-                <div class="flex items-center">
-                    <input id="currently_working" name="currently_working" type="checkbox" value="Yes"
-                        <?php echo ($currentWork['currently_working'] ?? $_POST['currently_working'] ?? '') === 'Yes' ? 'checked' : ''; ?>
-                        class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary">
-                    <label for="currently_working" class="block ml-2 text-xs font-medium text-gray-500">
-                        Currently Working Here?
-                    </label>
                 </div>
 
                 <div class="flex justify-between">
@@ -262,7 +203,7 @@ $currentWork = !empty($workExperience) ? $workExperience[0] : null;
                     </a>
                     <button type="submit" name="submit_step3"
                         class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        <?php echo $currentWork ? 'Update & Continue' : 'Next Step'; ?>
+                        <?php echo (!empty($education) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

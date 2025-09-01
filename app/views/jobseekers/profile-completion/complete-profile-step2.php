@@ -49,7 +49,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">3</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Employment</span>
+                        <span class="mt-1 text-xs text-gray-500">Education</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -57,7 +57,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Education</span>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
                     </div>
 
                     <!-- Step 5 -->
@@ -65,7 +65,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=5" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">5</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Experience</span>
+                        <span class="mt-1 text-xs text-gray-500">Skills</span>
                     </div>
 
                     <!-- Step 6 -->
@@ -73,7 +73,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">6</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Skills</span>
+                        <span class="mt-1 text-xs text-gray-500">Certificates</span>
                     </div>
 
                     <!-- Step 7 -->
@@ -81,21 +81,13 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">7</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
-                    </div>
-
-                    <!-- Step 8 -->
-                    <div class="flex flex-col items-center">
-                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                            <span class="text-sm font-semibold">8</span>
-                        </a>
                         <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
 
                 <!-- Progress bar -->
                 <div class="w-full h-2 bg-gray-200 rounded">
-                    <div class="h-2 rounded bg-primary" style="width: 25%"></div>
+                    <div class="h-2 rounded bg-primary" style="width: 28.57%"></div>
                 </div>
             </div>
 
@@ -207,31 +199,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- Municipal -->
-                    <div>
-                        <label for="municipal" class="block mb-1 text-xs font-medium text-gray-500">
-                            Municipal
-                        </label>
-                        <div class="mt-1">
-                            <input id="municipal" name="municipal" type="text"
-                                value="<?php echo htmlspecialchars($jobseeker['municipal'] ?? $_POST['municipal'] ?? ''); ?>"
-                                placeholder="Municipal"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                        </div>
-                    </div>
-
-                    <!-- Barangay -->
-                    <div>
-                        <label for="barangay" class="block mb-1 text-xs font-medium text-gray-500">
-                            Barangay
-                        </label>
-                        <div class="mt-1">
-                            <input id="barangay" name="barangay" type="text"
-                                value="<?php echo htmlspecialchars($jobseeker['barangay'] ?? $_POST['barangay'] ?? ''); ?>"
-                                placeholder="Barangay"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                        </div>
+                <!-- Address -->
+                <div>
+                    <label for="address" class="block mb-1 text-xs font-medium text-gray-500">
+                        Complete Address
+                    </label>
+                    <div class="mt-1">
+                        <textarea id="address" name="address" rows="3"
+                            placeholder="Complete Address"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"><?php echo htmlspecialchars($jobseeker['address'] ?? $_POST['address'] ?? ''); ?></textarea>
                     </div>
                 </div>
 

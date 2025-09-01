@@ -9,15 +9,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <div class="flex justify-center mb-4">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                 </div>
             </div>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
-                Work Experience
+                Skills & Expertise
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
-                List your relevant professional experience (optional)
+                Showcase your core skills and proficiency levels
             </p>
         </div>
     </div>
@@ -49,7 +49,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=3" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">3</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Employment</span>
+                        <span class="mt-1 text-xs text-gray-500">Education</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -57,7 +57,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=4" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">4</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Education</span>
+                        <span class="mt-1 text-xs text-gray-500">Experience</span>
                     </div>
 
                     <!-- Step 5 -->
@@ -65,7 +65,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
                             <span class="text-sm font-semibold">5</span>
                         </div>
-                        <span class="mt-1 text-xs text-gray-600">Experience</span>
+                        <span class="mt-1 text-xs text-gray-600">Skills</span>
                     </div>
 
                     <!-- Step 6 -->
@@ -73,7 +73,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=6" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">6</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Skills</span>
+                        <span class="mt-1 text-xs text-gray-500">Certificates</span>
                     </div>
 
                     <!-- Step 7 -->
@@ -81,92 +81,61 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <a href="?page=complete-jobseeker-profile&step=7" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
                             <span class="text-sm font-semibold">7</span>
                         </a>
-                        <span class="mt-1 text-xs text-gray-500">Portfolio</span>
-                    </div>
-
-                    <!-- Step 8 -->
-                    <div class="flex flex-col items-center">
-                        <a href="?page=complete-jobseeker-profile&step=8" class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors bg-gray-200 rounded-full hover:bg-gray-300 hover:text-gray-700">
-                            <span class="text-sm font-semibold">8</span>
-                        </a>
                         <span class="mt-1 text-xs text-gray-500">Review</span>
                     </div>
                 </div>
 
                 <!-- Progress bar -->
                 <div class="w-full h-2 bg-gray-200 rounded">
-                    <div class="h-2 rounded bg-primary" style="width: 62.5%"></div>
+                    <div class="h-2 rounded bg-primary" style="width: 71.43%"></div>
                 </div>
             </div>
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5">
-                <!-- Job Title -->
-                <div>
-                    <label for="job_title" class="block mb-1 text-xs font-medium text-gray-500">
-                        Job Title
-                    </label>
-                    <div class="mt-1">
-                        <input id="job_title" name="job_title" type="text"
-                            placeholder="Job Title"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
-                </div>
-
-                <!-- Company Name -->
-                <div>
-                    <label for="company_name" class="block mb-1 text-xs font-medium text-gray-500">
-                        Company/Organization Name
-                    </label>
-                    <div class="mt-1">
-                        <input id="company_name" name="company_name" type="text"
-                            placeholder="Company/Organization Name"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
-                </div>
-
-                <!-- Year Range -->
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div>
-                        <label for="start_year" class="block mb-1 text-xs font-medium text-gray-500">
-                            Start Year
-                        </label>
-                        <div class="mt-1">
-                            <select id="start_year" name="start_year"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                <option value="">Start Year</option>
-                                <?php for ($year = date('Y'); $year >= 1980; $year--): ?>
-                                    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-                                <?php endfor; ?>
-                            </select>
+                <div id="skills-container">
+                    <div class="grid grid-cols-1 gap-6 mb-6 skill-row sm:grid-cols-2">
+                        <div>
+                            <label for="skills_0" class="block mb-1 text-xs font-medium text-gray-500">
+                                Skill Name
+                            </label>
+                            <div class="mt-1">
+                                <input id="skills_0" name="skills[]" type="text"
+                                    placeholder="e.g., JavaScript, Communication, Project Management"
+                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label for="end_year" class="block mb-1 text-xs font-medium text-gray-500">
-                            End Year
-                        </label>
-                        <div class="mt-1">
-                            <select id="end_year" name="end_year"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                <option value="">End Year</option>
-                                <?php for ($year = date('Y'); $year >= 1980; $year--): ?>
-                                    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-                                <?php endfor; ?>
-                            </select>
+                        <div>
+                            <label for="proficiency_0" class="block mb-1 text-xs font-medium text-gray-500">
+                                Proficiency Level
+                            </label>
+                            <div class="flex mt-1">
+                                <select id="proficiency_0" name="proficiency[]"
+                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                                <button type="button" onclick="this.closest('.skill-row').remove()"
+                                    class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Responsibilities -->
-                <div>
-                    <label for="responsibilities" class="block mb-1 text-xs font-medium text-gray-500">
-                        Brief Description of Responsibilities
-                    </label>
-                    <div class="mt-1">
-                        <textarea id="responsibilities" name="responsibilities" rows="4"
-                            placeholder="Describe your key responsibilities and achievements..."
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"></textarea>
-                    </div>
+                <div class="flex justify-center">
+                    <button type="button" id="add-skill"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Another Skill
+                    </button>
                 </div>
 
                 <div class="flex justify-between">
@@ -178,7 +147,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     </a>
                     <button type="submit" name="submit_step5"
                         class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        <?php echo (count($workExperience) > 1 ? 'Update & Continue' : 'Next Step'); ?>
+                        <?php echo (!empty($skills) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -188,3 +157,112 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let skillCount = 1;
+        const addSkillBtn = document.getElementById('add-skill');
+        const skillsContainer = document.getElementById('skills-container');
+
+        // Load existing skills
+        <?php if (!empty($skills)): ?>
+            // Clear the default skill row first
+            skillsContainer.innerHTML = '';
+            skillCount = 0;
+
+            <?php foreach ($skills as $index => $skill): ?>
+                <?php if ($skill['skill_name'] !== 'N/A'): ?>
+                    const skillRow<?php echo $index; ?> = document.createElement('div');
+                    skillRow<?php echo $index; ?>.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
+                    skillRow<?php echo $index; ?>.innerHTML = `
+                    <div>
+                        <label for="skills_<?php echo $index; ?>" class="block mb-1 text-xs font-medium text-gray-500">
+                            Skill Name
+                        </label>
+                        <div class="mt-1">
+                            <input id="skills_<?php echo $index; ?>" name="skills[]" type="text"
+                                   value="<?php echo htmlspecialchars($skill['skill_name']); ?>"
+                                   placeholder="e.g., JavaScript, Communication, Project Management"
+                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="proficiency_<?php echo $index; ?>" class="block mb-1 text-xs font-medium text-gray-500">
+                            Proficiency Level
+                        </label>
+                        <div class="flex mt-1">
+                            <select id="proficiency_<?php echo $index; ?>" name="proficiency[]" 
+                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                <option value="Beginner" ${('<?php echo $skill['proficiency_level']; ?>' === 'Beginner') ? 'selected' : ''}>Beginner</option>
+                                <option value="Intermediate" ${('<?php echo $skill['proficiency_level']; ?>' === 'Intermediate') ? 'selected' : ''}>Intermediate</option>
+                                <option value="Advanced" ${('<?php echo $skill['proficiency_level']; ?>' === 'Advanced') ? 'selected' : ''}>Advanced</option>
+                                <option value="Expert" ${('<?php echo $skill['proficiency_level']; ?>' === 'Expert') ? 'selected' : ''}>Expert</option>
+                            </select>
+                            <button type="button" onclick="this.closest('.skill-row').remove()" 
+                                    class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                    skillsContainer.appendChild(skillRow<?php echo $index; ?>);
+                    skillCount++;
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            // If no valid skills exist, add empty row
+            if (skillCount === 0) {
+                addEmptySkillRow();
+            }
+        <?php endif; ?>
+
+        function addEmptySkillRow() {
+            const skillRow = document.createElement('div');
+            skillRow.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
+            skillRow.innerHTML = `
+            <div>
+                <label for="skills_${skillCount}" class="block mb-1 text-xs font-medium text-gray-500">
+                    Skill Name
+                </label>
+                <div class="mt-1">
+                    <input id="skills_${skillCount}" name="skills[]" type="text"
+                           placeholder="e.g., JavaScript, Communication, Project Management"
+                           class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                </div>
+            </div>
+
+            <div>
+                <label for="proficiency_${skillCount}" class="block mb-1 text-xs font-medium text-gray-500">
+                    Proficiency Level
+                </label>
+                <div class="flex mt-1">
+                    <select id="proficiency_${skillCount}" name="proficiency[]" 
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                    <button type="button" onclick="this.closest('.skill-row').remove()" 
+                            class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+            skillsContainer.appendChild(skillRow);
+            skillCount++;
+        }
+
+        addSkillBtn.addEventListener('click', function() {
+            if (skillCount < 10) { // Limit to 10 skills
+                addEmptySkillRow();
+            }
+        });
+    });
+</script>

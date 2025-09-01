@@ -231,27 +231,72 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                     <h2 class="mb-1 font-semibold text-primary text-md">Job Attachments</h2>
                                     <div class="space-y-3">
                                         <?php foreach ($job['attachments'] as $attachment): ?>
+                                            <?php
+                                            // Extract file extension for each attachment
+                                            $file_extension = strtolower(pathinfo($attachment['file_path'], PATHINFO_EXTENSION));
+
+                                            // Define icon path based on file extension
+                                            $icon_path = match ($file_extension) {
+                                                'pdf' => '/sikap/public/assets/icons/pdf-icon.png',
+                                                'doc', 'docx' => '/sikap/public/assets/icons/word-icon.png',
+                                                'jpg', 'jpeg', 'png', 'gif' => '/sikap/public/assets/icons/image-icon.png',
+                                                'zip', 'rar' => '/sikap/public/assets/icons/archive-icon.png',
+                                                'txt' => '/sikap/public/assets/icons/text-icon.png',
+                                                'xls', 'xlsx' => '/sikap/public/assets/icons/excel-icon.png',
+                                                'ppt', 'pptx' => '/sikap/public/assets/icons/powerpoint-icon.png',
+                                                default => '/sikap/public/assets/icons/file-icon.png'
+                                            };
+                                            ?>
                                             <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
                                                 <div class="flex items-center">
                                                     <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
-                                                        <img
-                                                            src="../public/assets/icons/pdf-icon.png"
-                                                            alt="Icon"
-                                                            class="object-cover w-8 h-8" />
+                                                        <img src="<?php echo $icon_path; ?>"
+                                                            alt="<?php echo strtoupper($file_extension); ?> Icon"
+                                                            class="object-cover w-8 h-8"
+                                                            onerror="this.src='/sikap/public/assets/icons/file-icon.png'" />
                                                     </div>
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900">
                                                             <?php echo htmlspecialchars(basename($attachment['file_path'])); ?>
                                                         </div>
-                                                        <div class="text-xs text-gray-500">PDF Document</div>
+                                                        <div class="text-xs text-gray-500">
+                                                            <?php
+                                                            echo match ($file_extension) {
+                                                                'pdf' => 'PDF Document',
+                                                                'doc' => 'Word Document',
+                                                                'docx' => 'Word Document',
+                                                                'xls' => 'Excel Spreadsheet',
+                                                                'xlsx' => 'Excel Spreadsheet',
+                                                                'ppt' => 'PowerPoint Presentation',
+                                                                'pptx' => 'PowerPoint Presentation',
+                                                                'txt' => 'Text Document',
+                                                                'jpg', 'jpeg', 'png', 'gif' => 'Image File',
+                                                                'zip', 'rar' => 'Archive File',
+                                                                default => strtoupper($file_extension) . ' File'
+                                                            };
+                                                            ?>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <a href="<?php echo htmlspecialchars($attachment['file_path']); ?>"
-                                                    target="_blank"
-                                                    class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                    <i class="mr-2 fas fa-download"></i>
-                                                    Download
-                                                </a>
+
+                                                <div class="flex gap-2">
+                                                    <!-- View/Preview Button (for PDFs and images) -->
+                                                    <?php if (in_array($file_extension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])): ?>
+                                                        <a href="?page=view-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?><?php echo isset($attachment['attachment_id']) ? '&attachment_id=' . $attachment['attachment_id'] : ''; ?>"
+                                                            target="_blank"
+                                                            class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+                                                            <i class="mr-2 fas fa-eye"></i>
+                                                            View
+                                                        </a>
+                                                    <?php endif; ?>
+
+                                                    <!-- Download Button -->
+                                                    <a href="?page=download-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?><?php echo isset($attachment['attachment_id']) ? '&attachment_id=' . $attachment['attachment_id'] : ''; ?>"
+                                                        class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+                                                        <i class="mr-2 fas fa-download"></i>
+                                                        Download
+                                                    </a>
+                                                </div>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
@@ -259,6 +304,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <?php endif; ?>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Right Section - Sidebar -->

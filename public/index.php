@@ -627,6 +627,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerController();
             $controller->uploadBusinessLogo();
             break;
+        case 'saved-jobs':
+            require_once __DIR__ . '/../app/controllers/SaveJobController.php';
+            $controller = new SaveJobController();
+            $controller->showSavedJobs();
+            break;
         case 'save-job':
             require_once __DIR__ . '/../app/controllers/SaveJobController.php';
             $controller = new SaveJobController();
@@ -643,8 +648,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/employers/setting-employer.php';
             break;
 
-        default:
-            include __DIR__ . '/../app/views/pages/landing-page.php';
+        // Add these cases to your switch statement in index.php
+        case 'download-job-attachment':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadJobAttachment();
+            break;
+
+        case 'view-job-attachment':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->viewJobAttachment();
+            break;
+
+        case 'download-document':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadDocument();
             break;
 
         // Forgot Password Routes NEWWWWWWWWWWWWWW
@@ -688,6 +708,18 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new JobDetailsAjaxController();
             $controller->getJobDetails();
             exit; // Prevent any further output
+            break;
+        case 'delete-work-experience':
+            $jobseekerController->deleteWorkExperience();
+            break;
+
+        case 'get-work-experience':
+            // Make sure jobseeker controller is instantiated
+            if (!isset($jobseekerController)) {
+                require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+                $jobseekerController = new JobseekerController();
+            }
+            $jobseekerController->getWorkExperience();
             break;
     }
     ?>

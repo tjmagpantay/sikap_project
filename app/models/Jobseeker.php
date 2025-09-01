@@ -146,22 +146,123 @@ class Jobseeker
         ]);
     }
 
+    public function updateEducation($jobseeker_id, $data, $education_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE jobseeker_education 
+                SET school_name = ?, education_level = ?, field_of_study = ?, start_date = ?, end_date = ?, updated_at = NOW()
+                WHERE education_id = ? AND jobseeker_id = ?
+            ");
+            return $stmt->execute([
+                $data['school_name'],
+                $data['education_level'],
+                $data['field_of_study'],
+                $data['start_date'],
+                $data['end_date'],
+                $education_id,
+                $jobseeker_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error updating education: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function saveWorkExperience($jobseeker_id, $data)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO jobseeker_work_experience (jobseeker_id, job_title, company_name, start_date, end_date, responsibilities, employment_type, currently_working) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
+        // If it's a current job, first remove any existing current job
+        if ($data['currently_working'] === 'Yes') {
+            $removeCurrentSql = "UPDATE jobseeker_work_experience 
+                           SET currently_working = 'No' 
+                           WHERE jobseeker_id = ? AND currently_working = 'Yes'";
+            $stmt = $this->db->prepare($removeCurrentSql);
+            $stmt->execute([$jobseeker_id]);
+        }
+
+        $sql = "INSERT INTO jobseeker_work_experience 
+                (jobseeker_id, job_title, company_name, employment_type, start_date, end_date, 
+                 currently_working, responsibilities) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             $jobseeker_id,
             $data['job_title'],
             $data['company_name'],
+            $data['employment_type'],
             $data['start_date'],
             $data['end_date'],
-            $data['responsibilities'],
-            $data['employment_type'],
-            $data['currently_working']
+            $data['currently_working'],
+            $data['responsibilities']
         ]);
+    }
+
+    public function deleteWorkExperience($jobseeker_id, $experience_id)
+    {
+        $sql = "DELETE FROM jobseeker_work_experience WHERE experience_id = ? AND jobseeker_id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$experience_id, $jobseeker_id]);
+    }
+
+    public function getWorkExperienceById($jobseeker_id, $experience_id)
+    {
+        $sql = "SELECT * FROM jobseeker_work_experience WHERE experience_id = ? AND jobseeker_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$experience_id, $jobseeker_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function hasCurrentJob($jobseeker_id)
+    {
+        $sql = "SELECT COUNT(*) FROM jobseeker_work_experience 
+                WHERE jobseeker_id = ? AND currently_working = 'Yes'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$jobseeker_id]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function getCurrentJob($jobseeker_id)
+    {
+        $sql = "SELECT * FROM jobseeker_work_experience 
+                WHERE jobseeker_id = ? AND currently_working = 'Yes' 
+                ORDER BY start_date DESC LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$jobseeker_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateWorkExperience($jobseeker_id, $data, $experience_id)
+    {
+        $sql = "UPDATE jobseeker_work_experience SET 
+                job_title = ?, 
+                company_name = ?, 
+                employment_type = ?, 
+                start_date = ?, 
+                end_date = ?, 
+                currently_working = ?, 
+                responsibilities = ? 
+                WHERE experience_id = ? AND jobseeker_id = ?";
+    
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['job_title'],
+            $data['company_name'],
+            $data['employment_type'],
+            $data['start_date'],
+            $data['end_date'],
+            $data['currently_working'],
+            $data['responsibilities'],
+            $experience_id,
+            $jobseeker_id
+        ]);
+    }
+
+    public function deleteSkills($jobseeker_id)
+    {
+        $sql = "DELETE FROM jobseeker_skills WHERE jobseeker_id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$jobseeker_id]);
     }
 
     public function saveSkill($jobseeker_id, $data)
@@ -442,5 +543,33 @@ class Jobseeker
             error_log('Error updating document: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function updateCertificate($jobseeker_id, $data, $certificate_id)
+    {
+        $sql = "UPDATE jobseeker_certificates SET 
+                certificate_title = ?, 
+                issuing_organization = ?, 
+                date_issued = ? 
+                WHERE certificate_id = ? AND jobseeker_id = ?";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['certificate_title'],
+            $data['issuing_organization'],
+            $data['date_issued'],
+            $certificate_id,
+            $jobseeker_id
+        ]);
+    }
+
+    public function getPreviousJobs($jobseeker_id)
+    {
+        $sql = "SELECT * FROM jobseeker_work_experience 
+                WHERE jobseeker_id = ? AND currently_working = 'No' 
+                ORDER BY start_date DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$jobseeker_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
