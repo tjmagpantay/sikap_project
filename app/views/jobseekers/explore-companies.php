@@ -191,7 +191,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                             </div>
 
                             <!-- Company Info -->
-                            <div class="p-6">
+                            <div class="px-6 mt-4">
                                 <?php if (!empty($employer['business_desc'])): ?>
                                     <p class="mb-4 text-sm text-gray-600 line-clamp-3">
                                         <?php echo htmlspecialchars(substr($employer['business_desc'], 0, 150)) . (strlen($employer['business_desc']) > 150 ? '...' : ''); ?>
