@@ -172,10 +172,10 @@ class Jobseeker
     public function saveWorkExperience($jobseeker_id, $data)
     {
         // If it's a current job, first remove any existing current job
-        if ($data['currently_working'] === 'Yes') {
+        if ($data['currently_working'] == 1) {
             $removeCurrentSql = "UPDATE jobseeker_work_experience 
-                           SET currently_working = 'No' 
-                           WHERE jobseeker_id = ? AND currently_working = 'Yes'";
+                           SET currently_working = 0 
+                           WHERE jobseeker_id = ? AND currently_working = 1";
             $stmt = $this->db->prepare($removeCurrentSql);
             $stmt->execute([$jobseeker_id]);
         }
@@ -216,7 +216,7 @@ class Jobseeker
     public function hasCurrentJob($jobseeker_id)
     {
         $sql = "SELECT COUNT(*) FROM jobseeker_work_experience 
-                WHERE jobseeker_id = ? AND currently_working = 'Yes'";
+                WHERE jobseeker_id = ? AND currently_working = 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$jobseeker_id]);
         return $stmt->fetchColumn() > 0;
@@ -225,7 +225,7 @@ class Jobseeker
     public function getCurrentJob($jobseeker_id)
     {
         $sql = "SELECT * FROM jobseeker_work_experience 
-                WHERE jobseeker_id = ? AND currently_working = 'Yes' 
+                WHERE jobseeker_id = ? AND currently_working = 1 
                 ORDER BY start_date DESC LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$jobseeker_id]);
@@ -243,7 +243,7 @@ class Jobseeker
                 currently_working = ?, 
                 responsibilities = ? 
                 WHERE experience_id = ? AND jobseeker_id = ?";
-    
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             $data['job_title'],

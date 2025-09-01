@@ -329,6 +329,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                     class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
                                     <i class="mr-2 fas fa-sign-in-alt"></i> Sign in to Apply
                                 </a>
+
                             <?php elseif (!isset($_SESSION['role']) || $_SESSION['role'] != User::ROLE_JOBSEEKER): ?>
                                 <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
                                     <div class="flex items-center justify-center">
@@ -336,21 +337,131 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <p class="text-sm text-gray-600">Only job seekers can apply</p>
                                     </div>
                                 </div>
-                            <?php elseif (isset($hasApplied) && $hasApplied): ?>
-                                <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+
+                            <?php elseif (!empty($incompleteApplication)): ?>
+                                <!-- Incomplete Application - Check this FIRST -->
+                                <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
                                     <div class="flex items-center">
-                                        <i class="mr-3 text-2xl text-primary fas fa-check-circle"></i>
+                                        <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
                                         <div>
-                                            <p class="text-sm font-medium text-primary">Application Submitted</p>
-                                            <p class="text-xs text-gray-600">Under review</p>
+                                            <p class="text-sm font-medium text-orange-700">Incomplete Application</p>
+                                            <p class="text-xs text-orange-600">
+                                                Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
+                                            </p>
+                                            <?php if (!empty($incompleteApplication['applied_at'])): ?>
+                                                <p class="mt-1 text-xs text-orange-500">
+                                                    Started: <?php echo date('M j, Y g:i A', strtotime($incompleteApplication['applied_at'])); ?>
+                                                </p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="space-y-2">
+                                    <a href="?page=my-applications#application-<?php echo $incompleteApplication['application_id']; ?>"
+                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600">
+                                        <i class="mr-2 fas fa-list"></i>
+                                        View My Application
+                                    </a>
+                                </div>
+
+                            <?php elseif ($hasApplied === true && !empty($applicationStatus)): ?>
+                                <!-- Complete Application - Check this SECOND -->
+                                <div class="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
+                                    <div class="flex items-center">
+                                        <i class="mr-3 text-2xl text-green-600 fas fa-check-circle"></i>
+                                        <div>
+                                            <p class="text-sm font-medium text-green-700">Application Submitted</p>
+                                            <p class="text-xs text-green-600">
+                                                Status:
+                                                <?php
+                                                // Display the actual application status
+                                                switch ($applicationStatus) {
+                                                    case 'pending':
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-yellow-500 rounded-full"></div>
+                                                                Pending Review
+                                                              </span>';
+                                                        break;
+                                                    case 'reviewed':
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-blue-500 rounded-full"></div>
+                                                                Under Review
+                                                              </span>';
+                                                        break;
+                                                    case 'shortlisted':
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-purple-500 rounded-full"></div>
+                                                                Shortlisted
+                                                              </span>';
+                                                        break;
+                                                    case 'hired':
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-green-700 bg-green-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-green-500 rounded-full"></div>
+                                                                Hired
+                                                              </span>';
+                                                        break;
+                                                    case 'rejected':
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-red-700 bg-red-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-red-500 rounded-full"></div>
+                                                                Not Selected
+                                                              </span>';
+                                                        break;
+                                                    default:
+                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">
+                                                                <div class="w-2 h-2 mr-1 bg-gray-500 rounded-full"></div>
+                                                                ' . ucfirst($applicationStatus) . '
+                                                              </span>';
+                                                }
+                                                ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Status-specific message -->
+                                <?php if ($applicationStatus === 'pending'): ?>
+                                    <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                                        <p class="text-sm text-yellow-800">
+                                            <i class="mr-2 fas fa-hourglass-half"></i>
+                                            Your application is being reviewed by the employer.
+                                        </p>
+                                    </div>
+                                <?php elseif ($applicationStatus === 'reviewed'): ?>
+                                    <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+                                        <p class="text-sm text-blue-800">
+                                            <i class="mr-2 fas fa-search"></i>
+                                            Your application is currently under detailed review.
+                                        </p>
+                                    </div>
+                                <?php elseif ($applicationStatus === 'shortlisted'): ?>
+                                    <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
+                                        <p class="text-sm text-purple-800">
+                                            <i class="mr-2 fas fa-star"></i>
+                                            Congratulations! You've been shortlisted for this position.
+                                        </p>
+                                    </div>
+                                <?php elseif ($applicationStatus === 'hired'): ?>
+                                    <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
+                                        <p class="text-sm text-green-800">
+                                            <i class="mr-2 fas fa-check-circle"></i>
+                                            Congratulations! You've been hired for this position.
+                                        </p>
+                                    </div>
+                                <?php elseif ($applicationStatus === 'rejected'): ?>
+                                    <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
+                                        <p class="text-sm text-red-800">
+                                            <i class="mr-2 fas fa-times-circle"></i>
+                                            Thank you for your interest. Unfortunately, you were not selected for this position.
+                                        </p>
+                                    </div>
+                                <?php endif; ?>
+
                                 <a href="?page=my-applications"
-                                    class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium transition-colors rounded-md text-primary hover:text-secondary bg-blue-50 hover:bg-blue-100">
-                                    <i class="mr-2 fas fa-file-alt"></i>
-                                    View Applications
+                                    class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-green-600 transition-colors rounded-md hover:text-green-700 bg-green-50 hover:bg-green-100">
+                                    <i class="mr-2 fas fa-list"></i>
+                                    View My Applications
                                 </a>
+
                             <?php elseif (isset($job['job_status']) && $job['job_status'] !== 'open'): ?>
                                 <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
                                     <div class="flex items-center justify-center">
@@ -361,6 +472,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         </div>
                                     </div>
                                 </div>
+
                             <?php elseif (!empty($job['application_deadline']) && strtotime($job['application_deadline']) < time()): ?>
                                 <div class="p-4 border border-red-200 rounded-lg bg-red-50">
                                     <div class="flex items-center justify-center">
@@ -371,7 +483,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         </div>
                                     </div>
                                 </div>
+
                             <?php else: ?>
+                                <!-- Ready to Apply -->
                                 <div class="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">

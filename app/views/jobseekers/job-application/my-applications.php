@@ -165,8 +165,11 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-300"><?php foreach ($applications as $application): ?>
-                                    <tr class="hover:bg-gray-50">
+                            <tbody class="bg-white divide-y divide-gray-300">
+                                <?php foreach ($applications as $index => $application): ?>
+                                    <tr class="hover:bg-gray-50" data-application-id="<?php echo $application['application_id']; ?>">
+
+
                                         <!-- Job Position Column -->
                                         <td class="px-6 py-5">
                                             <div class="flex items-center">
@@ -177,6 +180,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                     <div class="text-xs text-gray-500">
                                                         <?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?> • <?php echo htmlspecialchars($application['location']); ?>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </td>
@@ -190,51 +194,70 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                                         <!-- Status Column -->
                                         <td class="px-6 py-5">
-                                            <div class="flex items-center">
-                                                <?php
-                                                                                    switch ($application['application_status']) {
-                                                                                        case 'pending':
-                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
-                                                            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                        </div>';
-                                                                                            echo '<span class="text-sm font-medium text-yellow-600">Pending</span>';
-                                                                                            break;
-                                                                                        case 'shortlisted':
-                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-blue-600 rounded-full">
-                                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                                                            </svg>
-                                                        </div>';
-                                                                                            echo '<span class="text-sm font-medium text-blue-600">Shortlisted</span>';
-                                                                                            break;
-                                                                                        case 'hired':
-                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
-                                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </div>';
-                                                                                            echo '<span class="text-sm font-medium text-green-600">Hired</span>';
-                                                                                            break;
-                                                                                        case 'rejected':
-                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
-                                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
-                                                        </div>';
-                                                                                            echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
-                                                                                            break;
-                                                                                        default:
-                                                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
-                                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                        </div>';
-                                                                                            echo '<span class="text-sm font-medium text-gray-600">' . ucfirst($application['application_status']) . '</span>';
-                                                                                    }
-                                                ?>
-                                            </div>
+                                            <?php if (!$application['is_finalized']): ?>
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-orange-500 rounded-full">
+                                                        <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-sm font-medium text-orange-600">In Progress</span>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="flex items-center">
+                                                    <?php
+                                                    switch ($application['application_status']) {
+                                                        case 'pending':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
+                                                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-yellow-600">Pending</span>';
+                                                            break;
+                                                        case 'reviewed':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-blue-500 rounded-full">
+                                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-blue-600">Under Review</span>';
+                                                            break;
+                                                        case 'shortlisted':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-purple-600 rounded-full">
+                                                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-purple-600">Shortlisted</span>';
+                                                            break;
+                                                        case 'hired':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
+                                                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-green-600">Hired</span>';
+                                                            break;
+                                                        case 'rejected':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
+                                                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
+                                                            break;
+                                                        default:
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
+                                                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-gray-600">' . ucfirst($application['application_status']) . '</span>';
+                                                    }
+                                                    ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </td>
 
                                         <!-- Interview Status Column -->
@@ -268,8 +291,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                                         <!-- Applied Date Column -->
                                         <td class="px-6 py-5">
-                                            <div class="text-sm text-gray-900"><?php echo date('M j, Y', strtotime($application['applied_at'])); ?></div>
-                                            <div class="text-xs text-gray-500"><?php echo date('g:i A', strtotime($application['applied_at'])); ?></div>
+                                            <?php if (!empty($application['applied_at'])): ?>
+                                                <div class="text-sm text-gray-900"><?php echo date('M j, Y', strtotime($application['applied_at'])); ?></div>
+                                                <div class="text-xs text-gray-500"><?php echo date('g:i A', strtotime($application['applied_at'])); ?></div>
+                                            <?php else: ?>
+                                                <div class="text-sm text-gray-500">Not submitted</div>
+                                            <?php endif; ?>
                                         </td>
 
                                         <!-- Actions Column -->
@@ -278,7 +305,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 <!-- View Application Button -->
                                                 <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
                                                     class="inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                    
+
                                                     View
                                                 </a>
 
@@ -339,6 +366,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             </div>
         </div>
     </div>
+
 
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -417,6 +445,27 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 }, 300);
             }, 3000);
         }
+
+        // Scroll to specific application if hash is provided
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash) {
+                const targetElement = document.querySelector(window.location.hash);
+                if (targetElement) {
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        targetElement.classList.add('ring-2', 'ring-orange-300', 'ring-opacity-50');
+
+                        // Remove highlighting after 3 seconds
+                        setTimeout(() => {
+                            targetElement.classList.remove('ring-2', 'ring-orange-300', 'ring-opacity-50');
+                        }, 3000);
+                    }, 500);
+                }
+            }
+        });
     </script>
     </dl>
 </div>

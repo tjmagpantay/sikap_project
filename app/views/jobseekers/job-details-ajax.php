@@ -209,6 +209,9 @@ if (!isset($selectedJob) || empty($selectedJob)) {
             // Debug: Log the values to understand what's happening
             error_log("DEBUG - hasProfile: " . ($hasProfile ? 'true' : 'false'));
             error_log("DEBUG - has_applied: " . (isset($selectedJob['has_applied']) ? ($selectedJob['has_applied'] ? 'true' : 'false') : 'not set'));
+            error_log("DEBUG - is_finalized: " . (isset($selectedJob['is_finalized']) ? $selectedJob['is_finalized'] : 'not set'));
+            error_log("DEBUG - application_id: " . (isset($selectedJob['application_id']) ? $selectedJob['application_id'] : 'not set'));
+            error_log("DEBUG - current_step: " . (isset($selectedJob['current_step']) ? $selectedJob['current_step'] : 'not set'));
             error_log("DEBUG - jobseeker_id: " . ($jobseekerId ?? 'null'));
             ?>
 
@@ -217,16 +220,29 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                     class="flex-1 px-4 py-3 text-sm font-medium text-center text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-700">
                     Complete Profile to Apply
                 </a>
+
             <?php elseif (isset($selectedJob['has_applied']) && $selectedJob['has_applied'] === true): ?>
-                <span class="flex-1 px-4 py-3 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-lg">
-                    <i class="mr-1 fas fa-check-circle"></i> Applied
-                </span>
+                <?php if (isset($selectedJob['is_finalized']) && $selectedJob['is_finalized'] == 0): ?>
+                    <!-- Incomplete Application - Show Continue Button -->
+                    <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&application_id=<?php echo $selectedJob['application_id']; ?>&step=<?php echo $selectedJob['current_step'] ?? 1; ?>"
+                        class="flex-1 px-4 py-3 text-sm font-medium text-center text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600">
+                        <i class="mr-1 fas fa-play"></i> Continue Application
+                    </a>
+                <?php else: ?>
+                    <!-- Complete Application - Show Applied Status -->
+                    <span class="flex-1 px-4 py-3 text-sm font-medium text-center text-gray-500 bg-gray-100 border border-gray-300 rounded-lg">
+                        <i class="mr-1 fas fa-check-circle"></i> Applied
+                    </span>
+                <?php endif; ?>
+
             <?php else: ?>
+                <!-- No Application - Show Apply Button -->
                 <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&step=1"
                     class="flex-1 px-4 py-3 text-sm font-medium text-center text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
                     <i class="mr-1 fas fa-paper-plane"></i> Apply Now
                 </a>
             <?php endif; ?>
+
             <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
                 class="flex-1 px-4 py-3 text-sm font-medium text-center transition-colors bg-white border rounded-lg text-primary border-primary hover:bg-primary/5">
                 View Full Details

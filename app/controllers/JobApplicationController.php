@@ -29,10 +29,43 @@ class JobApplicationController
         $job_id = $_GET['job_id'] ?? null;
         $step = $_GET['step'] ?? 1;
         $application_id = $_GET['application_id'] ?? null;
+        $restart = $_GET['restart'] ?? false;
 
         if (!$job_id) {
             header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
             exit;
+        }
+
+        // If restarting, delete the incomplete application
+        if ($restart && $application_id) {
+            $this->jobApplicationModel->deleteApplication($application_id);
+            $application_id = null;
+        }
+
+        // Get or create application
+        if ($application_id) {
+            // Resume existing application
+            $application = $this->jobApplicationModel->getApplicationById($application_id);
+            if (!$application) {
+                header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('Application not found.'));
+                exit;
+            }
+        } else {
+            // Check if user already has an application for this job
+            if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+                $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+                if ($jobseeker) {
+                    $existingApp = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
+                        $jobseeker['jobseeker_id'],
+                        $job_id
+                    );
+                    if ($existingApp && !$restart) {
+                        // Redirect to resume existing application
+                        header('Location: ?page=apply-job&job_id=' . $job_id . '&application_id=' . $existingApp['application_id'] . '&step=' . $existingApp['current_step']);
+                        exit;
+                    }
+                }
+            }
         }
 
         // Get jobseeker info
@@ -634,11 +667,14 @@ class JobApplicationController
 
         // Add saved status to each job
         if ($jobseeker_id) {
-            require_once __DIR__ . '/../models/SavedJobs.php';
-            $savedJobsModel = new SavedJobs();
+            $savedJobsModelPath = __DIR__ . '/../models/SavedJobs.php';
+            if (file_exists($savedJobsModelPath)) {
+                require_once $savedJobsModelPath;
+                $savedJobsModel = new SavedJobs();
 
-            foreach ($jobs as &$job) {
-                $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+                foreach ($jobs as &$job) {
+                    $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+                }
             }
         }
 
@@ -749,11 +785,29 @@ class JobApplicationController
         $applications = $this->jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
 
         // Add saved status to each application
-        require_once __DIR__ . '/../models/SavedJobs.php';
-        $savedJobsModel = new SavedJobs();
+        $savedJobsModelPath = __DIR__ . '/../models/SavedJobs.php';
+        if (file_exists($savedJobsModelPath)) {
+            require_once $savedJobsModelPath;
+            $savedJobsModel = new SavedJobs();
 
-        foreach ($applications as &$application) {
-            $application['is_saved'] = $savedJobsModel->isSaved($jobseeker['jobseeker_id'], $application['job_id']);
+            // Use index-based loop instead of foreach with reference
+            for ($i = 0; $i < count($applications); $i++) {
+                $applications[$i]['is_saved'] = $savedJobsModel->isSaved($jobseeker['jobseeker_id'], $applications[$i]['job_id']);
+
+                // Debug each application after adding saved status
+                error_log("CONTROLLER DEBUG SavedJobs: Index $i - App ID: {$applications[$i]['application_id']}, Job ID: {$applications[$i]['job_id']}, Job Title: {$applications[$i]['job_title']}");
+            }
+        } else {
+            // Fallback: mark all as not saved
+            for ($i = 0; $i < count($applications); $i++) {
+                $applications[$i]['is_saved'] = false;
+            }
+        }
+
+        // Debug: Check what's being passed to the view
+        error_log("CONTROLLER DEBUG: Before view - Applications count: " . count($applications));
+        foreach ($applications as $index => $app) {
+            error_log("CONTROLLER DEBUG: Index $index - App ID: {$app['application_id']}, Job ID: {$app['job_id']}, Job Title: {$app['job_title']}");
         }
 
         include __DIR__ . '/../views/jobseekers/job-application/my-applications.php';
@@ -820,4 +874,79 @@ class JobApplicationController
         }
         exit;
     }
+
+    // Update the viewJob method to check for incomplete applications:
+
+    public function viewJob()
+    {
+        $job_id = $_GET['job_id'] ?? null;
+
+        if (!$job_id) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Get job details - use existing method
+        $job = $this->jobPostModel->getFullJobData($job_id);
+
+        if (!$job) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Initialize variables
+        $hasApplied = false;
+        $incompleteApplication = null;
+        $applicationStatus = null;
+
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if ($jobseeker) {
+                error_log("DEBUG: Looking for application for jobseeker_id: {$jobseeker['jobseeker_id']}, job_id: $job_id");
+
+                // Check for any existing application (complete or incomplete)
+                $existingApplication = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
+                    $jobseeker['jobseeker_id'],
+                    $job_id
+                );
+
+                error_log("DEBUG: existingApplication result: " . json_encode($existingApplication));
+
+                if ($existingApplication) {
+                    error_log("DEBUG: Found application - is_finalized: {$existingApplication['is_finalized']}");
+
+                    if ($existingApplication['is_finalized'] == 1) {
+                        // Complete application
+                        $hasApplied = true;
+                        $applicationStatus = $existingApplication['application_status'];
+                        $incompleteApplication = null;
+                        error_log("DEBUG: Set hasApplied=true, applicationStatus={$applicationStatus}");
+                    } else {
+                        // Incomplete application
+                        $incompleteApplication = $existingApplication;
+                        $hasApplied = false;
+                        $applicationStatus = null;
+                        error_log("DEBUG: Set incompleteApplication, hasApplied=false");
+                    }
+                } else {
+                    error_log("DEBUG: No existing application found");
+                }
+            } else {
+                error_log("DEBUG: No jobseeker found for user_id: {$_SESSION['user_id']}");
+            }
+        } else {
+            error_log("DEBUG: User not logged in or not a jobseeker");
+        }
+
+        // Debug the final variables
+        error_log("DEBUG viewJob FINAL: hasApplied = " . ($hasApplied ? 'true' : 'false'));
+        error_log("DEBUG viewJob FINAL: incompleteApplication = " . ($incompleteApplication ? 'exists (id: ' . $incompleteApplication['application_id'] . ')' : 'null'));
+        error_log("DEBUG viewJob FINAL: applicationStatus = " . ($applicationStatus ?? 'null'));
+
+        include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
+    }
+
+    // Update the getJobDetails method in JobDetailsAjaxController:
+
+    
 }

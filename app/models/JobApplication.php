@@ -47,7 +47,7 @@ class JobApplication
                 current_step, is_finalized, applied_at
             ) VALUES (
                 :jobseeker_id, :job_id, 'pending', 
-                1, FALSE, NULL
+                1, FALSE, NOW()
             )";
 
             $stmt = $this->db->prepare($sql);
@@ -144,21 +144,60 @@ class JobApplication
     public function getApplicationsByJobseeker($jobseeker_id)
     {
         try {
-            $sql = "SELECT ja.*, jp.job_title, jp.job_type, jp.location, 
-                           e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name,
-                           jam.interview_date, jam.interview_location, jam.notes
+            error_log("DEBUG: Querying applications for jobseeker_id = " . $jobseeker_id);
+
+            $sql = "SELECT ja.application_id,
+                           ja.jobseeker_id,
+                           ja.job_id,
+                           ja.application_status,
+                           ja.applied_at,
+                           ja.reviewed_at,
+                           ja.current_step,
+                           ja.is_finalized,
+                           jp.job_title, 
+                           jp.job_type, 
+                           jp.location,
+                           jp.pay_range,
+                           jp.workplace_option,
+                           COALESCE(eb.business_name, e.company_name) as company_name,
+                           e.first_name as employer_first_name, 
+                           e.last_name as employer_last_name
                     FROM job_application ja
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    LEFT JOIN job_application_management jam ON ja.application_id = jam.application_id
-                    WHERE ja.jobseeker_id = :jobseeker_id
-                    ORDER BY ja.applied_at DESC";
+                    WHERE ja.jobseeker_id = ?
+                    ORDER BY ja.application_id DESC";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->execute([$jobseeker_id]);
+            $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("DEBUG: Found " . count($applications) . " applications (including incomplete)");
+
+            // Get interview data for finalized applications only
+            for ($i = 0; $i < count($applications); $i++) {
+                if ($applications[$i]['is_finalized']) {
+                    $interviewSql = "SELECT interview_date, interview_location, notes 
+                                   FROM job_application_management 
+                                   WHERE application_id = ? 
+                                   ORDER BY created_at DESC 
+                                   LIMIT 1";
+                    $interviewStmt = $this->db->prepare($interviewSql);
+                    $interviewStmt->execute([$applications[$i]['application_id']]);
+                    $interview = $interviewStmt->fetch(PDO::FETCH_ASSOC);
+
+                    $applications[$i]['interview_date'] = $interview ? $interview['interview_date'] : null;
+                    $applications[$i]['interview_location'] = $interview ? $interview['interview_location'] : null;
+                    $applications[$i]['notes'] = $interview ? $interview['notes'] : null;
+                } else {
+                    $applications[$i]['interview_date'] = null;
+                    $applications[$i]['interview_location'] = null;
+                    $applications[$i]['notes'] = null;
+                }
+            }
+
+            return $applications;
         } catch (PDOException $e) {
             error_log('Error getting applications by jobseeker: ' . $e->getMessage());
             return [];
@@ -259,17 +298,18 @@ class JobApplication
     {
         try {
             $setParts = [];
-            $params = ['application_id' => $application_id];
+            $values = [];
 
             foreach ($data as $key => $value) {
-                $setParts[] = "$key = :$key";
-                $params[$key] = $value;
+                $setParts[] = "$key = ?";
+                $values[] = $value;
             }
 
-            $sql = "UPDATE job_application SET " . implode(', ', $setParts) . " WHERE application_id = :application_id";
+            $values[] = $application_id;
 
+            $sql = "UPDATE job_application SET " . implode(', ', $setParts) . " WHERE application_id = ?";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute($params);
+            return $stmt->execute($values);
         } catch (PDOException $e) {
             error_log('Error updating application: ' . $e->getMessage());
             return false;
@@ -279,15 +319,25 @@ class JobApplication
     public function getApplicationByJobseekerAndJob($jobseeker_id, $job_id)
     {
         try {
-            $sql = "SELECT * FROM job_application 
-                WHERE jobseeker_id = :jobseeker_id AND job_id = :job_id 
-                ORDER BY application_id DESC LIMIT 1";
+            $sql = "SELECT application_id, jobseeker_id, job_id, application_status, 
+                       is_finalized, current_step, applied_at
+                FROM job_application 
+                WHERE jobseeker_id = ? AND job_id = ?
+                ORDER BY application_id DESC 
+                LIMIT 1";
+
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'job_id' => $job_id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute([$jobseeker_id, $job_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Debug what we're getting from database
+            error_log("DEBUG getApplicationByJobseekerAndJob: jobseeker_id=$jobseeker_id, job_id=$job_id");
+            error_log("DEBUG getApplicationByJobseekerAndJob result: " . json_encode($result));
+
+            return $result;
         } catch (PDOException $e) {
             error_log('Error getting application by jobseeker and job: ' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -424,12 +474,9 @@ class JobApplication
     public function updateCurrentStep($application_id, $step)
     {
         try {
-            $sql = "UPDATE job_application SET current_step = :step WHERE application_id = :application_id";
+            $sql = "UPDATE job_application SET current_step = ? WHERE application_id = ?";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'step' => $step,
-                'application_id' => $application_id
-            ]);
+            return $stmt->execute([$step, $application_id]);
         } catch (PDOException $e) {
             error_log('Error updating current step: ' . $e->getMessage());
             return false;
@@ -616,6 +663,47 @@ class JobApplication
         } catch (PDOException $e) {
             error_log('Error getting jobs for filter dropdown: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    public function getApplicationById($application_id)
+    {
+        try {
+            $sql = "SELECT * FROM job_application WHERE application_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$application_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting application by ID: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function deleteApplication($application_id)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Delete related data first
+            $deleteSql = "DELETE FROM job_application_answers WHERE application_id = ?";
+            $stmt = $this->db->prepare($deleteSql);
+            $stmt->execute([$application_id]);
+
+            $deleteSql = "DELETE FROM job_application_attachments WHERE application_id = ?";
+            $stmt = $this->db->prepare($deleteSql);
+            $stmt->execute([$application_id]);
+
+            // Delete the application
+            $deleteSql = "DELETE FROM job_application WHERE application_id = ?";
+            $stmt = $this->db->prepare($deleteSql);
+            $result = $stmt->execute([$application_id]);
+
+            $this->db->commit();
+            return $result;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            error_log('Error deleting application: ' . $e->getMessage());
+            return false;
         }
     }
 }
