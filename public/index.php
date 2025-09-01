@@ -183,12 +183,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
             break;
         case 'settings-jobseeker':
-            include __DIR__ . '/../app/views/jobseekers/settings-jobseeker.php';
+            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
+            $controller = new JobseekerSettingsController();
+            $controller->showSettings();
             break;
-        case 'saved-jobs':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->savedJobs();
+        case 'update-jobseeker-settings':
+            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
+            $controller = new JobseekerSettingsController();
+            $controller->updateSettings();
             break;
 
         // Jobseeker 2FA OTP Routes NEWWWWWWWWWW

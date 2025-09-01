@@ -10,9 +10,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Page Header -->
             <div class="mb-8">
                 <div class="flex items-center mb-2 space-x-3">
-                    <a href="?page=profile-jobseeker" class="text-gray-500 transition-colors hover:text-primary">
-                        
-                    </a>
                     <h1 class="text-3xl font-bold text-mainGray">Account Settings</h1>
                 </div>
                 <p class="mt-2 text-sm text-gray-600">Manage your account security and preferences</p>
@@ -73,46 +70,71 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Job Recommendations</h4>
-                                <p class="text-xs text-gray-500">Receive personalized job recommendations based on your profile</p>
+                    <form id="email-preferences-form">
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Job Recommendations</h4>
+                                    <p class="text-xs text-gray-500">
+                                        Receive personalized job recommendations based on your profile
+                                    </p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="job_recommendations"
+                                        name="job_recommendations"
+                                        value="1"
+                                        <?php echo (isset($settings['job_recommendations']) && $settings['job_recommendations'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="job_recommendations" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Application Updates</h4>
+                                    <p class="text-xs text-gray-500">Get notified when employers respond to your applications</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="application_updates"
+                                        name="application_updates"
+                                        value="1"
+                                        <?php echo (isset($settings['application_updates']) && $settings['application_updates'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="application_updates" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Programs and News</h4>
+                                    <p class="text-xs text-gray-500">Receive weekly updates about new features and job market insights</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="programs_news"
+                                        name="programs_news"
+                                        value="1"
+                                        <?php echo (isset($settings['programs_news']) && $settings['programs_news'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="programs_news" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Application Updates</h4>
-                                <p class="text-xs text-gray-500">Get notified when employers respond to your applications</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
+                        <div class="mt-6">
+                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                Save Preferences
+                            </button>
                         </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Newsletter</h4>
-                                <p class="text-xs text-gray-500">Receive weekly updates about new features and job market insights</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                        <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                            Save Preferences
-                        </button>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Privacy Settings -->
@@ -122,46 +144,69 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <p class="mt-1 text-sm text-gray-600">Control who can see your profile and contact information</p>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Profile Visibility</h4>
-                                <p class="text-xs text-gray-500">Allow employers to find and view your profile</p>
+                    <form id="privacy-settings-form">
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Profile Visibility</h4>
+                                    <p class="text-xs text-gray-500">Allow employers to find and view your profile</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="profile_visibility"
+                                        name="profile_visibility"
+                                        value="1"
+                                        <?php echo (isset($settings['profile_visibility']) && $settings['profile_visibility'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="profile_visibility" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
+                                    <p class="text-xs text-gray-500">Show your contact details to potential employers</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="contact_information"
+                                        name="contact_information"
+                                        value="1"
+                                        <?php echo (isset($settings['contact_information']) && $settings['contact_information'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="contact_information" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Resume Download</h4>
+                                    <p class="text-xs text-gray-500">Allow employers to download your resume</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="resume_download"
+                                        name="resume_download"
+                                        value="1"
+                                        <?php echo (isset($settings['resume_download']) && $settings['resume_download'] == 1) ? 'checked' : ''; ?>>
+                                    <label for="resume_download" class="toggle-label">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
-                                <p class="text-xs text-gray-500">Show your contact details to potential employers</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
+                        <div class="mt-6">
+                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                Save Privacy Settings
+                            </button>
                         </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Resume Download</h4>
-                                <p class="text-xs text-gray-500">Allow employers to download your resume</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                        <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                            Save Privacy Settings
-                        </button>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Account Information -->
@@ -243,6 +288,59 @@ include_once __DIR__ . '/navbar-jobseeker.php';
     </div>
 </div>
 
+<style>
+    /* Custom Toggle Switch Styles */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+    }
+
+    .toggle-switch input[type="checkbox"] {
+        display: none;
+    }
+
+    .toggle-label {
+        position: relative;
+        display: block;
+        width: 44px;
+        height: 24px;
+        cursor: pointer;
+        border-radius: 12px;
+        background-color: #e5e7eb;
+        transition: background-color 0.3s ease;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    /* Changed from green to primary color */
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
+        background-color: var(--primary-color, #3b82f6);
+    }
+
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label .toggle-slider {
+        transform: translateX(20px);
+    }
+
+    .toggle-switch input[type="checkbox"]:focus+.toggle-label {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Fallback if CSS variables not available */
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
+        background-color: #3b82f6;
+    }
+</style>
+
 <script>
     function togglePasswordForm() {
         const form = document.getElementById('password-form');
@@ -264,6 +362,98 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             }
         }
     }
+
+    // Handle email preferences form
+    document.getElementById('email-preferences-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('action', 'update_email_preferences');
+
+        // Get checkbox values - send 1 if checked, 0 if not checked
+        const jobRecommendations = document.getElementById('job_recommendations');
+        const applicationUpdates = document.getElementById('application_updates');
+        const programsNews = document.getElementById('programs_news');
+
+        // Always send values (1 for checked, 0 for unchecked)
+        formData.append('job_recommendations', jobRecommendations.checked ? '1' : '0');
+        formData.append('application_updates', applicationUpdates.checked ? '1' : '0');
+        formData.append('programs_news', programsNews.checked ? '1' : '0');
+
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        fetch('?page=update-jobseeker-settings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Email preferences updated successfully!');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating preferences.');
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+    });
+
+    // Handle privacy settings form
+    document.getElementById('privacy-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('action', 'update_privacy_settings');
+
+        // Get checkbox values - send 1 if checked, 0 if not checked
+        const profileVisibility = document.getElementById('profile_visibility');
+        const contactInformation = document.getElementById('contact_information');
+        const resumeDownload = document.getElementById('resume_download');
+
+        // Always send values (1 for checked, 0 for unchecked)
+        formData.append('profile_visibility', profileVisibility.checked ? '1' : '0');
+        formData.append('contact_information', contactInformation.checked ? '1' : '0');
+        formData.append('resume_download', resumeDownload.checked ? '1' : '0');
+
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        fetch('?page=update-jobseeker-settings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Privacy settings updated successfully!');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating settings.');
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
         const passwordForm = document.querySelector('#password-form form');
