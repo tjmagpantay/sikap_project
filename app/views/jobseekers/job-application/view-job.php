@@ -339,29 +339,105 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 </div>
 
                             <?php elseif (!empty($incompleteApplication)): ?>
-                                <!-- Incomplete Application - Check this FIRST -->
+                                <!-- Incomplete Application - Show Detailed Progress -->
                                 <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
-                                    <div class="flex items-center">
-                                        <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-orange-700">Incomplete Application</p>
-                                            <p class="text-xs text-orange-600">
-                                                Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
-                                            </p>
-                                            <?php if (!empty($incompleteApplication['applied_at'])): ?>
-                                                <p class="mt-1 text-xs text-orange-500">
-                                                    Started: <?php echo date('M j, Y g:i A', strtotime($incompleteApplication['applied_at'])); ?>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
+                                            <div>
+                                                <p class="text-sm font-medium text-orange-700">Application in Progress</p>
+                                                <p class="text-xs text-orange-600">
+                                                    Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
                                                 </p>
-                                            <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
+                                            <?php echo round(($incompleteApplication['current_step'] / 4) * 100); ?>% Complete
+                                        </span>
+                                    </div>
+
+                                    <!-- Progress Steps -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-xs font-medium text-orange-700">Application Progress</span>
+                                            <span class="text-xs text-orange-600">Step <?php echo $incompleteApplication['current_step']; ?> of 4</span>
+                                        </div>
+
+                                        <!-- Progress Bar -->
+                                        <div class="w-full h-2 bg-orange-200 rounded-full">
+                                            <div class="h-2 transition-all duration-300 bg-orange-500 rounded-full"
+                                                style="width: <?php echo ($incompleteApplication['current_step'] / 4) * 100; ?>%"></div>
+                                        </div>
+
+                                        <!-- Step Labels -->
+                                        <div class="flex justify-between mt-2 text-xs">
+                                            <span class="<?php echo $incompleteApplication['current_step'] >= 1 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                Documents
+                                            </span>
+                                            <span class="<?php echo $incompleteApplication['current_step'] >= 2 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                Questions
+                                            </span>
+                                            <span class="<?php echo $incompleteApplication['current_step'] >= 3 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                Eligibility
+                                            </span>
+                                            <span class="<?php echo $incompleteApplication['current_step'] >= 4 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                Review
+                                            </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <a href="?page=my-applications#application-<?php echo $incompleteApplication['application_id']; ?>"
-                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600">
-                                        <i class="mr-2 fas fa-list"></i>
-                                        View My Application
-                                    </a>
+
+                                    <!-- Current Step Info -->
+                                    <div class="p-3 mb-3 bg-orange-100 border border-orange-300 rounded-md">
+                                        <div class="flex items-start">
+                                            <div class="flex items-center justify-center w-6 h-6 mr-3 bg-orange-500 rounded-full">
+                                                <span class="text-xs font-bold text-white"><?php echo $incompleteApplication['current_step']; ?></span>
+                                            </div>
+                                            <div class="flex-1">
+                                                <?php
+                                                switch ($incompleteApplication['current_step']) {
+                                                    case 1:
+                                                        echo '<p class="text-sm font-medium text-orange-800">Step 1: Documents & Personal Info</p>';
+                                                        echo '<p class="mt-1 text-xs text-orange-700">Upload your resume/CV and complete personal information.</p>';
+                                                        break;
+                                                    case 2:
+                                                        echo '<p class="text-sm font-medium text-orange-800">Step 2: Screening Questions</p>';
+                                                        echo '<p class="mt-1 text-xs text-orange-700">Answer employer screening questions for this position.</p>';
+                                                        break;
+                                                    case 3:
+                                                        echo '<p class="text-sm font-medium text-orange-800">Step 3: Eligibility Information</p>';
+                                                        echo '<p class="mt-1 text-xs text-orange-700">Provide eligibility details and program interests.</p>';
+                                                        break;
+                                                    case 4:
+                                                        echo '<p class="text-sm font-medium text-orange-800">Step 4: Review & Submit</p>';
+                                                        echo '<p class="mt-1 text-xs text-orange-700">Review your application and submit to employer.</p>';
+                                                        break;
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Started Date -->
+                                    <?php if (!empty($incompleteApplication['applied_at'])): ?>
+                                        <p class="mb-3 text-xs text-orange-500">
+                                            <i class="mr-1 fas fa-calendar-alt"></i>
+                                            Started: <?php echo date('M j, Y g:i A', strtotime($incompleteApplication['applied_at'])); ?>
+                                        </p>
+                                    <?php endif; ?>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex gap-2">
+                                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&application_id=<?php echo $incompleteApplication['application_id']; ?>&step=<?php echo $incompleteApplication['current_step']; ?>"
+                                            class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                            <i class="mr-2 fas fa-play"></i>
+                                            Continue Application
+                                        </a>
+                                        <a href="?page=my-applications#application-<?php echo $incompleteApplication['application_id']; ?>"
+                                            class="flex items-center justify-center px-4 py-3 text-sm font-medium text-orange-600 transition-colors bg-orange-100 border border-orange-300 rounded-md hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                            <i class="mr-2 fas fa-list"></i>
+                                            View Details
+                                        </a>
+                                    </div>
                                 </div>
 
                             <?php elseif ($hasApplied === true && !empty($applicationStatus)): ?>
