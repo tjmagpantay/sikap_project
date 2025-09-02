@@ -5,7 +5,7 @@ $landingController = new LandingPageController();
 $companies = $landingController->getTopCompanies(4);
 ?>
 
-<section class="px-6 py-20 bg-gray-50 sm:px-6 md:px-16 lg:px-24">
+<section id="top-companies" class="px-6 py-20 bg-gray-50 sm:px-6 md:px-16 lg:px-24">
   <div class="mx-auto max-w-7xl">
     <div class="flex items-start justify-between mb-8">
       <div class="flex flex-col">

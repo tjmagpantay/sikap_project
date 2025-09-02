@@ -315,7 +315,15 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <div class="mb-6 sm:mb-8">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900 sm:text-xl">Application Status</h3>
 
+                            <?php
+                            // Debug output to see what variables we have
+                            error_log("VIEW DEBUG: hasApplied = " . (isset($hasApplied) ? ($hasApplied ? 'true' : 'false') : 'not set'));
+                            error_log("VIEW DEBUG: incompleteApplication = " . (isset($incompleteApplication) && $incompleteApplication ? 'exists' : 'null'));
+                            error_log("VIEW DEBUG: applicationStatus = " . (isset($applicationStatus) ? $applicationStatus : 'not set'));
+                            ?>
+
                             <?php if (!isset($_SESSION['user_id'])): ?>
+                                <!-- Not Logged In -->
                                 <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                     <div class="flex items-center">
                                         <i class="mr-3 text-blue-500 fas fa-info-circle"></i>
@@ -331,6 +339,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 </a>
 
                             <?php elseif (!isset($_SESSION['role']) || $_SESSION['role'] != User::ROLE_JOBSEEKER): ?>
+                                <!-- Wrong User Type -->
                                 <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
                                     <div class="flex items-center justify-center">
                                         <i class="mr-2 text-gray-400 fas fa-user-times"></i>
@@ -338,252 +347,432 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                     </div>
                                 </div>
 
-                            <?php elseif (!empty($incompleteApplication)): ?>
-                                <!-- Incomplete Application - Show Detailed Progress -->
-                                <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <div class="flex items-center">
-                                            <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
-                                            <div>
-                                                <p class="text-sm font-medium text-orange-700">Application in Progress</p>
-                                                <p class="text-xs text-orange-600">
-                                                    Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
+                            <?php elseif (isset($hasApplied) && $hasApplied === true): ?>
+                                <?php if (isset($incompleteApplication) && !empty($incompleteApplication)): ?>
+                                    <!-- INCOMPLETE APPLICATION - Show Detailed Progress -->
+                                    <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div class="flex items-center">
+                                                <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-orange-700">Application in Progress</p>
+                                                    <p class="text-xs text-orange-600">
+                                                        Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
+                                                <?php echo round(($incompleteApplication['current_step'] / 4) * 100); ?>% Complete
+                                            </span>
+                                        </div>
+
+                                        <!-- Progress Steps -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs font-medium text-orange-700">Application Progress</span>
+                                                <span class="text-xs text-orange-600">Step <?php echo $incompleteApplication['current_step']; ?> of 4</span>
+                                            </div>
+
+                                            <!-- Progress Bar -->
+                                            <div class="w-full h-2 bg-orange-200 rounded-full">
+                                                <div class="h-2 transition-all duration-300 bg-orange-500 rounded-full"
+                                                    style="width: <?php echo ($incompleteApplication['current_step'] / 4) * 100; ?>%"></div>
+                                            </div>
+
+                                            <!-- Step Labels -->
+                                            <div class="flex justify-between mt-2 text-xs">
+                                                <span class="<?php echo $incompleteApplication['current_step'] >= 1 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                    Documents
+                                                </span>
+                                                <span class="<?php echo $incompleteApplication['current_step'] >= 2 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                    Questions
+                                                </span>
+                                                <span class="<?php echo $incompleteApplication['current_step'] >= 3 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                    Eligibility
+                                                </span>
+                                                <span class="<?php echo $incompleteApplication['current_step'] >= 4 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
+                                                    Review
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Current Step Info -->
+                                        <div class="p-3 mb-3 bg-orange-100 border border-orange-300 rounded-md">
+                                            <div class="flex items-start">
+                                                <div class="flex items-center justify-center w-6 h-6 mr-3 bg-orange-500 rounded-full">
+                                                    <span class="text-xs font-bold text-white"><?php echo $incompleteApplication['current_step']; ?></span>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <?php
+                                                    switch ($incompleteApplication['current_step']) {
+                                                        case 1:
+                                                            echo '<p class="text-sm font-medium text-orange-800">Step 1: Documents & Personal Info</p>';
+                                                            echo '<p class="mt-1 text-xs text-orange-700">Upload your resume/CV and complete personal information.</p>';
+                                                            break;
+                                                        case 2:
+                                                            echo '<p class="text-sm font-medium text-orange-800">Step 2: Screening Questions</p>';
+                                                            echo '<p class="mt-1 text-xs text-orange-700">Answer employer screening questions for this position.</p>';
+                                                            break;
+                                                        case 3:
+                                                            echo '<p class="text-sm font-medium text-orange-800">Step 3: Eligibility Information</p>';
+                                                            echo '<p class="mt-1 text-xs text-orange-700">Provide eligibility details and program interests.</p>';
+                                                            break;
+                                                        case 4:
+                                                            echo '<p class="text-sm font-medium text-orange-800">Step 4: Review & Submit</p>';
+                                                            echo '<p class="mt-1 text-xs text-orange-700">Review your application and submit to employer.</p>';
+                                                            break;
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div class="flex gap-2">
+                                            <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&application_id=<?php echo $incompleteApplication['application_id']; ?>&step=<?php echo $incompleteApplication['current_step']; ?>"
+                                                class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                                <i class="mr-2 fas fa-play"></i>
+                                                Continue Application
+                                            </a>
+                                            <a href="?page=view-application&application_id=<?php echo $incompleteApplication['application_id']; ?>"
+                                                class="flex items-center justify-center px-4 py-3 text-sm font-medium text-orange-600 transition-colors bg-orange-100 border border-orange-300 rounded-md hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                                <i class="mr-2 fas fa-eye"></i>
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                <?php else: ?>
+                                    <!-- COMPLETE APPLICATION - Show Status with Enhanced Display -->
+                                    <?php if (isset($applicationStatus) && !empty($applicationStatus)): ?>
+                                        <div class="p-4 mb-4 border rounded-lg
+                                            <?php
+                                            switch ($applicationStatus) {
+                                                case 'pending':
+                                                    echo 'border-yellow-200 bg-yellow-50';
+                                                    break;
+                                                case 'reviewed':
+                                                    echo 'border-blue-200 bg-blue-50';
+                                                    break;
+                                                case 'shortlisted':
+                                                    echo 'border-purple-200 bg-purple-50';
+                                                    break;
+                                                case 'hired':
+                                                    echo 'border-green-200 bg-green-50';
+                                                    break;
+                                                case 'rejected':
+                                                    echo 'border-red-200 bg-red-50';
+                                                    break;
+                                                default:
+                                                    echo 'border-gray-200 bg-gray-50';
+                                            }
+                                            ?>">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-8 h-8 mr-3 rounded-full border-2
+                                                        <?php
+                                                        switch ($applicationStatus) {
+                                                            case 'pending':
+                                                                echo 'border-yellow-500 bg-yellow-100';
+                                                                break;
+                                                            case 'reviewed':
+                                                                echo 'border-blue-500 bg-blue-100';
+                                                                break;
+                                                            case 'shortlisted':
+                                                                echo 'border-purple-600 bg-purple-100';
+                                                                break;
+                                                            case 'hired':
+                                                                echo 'border-green-600 bg-green-100';
+                                                                break;
+                                                            case 'rejected':
+                                                                echo 'border-red-600 bg-red-100';
+                                                                break;
+                                                            default:
+                                                                echo 'border-gray-400 bg-gray-100';
+                                                        }
+                                                        ?>">
+
+                                                        <?php
+                                                        switch ($applicationStatus) {
+                                                            case 'pending':
+                                                                echo '<svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                      </svg>';
+                                                                break;
+                                                            case 'reviewed':
+                                                                echo '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                                      </svg>';
+                                                                break;
+                                                            case 'shortlisted':
+                                                                echo '<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                                                      </svg>';
+                                                                break;
+                                                            case 'hired':
+                                                                echo '<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                      </svg>';
+                                                                break;
+                                                            case 'rejected':
+                                                                echo '<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                      </svg>';
+                                                                break;
+                                                            default:
+                                                                echo '<svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                      </svg>';
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium 
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'text-yellow-700';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'text-blue-700';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'text-purple-700';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'text-green-700';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'text-red-700';
+                                                                    break;
+                                                                default:
+                                                                    echo 'text-gray-700';
+                                                            }
+                                                            ?>">
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'Application Submitted';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'Under Review';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'Shortlisted';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'Hired';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'Not Selected';
+                                                                    break;
+                                                                default:
+                                                                    echo ucfirst($applicationStatus);
+                                                            }
+                                                            ?>
+                                                        </p>
+                                                        <p class="text-xs 
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'text-yellow-600';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'text-blue-600';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'text-purple-600';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'text-green-600';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'text-red-600';
+                                                                    break;
+                                                                default:
+                                                                    echo 'text-gray-600';
+                                                            }
+                                                            ?>">
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'Waiting for employer review';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'Your application is being evaluated';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'You\'re in the final selection!';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'Congratulations! You got the job!';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'Thank you for your interest';
+                                                                    break;
+                                                                default:
+                                                                    echo 'Application status: ' . $applicationStatus;
+                                                            }
+                                                            ?>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Application Date -->
+                                                <?php if (!empty($applicationData['applied_at'])): ?>
+                                                    <div class="text-right">
+                                                        <p class="text-xs font-medium 
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'text-yellow-700';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'text-blue-700';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'text-purple-700';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'text-green-700';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'text-red-700';
+                                                                    break;
+                                                                default:
+                                                                    echo 'text-gray-700';
+                                                            }
+                                                            ?>">Applied</p>
+                                                        <p class="text-xs 
+                                                            <?php
+                                                            switch ($applicationStatus) {
+                                                                case 'pending':
+                                                                    echo 'text-yellow-600';
+                                                                    break;
+                                                                case 'reviewed':
+                                                                    echo 'text-blue-600';
+                                                                    break;
+                                                                case 'shortlisted':
+                                                                    echo 'text-purple-600';
+                                                                    break;
+                                                                case 'hired':
+                                                                    echo 'text-green-600';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo 'text-red-600';
+                                                                    break;
+                                                                default:
+                                                                    echo 'text-gray-600';
+                                                            }
+                                                            ?>">
+                                                            <?php echo date('M j, Y', strtotime($applicationData['applied_at'])); ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status-specific detailed message -->
+                                        <?php if ($applicationStatus === 'pending'): ?>
+                                            <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                                                <p class="text-sm text-yellow-800">
+                                                    <i class="mr-2 fas fa-hourglass-half"></i>
+                                                    Your application is being reviewed by the employer. You'll be notified when there's an update.
                                                 </p>
                                             </div>
-                                        </div>
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
-                                            <?php echo round(($incompleteApplication['current_step'] / 4) * 100); ?>% Complete
-                                        </span>
-                                    </div>
-
-                                    <!-- Progress Steps -->
-                                    <div class="mb-4">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <span class="text-xs font-medium text-orange-700">Application Progress</span>
-                                            <span class="text-xs text-orange-600">Step <?php echo $incompleteApplication['current_step']; ?> of 4</span>
-                                        </div>
-
-                                        <!-- Progress Bar -->
-                                        <div class="w-full h-2 bg-orange-200 rounded-full">
-                                            <div class="h-2 transition-all duration-300 bg-orange-500 rounded-full"
-                                                style="width: <?php echo ($incompleteApplication['current_step'] / 4) * 100; ?>%"></div>
-                                        </div>
-
-                                        <!-- Step Labels -->
-                                        <div class="flex justify-between mt-2 text-xs">
-                                            <span class="<?php echo $incompleteApplication['current_step'] >= 1 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                Documents
-                                            </span>
-                                            <span class="<?php echo $incompleteApplication['current_step'] >= 2 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                Questions
-                                            </span>
-                                            <span class="<?php echo $incompleteApplication['current_step'] >= 3 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                Eligibility
-                                            </span>
-                                            <span class="<?php echo $incompleteApplication['current_step'] >= 4 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                Review
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Current Step Info -->
-                                    <div class="p-3 mb-3 bg-orange-100 border border-orange-300 rounded-md">
-                                        <div class="flex items-start">
-                                            <div class="flex items-center justify-center w-6 h-6 mr-3 bg-orange-500 rounded-full">
-                                                <span class="text-xs font-bold text-white"><?php echo $incompleteApplication['current_step']; ?></span>
+                                        <?php elseif ($applicationStatus === 'reviewed'): ?>
+                                            <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+                                                <p class="text-sm text-blue-800">
+                                                    <i class="mr-2 fas fa-search"></i>
+                                                    Your application is currently under detailed review. The employer is evaluating your qualifications.
+                                                </p>
                                             </div>
-                                            <div class="flex-1">
-                                                <?php
-                                                switch ($incompleteApplication['current_step']) {
-                                                    case 1:
-                                                        echo '<p class="text-sm font-medium text-orange-800">Step 1: Documents & Personal Info</p>';
-                                                        echo '<p class="mt-1 text-xs text-orange-700">Upload your resume/CV and complete personal information.</p>';
-                                                        break;
-                                                    case 2:
-                                                        echo '<p class="text-sm font-medium text-orange-800">Step 2: Screening Questions</p>';
-                                                        echo '<p class="mt-1 text-xs text-orange-700">Answer employer screening questions for this position.</p>';
-                                                        break;
-                                                    case 3:
-                                                        echo '<p class="text-sm font-medium text-orange-800">Step 3: Eligibility Information</p>';
-                                                        echo '<p class="mt-1 text-xs text-orange-700">Provide eligibility details and program interests.</p>';
-                                                        break;
-                                                    case 4:
-                                                        echo '<p class="text-sm font-medium text-orange-800">Step 4: Review & Submit</p>';
-                                                        echo '<p class="mt-1 text-xs text-orange-700">Review your application and submit to employer.</p>';
-                                                        break;
-                                                }
-                                                ?>
+                                        <?php elseif ($applicationStatus === 'shortlisted'): ?>
+                                            <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
+                                                <p class="text-sm text-purple-800">
+                                                    <i class="mr-2 fas fa-star"></i>
+                                                    Congratulations! You've been shortlisted for this position. The employer may contact you soon for the next steps.
+                                                </p>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Started Date -->
-                                    <?php if (!empty($incompleteApplication['applied_at'])): ?>
-                                        <p class="mb-3 text-xs text-orange-500">
-                                            <i class="mr-1 fas fa-calendar-alt"></i>
-                                            Started: <?php echo date('M j, Y g:i A', strtotime($incompleteApplication['applied_at'])); ?>
-                                        </p>
-                                    <?php endif; ?>
-
-                                    <!-- Action Buttons -->
-                                    <div class="flex gap-2">
-                                        <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&application_id=<?php echo $incompleteApplication['application_id']; ?>&step=<?php echo $incompleteApplication['current_step']; ?>"
-                                            class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                                            <i class="mr-2 fas fa-play"></i>
-                                            Continue Application
-                                        </a>
-                                        <a href="?page=my-applications#application-<?php echo $incompleteApplication['application_id']; ?>"
-                                            class="flex items-center justify-center px-4 py-3 text-sm font-medium text-orange-600 transition-colors bg-orange-100 border border-orange-300 rounded-md hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                                            <i class="mr-2 fas fa-list"></i>
-                                            View Details
-                                        </a>
-                                    </div>
-                                </div>
-
-                            <?php elseif ($hasApplied === true && !empty($applicationStatus)): ?>
-                                <!-- Complete Application - Check this SECOND -->
-                                <div class="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
-                                    <div class="flex items-center">
-                                        <i class="mr-3 text-2xl text-green-600 fas fa-check-circle"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-green-700">Application Submitted</p>
-                                            <p class="text-xs text-green-600">
-                                                Status:
-                                                <?php
-                                                // Display the actual application status
-                                                switch ($applicationStatus) {
-                                                    case 'pending':
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-yellow-500 rounded-full"></div>
-                                                                Pending Review
-                                                              </span>';
-                                                        break;
-                                                    case 'reviewed':
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-blue-500 rounded-full"></div>
-                                                                Under Review
-                                                              </span>';
-                                                        break;
-                                                    case 'shortlisted':
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-purple-500 rounded-full"></div>
-                                                                Shortlisted
-                                                              </span>';
-                                                        break;
-                                                    case 'hired':
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-green-700 bg-green-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-green-500 rounded-full"></div>
-                                                                Hired
-                                                              </span>';
-                                                        break;
-                                                    case 'rejected':
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-red-700 bg-red-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-red-500 rounded-full"></div>
-                                                                Not Selected
-                                                              </span>';
-                                                        break;
-                                                    default:
-                                                        echo '<span class="inline-flex items-center px-2 py-1 ml-2 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">
-                                                                <div class="w-2 h-2 mr-1 bg-gray-500 rounded-full"></div>
-                                                                ' . ucfirst($applicationStatus) . '
-                                                              </span>';
-                                                }
-                                                ?>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Status-specific message -->
-                                <?php if ($applicationStatus === 'pending'): ?>
-                                    <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                                        <p class="text-sm text-yellow-800">
-                                            <i class="mr-2 fas fa-hourglass-half"></i>
-                                            Your application is being reviewed by the employer.
-                                        </p>
-                                    </div>
-                                <?php elseif ($applicationStatus === 'reviewed'): ?>
-                                    <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
-                                        <p class="text-sm text-blue-800">
-                                            <i class="mr-2 fas fa-search"></i>
-                                            Your application is currently under detailed review.
-                                        </p>
-                                    </div>
-                                <?php elseif ($applicationStatus === 'shortlisted'): ?>
-                                    <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
-                                        <p class="text-sm text-purple-800">
-                                            <i class="mr-2 fas fa-star"></i>
-                                            Congratulations! You've been shortlisted for this position.
-                                        </p>
-                                    </div>
-                                <?php elseif ($applicationStatus === 'hired'): ?>
-                                    <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
-                                        <p class="text-sm text-green-800">
-                                            <i class="mr-2 fas fa-check-circle"></i>
-                                            Congratulations! You've been hired for this position.
-                                        </p>
-                                    </div>
-                                <?php elseif ($applicationStatus === 'rejected'): ?>
-                                    <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
-                                        <p class="text-sm text-red-800">
-                                            <i class="mr-2 fas fa-times-circle"></i>
-                                            Thank you for your interest. Unfortunately, you were not selected for this position.
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
-
-                                <a href="?page=my-applications"
-                                    class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-green-600 transition-colors rounded-md hover:text-green-700 bg-green-50 hover:bg-green-100">
-                                    <i class="mr-2 fas fa-list"></i>
-                                    View My Applications
-                                </a>
-
-                            <?php elseif (isset($job['job_status']) && $job['job_status'] !== 'open'): ?>
-                                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                                    <div class="flex items-center justify-center">
-                                        <i class="mr-2 text-gray-400 fas fa-lock"></i>
-                                        <div class="text-center">
-                                            <p class="text-sm font-medium text-gray-600">Not Accepting Applications</p>
-                                            <p class="text-xs text-gray-500">This position is currently <?php echo $job['job_status']; ?></p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            <?php elseif (!empty($job['application_deadline']) && strtotime($job['application_deadline']) < time()): ?>
-                                <div class="p-4 border border-red-200 rounded-lg bg-red-50">
-                                    <div class="flex items-center justify-center">
-                                        <i class="mr-2 text-red-400 fas fa-hourglass-end"></i>
-                                        <div class="text-center">
-                                            <p class="text-sm font-medium text-red-700">Deadline Passed</p>
-                                            <p class="text-xs text-red-600">Applications are no longer accepted</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            <?php else: ?>
-                                <!-- Ready to Apply -->
-                                <div class="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <div>
-                                                <p class="text-sm font-medium text-secondary">Ready to Apply</p>
-                                                <p class="text-xs text-primary">Quick & secure process</p>
+                                        <?php elseif ($applicationStatus === 'hired'): ?>
+                                            <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
+                                                <p class="text-sm text-green-800">
+                                                    <i class="mr-2 fas fa-check-circle"></i>
+                                                    Congratulations! You've been hired for this position. The employer will contact you with further details.
+                                                </p>
                                             </div>
-                                        </div>
-                                        <?php if (!empty($job['application_deadline'])): ?>
-                                            <div class="text-right">
-                                                <p class="text-xs font-medium text-secondary">Deadline</p>
-                                                <p class="text-xs text-primary"><?php echo date('M j', strtotime($job['application_deadline'])); ?></p>
+                                        <?php elseif ($applicationStatus === 'rejected'): ?>
+                                            <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
+                                                <p class="text-sm text-red-800">
+                                                    <i class="mr-2 fas fa-info-circle"></i>
+                                                    Thank you for your interest. Unfortunately, you were not selected for this position. Keep applying to other opportunities!
+                                                </p>
                                             </div>
                                         <?php endif; ?>
-                                    </div>
-                                </div>
 
-                                <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
-                                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                                    <i class="mr-2 fas fa-paper-plane"></i>
-                                    Apply for this Job
-                                </a>
+                                        <!-- Action Buttons for Complete Application -->
+                                        <div class="flex gap-2">
+                                            <a href="?page=view-application&application_id=<?php echo $applicationData['application_id']; ?>"
+                                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium transition-colors rounded-md 
+                                                <?php
+                                                switch ($applicationStatus) {
+                                                    case 'pending':
+                                                        echo 'text-yellow-600 bg-yellow-100 hover:bg-yellow-200';
+                                                        break;
+                                                    case 'reviewed':
+                                                        echo 'text-blue-600 bg-blue-100 hover:bg-blue-200';
+                                                        break;
+                                                    case 'shortlisted':
+                                                        echo 'text-purple-600 bg-purple-100 hover:bg-purple-200';
+                                                        break;
+                                                    case 'hired':
+                                                        echo 'text-green-600 bg-green-100 hover:bg-green-200';
+                                                        break;
+                                                    case 'rejected':
+                                                        echo 'text-red-600 bg-red-100 hover:bg-red-200';
+                                                        break;
+                                                    default:
+                                                        echo 'text-gray-600 bg-gray-100 hover:bg-gray-200';
+                                                }
+                                                ?>">
+                                                <i class="mr-2 fas fa-eye"></i>
+                                                View Application
+                                            </a>
+                                            <a href="?page=my-applications"
+                                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
+                                                <i class="mr-2 fas fa-list"></i>
+                                                All Applications
+                                            </a>
+                                        </div>
+
+                                    <?php else: ?>
+                                        <!-- Fallback: Application exists but status is missing -->
+                                        <div class="p-4 mb-4 border border-gray-200 rounded-lg bg-gray-50">
+                                            <div class="flex items-center">
+                                                <i class="mr-3 text-gray-500 fas fa-file-alt"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-700">Application Found</p>
+                                                    <p class="text-xs text-gray-600">Status information is being updated</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex gap-2">
+                                            <?php if (isset($applicationData['application_id'])): ?>
+                                                <a href="?page=view-application&application_id=<?php echo $applicationData['application_id']; ?>"
+                                                    class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
+                                                    <i class="mr-2 fas fa-eye"></i>
+                                                    View Application
+                                                </a>
+                                            <?php endif; ?>
+                                            <a href="?page=my-applications"
+                                                class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
+                                                <i class="mr-2 fas fa-list"></i>
+                                                All Applications
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
 

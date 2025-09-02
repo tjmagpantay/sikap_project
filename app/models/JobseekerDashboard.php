@@ -514,17 +514,39 @@ class JobseekerDashboard
                 $savedJobs = new SavedJobs();
                 $job['is_saved'] = $savedJobs->isSaved($jobseeker_id, $job_id);
 
-                // Check if user has applied - let's debug this
+                // Get detailed application data
                 $jobApplication = new JobApplication();
-                $hasApplied = $jobApplication->hasApplied($jobseeker_id, $job_id);
+                $applicationData = $jobApplication->getApplicationByJobseekerAndJob($jobseeker_id, $job_id);
 
-                // Debug logging
-                error_log("DEBUG - JobseekerDashboard: jobseeker_id={$jobseeker_id}, job_id={$job_id}, hasApplied=" . ($hasApplied ? 'true' : 'false'));
+                if ($applicationData) {
+                    $job['has_applied'] = true;
+                    $job['application_id'] = $applicationData['application_id'];
+                    $job['application_status'] = $applicationData['application_status'];
+                    $job['is_finalized'] = $applicationData['is_finalized'];
+                    $job['current_step'] = $applicationData['current_step'];
+                    $job['applied_at'] = $applicationData['applied_at'];
 
-                $job['has_applied'] = $hasApplied;
+                    // Debug logging
+                    error_log("DEBUG - JobseekerDashboard: Found application - ID: {$applicationData['application_id']}, Status: {$applicationData['application_status']}, Finalized: {$applicationData['is_finalized']}, Step: {$applicationData['current_step']}");
+                } else {
+                    $job['has_applied'] = false;
+                    $job['application_id'] = null;
+                    $job['application_status'] = null;
+                    $job['is_finalized'] = null;
+                    $job['current_step'] = null;
+                    $job['applied_at'] = null;
+
+                    // Debug logging
+                    error_log("DEBUG - JobseekerDashboard: No application found for jobseeker_id={$jobseeker_id}, job_id={$job_id}");
+                }
             } else {
                 $job['is_saved'] = false;
                 $job['has_applied'] = false;
+                $job['application_id'] = null;
+                $job['application_status'] = null;
+                $job['is_finalized'] = null;
+                $job['current_step'] = null;
+                $job['applied_at'] = null;
             }
 
             return $job;

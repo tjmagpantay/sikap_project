@@ -875,7 +875,7 @@ class JobApplicationController
         exit;
     }
 
-    // Update the viewJob method to check for incomplete applications:
+    // Update the viewJob method in JobApplicationController.php:
 
     public function viewJob()
     {
@@ -886,7 +886,7 @@ class JobApplicationController
             exit;
         }
 
-        // Get job details - use existing method
+        // Get job details
         $job = $this->jobPostModel->getFullJobData($job_id);
 
         if (!$job) {
@@ -894,59 +894,62 @@ class JobApplicationController
             exit;
         }
 
-        // Initialize variables
+        // Initialize variables - IMPORTANT: These must be initialized for the view
         $hasApplied = false;
         $incompleteApplication = null;
         $applicationStatus = null;
+        $applicationData = null;
 
+        // Check application status if user is logged in as jobseeker
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-            if ($jobseeker) {
-                error_log("DEBUG: Looking for application for jobseeker_id: {$jobseeker['jobseeker_id']}, job_id: $job_id");
 
-                // Check for any existing application (complete or incomplete)
-                $existingApplication = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
+            if ($jobseeker) {
+                error_log("DEBUG viewJob: Looking for application for jobseeker_id: {$jobseeker['jobseeker_id']}, job_id: $job_id");
+
+                // Get complete application data
+                $applicationData = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
                     $jobseeker['jobseeker_id'],
                     $job_id
                 );
 
-                error_log("DEBUG: existingApplication result: " . json_encode($existingApplication));
+                error_log("DEBUG viewJob: Application data: " . json_encode($applicationData));
 
-                if ($existingApplication) {
-                    error_log("DEBUG: Found application - is_finalized: {$existingApplication['is_finalized']}");
-
-                    if ($existingApplication['is_finalized'] == 1) {
+                if ($applicationData) {
+                    // FIXED LOGIC: Check is_finalized to determine which path to take
+                    if ($applicationData['is_finalized'] == 1) {
                         // Complete application
                         $hasApplied = true;
-                        $applicationStatus = $existingApplication['application_status'];
+                        $applicationStatus = $applicationData['application_status'];
                         $incompleteApplication = null;
-                        error_log("DEBUG: Set hasApplied=true, applicationStatus={$applicationStatus}");
+                        error_log("DEBUG viewJob: Complete application found - Status: {$applicationStatus}");
                     } else {
                         // Incomplete application
-                        $incompleteApplication = $existingApplication;
-                        $hasApplied = false;
+                        $hasApplied = true;  // Set to true because an application exists
                         $applicationStatus = null;
-                        error_log("DEBUG: Set incompleteApplication, hasApplied=false");
+                        $incompleteApplication = $applicationData;  // Set the incomplete application data
+                        error_log("DEBUG viewJob: Incomplete application found - Step: {$applicationData['current_step']}");
                     }
                 } else {
-                    error_log("DEBUG: No existing application found");
+                    error_log("DEBUG viewJob: No application found");
+                    // No application exists
+                    $hasApplied = false;
+                    $incompleteApplication = null;
+                    $applicationStatus = null;
                 }
-            } else {
-                error_log("DEBUG: No jobseeker found for user_id: {$_SESSION['user_id']}");
             }
-        } else {
-            error_log("DEBUG: User not logged in or not a jobseeker");
         }
 
-        // Debug the final variables
+        // Enhanced debug logging
         error_log("DEBUG viewJob FINAL: hasApplied = " . ($hasApplied ? 'true' : 'false'));
-        error_log("DEBUG viewJob FINAL: incompleteApplication = " . ($incompleteApplication ? 'exists (id: ' . $incompleteApplication['application_id'] . ')' : 'null'));
+        error_log("DEBUG viewJob FINAL: incompleteApplication = " . ($incompleteApplication ? 'exists (step: ' . $incompleteApplication['current_step'] . ')' : 'null'));
         error_log("DEBUG viewJob FINAL: applicationStatus = " . ($applicationStatus ?? 'null'));
+        error_log("DEBUG viewJob FINAL: applicationData = " . ($applicationData ? 'exists' : 'null'));
 
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
 
     // Update the getJobDetails method in JobDetailsAjaxController:
 
-    
+
 }

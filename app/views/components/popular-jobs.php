@@ -1,4 +1,4 @@
-<section class="px-4 py-20 bg-white sm:px-6 md:px-16 lg:px-24">
+<section id="popular-jobs" class="px-4 py-20 bg-white sm:px-6 md:px-16 lg:px-24">
   <div class="mx-auto max-w-7xl">
     <div class="flex items-start justify-between mb-8">
       <div class="flex flex-col">

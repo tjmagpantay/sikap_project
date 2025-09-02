@@ -320,19 +320,33 @@ class JobApplication
     {
         try {
             $sql = "SELECT application_id, jobseeker_id, job_id, application_status, 
-                       is_finalized, current_step, applied_at
-                FROM job_application 
-                WHERE jobseeker_id = ? AND job_id = ?
-                ORDER BY application_id DESC 
-                LIMIT 1";
+                   is_finalized, current_step, applied_at
+            FROM job_application 
+            WHERE jobseeker_id = ? AND job_id = ?
+            ORDER BY application_id DESC 
+            LIMIT 1";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id, $job_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Debug what we're getting from database
+            // Enhanced debugging
             error_log("DEBUG getApplicationByJobseekerAndJob: jobseeker_id=$jobseeker_id, job_id=$job_id");
+            error_log("DEBUG getApplicationByJobseekerAndJob SQL: $sql");
             error_log("DEBUG getApplicationByJobseekerAndJob result: " . json_encode($result));
+
+            if ($result) {
+                // Make sure we're returning the right data types
+                $result['is_finalized'] = (int)$result['is_finalized'];
+                $result['current_step'] = (int)$result['current_step'];
+                $result['application_id'] = (int)$result['application_id'];
+                $result['jobseeker_id'] = (int)$result['jobseeker_id'];
+                $result['job_id'] = (int)$result['job_id'];
+
+                error_log("DEBUG: Found application - is_finalized={$result['is_finalized']}, current_step={$result['current_step']}, status={$result['application_status']}");
+            } else {
+                error_log("DEBUG: No application found for this jobseeker/job combination");
+            }
 
             return $result;
         } catch (PDOException $e) {

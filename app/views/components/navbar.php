@@ -21,9 +21,9 @@
         <!-- Desktop Menu -->
         <div class="hidden lg:block">
           <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
-            <li><a href="#" class="nav-link">Job Search</a></li>
+            <li><a href="#popular-jobs" class="nav-link">Job Search</a></li>
             <li><a href="?page=program-events" class="nav-link">Programs</a></li>
-            <li><a href="#" class="nav-link">Explore Companies</a></li>
+            <li><a href="#top-companies" class="nav-link">Explore Companies</a></li>
             <li><a href="#" class="nav-link">Community</a></li>
           </ul>
         </div>
@@ -65,7 +65,7 @@
         style="display: none;"
       >
         <ul class="flex flex-col gap-4 mt-8">
-          <li><a href="#" class="nav-link">Job Search</a></li>
+          <li><a href="#popular-jobs" class="nav-link">Job Search</a></li> 
           <li><a href="#" class="nav-link">Programs</a></li>
           <li><a href="#" class="nav-link">Explore Companies</a></li>
           <li><a href="#" class="nav-link">Community</a></li>
