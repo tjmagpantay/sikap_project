@@ -228,114 +228,83 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                 <?php if (isset($selectedJob['is_finalized']) && $selectedJob['is_finalized'] == 0): ?>
                     <!-- Incomplete Application - Show In Progress Status with Continue Button -->
                     <div class="flex flex-col flex-1 gap-2">
-                        <!-- Status Display -->
+                        <!-- Continue Application Button - Primary Style -->
                         <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&application_id=<?php echo $selectedJob['application_id']; ?>&step=<?php echo $selectedJob['current_step'] ?? 1; ?>"
-                            class="flex items-center justify-center px-3 py-3 transition-colors border rounded-lg bg-primary hover:bg-orange-100">
-
-                            <div class="flex items-center justify-center w-5 h-5 mr-2 border-2 rounded-full">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-
-                            <span class="text-sm font-medium text-white">Continue Application</span>
+                            class="flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
+                            <i class="mr-2 fas fa-play"></i>
+                            Continue Application
                         </a>
-
-
-
                     </div>
 
                 <?php else: ?>
-                    <!-- Complete Application - Show Actual Status -->
+                    <!-- Complete Application - Show Status Button -->
                     <div class="flex flex-col flex-1 gap-2">
-                        <!-- Status Display -->
-                        <div class="flex items-center justify-center px-3 py-2 rounded-lg
-                            <?php
-                            switch ($selectedJob['application_status']) {
-                                case 'pending':
-                                    echo 'bg-yellow-50 border border-yellow-200';
-                                    break;
-                                case 'reviewed':
-                                    echo 'bg-blue-50 border border-blue-200';
-                                    break;
-                                case 'shortlisted':
-                                    echo 'bg-purple-50 border border-purple-200';
-                                    break;
-                                case 'hired':
-                                    echo 'bg-green-50 border border-green-200';
-                                    break;
-                                case 'rejected':
-                                    echo 'bg-red-50 border border-red-200';
-                                    break;
-                                default:
-                                    echo 'bg-gray-50 border border-gray-200';
-                            }
-                            ?>">
+                        <!-- Status Display as Button - Primary Style -->
+                        <a href="?page=view-application&application_id=<?php echo $selectedJob['application_id']; ?>"
+                            class="flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
 
-                            <?php
-                            switch ($selectedJob['application_status']) {
-                                case 'pending':
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-yellow-500 rounded-full">
-                                            <svg class="w-3 h-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- Status Icon -->
+                            <div class="flex items-center justify-center w-5 h-5 mr-2">
+                                <?php
+                                switch ($selectedJob['application_status']) {
+                                    case 'pending':
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-yellow-600">Pending Review</span>';
-                                    break;
-                                case 'reviewed':
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-blue-500 rounded-full">
-                                            <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              </svg>';
+                                        break;
+                                    case 'reviewed':
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-blue-600">Under Review</span>';
-                                    break;
-                                case 'shortlisted':
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-purple-600 rounded-full">
-                                            <svg class="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              </svg>';
+                                        break;
+                                    case 'shortlisted':
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-purple-600">Shortlisted</span>';
-                                    break;
-                                case 'hired':
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-green-600 rounded-full">
-                                            <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4-4m4.5 10.5l-1.5-1.5l-2.5 2.5l-4-4l-1.5 1.5L12 22l9-9l-1.5-1.5z" />
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-green-600">Hired</span>';
-                                    break;
-                                case 'rejected':
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-red-600 rounded-full">
-                                            <svg class="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              </svg>';
+                                        break;
+                                    case 'hired':
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                              </svg>';
+                                        break;
+                                    case 'rejected':
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
-                                    break;
-                                default:
-                                    echo '<div class="flex items-center justify-center w-5 h-5 mr-2 border-2 border-gray-600 rounded-full">
-                                            <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                          </div>';
-                                    echo '<span class="text-sm font-medium text-gray-600">Application Received</span>';
-                            }
-                            ?>
-                        </div>
-
-                        <!-- Next Steps (if shortlisted) -->
-                        <?php if ($selectedJob['application_status'] === 'shortlisted'): ?>
-                            <div class="flex flex-col gap-2">
-                                <div class="text-xs text-gray-400">Next Steps</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 text-xs text-gray-700 bg-gray-100 rounded-full">Interview</span>
-                                    <span class="px-3 py-1 text-xs text-gray-700 bg-gray-100 rounded-full">Offer</span>
-                                </div>
+                                              </svg>';
+                                        break;
+                                    default:
+                                        echo '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                              </svg>';
+                                }
+                                ?>
                             </div>
-                        <?php endif; ?>
+
+                            <!-- Status Text -->
+                            <span class="text-sm font-medium text-white">
+                                <?php
+                                switch ($selectedJob['application_status']) {
+                                    case 'pending':
+                                        echo 'Pending Review';
+                                        break;
+                                    case 'reviewed':
+                                        echo 'Under Review';
+                                        break;
+                                    case 'shortlisted':
+                                        echo 'Shortlisted';
+                                        break;
+                                    case 'hired':
+                                        echo 'Hired';
+                                        break;
+                                    case 'rejected':
+                                        echo 'Not Selected';
+                                        break;
+                                    default:
+                                        echo 'View Application';
+                                }
+                                ?>
+                            </span>
+                        </a>
                     </div>
                 <?php endif; ?>
 
@@ -343,12 +312,15 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                 <!-- No Application - Show Apply Button -->
                 <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&step=1"
                     class="flex-1 px-4 py-3 text-sm font-medium text-center text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
-                    <i class="mr-1 fas fa-paper-plane"></i> Apply Now
+                    <i class="mr-1 fas fa-paper-plane"></i>
+                    Apply Now
                 </a>
             <?php endif; ?>
 
+            <!-- View Full Details Button - Keep as secondary style -->
             <a href="?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>"
                 class="flex-1 px-4 py-3 text-sm font-medium text-center transition-colors bg-white border rounded-lg text-primary border-primary hover:bg-primary/5">
+                <i class="mr-1 fas fa-external-link-alt"></i>
                 View Full Details
             </a>
         </div>
