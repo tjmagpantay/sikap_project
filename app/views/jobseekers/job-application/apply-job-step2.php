@@ -267,4 +267,4 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </button>
                 </div>
             </form>
-        </div
+        </div>

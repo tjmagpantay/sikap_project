@@ -15,7 +15,7 @@ class JobApplicantsController
         $this->employerModel = new Employer();
     }
 
-    public function viewApplicants($job_id)
+    public function viewApplicants($job_id = null)
     {
         // Check if user is logged in as employer
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
@@ -30,7 +30,10 @@ class JobApplicantsController
             exit();
         }
 
-        $job_id = $_GET['job_id'] ?? null;
+        // Use passed job_id or get from URL
+        if (!$job_id) {
+            $job_id = $_GET['job_id'] ?? null;
+        }
 
         if (!$job_id) {
             // Redirect if no job ID provided
@@ -40,6 +43,10 @@ class JobApplicantsController
 
         // Get applicants only for this employer's job
         $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id, $employer['employer_id']);
+
+        // Debug output
+        error_log("DEBUG: Job ID: $job_id, Employer ID: {$employer['employer_id']}, Applicants count: " . count($applicants));
+
         include __DIR__ . '/../views/employers/manage-applications.php';
     }
 

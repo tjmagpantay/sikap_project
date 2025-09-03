@@ -481,7 +481,7 @@ class JobPostController
         $incompleteApplication = null;
         $applicationStatus = null;
         $applicationData = null;
-        
+
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             try {
                 require_once __DIR__ . '/../models/JobApplication.php';
@@ -496,10 +496,10 @@ class JobPostController
                     $profileCompleted = !empty($jobseeker['profile_completed']) && $jobseeker['profile_completed'] == 1;
                     error_log("DEBUG JobPostController: Profile completed field: " . ($jobseeker['profile_completed'] ?? 'NULL'));
                     error_log("DEBUG JobPostController: Profile completed boolean: " . ($profileCompleted ? 'true' : 'false'));
-                    
+
                     // Check for any application (complete or incomplete)
                     $application = $jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
-                    
+
                     if ($application) {
                         $hasApplied = true;
                         $applicationData = $application;

@@ -1,12 +1,22 @@
 <?php
 include_once __DIR__ . '/components/employer_auth_check.php';
-require_once __DIR__ . '/../../models/Employer.php';
 
-$employerModel = new Employer();
-$employer = $employerModel->findByUserId($_SESSION['user_id']);
+// Check if $settings is passed from controller
+if (!isset($settings)) {
+    // If not called from controller, redirect to proper route
+    header('Location: ?page=setting-employer');
+    exit;
+}
 
-if ($employer === false) {
-    $employer = ['business_name' => '', 'contact_person' => ''];
+// Check if $employer is passed from controller  
+if (!isset($employer)) {
+    require_once __DIR__ . '/../../models/Employer.php';
+    $employerModel = new Employer();
+    $employer = $employerModel->findByUserId($_SESSION['user_id']);
+
+    if ($employer === false) {
+        $employer = ['business_name' => '', 'contact_person' => ''];
+    }
 }
 ?>
 
@@ -15,7 +25,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
 ?>
 
 <div class="min-h-screen">
-    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Header with breadcrumbs -->
         <div class="mb-8">
             <!-- Breadcrumb Navigation -->
@@ -104,7 +114,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </div>
 
             <!-- Email Preferences -->
-            <div class="p-6 bg-white rounded-lg shadow">
+            <div class="p-6 bg-white rounded-lg shadow" id="email-preferences">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Email Preferences</h3>
                     <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
@@ -116,10 +126,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Application Notifications</h4>
                             <p class="text-xs text-gray-500">Get notified when candidates apply to your job posts</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="application_notifications"
+                                name="application_notifications"
+                                value="1"
+                                <?php echo (isset($settings['application_notifications']) && $settings['application_notifications'] == 1) ? 'checked' : ''; ?>>
+                            <label for="application_notifications" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -127,10 +144,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Candidate Matches</h4>
                             <p class="text-xs text-gray-500">Receive recommendations for qualified candidates</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="candidate_matches"
+                                name="candidate_matches"
+                                value="1"
+                                <?php echo (isset($settings['candidate_matches']) && $settings['candidate_matches'] == 1) ? 'checked' : ''; ?>>
+                            <label for="candidate_matches" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -138,10 +162,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Job Post Updates</h4>
                             <p class="text-xs text-gray-500">Get notified about job post performance and statistics</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="job_post_updates"
+                                name="job_post_updates"
+                                value="1"
+                                <?php echo (isset($settings['job_post_updates']) && $settings['job_post_updates'] == 1) ? 'checked' : ''; ?>>
+                            <label for="job_post_updates" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -149,22 +180,31 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Platform Updates</h4>
                             <p class="text-xs text-gray-500">Receive updates about new features and hiring insights</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="platform_updates"
+                                name="platform_updates"
+                                value="1"
+                                <?php echo (isset($settings['platform_updates']) && $settings['platform_updates'] == 1) ? 'checked' : ''; ?>>
+                            <label for="platform_updates" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-6">
-                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                <!-- Save Button -->
+                <div class="flex justify-end mt-6">
+                    <button id="save-email-preferences"
+                        class="px-4 py-2 text-white rounded-md bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Save Preferences
                     </button>
                 </div>
             </div>
 
             <!-- Company Visibility Settings -->
-            <div class="p-6 bg-white rounded-lg shadow">
+            <div class="p-6 bg-white rounded-lg shadow" id="visibility-settings">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Company Visibility Settings</h3>
                     <p class="mt-1 text-sm text-gray-600">Control how your company appears to job seekers</p>
@@ -176,10 +216,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Company Profile Visibility</h4>
                             <p class="text-xs text-gray-500">Allow job seekers to view your company profile and information</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="company_profile_visibility"
+                                name="company_profile_visibility"
+                                value="1"
+                                <?php echo (isset($settings['company_profile_visibility']) && $settings['company_profile_visibility'] == 1) ? 'checked' : ''; ?>>
+                            <label for="company_profile_visibility" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -187,10 +234,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
                             <p class="text-xs text-gray-500">Display contact details on job posts and company profile</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="contact_information"
+                                name="contact_information"
+                                value="1"
+                                <?php echo (isset($settings['contact_information']) && $settings['contact_information'] == 1) ? 'checked' : ''; ?>>
+                            <label for="contact_information" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -198,10 +252,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Job Post Analytics</h4>
                             <p class="text-xs text-gray-500">Show application statistics and job performance metrics</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="job_post_analytics"
+                                name="job_post_analytics"
+                                value="1"
+                                <?php echo (isset($settings['job_post_analytics']) && $settings['job_post_analytics'] == 1) ? 'checked' : ''; ?>>
+                            <label for="job_post_analytics" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -271,7 +332,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </div>
 
             <!-- Hiring Preferences -->
-            <div class="p-6 bg-white rounded-lg shadow">
+            <div class="p-6 bg-white rounded-lg shadow" id="hiring-preferences">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Hiring Preferences</h3>
                     <p class="mt-1 text-sm text-gray-600">Set your default preferences for hiring and recruitment</p>
@@ -283,10 +344,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Auto-screen Applications</h4>
                             <p class="text-xs text-gray-500">Automatically filter applications based on job requirements</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="auto_screen_applications"
+                                name="auto_screen_applications"
+                                value="1"
+                                <?php echo (isset($settings['auto_screen_applications']) && $settings['auto_screen_applications'] == 1) ? 'checked' : ''; ?>>
+                            <label for="auto_screen_applications" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -294,10 +362,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Send Auto-replies</h4>
                             <p class="text-xs text-gray-500">Automatically acknowledge receipt of applications</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="send_auto_replies"
+                                name="send_auto_replies"
+                                value="1"
+                                <?php echo (isset($settings['send_auto_replies']) && $settings['send_auto_replies'] == 1) ? 'checked' : ''; ?>>
+                            <label for="send_auto_replies" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between">
@@ -305,10 +380,17 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <h4 class="text-sm font-medium text-gray-900">Priority Candidate Alerts</h4>
                             <p class="text-xs text-gray-500">Get immediate alerts for high-priority candidate applications</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="priority_candidate_alerts"
+                                name="priority_candidate_alerts"
+                                value="1"
+                                <?php echo (isset($settings['priority_candidate_alerts']) && $settings['priority_candidate_alerts'] == 1) ? 'checked' : ''; ?>>
+                            <label for="priority_candidate_alerts" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -354,6 +436,59 @@ include_once __DIR__ . '/components/navbar-employer.php';
     </div>
 </div>
 
+<style>
+    /* Custom Toggle Switch Styles */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+    }
+
+    .toggle-switch input[type="checkbox"] {
+        display: none;
+    }
+
+    .toggle-label {
+        position: relative;
+        display: block;
+        width: 44px;
+        height: 24px;
+        cursor: pointer;
+        border-radius: 12px;
+        background-color: #e5e7eb;
+        transition: background-color 0.3s ease;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    /* Changed from green to primary color */
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
+        background-color: var(--primary-color, #3b82f6);
+    }
+
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label .toggle-slider {
+        transform: translateX(20px);
+    }
+
+    .toggle-switch input[type="checkbox"]:focus+.toggle-label {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Fallback if CSS variables not available */
+    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
+        background-color: #3b82f6;
+    }
+</style>
+
 <script>
     function togglePasswordForm() {
         const form = document.getElementById('password-form');
@@ -376,7 +511,52 @@ include_once __DIR__ . '/components/navbar-employer.php';
         }
     }
 
+    // Handle settings updates
     document.addEventListener('DOMContentLoaded', function() {
+        // Email Preferences Save Button
+        const emailSaveBtn = document.getElementById('save-email-preferences');
+        if (emailSaveBtn) {
+            emailSaveBtn.addEventListener('click', function() {
+                updateEmailPreferences();
+            });
+        }
+
+        // Visibility Settings Save Button
+        const visibilitySaveBtn = document.getElementById('save-visibility-settings');
+        if (visibilitySaveBtn) {
+            visibilitySaveBtn.addEventListener('click', function() {
+                updateVisibilitySettings();
+            });
+        }
+
+        // Hiring Preferences Save Button
+        const hiringSaveBtn = document.getElementById('save-hiring-preferences');
+        if (hiringSaveBtn) {
+            hiringSaveBtn.addEventListener('click', function() {
+                updateHiringPreferences();
+            });
+        }
+
+        // Auto-save on toggle change (optional)
+        const allToggles = document.querySelectorAll('input[type="checkbox"]');
+        allToggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                // Auto-save functionality - you can remove this if you only want manual save
+                const section = this.closest('[id$="-preferences"], [id$="-settings"]');
+                if (section) {
+                    const sectionId = section.id;
+                    if (sectionId === 'email-preferences') {
+                        setTimeout(() => updateEmailPreferences(), 500);
+                    } else if (sectionId === 'visibility-settings') {
+                        setTimeout(() => updateVisibilitySettings(), 500);
+                    } else if (sectionId === 'hiring-preferences') {
+                        setTimeout(() => updateHiringPreferences(), 500);
+                    }
+                }
+            });
+        });
+
+        // Password form
         const passwordForm = document.querySelector('#password-form form');
         if (passwordForm) {
             passwordForm.addEventListener('submit', function(e) {
@@ -406,4 +586,193 @@ include_once __DIR__ . '/components/navbar-employer.php';
             });
         }
     });
+
+    function updateEmailPreferences() {
+        const formData = new FormData();
+        formData.append('action', 'update_email_preferences');
+
+        const applicationNotifications = document.getElementById('application_notifications');
+        const candidateMatches = document.getElementById('candidate_matches');
+        const jobPostUpdates = document.getElementById('job_post_updates');
+        const platformUpdates = document.getElementById('platform_updates');
+
+        formData.append('application_notifications', applicationNotifications && applicationNotifications.checked ? '1' : '0');
+        formData.append('candidate_matches', candidateMatches && candidateMatches.checked ? '1' : '0');
+        formData.append('job_post_updates', jobPostUpdates && jobPostUpdates.checked ? '1' : '0');
+        formData.append('platform_updates', platformUpdates && platformUpdates.checked ? '1' : '0');
+
+        // Show loading state
+        const saveBtn = document.getElementById('save-email-preferences');
+        if (saveBtn) {
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+        }
+
+        fetch('?page=update-employer-settings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showSuccessMessage('Email preferences updated successfully!');
+                } else {
+                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('An error occurred while updating preferences. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                if (saveBtn) {
+                    saveBtn.textContent = 'Save Preferences';
+                    saveBtn.disabled = false;
+                }
+            });
+    }
+
+    function updateVisibilitySettings() {
+        const formData = new FormData();
+        formData.append('action', 'update_visibility_settings');
+
+        const companyProfileVisibility = document.getElementById('company_profile_visibility');
+        const contactInformation = document.getElementById('contact_information');
+        const jobPostAnalytics = document.getElementById('job_post_analytics');
+
+        formData.append('company_profile_visibility', companyProfileVisibility && companyProfileVisibility.checked ? '1' : '0');
+        formData.append('contact_information', contactInformation && contactInformation.checked ? '1' : '0');
+        formData.append('job_post_analytics', jobPostAnalytics && jobPostAnalytics.checked ? '1' : '0');
+
+        // Show loading state
+        const saveBtn = document.getElementById('save-visibility-settings');
+        if (saveBtn) {
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+        }
+
+        fetch('?page=update-employer-settings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showSuccessMessage('Visibility settings updated successfully!');
+                } else {
+                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('An error occurred while updating settings. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                if (saveBtn) {
+                    saveBtn.textContent = 'Save Settings';
+                    saveBtn.disabled = false;
+                }
+            });
+    }
+
+    function updateHiringPreferences() {
+        const formData = new FormData();
+        formData.append('action', 'update_hiring_preferences');
+
+        const autoScreenApplications = document.getElementById('auto_screen_applications');
+        const sendAutoReplies = document.getElementById('send_auto_replies');
+        const priorityCandidateAlerts = document.getElementById('priority_candidate_alerts');
+
+        formData.append('auto_screen_applications', autoScreenApplications && autoScreenApplications.checked ? '1' : '0');
+        formData.append('send_auto_replies', sendAutoReplies && sendAutoReplies.checked ? '1' : '0');
+        formData.append('priority_candidate_alerts', priorityCandidateAlerts && priorityCandidateAlerts.checked ? '1' : '0');
+
+        // Show loading state
+        const saveBtn = document.getElementById('save-hiring-preferences');
+        if (saveBtn) {
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+        }
+
+        fetch('?page=update-employer-settings', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showSuccessMessage('Hiring preferences updated successfully!');
+                } else {
+                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('An error occurred while updating preferences. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                if (saveBtn) {
+                    saveBtn.textContent = 'Save Preferences';
+                    saveBtn.disabled = false;
+                }
+            });
+    }
+
+    function showSuccessMessage(message) {
+        // Remove any existing messages
+        const existing = document.querySelector('.success-message, .error-message');
+        if (existing) {
+            existing.remove();
+        }
+
+        // Create a new success message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        alertDiv.textContent = message;
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            if (document.body.contains(alertDiv)) {
+                document.body.removeChild(alertDiv);
+            }
+        }, 3000);
+    }
+
+    function showErrorMessage(message) {
+        // Remove any existing messages
+        const existing = document.querySelector('.success-message, .error-message');
+        if (existing) {
+            existing.remove();
+        }
+
+        // Create a new error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'error-message fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        alertDiv.textContent = message;
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            if (document.body.contains(alertDiv)) {
+                document.body.removeChild(alertDiv);
+            }
+        }, 3000);
+    }
 </script>

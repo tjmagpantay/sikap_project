@@ -112,19 +112,24 @@ class JobApplicants
                     ja.applied_at,
                     js.first_name,
                     js.last_name,
-                    js.profile_picture
+                    js.profile_picture,
+                    u.email
                 FROM job_application ja
-                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id";
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                JOIN users u ON js.user_id = u.user_id";
 
         // Add JOIN with job_post to verify employer ownership
         if ($employer_id !== null) {
             $sql .= " JOIN job_post jp ON ja.job_id = jp.job_id
-                     WHERE ja.job_id = ? AND jp.employer_id = ?";
+                     WHERE ja.job_id = ? AND jp.employer_id = ? AND ja.is_finalized = 1";
         } else {
-            $sql .= " WHERE ja.job_id = ?";
+            $sql .= " WHERE ja.job_id = ? AND ja.is_finalized = 1";
         }
 
         $sql .= " ORDER BY ja.applied_at DESC";
+
+        error_log("DEBUG JobApplicants: SQL Query: " . $sql);
+        error_log("DEBUG JobApplicants: job_id=$job_id, employer_id=$employer_id");
 
         $stmt = $this->db->prepare($sql);
 
@@ -134,6 +139,9 @@ class JobApplicants
             $stmt->execute([$job_id]);
         }
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        error_log("DEBUG JobApplicants: Found " . count($results) . " applicants");
+
+        return $results;
     }
 }

@@ -251,6 +251,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new JobApplicantsController();
             $controller->viewApplicants($_GET['job_id'] ?? null);
             break;
+        case 'job-applications':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
         case 'manage-applications':
             require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
             $controller = new JobApplicantsController();
@@ -645,7 +650,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         case 'setting-employer':
-            include __DIR__ . '/../app/views/employers/setting-employer.php';
+            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
+            $controller = new EmployerSettingsController();
+            $controller->showSettings();
+            break;
+
+        case 'update-employer-settings':
+            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
+            $controller = new EmployerSettingsController();
+            $controller->updateSettings();
             break;
 
         // Add these cases to your switch statement in index.php
