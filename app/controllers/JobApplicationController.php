@@ -155,6 +155,22 @@ class JobApplicationController
     // Step 2: Screening Questions
     private function showStep2($job, $jobseeker, $application_id)
     {
+        // Debug logging
+        error_log("DEBUG Step2: job_id = " . $job['job_id']);
+        error_log("DEBUG Step2: screening_questions_enabled = " . ($job['screening_questions_enabled'] ?? 'not set'));
+
+        // Get screening questions if enabled
+        $screeningQuestions = [];
+        if (($job['screening_questions_enabled'] ?? 0) == 1) {
+            $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job['job_id']);
+            error_log("DEBUG Step2: Found " . count($screeningQuestions) . " screening questions");
+            foreach ($screeningQuestions as $q) {
+                error_log("DEBUG Step2: Question - " . $q['question_text'] . " (Type: " . $q['question_type'] . ")");
+            }
+        } else {
+            error_log("DEBUG Step2: Screening questions not enabled");
+        }
+
         // Allow navigation to step 2 if application exists and user has reached at least step 2
         if (!$application_id) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
@@ -166,12 +182,6 @@ class JobApplicationController
         if ($applicationData && $applicationData['current_step'] < 2) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
             exit;
-        }
-
-        // Get screening questions if enabled
-        $screeningQuestions = [];
-        if (($job['screening_questions_enabled'] ?? 0) == 1) {
-            $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job['job_id']);
         }
 
         // Get existing answers if any
@@ -277,154 +287,180 @@ class JobApplicationController
 
             // Get current attachments to check what's already attached
             $currentAttachments = $this->jobApplicationModel->getApplicationAttachments($application_id);
-            $currentResumeAttached = false;
-            $currentCvAttached = false;
-            $currentResumeInfo = null;
-            $currentCvInfo = null;
+
+            // Create arrays to track what's currently attached
+            $currentResumeAttachments = [];
+            $currentCvAttachments = [];
+            $currentAdditionalAttachments = [];
 
             foreach ($currentAttachments as $attachment) {
-                if ($attachment['file_type'] === 'resume') {
-                    $currentResumeAttached = true;
-                    $currentResumeInfo = $attachment;
-                }
-                if ($attachment['file_type'] === 'cv') {
-                    $currentCvAttached = true;
-                    $currentCvInfo = $attachment;
+                $fileType = strtolower($attachment['file_type']);
+                if ($fileType === 'resume') {
+                    $currentResumeAttachments[] = $attachment;
+                } elseif ($fileType === 'cv') {
+                    $currentCvAttachments[] = $attachment;
+                } else {
+                    $currentAdditionalAttachments[] = $attachment;
                 }
             }
+
+            error_log("DEBUG Step1: Current resume attachments: " . count($currentResumeAttachments));
+            error_log("DEBUG Step1: Current CV attachments: " . count($currentCvAttachments));
 
             $resumeHandled = false;
             $cvHandled = false;
 
-            // Handle Resume (only allow one)
-            if (!empty($_POST['selected_resumes'])) {
-                // Use the first selected resume only
-                $resumePath = $_POST['selected_resumes'][0];
+            // === HANDLE RESUME (Only one allowed) ===
 
-                // Check if this is the same resume already attached
-                $isAlreadyAttached = false;
-                if ($currentResumeAttached && $currentResumeInfo) {
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $resumePath);
-                    if (
-                        $profileDoc &&
-                        (($currentResumeInfo['file_path'] === $resumePath) ||
-                            (!empty($currentResumeInfo['profile_document_id']) &&
-                                $currentResumeInfo['profile_document_id'] == $profileDoc['document_id']))
-                    ) {
-                        $isAlreadyAttached = true;
-                        $resumeHandled = true; // Already handled, no need to re-attach
+            // Check what user wants to do with resume
+            $newResumeUploaded = !empty($_FILES['new_resume']['name']) && $_FILES['new_resume']['error'] === UPLOAD_ERR_OK;
+            $selectedResumes = $_POST['selected_resumes'] ?? [];
+
+            error_log("DEBUG Step1: New resume uploaded: " . ($newResumeUploaded ? 'yes' : 'no'));
+            error_log("DEBUG Step1: Selected resumes: " . json_encode($selectedResumes));
+
+            if ($newResumeUploaded) {
+                // NEW RESUME UPLOAD - Clear all existing resume attachments and add new one
+                $this->jobApplicationModel->clearResumeAttachments($application_id);
+
+                $resumePath = $this->handleResumeUpload($_FILES['new_resume']);
+                if ($resumePath) {
+                    $this->jobApplicationModel->saveApplicationAttachment($application_id, $resumePath, 'Resume');
+                    $resumeHandled = true;
+
+                    // Optionally save to profile
+                    if (isset($_POST['save_resume_to_profile']) && $_POST['save_resume_to_profile'] == '1') {
+                        $this->saveOrUpdateProfileDocument($jobseeker['jobseeker_id'], $resumePath, 'resume', $_FILES['new_resume']['name']);
+                    }
+
+                    error_log("DEBUG Step1: New resume uploaded and attached");
+                }
+            } elseif (!empty($selectedResumes)) {
+                // SELECTED EXISTING RESUME - Check if it's already attached
+                $selectedResumePath = $selectedResumes[0]; // Only take first one
+
+                // Check if this resume is already attached
+                $alreadyAttached = false;
+                foreach ($currentResumeAttachments as $attachment) {
+                    if ($attachment['file_path'] === $selectedResumePath) {
+                        $alreadyAttached = true;
+                        break;
+                    }
+
+                    // Also check profile document reference
+                    if (!empty($attachment['profile_document_id'])) {
+                        $profileDoc = $this->findProfileDocumentById($attachment['profile_document_id']);
+                        if ($profileDoc && $profileDoc['file_path'] === $selectedResumePath) {
+                            $alreadyAttached = true;
+                            break;
+                        }
                     }
                 }
 
-                if (!$isAlreadyAttached) {
-                    // Clear existing resume attachment first
+                if (!$alreadyAttached) {
+                    // Clear existing resume attachments and add the selected one
                     $this->jobApplicationModel->clearResumeAttachments($application_id);
 
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $resumePath);
+                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedResumePath);
                     if ($profileDoc) {
-                        // Create reference to existing profile document
                         $this->jobApplicationModel->saveApplicationAttachmentReference(
                             $application_id,
                             $profileDoc['document_id'],
                             'Resume'
                         );
-                        $resumeHandled = true;
+                        error_log("DEBUG Step1: Selected resume attached (not duplicate)");
+                    } else {
+                        // Fallback: direct file attachment
+                        $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
+                        error_log("DEBUG Step1: Selected resume attached as direct file");
                     }
+                } else {
+                    error_log("DEBUG Step1: Selected resume is already attached - skipping");
                 }
-            } elseif (!empty($_FILES['new_resume']['name'])) {
-                // Clear existing resume attachment first
-                $this->jobApplicationModel->clearResumeAttachments($application_id);
 
-                // Upload new resume and replace any existing one
-                $resumePath = $this->handleResumeUpload($_FILES['new_resume']);
-                if ($resumePath) {
-                    // Save as application attachment
-                    $this->jobApplicationModel->saveApplicationAttachment($application_id, $resumePath, 'Resume');
-                    $resumeHandled = true;
-
-                    // Optionally save to profile documents for future use
-                    if (isset($_POST['save_resume_to_profile']) && $_POST['save_resume_to_profile'] == '1') {
-                        // Check if user already has a resume in profile, update it instead of creating new
-                        $existingResume = $this->jobseekerModel->findDocumentByType($jobseeker['jobseeker_id'], 'resume');
-                        if ($existingResume) {
-                            // Update existing resume
-                            $this->jobseekerModel->updateDocument($existingResume['document_id'], $resumePath, $_FILES['new_resume']['name']);
-                        } else {
-                            // Create new profile document
-                            $this->jobseekerModel->saveDocument($jobseeker['jobseeker_id'], $resumePath, 'resume', $_FILES['new_resume']['name']);
-                        }
-                    }
-                }
+                $resumeHandled = true;
             } else {
-                // If no resume selected/uploaded but one is currently attached, keep it
-                if ($currentResumeAttached) {
+                // NO NEW SELECTION - Keep existing resume attachments if any
+                if (!empty($currentResumeAttachments)) {
                     $resumeHandled = true;
+                    error_log("DEBUG Step1: Keeping existing resume attachments");
                 }
             }
 
-            // Handle CV (only allow one)
-            if (!empty($_POST['selected_cvs'])) {
-                // Use the first selected CV only
-                $cvPath = $_POST['selected_cvs'][0];
+            // === HANDLE CV (Only one allowed) ===
 
-                // Check if this is the same CV already attached
-                $isAlreadyAttached = false;
-                if ($currentCvAttached && $currentCvInfo) {
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $cvPath);
-                    if (
-                        $profileDoc &&
-                        (($currentCvInfo['file_path'] === $cvPath) ||
-                            (!empty($currentCvInfo['profile_document_id']) &&
-                                $currentCvInfo['profile_document_id'] == $profileDoc['document_id']))
-                    ) {
-                        $isAlreadyAttached = true;
-                        $cvHandled = true; // Already handled, no need to re-attach
+            // Check what user wants to do with CV
+            $newCvUploaded = !empty($_FILES['new_cv']['name']) && $_FILES['new_cv']['error'] === UPLOAD_ERR_OK;
+            $selectedCvs = $_POST['selected_cvs'] ?? [];
+
+            error_log("DEBUG Step1: New CV uploaded: " . ($newCvUploaded ? 'yes' : 'no'));
+            error_log("DEBUG Step1: Selected CVs: " . json_encode($selectedCvs));
+
+            if ($newCvUploaded) {
+                // NEW CV UPLOAD - Clear all existing CV attachments and add new one
+                $this->jobApplicationModel->clearCvAttachments($application_id);
+
+                $cvPath = $this->handleResumeUpload($_FILES['new_cv']);
+                if ($cvPath) {
+                    $this->jobApplicationModel->saveApplicationAttachment($application_id, $cvPath, 'CV');
+                    $cvHandled = true;
+
+                    // Optionally save to profile
+                    if (isset($_POST['save_cv_to_profile']) && $_POST['save_cv_to_profile'] == '1') {
+                        $this->saveOrUpdateProfileDocument($jobseeker['jobseeker_id'], $cvPath, 'cv', $_FILES['new_cv']['name']);
+                    }
+
+                    error_log("DEBUG Step1: New CV uploaded and attached");
+                }
+            } elseif (!empty($selectedCvs)) {
+                // SELECTED EXISTING CV - Check if it's already attached
+                $selectedCvPath = $selectedCvs[0]; // Only take first one
+
+                // Check if this CV is already attached
+                $alreadyAttached = false;
+                foreach ($currentCvAttachments as $attachment) {
+                    if ($attachment['file_path'] === $selectedCvPath) {
+                        $alreadyAttached = true;
+                        break;
+                    }
+
+                    // Also check profile document reference
+                    if (!empty($attachment['profile_document_id'])) {
+                        $profileDoc = $this->findProfileDocumentById($attachment['profile_document_id']);
+                        if ($profileDoc && $profileDoc['file_path'] === $selectedCvPath) {
+                            $alreadyAttached = true;
+                            break;
+                        }
                     }
                 }
 
-                if (!$isAlreadyAttached) {
-                    // Clear existing CV attachment first
+                if (!$alreadyAttached) {
+                    // Clear existing CV attachments and add the selected one
                     $this->jobApplicationModel->clearCvAttachments($application_id);
 
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $cvPath);
+                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedCvPath);
                     if ($profileDoc) {
-                        // Create reference to existing profile document
                         $this->jobApplicationModel->saveApplicationAttachmentReference(
                             $application_id,
                             $profileDoc['document_id'],
                             'CV'
                         );
-                        $cvHandled = true;
+                        error_log("DEBUG Step1: Selected CV attached (not duplicate)");
+                    } else {
+                        // Fallback: direct file attachment
+                        $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
+                        error_log("DEBUG Step1: Selected CV attached as direct file");
                     }
+                } else {
+                    error_log("DEBUG Step1: Selected CV is already attached - skipping");
                 }
-            } elseif (!empty($_FILES['new_cv']['name'])) {
-                // Clear existing CV attachment first
-                $this->jobApplicationModel->clearCvAttachments($application_id);
 
-                // Upload new CV and replace any existing one
-                $cvPath = $this->handleResumeUpload($_FILES['new_cv']);
-                if ($cvPath) {
-                    // Save as application attachment
-                    $this->jobApplicationModel->saveApplicationAttachment($application_id, $cvPath, 'CV');
-                    $cvHandled = true;
-
-                    // Optionally save to profile documents for future use
-                    if (isset($_POST['save_cv_to_profile']) && $_POST['save_cv_to_profile'] == '1') {
-                        // Check if user already has a CV in profile, update it instead of creating new
-                        $existingCV = $this->jobseekerModel->findDocumentByType($jobseeker['jobseeker_id'], 'cv');
-                        if ($existingCV) {
-                            // Update existing CV
-                            $this->jobseekerModel->updateDocument($existingCV['document_id'], $cvPath, $_FILES['new_cv']['name']);
-                        } else {
-                            // Create new CV document
-                            $this->jobseekerModel->saveDocument($jobseeker['jobseeker_id'], $cvPath, 'cv', $_FILES['new_cv']['name']);
-                        }
-                    }
-                }
+                $cvHandled = true;
             } else {
-                // If no CV selected/uploaded but one is currently attached, keep it
-                if ($currentCvAttached) {
+                // NO NEW SELECTION - Keep existing CV attachments if any
+                if (!empty($currentCvAttachments)) {
                     $cvHandled = true;
+                    error_log("DEBUG Step1: Keeping existing CV attachments");
                 }
             }
 
@@ -433,7 +469,8 @@ class JobApplicationController
                 throw new Exception('Please select at least one existing document or upload a new resume/CV');
             }
 
-            // Handle additional attachments (these can be multiple)
+            // === HANDLE ADDITIONAL ATTACHMENTS ===
+            // Only add new additional attachments if any files are uploaded
             if (!empty($_FILES['attachments']['name'][0])) {
                 foreach ($_FILES['attachments']['name'] as $index => $filename) {
                     if (!empty($filename)) {
@@ -449,6 +486,7 @@ class JobApplicationController
                         if ($attachmentPath) {
                             $file_type = $_POST['attachment_types'][$index] ?? 'Others';
                             $this->jobApplicationModel->saveApplicationAttachment($application_id, $attachmentPath, $file_type);
+                            error_log("DEBUG Step1: Additional attachment uploaded: $file_type");
                         }
                     }
                 }
@@ -482,10 +520,21 @@ class JobApplicationController
             // Save new answers
             foreach ($screeningQuestions as $question) {
                 $answer_key = 'question_' . $question['question_id'];
-                if (isset($_POST[$answer_key]) && !empty($_POST[$answer_key])) {
-                    $answer = trim($_POST[$answer_key]);
-                    if (!$this->jobApplicationModel->saveApplicationAnswer($application_id, $question['question_id'], $answer)) {
-                        throw new Exception('Failed to save screening answers');
+
+                if (isset($_POST[$answer_key])) {
+                    $answer = $_POST[$answer_key];
+
+                    // Handle checkbox arrays (multiple selections)
+                    if (is_array($answer)) {
+                        $answer = implode(',', array_map('trim', $answer));
+                    } else {
+                        $answer = trim($answer);
+                    }
+
+                    if (!empty($answer)) {
+                        if (!$this->jobApplicationModel->saveApplicationAnswer($application_id, $question['question_id'], $answer)) {
+                            throw new Exception('Failed to save screening answers');
+                        }
                     }
                 }
             }
@@ -579,7 +628,7 @@ class JobApplicationController
             }
 
             // Create upload directory
-            $uploadDir = __DIR__ . '/../../public/uploads/applications/';
+            $uploadDir = __DIR__ . '/../../uploads/applications/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -627,7 +676,7 @@ class JobApplicationController
             }
 
             // Create upload directory
-            $uploadDir = __DIR__ . '/../../public/uploads/applications/';
+            $uploadDir = __DIR__ . '/../../uploads/applications/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -723,13 +772,96 @@ class JobApplicationController
         return $this->jobseekerModel->saveDocument($jobseeker_id, $file_path, $file_type, $file_name);
     }
 
+    private function findProfileDocumentById($document_id)
+    {
+        try {
+            return $this->jobseekerModel->findDocumentById($document_id);
+        } catch (Exception $e) {
+            error_log("Error finding profile document by ID: " . $e->getMessage());
+            return null;
+        }
+    }
+
     private function findProfileDocumentByPath($jobseeker_id, $file_path)
     {
-        // Move this to Jobseeker model
-        return $this->jobseekerModel->findDocumentByPath($jobseeker_id, $file_path);
+        try {
+            return $this->jobseekerModel->findDocumentByPath($jobseeker_id, $file_path);
+        } catch (Exception $e) {
+            error_log("Error finding profile document by path: " . $e->getMessage());
+            return null;
+        }
     }
 
     // Keep existing methods for viewing applications, success page, etc.
+
+    public function viewJob()
+    {
+        $job_id = $_GET['job_id'] ?? null;
+
+        if (!$job_id) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Get job details
+        $job = $this->jobPostModel->getFullJobData($job_id);
+        if (!$job) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Initialize application-related variables
+        $hasApplied = false;
+        $incompleteApplication = null;
+        $applicationStatus = null;
+        $applicationData = null;
+        $profileCompleted = false;
+
+        // Check application status if user is logged in as jobseeker
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+            if ($jobseeker) {
+                // Check if profile is completed
+                $profileCompleted = !empty($jobseeker['profile_completed']) && $jobseeker['profile_completed'] == 1;
+                error_log("DEBUG viewJob: Profile completed: " . ($profileCompleted ? 'true' : 'false'));
+
+                // Check for any application (complete or incomplete)
+                $application = $this->jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
+
+                if ($application) {
+                    $hasApplied = true;
+                    $applicationData = $application;
+
+                    if ($application['is_finalized'] == 1) {
+                        // Complete application
+                        $applicationStatus = $application['application_status'] ?? 'pending';
+                        error_log("DEBUG viewJob: Complete application found - status: $applicationStatus");
+                    } else {
+                        // Incomplete application
+                        $incompleteApplication = $application;
+                        error_log("DEBUG viewJob: Incomplete application found - step: {$application['current_step']}");
+                    }
+                } else {
+                    error_log("DEBUG viewJob: No application found for jobseeker_id={$jobseeker['jobseeker_id']}, job_id=$job_id");
+                }
+            } else {
+                error_log("DEBUG viewJob: No jobseeker record found for user_id: " . $_SESSION['user_id']);
+            }
+        } else {
+            error_log("DEBUG viewJob: No active jobseeker session - user_id: " . ($_SESSION['user_id'] ?? 'not set') . ", role: " . ($_SESSION['role'] ?? 'not set'));
+        }
+
+        // Debug output
+        error_log("DEBUG viewJob FINAL: hasApplied=" . ($hasApplied ? 'true' : 'false'));
+        error_log("DEBUG viewJob FINAL: incompleteApplication=" . ($incompleteApplication ? 'exists' : 'null'));
+        error_log("DEBUG viewJob FINAL: applicationStatus=" . ($applicationStatus ?? 'null'));
+        error_log("DEBUG viewJob FINAL: profileCompleted=" . ($profileCompleted ? 'true' : 'false'));
+
+        // Load view with all variables
+        include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
+    }
+
     public function applicationSuccess()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
@@ -877,79 +1009,26 @@ class JobApplicationController
 
     // Update the viewJob method in JobApplicationController.php:
 
-    public function viewJob()
+    private function saveOrUpdateProfileDocument($jobseeker_id, $file_path, $file_type, $file_name)
     {
-        $job_id = $_GET['job_id'] ?? null;
+        try {
+            // Check if user already has this type of document in profile
+            $existingDoc = $this->jobseekerModel->findDocumentByType($jobseeker_id, $file_type);
 
-        if (!$job_id) {
-            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-            exit;
-        }
-
-        // Get job details
-        $job = $this->jobPostModel->getFullJobData($job_id);
-
-        if (!$job) {
-            header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-            exit;
-        }
-
-        // Initialize variables - IMPORTANT: These must be initialized for the view
-        $hasApplied = false;
-        $incompleteApplication = null;
-        $applicationStatus = null;
-        $applicationData = null;
-
-        // Check application status if user is logged in as jobseeker
-        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-
-            if ($jobseeker) {
-                error_log("DEBUG viewJob: Looking for application for jobseeker_id: {$jobseeker['jobseeker_id']}, job_id: $job_id");
-
-                // Get complete application data
-                $applicationData = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
-                    $jobseeker['jobseeker_id'],
-                    $job_id
-                );
-
-                error_log("DEBUG viewJob: Application data: " . json_encode($applicationData));
-
-                if ($applicationData) {
-                    // FIXED LOGIC: Check is_finalized to determine which path to take
-                    if ($applicationData['is_finalized'] == 1) {
-                        // Complete application
-                        $hasApplied = true;
-                        $applicationStatus = $applicationData['application_status'];
-                        $incompleteApplication = null;
-                        error_log("DEBUG viewJob: Complete application found - Status: {$applicationStatus}");
-                    } else {
-                        // Incomplete application
-                        $hasApplied = true;  // Set to true because an application exists
-                        $applicationStatus = null;
-                        $incompleteApplication = $applicationData;  // Set the incomplete application data
-                        error_log("DEBUG viewJob: Incomplete application found - Step: {$applicationData['current_step']}");
-                    }
-                } else {
-                    error_log("DEBUG viewJob: No application found");
-                    // No application exists
-                    $hasApplied = false;
-                    $incompleteApplication = null;
-                    $applicationStatus = null;
-                }
+            if ($existingDoc) {
+                // Update existing document
+                $this->jobseekerModel->updateDocument($existingDoc['document_id'], $file_path, $file_name);
+                error_log("DEBUG: Updated existing $file_type in profile");
+            } else {
+                // Create new profile document
+                $this->jobseekerModel->saveDocument($jobseeker_id, $file_path, $file_type, $file_name);
+                error_log("DEBUG: Created new $file_type in profile");
             }
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Error saving/updating profile document: " . $e->getMessage());
+            return false;
         }
-
-        // Enhanced debug logging
-        error_log("DEBUG viewJob FINAL: hasApplied = " . ($hasApplied ? 'true' : 'false'));
-        error_log("DEBUG viewJob FINAL: incompleteApplication = " . ($incompleteApplication ? 'exists (step: ' . $incompleteApplication['current_step'] . ')' : 'null'));
-        error_log("DEBUG viewJob FINAL: applicationStatus = " . ($applicationStatus ?? 'null'));
-        error_log("DEBUG viewJob FINAL: applicationData = " . ($applicationData ? 'exists' : 'null'));
-
-        include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
-
-    // Update the getJobDetails method in JobDetailsAjaxController:
-
-
 }

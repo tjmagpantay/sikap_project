@@ -113,7 +113,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     <p class="text-xs text-gray-500">Uploaded <?php echo date('M j, Y', strtotime($cvAttachment['uploaded_at'])); ?></p>
                                                 </div>
                                             </div>
-                                            <a href="/<?php echo htmlspecialchars($cvAttachment['file_path']); ?>" target="_blank"
+<a href="../<?php echo htmlspecialchars($cvAttachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -138,7 +138,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     <p class="text-xs text-gray-500">Uploaded <?php echo date('M j, Y', strtotime($resumeAttachment['uploaded_at'])); ?></p>
                                                 </div>
                                             </div>
-                                            <a href="/<?php echo htmlspecialchars($resumeAttachment['file_path']); ?>" target="_blank"
+                                            <a href="../<?php echo htmlspecialchars($resumeAttachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -163,7 +163,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     <p class="text-xs text-gray-500">Uploaded <?php echo date('M j, Y', strtotime($attachment['uploaded_at'])); ?></p>
                                                 </div>
                                             </div>
-                                            <a href="/<?php echo htmlspecialchars($attachment['file_path']); ?>" target="_blank"
+                                            <a href="../<?php echo htmlspecialchars($attachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

@@ -477,6 +477,11 @@ class JobPostController
 
         // Check if user has already applied (if logged in as jobseeker)
         $hasApplied = false;
+        $profileCompleted = false;
+        $incompleteApplication = null;
+        $applicationStatus = null;
+        $applicationData = null;
+        
         if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
             try {
                 require_once __DIR__ . '/../models/JobApplication.php';
@@ -487,7 +492,28 @@ class JobPostController
                 $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
 
                 if ($jobseeker) {
-                    $hasApplied = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+                    // Check if profile is completed
+                    $profileCompleted = !empty($jobseeker['profile_completed']) && $jobseeker['profile_completed'] == 1;
+                    error_log("DEBUG JobPostController: Profile completed field: " . ($jobseeker['profile_completed'] ?? 'NULL'));
+                    error_log("DEBUG JobPostController: Profile completed boolean: " . ($profileCompleted ? 'true' : 'false'));
+                    
+                    // Check for any application (complete or incomplete)
+                    $application = $jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
+                    
+                    if ($application) {
+                        $hasApplied = true;
+                        $applicationData = $application;
+
+                        if ($application['is_finalized'] == 1) {
+                            // Complete application
+                            $applicationStatus = $application['application_status'] ?? 'pending';
+                        } else {
+                            // Incomplete application
+                            $incompleteApplication = $application;
+                        }
+                    } else {
+                        $hasApplied = $jobApplicationModel->hasApplied($jobseeker['jobseeker_id'], $job['job_id']);
+                    }
                 }
             } catch (Exception $e) {
                 error_log('Error checking application status: ' . $e->getMessage());
@@ -505,6 +531,12 @@ class JobPostController
                 $screeningQuestions = [];
             }
         }
+
+        // Debug output
+        error_log("DEBUG JobPostController FINAL: hasApplied=" . ($hasApplied ? 'true' : 'false'));
+        error_log("DEBUG JobPostController FINAL: incompleteApplication=" . ($incompleteApplication ? 'exists' : 'null'));
+        error_log("DEBUG JobPostController FINAL: applicationStatus=" . ($applicationStatus ?? 'null'));
+        error_log("DEBUG JobPostController FINAL: profileCompleted=" . ($profileCompleted ? 'true' : 'false'));
 
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }

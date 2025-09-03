@@ -592,7 +592,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         }
     }
 
-    // Add form validation before submission
+    // Enhanced form validation
     document.querySelector('form').addEventListener('submit', function(e) {
         const selectedResumes = document.querySelectorAll('input[name="selected_resumes[]"]:checked');
         const newResume = document.getElementById('new_resume').files.length;
@@ -611,49 +611,41 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             return false;
         }
 
-        // Prevent multiple selections of same type
+        // Prevent multiple selections of same type - ENFORCED
         if (selectedResumes.length > 1) {
             e.preventDefault();
-            alert('Please select only one resume.');
+            alert('Please select only ONE resume. Multiple resumes are not allowed.');
             return false;
         }
 
         if (selectedCVs.length > 1) {
             e.preventDefault();
-            alert('Please select only one CV.');
+            alert('Please select only ONE CV. Multiple CVs are not allowed.');
             return false;
         }
 
         // Warn if both existing and new documents are selected for same type
         if (selectedResumes.length > 0 && newResume > 0) {
-            if (!confirm('You have selected both an existing resume and uploaded a new one. The new resume will be used. Continue?')) {
+            if (!confirm('You have selected both an existing resume and uploaded a new one. The NEW resume will be used and will REPLACE any existing resume. Continue?')) {
                 e.preventDefault();
                 return false;
             }
         }
 
         if (selectedCVs.length > 0 && newCV > 0) {
-            if (!confirm('You have selected both an existing CV and uploaded a new one. The new CV will be used. Continue?')) {
-                e.preventDefault();
-                return false;
-            }
-        }
-
-        // If user has existing attachments but makes no new selections/uploads, confirm they want to keep current
-        if (hasExistingAttachments && !hasAnyDocument) {
-            if (!confirm('No changes detected. Do you want to continue with your currently attached documents?')) {
+            if (!confirm('You have selected both an existing CV and uploaded a new one. The NEW CV will be used and will REPLACE any existing CV. Continue?')) {
                 e.preventDefault();
                 return false;
             }
         }
     });
 
-    // Add change handlers to prevent multiple resume selections
+    // STRICT: Only allow one resume and one CV selection
     document.addEventListener('DOMContentLoaded', function() {
         const resumeCheckboxes = document.querySelectorAll('input[name="selected_resumes[]"]');
         const cvCheckboxes = document.querySelectorAll('input[name="selected_cvs[]"]');
 
-        // Handle resume checkbox exclusive selection
+        // Handle resume checkbox exclusive selection (ONLY ONE ALLOWED)
         resumeCheckboxes.forEach(function(checkbox) {
             checkbox.addEventListener('change', function() {
                 if (this.checked) {
@@ -666,7 +658,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             });
         });
 
-        // Handle CV checkbox exclusive selection
+        // Handle CV checkbox exclusive selection (ONLY ONE ALLOWED)
         cvCheckboxes.forEach(function(checkbox) {
             checkbox.addEventListener('change', function() {
                 if (this.checked) {
@@ -677,6 +669,47 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     });
                 }
             });
+        });
+
+        // Clear file inputs when existing documents are selected
+        const newResumeInput = document.getElementById('new_resume');
+        const newCvInput = document.getElementById('new_cv');
+
+        resumeCheckboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    newResumeInput.value = '';
+                    document.getElementById('resume-filename').classList.add('hidden');
+                    document.getElementById('save-resume-to-profile-option').style.display = 'none';
+                }
+            });
+        });
+
+        cvCheckboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    newCvInput.value = '';
+                    document.getElementById('cv-filename').classList.add('hidden');
+                    document.getElementById('save-cv-to-profile-option').style.display = 'none';
+                }
+            });
+        });
+
+        // Clear checkboxes when new files are selected
+        newResumeInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                resumeCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+            }
+        });
+
+        newCvInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                cvCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+            }
         });
     });
 </script>

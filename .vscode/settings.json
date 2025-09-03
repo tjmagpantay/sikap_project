@@ -1,8 +1,8 @@
-{
-  "files.exclude": {
-    "**/*.pdf": true
-  },
-  "search.exclude": {
-    "**/*.pdf": true
-  }
-}
+// {
+//   "files.exclude": {
+//     "**/*.pdf": true
+//   },
+//   "search.exclude": {
+//     "**/*.pdf": true
+//   }
+// }

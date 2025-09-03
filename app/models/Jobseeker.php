@@ -116,17 +116,59 @@ class Jobseeker
         }
     }
 
+    public function findDocumentById($document_id)
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents WHERE document_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$document_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding document by ID: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function findDocumentByType($jobseeker_id, $file_type)
+    {
+        try {
+            $sql = "SELECT * FROM jobseeker_documents 
+                    WHERE jobseeker_id = ? AND LOWER(file_type) = LOWER(?) 
+                    ORDER BY uploaded_at DESC LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$jobseeker_id, $file_type]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding document by type: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function updateDocument($document_id, $file_path, $file_name)
+    {
+        try {
+            $sql = "UPDATE jobseeker_documents 
+                    SET file_path = ?, file_name = ?, uploaded_at = NOW() 
+                    WHERE document_id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$file_path, $file_name, $document_id]);
+        } catch (PDOException $e) {
+            error_log('Error updating document: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function findDocumentByPath($jobseeker_id, $file_path)
     {
         try {
             $sql = "SELECT * FROM jobseeker_documents 
-                    WHERE jobseeker_id = :jobseeker_id AND file_path = :file_path";
+                    WHERE jobseeker_id = ? AND file_path = ?";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_path' => $file_path]);
+            $stmt->execute([$jobseeker_id, $file_path]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error finding document by path: ' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -196,6 +238,7 @@ class Jobseeker
             $data['currently_working'],
             $data['responsibilities']
         ]);
+    
     }
 
     public function deleteWorkExperience($jobseeker_id, $experience_id)
@@ -510,38 +553,6 @@ class Jobseeker
         } catch (PDOException $e) {
             error_log('Error getting profile picture: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    public function findDocumentByType($jobseeker_id, $file_type)
-    {
-        try {
-            $sql = "SELECT * FROM jobseeker_documents 
-                    WHERE jobseeker_id = :jobseeker_id AND file_type = :file_type";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(['jobseeker_id' => $jobseeker_id, 'file_type' => $file_type]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error finding document by type: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function updateDocument($document_id, $file_path, $file_name)
-    {
-        try {
-            $sql = "UPDATE jobseeker_documents 
-                    SET file_path = :file_path, file_name = :file_name, updated_at = NOW() 
-                    WHERE id = :document_id";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'file_path' => $file_path,
-                'file_name' => $file_name,
-                'document_id' => $document_id
-            ]);
-        } catch (PDOException $e) {
-            error_log('Error updating document: ' . $e->getMessage());
-            return false;
         }
     }
 

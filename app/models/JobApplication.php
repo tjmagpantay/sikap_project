@@ -84,14 +84,10 @@ class JobApplication
     public function saveApplicationAttachment($application_id, $file_path, $file_type)
     {
         try {
-            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type) 
-                    VALUES (:application_id, :file_path, :file_type)";
+            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type, uploaded_at) 
+                VALUES (?, ?, ?, NOW())";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'application_id' => $application_id,
-                'file_path' => $file_path,
-                'file_type' => $file_type
-            ]);
+            return $stmt->execute([$application_id, $file_path, $file_type]);
         } catch (PDOException $e) {
             error_log('Error saving application attachment: ' . $e->getMessage());
             return false;
@@ -101,26 +97,11 @@ class JobApplication
     public function saveApplicationAttachmentReference($application_id, $profile_document_id, $file_type)
     {
         try {
-            // Get the file path from profile document
-            $sql = "SELECT file_path FROM jobseeker_documents WHERE document_id = :document_id";
+            $sql = "INSERT INTO job_application_attachments 
+                    (application_id, profile_document_id, file_type, uploaded_at) 
+                    VALUES (?, ?, ?, NOW())";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['document_id' => $profile_document_id]);
-            $doc = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$doc) {
-                return false;
-            }
-
-            // Insert into application_attachments with reference
-            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type, profile_document_id) 
-                    VALUES (:application_id, :file_path, :file_type, :profile_document_id)";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'application_id' => $application_id,
-                'file_path' => $doc['file_path'],
-                'file_type' => $file_type,
-                'profile_document_id' => $profile_document_id
-            ]);
+            return $stmt->execute([$application_id, $profile_document_id, $file_type]);
         } catch (PDOException $e) {
             error_log('Error saving application attachment reference: ' . $e->getMessage());
             return false;
@@ -448,10 +429,9 @@ class JobApplication
     {
         try {
             $sql = "DELETE FROM application_attachments 
-                    WHERE application_id = :application_id 
-                    AND file_type IN ('Resume', 'resume')";
+                    WHERE application_id = ? AND LOWER(file_type) = 'resume'";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute(['application_id' => $application_id]);
+            return $stmt->execute([$application_id]);
         } catch (PDOException $e) {
             error_log('Error clearing resume attachments: ' . $e->getMessage());
             return false;
@@ -462,10 +442,9 @@ class JobApplication
     {
         try {
             $sql = "DELETE FROM application_attachments 
-                    WHERE application_id = :application_id 
-                    AND file_type IN ('CV', 'cv')";
+                    WHERE application_id = ? AND LOWER(file_type) = 'cv'";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute(['application_id' => $application_id]);
+            return $stmt->execute([$application_id]);
         } catch (PDOException $e) {
             error_log('Error clearing CV attachments: ' . $e->getMessage());
             return false;

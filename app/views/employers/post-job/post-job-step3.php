@@ -128,7 +128,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                         </label>
                                         <input type="text" name="questions[<?php echo $index; ?>][options]"
                                             value="<?php echo htmlspecialchars($question['question_option'] ?? ''); ?>"
-                                            placeholder="Option 1, Option 2, Option 3"
+                                            placeholder="Option 1|Option 2|Option 3"
                                             class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                                     </div>
                                 </div>
@@ -231,7 +231,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         Options (comma-separated)
                     </label>
                     <input type="text" name="questions[${questionCount}][options]" 
-                           placeholder="Option 1, Option 2, Option 3"
+                           placeholder="Option 1|Option 2|Option 3"
                            class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
             </div>

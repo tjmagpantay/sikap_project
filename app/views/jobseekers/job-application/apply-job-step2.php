@@ -157,9 +157,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                             rows="4"
                                             class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"><?php echo htmlspecialchars($existingAnswer); ?></textarea>
 
-                                    <?php elseif ($question['question_type'] === 'multiple_choice' && !empty($question['question_option'])): ?>
+                                    <?php elseif (in_array($question['question_type'], ['radio', 'multiple_choice']) && !empty($question['question_option'])): ?>
                                         <?php
-                                        $options = explode('|', $question['question_option']);
+                                        // Handle both comma and pipe separators
+                                        if (strpos($question['question_option'], '|') !== false) {
+                                            $options = explode('|', $question['question_option']);
+                                        } else {
+                                            $options = explode(',', $question['question_option']);
+                                        }
                                         ?>
                                         <div class="space-y-2">
                                             <?php foreach ($options as $option): ?>
@@ -173,6 +178,49 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 </label>
                                             <?php endforeach; ?>
                                         </div>
+
+                                    <?php elseif ($question['question_type'] === 'checkbox' && !empty($question['question_option'])): ?>
+                                        <?php
+                                        // Handle both comma and pipe separators
+                                        if (strpos($question['question_option'], '|') !== false) {
+                                            $options = explode('|', $question['question_option']);
+                                        } else {
+                                            $options = explode(',', $question['question_option']);
+                                        }
+                                        $existingAnswers = explode(',', $existingAnswer); // For multiple selections
+                                        ?>
+                                        <div class="space-y-2">
+                                            <?php foreach ($options as $option): ?>
+                                                <label class="flex items-center p-2 transition-colors rounded-md hover:bg-gray-100">
+                                                    <input type="checkbox"
+                                                        name="<?php echo $questionName; ?>[]"
+                                                        value="<?php echo htmlspecialchars(trim($option)); ?>"
+                                                        <?php echo in_array(trim($option), $existingAnswers) ? 'checked' : ''; ?>
+                                                        class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary/50 focus:border-primary">
+                                                    <span class="ml-2 text-sm text-gray-700"><?php echo htmlspecialchars(trim($option)); ?></span>
+                                                </label>
+                                            <?php endforeach; ?>
+                                        </div>
+
+                                    <?php elseif ($question['question_type'] === 'dropdown' && !empty($question['question_option'])): ?>
+                                        <?php
+                                        // Handle both comma and pipe separators
+                                        if (strpos($question['question_option'], '|') !== false) {
+                                            $options = explode('|', $question['question_option']);
+                                        } else {
+                                            $options = explode(',', $question['question_option']);
+                                        }
+                                        ?>
+                                        <select name="<?php echo $questionName; ?>"
+                                            class="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                            <option value="">Select an option...</option>
+                                            <?php foreach ($options as $option): ?>
+                                                <option value="<?php echo htmlspecialchars(trim($option)); ?>"
+                                                    <?php echo ($existingAnswer === trim($option)) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars(trim($option)); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
 
                                     <?php elseif ($question['question_type'] === 'yes_no'): ?>
                                         <div class="space-y-2">
@@ -219,4 +267,4 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </button>
                 </div>
             </form>
-        </div>
+        </div

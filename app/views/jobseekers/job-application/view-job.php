@@ -320,9 +320,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             error_log("VIEW DEBUG: hasApplied = " . (isset($hasApplied) ? ($hasApplied ? 'true' : 'false') : 'not set'));
                             error_log("VIEW DEBUG: incompleteApplication = " . (isset($incompleteApplication) && $incompleteApplication ? 'exists' : 'null'));
                             error_log("VIEW DEBUG: applicationStatus = " . (isset($applicationStatus) ? $applicationStatus : 'not set'));
-                            ?>
-
-                            <?php if (!isset($_SESSION['user_id'])): ?>
+                            error_log("VIEW DEBUG: profileCompleted = " . (isset($profileCompleted) ? ($profileCompleted ? 'true' : 'false') : 'not set'));
+                            ?> <?php if (!isset($_SESSION['user_id'])): ?>
                                 <!-- Not Logged In -->
                                 <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                     <div class="flex items-center">
@@ -430,7 +429,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <!-- Action Buttons -->
                                         <div class="flex gap-2">
                                             <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&application_id=<?php echo $incompleteApplication['application_id']; ?>&step=<?php echo $incompleteApplication['current_step']; ?>"
-                                                class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                                class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium transition-colors bg-orange-500 rounded-md text-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                                                 <i class="mr-2 fas fa-play"></i>
                                                 Continue Application
                                             </a>
@@ -756,7 +755,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="flex gap-2">
                                             <?php if (isset($applicationData['application_id'])): ?>
                                                 <a href="?page=view-application&application_id=<?php echo $applicationData['application_id']; ?>"
@@ -772,6 +771,43 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                             </a>
                                         </div>
                                     <?php endif; ?>
+                                <?php endif; ?>
+
+                            <?php else: ?>
+                                <!-- NO APPLICATION - Show Apply Button -->
+                                <?php if (!isset($profileCompleted) || !$profileCompleted): ?>
+                                    <!-- Profile Incomplete -->
+                                    <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
+                                        <div class="flex items-center">
+                                            <i class="mr-3 text-primary fas fa-user-edit"></i>
+                                            <div>
+                                                <p class="text-sm font-medium text-orange-700">Complete Profile Required</p>
+                                                <p class="text-xs text-orange-600">Finish setting up your profile to apply for jobs</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="?page=complete-jobseeker-profile"
+                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600">
+                                        <i class="mr-2 fas fa-user-edit"></i>
+                                        Complete Profile to Apply
+                                    </a>
+
+                                <?php else: ?>
+                                    <!-- Profile Complete - Show Apply Button -->
+                                    <div class="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
+                                        <div class="flex items-center">
+                                            <i class="mr-3 text-primary fas fa-paper-plane"></i>
+                                            <div>
+                                                <p class="text-sm font-medium text-green-700">Ready to Apply</p>
+                                                <p class="text-xs text-green-600">Start your application for this position</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
+                                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90">
+                                        <i class="mr-2 fas fa-paper-plane"></i>
+                                        Apply Now
+                                    </a>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </div>

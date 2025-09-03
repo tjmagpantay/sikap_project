@@ -2,13 +2,24 @@
 
 RewriteEngine On
 
-# Redirect all requests to index.php
+# Allow direct access to uploads folder and files
+
+RewriteRule ^uploads/(.\*)$ ../uploads/$1 [L]
+
+# Allow direct access to common file types (don't route through index.php)
+
+RewriteCond %{REQUEST_URI} \.(pdf|doc|docx|jpg|jpeg|png|gif|css|js|ico)$ [NC]
+RewriteRule . - [L]
+
+# Redirect all other requests to index.php (only if file/directory doesn't exist)
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
 # Security: Prevent access to config.php
+
 <Files config.php>
     Order allow,deny
     Deny from all
-</Files> 
+</Files>
