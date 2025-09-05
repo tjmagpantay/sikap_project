@@ -748,6 +748,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             $jobseekerController->getWorkExperience();
             break;
+        case 'abt-sikap':
+            include __DIR__ . '/../app/views/pages/abt-sikap.php';
+            break;
+
+        case 'customer-support':
+            include __DIR__ . '/../app/views/pages/customer-support.php';
+            break;
     }
     ?>
 </body>

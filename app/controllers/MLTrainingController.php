@@ -47,14 +47,14 @@ class MLTrainingController
         // Step 1: Collect all job data
         echo "<h2>📊 Step 1: Collecting Job Data</h2>";
         $allJobs = $this->getAllJobsWithSkills();
-
+        
         $trainingJobs = [];
         $skillFrequency = [];
         $jobSkillMatrix = [];
 
         foreach ($allJobs as $job) {
             $jobSkills = $this->jobPostModel->getJobSkillsArray($job['job_id']);
-
+            
             if (!empty($jobSkills)) {
                 $cleanedJob = [
                     'job_id' => (int)$job['job_id'],
@@ -66,20 +66,20 @@ class MLTrainingController
                     'job_summary' => $job['job_summary'] ?? '',
                     'posted_date' => $job['created_at'] ?? null
                 ];
-
+                
                 $trainingJobs[] = $cleanedJob;
-
+                
                 // Count skill frequency
                 foreach ($jobSkills as $skill) {
                     $skillFrequency[$skill] = ($skillFrequency[$skill] ?? 0) + 1;
                 }
-
+                
                 // Build skill co-occurrence matrix
                 for ($i = 0; $i < count($jobSkills); $i++) {
                     for ($j = $i + 1; $j < count($jobSkills); $j++) {
                         $skill1 = $jobSkills[$i];
                         $skill2 = $jobSkills[$j];
-
+                        
                         $key = $skill1 < $skill2 ? "$skill1|$skill2" : "$skill2|$skill1";
                         $jobSkillMatrix[$key] = ($jobSkillMatrix[$key] ?? 0) + 1;
                     }
@@ -138,14 +138,14 @@ class MLTrainingController
 
         // Step 5: Train the model
         echo "<h2>🚀 Step 5: Training TF-IDF Model</h2>";
-
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['train_model'])) {
             echo "<div class='info'>";
             echo "<p>🔄 Training in progress... Please wait.</p>";
             echo "</div>";
-
+            
             $result = $this->trainMLModel($trainingData);
-
+            
             if ($result['success']) {
                 echo "<div class='success'>";
                 echo "<h3>🎉 Model training completed successfully!</h3>";
@@ -158,13 +158,14 @@ class MLTrainingController
                 echo "<li><strong>Model Type:</strong> TF-IDF + Enhanced Synonyms</li>";
                 echo "</ul>";
                 echo "</div>";
-
+                
                 echo "<div class='info'>";
                 echo "<h3>🎯 Next Steps:</h3>";
                 echo "<p>Your model has been trained! Now you can test it:</p>";
                 echo "<a href='?page=test-ml' class='button'>🧪 Test Trained Model</a>";
                 echo "<a href='?page=test-comparison' class='button'>📊 Compare Before/After</a>";
                 echo "</div>";
+                
             } else {
                 echo "<div class='error'>";
                 echo "<h3>❌ Training failed</h3>";
@@ -189,7 +190,7 @@ class MLTrainingController
             echo "<tr><td>Unique Skills</td><td>" . count($skillFrequency) . "</td><td>Distinct skills in your system</td></tr>";
             echo "<tr><td>Skill Relationships</td><td>" . count($jobSkillMatrix) . "</td><td>Co-occurring skill pairs</td></tr>";
             echo "</table>";
-
+            
             echo "<form method='POST'>";
             echo "<button type='submit' name='train_model' class='button' style='font-size: 18px; padding: 15px 30px;'>🚀 Start TF-IDF Training</button>";
             echo "</form>";
@@ -209,10 +210,11 @@ class MLTrainingController
                     FROM job_posts j 
                     WHERE j.status = 'active'
                     ORDER BY j.created_at DESC";
-
+            
             $stmt = $this->jobPostModel->getPdo()->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
         } catch (Exception $e) {
             error_log('Error getting jobs: ' . $e->getMessage());
             return [];
@@ -227,15 +229,15 @@ class MLTrainingController
                     FROM jobseekers j 
                     INNER JOIN jobseeker_skills js ON j.jobseeker_id = js.jobseeker_id
                     WHERE j.first_name IS NOT NULL AND j.last_name IS NOT NULL";
-
+            
             $stmt = $this->jobseekerModel->getPdo()->prepare($sql);
             $stmt->execute();
             $jobseekers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+            
             $jobseekerData = [];
             foreach ($jobseekers as $jobseeker) {
                 $skills = $this->jobseekerModel->getSkillsArray($jobseeker['jobseeker_id']);
-
+                
                 if (!empty($skills)) {
                     $jobseekerData[] = [
                         'jobseeker_id' => (int)$jobseeker['jobseeker_id'],
@@ -244,8 +246,9 @@ class MLTrainingController
                     ];
                 }
             }
-
+            
             return $jobseekerData;
+            
         } catch (Exception $e) {
             error_log('Error getting jobseeker data: ' . $e->getMessage());
             return [];
@@ -256,7 +259,7 @@ class MLTrainingController
     {
         try {
             $response = $this->makeRequest('POST', '/train_model', $trainingData);
-
+            
             if ($response && isset($response['success']) && $response['success']) {
                 return [
                     'success' => true,
@@ -272,6 +275,7 @@ class MLTrainingController
                     'message' => $response['error'] ?? 'Unknown training error'
                 ];
             }
+            
         } catch (Exception $e) {
             return [
                 'success' => false,
@@ -283,9 +287,9 @@ class MLTrainingController
     private function makeRequest($method, $endpoint, $data = null)
     {
         $url = 'http://127.0.0.1:5000' . $endpoint;
-
+        
         $ch = curl_init();
-
+        
         curl_setopt_array($ch, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
@@ -297,25 +301,25 @@ class MLTrainingController
                 'Accept: application/json'
             ]
         ]);
-
+        
         if ($method === 'POST' && $data !== null) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         }
-
+        
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-
+        
         curl_close($ch);
-
+        
         if ($error) {
             throw new Exception('cURL error: ' . $error);
         }
-
+        
         if ($httpCode !== 200) {
             throw new Exception('HTTP error: ' . $httpCode . ' - ' . $response);
         }
-
+        
         return json_decode($response, true);
     }
 }

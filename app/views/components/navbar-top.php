@@ -5,19 +5,19 @@
       <ul class="flex flex-row items-center gap-4 font-light">
 
         <li class="nav-link-top">
-          <a href="#" class="flex items-center">PESO</a>
+          <a href="https://peis.philjobnet.ph/" target="_blank" class="flex items-center">PESO</a>
         </li>
         <li class="nav-link-top">
-          <a href="#" class="flex items-center">DOLE</a>
+          <a href="https://www.foi.gov.ph/agencies/dole/" target="_blank class=" flex items-center">DOLE</a>
         </li>
         <li class="nav-link-top">
-          <a href="#" class="flex items-center">Rosario</a>
+          <a href="https://www.lgurosariobatangas.com/" target="_blank class=" flex items-center">Rosario</a>
         </li>
         <li class="nav-link-top">
-          <a href="#" class="flex items-center">Sikap</a>
+          <a href="?page=abt-sikap" class="flex items-center">Sikap</a>
         </li>
         <li class="sm:block nav-link-top">
-          <a href="#" class="flex items-center">Customer Support</a>
+          <a href="?page=customer-support" class="flex items-center">Customer Support</a>
         </li>
       </ul>
     </div>
