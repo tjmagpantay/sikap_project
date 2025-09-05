@@ -6,8 +6,8 @@
     include_once __DIR__ . '/../components/navbar.php';
     include_once __DIR__ . '/../components/alert-modal.php';
 ?>
-<script src="/sikap_development/app/views/components/register-validation.js"></script>
-<script src="/sikap_development/app/views/components/terms-condi.js"></script>
+<script src="/sikap/app/views/components/register-validation.js"></script>
+<script src="/sikap/app/views/components/terms-condi.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body class="flex items-center justify-center min-h-screen bg-gray-100">

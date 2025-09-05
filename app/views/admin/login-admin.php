@@ -2,6 +2,7 @@
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/components/navbar-admin.php';
 ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="flex items-center justify-center px-4 py-16 ">
     <div class="flex flex-col-reverse w-full max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
@@ -26,37 +27,39 @@ include_once __DIR__ . '/components/navbar-admin.php';
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-5" method="POST" action="?page=admin-login">
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input id="email" name="email" type="email" required
-                        placeholder="Enter admin email"
-                        class="block w-full px-3 py-2 mt-1 text-sm placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
+        <?php 
+$isLocked = isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= 5 && 
+            (time() - $_SESSION['last_attempt_time']) < 300;
+?>
 
-                <div class="mt-2">
-                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <div class="relative mt-1">
-                        <input id="password" name="password" type="password" required
-                            placeholder="Enter admin password"
-                            class="block w-full px-3 py-2 pr-12 text-sm placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <button type="button" onclick="togglePassword()" class="absolute text-gray-400 transform -translate-y-1/2 top-1/2 right-3 hover:text-gray-600 focus:outline-none">
-                            <svg id="password-icon-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                            <svg id="password-icon-hide" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+<form class="space-y-5" method="POST" action="?page=admin-login">
+    <!-- Email -->
+    <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input id="email" name="email" type="email" required
+            placeholder="Enter admin email"
+            class="block w-full px-3 py-2 mt-1 text-sm border rounded-md shadow-sm"
+            <?php echo $isLocked ? 'disabled' : ''; ?>>
+    </div>
 
-                <button type="submit"
-                    class="justify-end w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                    Access Admin Dashboard
-                </button>
-            </form>
+    <!-- Password -->
+    <div class="mt-2">
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input id="password" name="password" type="password" required
+            placeholder="Enter admin password"
+            class="block w-full px-3 py-2 mt-1 text-sm border rounded-md shadow-sm"
+            <?php echo $isLocked ? 'disabled' : ''; ?>>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit"
+        class="w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90"
+        <?php echo $isLocked ? 'disabled style="cursor:not-allowed;opacity:0.6;"' : ''; ?>>
+        Access Admin Dashboard
+    </button>
+</form>
+
+
 
             
         </div>
@@ -95,6 +98,46 @@ include_once __DIR__ . '/components/navbar-admin.php';
 </div>
 
 <script>
+    document.querySelector("form").addEventListener("submit", function(e) {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    // Basic email format check
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !password) {
+        e.preventDefault(); // stop form from submitting
+        Swal.fire({
+            icon: "warning",
+            title: "Missing Fields",
+            text: "Please enter both email and password.",
+            confirmButtonColor: "#2563eb"
+        });
+        return;
+    }
+
+    if (!emailPattern.test(email)) {
+        e.preventDefault();
+        Swal.fire({
+            icon: "error",
+            title: "Invalid Email",
+            text: "Please enter a valid email address.",
+            confirmButtonColor: "#2563eb"
+        });
+        return;
+    }
+
+    if (password.length < 6) {
+        e.preventDefault();
+        Swal.fire({
+            icon: "error",
+            title: "Wrong Password",
+            text: "Try again.",
+            confirmButtonColor: "#2563eb"
+        });
+        return;
+    }
+});
     function togglePassword() {
         const passwordInput = document.getElementById('password');
         const showIcon = document.getElementById('password-icon-show');
@@ -110,4 +153,5 @@ include_once __DIR__ . '/components/navbar-admin.php';
             showIcon.classList.remove('hidden');
         }
     }
+
 </script>

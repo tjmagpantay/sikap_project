@@ -17,44 +17,83 @@ class AdminController
         $this->jobPostModel = new JobPost();
     }
 
-    public function login()
-    {
-        $error = '';
+  public function login()
+{
+    if (!isset($_SESSION['login_attempts'])) {
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['last_attempt_time'] = null;
+    }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
+    $popupMessage = '';
+    $popupType = 'error'; // default modal type
 
-            // Debug logging
-            error_log("Login attempt - Email: " . $email);
+    // Check if locked
+    if ($_SESSION['login_attempts'] >= 5) {
+        $timeSinceLast = time() - $_SESSION['last_attempt_time'];
+        if ($timeSinceLast < 300) { // 5 minutes
+            $remaining = ceil((300 - $timeSinceLast) / 60);
+            $popupMessage = "Too many failed attempts. Please try again in {$remaining} minute(s).";
+            include __DIR__ . '/../views/admin/login-admin.php';
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Blocked',
+                    text: '".addslashes($popupMessage)."'
+                });
+            </script>";
+            return;
+        } else {
+            $_SESSION['login_attempts'] = 0; // reset after cooldown
+        }
+    }
 
-            if (empty($email) || empty($password)) {
-                $error = 'Please fill in all fields.';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        if (empty($email) || empty($password)) {
+            $popupMessage = 'Please fill in all fields.';
+        } else {
+            $admin = $this->adminModel->authenticate($email, $password);
+
+            if ($admin) {
+                $_SESSION['login_attempts'] = 0;
+                $_SESSION['user_id'] = $admin['user_id'];
+                $_SESSION['admin_id'] = $admin['admin_id'];
+                $_SESSION['role'] = 'admin';
+                $_SESSION['admin_name'] = $admin['admin_name'];
+
+                header('Location: ?page=admin-dashboard');
+                exit;
             } else {
-                $admin = $this->adminModel->authenticate($email, $password);
+                $_SESSION['login_attempts']++;
+                $_SESSION['last_attempt_time'] = time();
 
-                // Debug logging
-                error_log("Authentication result: " . print_r($admin, true));
-
-                if ($admin) {
-                    $_SESSION['user_id'] = $admin['user_id'];
-                    $_SESSION['admin_id'] = $admin['admin_id'];
-                    $_SESSION['role'] = 'admin'; // Hardcode this instead of using $admin['role_name']
-                    $_SESSION['admin_name'] = $admin['admin_name'];
-
-                    // Debug logging
-                    error_log("Session variables set: " . print_r($_SESSION, true));
-
-                    header('Location: ?page=admin-dashboard');
-                    exit;
+                $remainingAttempts = 5 - $_SESSION['login_attempts'];
+                if ($remainingAttempts <= 0) {
+                    $popupMessage = 'Too many failed attempts. Please wait 5 minutes before trying again.';
                 } else {
-                    $error = 'Invalid credentials.';
+                    $popupMessage = "Invalid credentials. You have {$remainingAttempts} attempt(s) left.";
                 }
             }
         }
-
-        include __DIR__ . '/../views/admin/login-admin.php';
     }
+
+    include __DIR__ . '/../views/admin/login-admin.php';
+
+    if (!empty($popupMessage)) {
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: '".addslashes($popupMessage)."',
+                confirmButtonColor: '#2563eb'
+            });
+        </script>";
+    }
+}
+
+
 
     public function dashboard()
     {
@@ -428,4 +467,6 @@ class AdminController
     {
         return isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin';
     }
+
+    
 }

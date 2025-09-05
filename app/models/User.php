@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../config/sikap_db.php';
 
 class User {
-    private $db;
+    private $db; 
 
     const ROLE_ADMIN = 1;
     const ROLE_EMPLOYER = 2;
@@ -26,12 +26,23 @@ class User {
         try {
             $this->db->beginTransaction();
             
+            // Check if email exists
+            $existingUser = $this->findByEmail($email);
+            if ($existingUser) {
+                $this->db->rollback();
+                return false;
+            }
+            
             // Create user
             $stmt = $this->db->prepare("INSERT INTO users (email, password, status, created_at) VALUES (?, ?, ?, NOW())");
             $stmt->execute([$email, $password, $status]);
             $user_id = $this->db->lastInsertId();
             
-            // Assign role
+            // Delete any existing roles first (shouldn't exist, but just in case)
+            $deleteStmt = $this->db->prepare("DELETE FROM user_roles WHERE user_id = ?");
+            $deleteStmt->execute([$user_id]);
+            
+            // Assign new role
             $stmt = $this->db->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)");
             $stmt->execute([$user_id, $role_id]);
             
@@ -45,11 +56,21 @@ class User {
 
     public function findByEmail($email) {
         $stmt = $this->db->prepare("
-            SELECT u.*, ur.role_id, r.role_name 
+            SELECT u.*, ur.role_id, r.role_name,
+                   CASE 
+                       WHEN ur.role_id = 2 THEN 'employer'
+                       WHEN ur.role_id = 3 THEN 'jobseeker'
+                       WHEN ur.role_id = 1 THEN 'admin'
+                   END as user_type
             FROM users u 
-            LEFT JOIN user_roles ur ON u.user_id = ur.user_id 
+            LEFT JOIN (
+                SELECT user_id, MAX(role_id) as role_id
+                FROM user_roles
+                GROUP BY user_id
+            ) ur ON u.user_id = ur.user_id 
             LEFT JOIN roles r ON ur.role_id = r.role_id 
             WHERE u.email = ?
+            LIMIT 1
         ");
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -99,21 +120,52 @@ class User {
     public function createWithGoogle($email, $googleId, $name, $role_id, $status = 'active') {
         try {
             $this->db->beginTransaction();
+            
+            // First check if email exists with any role
+            $stmt = $this->db->prepare("
+                SELECT u.user_id, u.email, ur.role_id
+                FROM users u
+                LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+                WHERE u.email = ?
+            ");
+            $stmt->execute([$email]);
+            $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existingUser) {
+                $this->db->rollback();
+                error_log("Attempt to create duplicate account for email: " . $email);
+                return false;
+            }
+            
             // Use a random password for Google users
             $randomPassword = bin2hex(random_bytes(16));
             $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+            
+            // Create user
             $stmt = $this->db->prepare("
                 INSERT INTO users (email, password, status, created_at)
                 VALUES (?, ?, ?, NOW())
             ");
             $stmt->execute([$email, $hashedPassword, $status]);
             $user_id = $this->db->lastInsertId();
-            // Assign role
+            
+            // Insert role with a check to prevent duplicates
             $stmt = $this->db->prepare("
                 INSERT INTO user_roles (user_id, role_id)
-                VALUES (?, ?)
+                SELECT ?, ?
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM user_roles WHERE user_id = ?
+                )
             ");
-            $stmt->execute([$user_id, $role_id]);
+            $stmt->execute([$user_id, $role_id, $user_id]);
+            
+            // If role wasn't inserted, rollback everything
+            if ($stmt->rowCount() === 0) {
+                $this->db->rollback();
+                error_log("Failed to assign role for user: " . $user_id);
+                return false;
+            }
+            
             $this->db->commit();
             return $user_id;
         } catch(Exception $e) {
@@ -156,6 +208,82 @@ class User {
 
     public function getDb() {
         return $this->db;
+    }
+    
+    /**
+     * Clean up duplicate roles in the database
+     */
+    public function cleanupDuplicateRoles() {
+        try {
+            $this->db->beginTransaction();
+            
+            // Find users with multiple roles
+            $findDuplicates = $this->db->query("
+                SELECT user_id, COUNT(*) as role_count
+                FROM user_roles
+                GROUP BY user_id
+                HAVING role_count > 1
+            ");
+            
+            while ($row = $findDuplicates->fetch(PDO::FETCH_ASSOC)) {
+                // For each user with multiple roles, keep only the most recent one
+                $stmt = $this->db->prepare("
+                    DELETE ur1 FROM user_roles ur1
+                    INNER JOIN (
+                        SELECT user_id, MAX(id) as max_id
+                        FROM user_roles
+                        WHERE user_id = ?
+                        GROUP BY user_id
+                    ) ur2 ON ur1.user_id = ur2.user_id
+                    WHERE ur1.id < ur2.max_id
+                ");
+                $stmt->execute([$row['user_id']]);
+            }
+            
+            $this->db->commit();
+            return true;
+        } catch(Exception $e) {
+            $this->db->rollback();
+            error_log("Error cleaning up duplicate roles: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Ensures a user has only one role and returns the current role
+     */
+    private function ensureSingleRole($user_id) {
+        try {
+            $this->db->beginTransaction();
+            
+            // Check for multiple roles
+            $checkStmt = $this->db->prepare("
+                SELECT COUNT(*) as role_count
+                FROM user_roles
+                WHERE user_id = ?
+            ");
+            $checkStmt->execute([$user_id]);
+            $result = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result['role_count'] > 1) {
+                // Keep only the most recent role
+                $cleanupStmt = $this->db->prepare("
+                    DELETE ur1 FROM user_roles ur1
+                    INNER JOIN user_roles ur2 
+                    WHERE ur1.user_id = ur2.user_id 
+                    AND ur1.user_id = ?
+                    AND ur1.id < ur2.id
+                ");
+                $cleanupStmt->execute([$user_id]);
+            }
+            
+            $this->db->commit();
+            return true;
+        } catch(Exception $e) {
+            $this->db->rollback();
+            error_log("Error ensuring single role: " . $e->getMessage());
+            return false;
+        }
     }
 }
 

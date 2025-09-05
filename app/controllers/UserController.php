@@ -365,7 +365,7 @@ class UserController
             'client_secret' => $clientSecret,
             'redirect_uri' => $redirectUri,
             'grant_type' => 'authorization_code',
-        ];
+        ]; 
         $ch = curl_init($tokenUrl);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
@@ -394,29 +394,36 @@ class UserController
             header('Location: ?page=login-' . $userType);
             exit;
         }
-        // Check if user exists by google_id or email
-        $user = $this->userModel->findByGoogleId($googleId);
-        if (!$user) {
-            $user = $this->userModel->findByEmail($email);
-        }
-        if ($user) {
-            // User exists, update google_id if missing
-            if (empty($user['google_id'])) {
-                $this->userModel->updateGoogleId($user['user_id'], $googleId);
-            }
-            $userId = $user['user_id'];
-            $roleId = $user['role_id'];
-        } else {
-            // Create new user in users table and correct profile table
-            $roleId = ($userType === 'employer') ? User::ROLE_EMPLOYER : User::ROLE_JOBSEEKER;
-            $status = ($userType === 'employer') ? 'pending' : 'active';
-            $userId = $this->userModel->createWithGoogle($email, $googleId, $name, $roleId, $status);
-            if (!$userId) {
-                $_SESSION['error'] = 'Failed to create Google user.';
+        // First check if email already exists
+        $existingUser = $this->userModel->findByEmail($email);
+        
+        if ($existingUser) {
+            // User exists, verify they're using the correct role's login page
+            $userRoleId = $existingUser['role_id'];
+            $requestedRoleId = ($userType === 'employer') ? User::ROLE_EMPLOYER : User::ROLE_JOBSEEKER;
+            
+            if ($userRoleId !== $requestedRoleId) {
+                $roleText = ($userRoleId == User::ROLE_EMPLOYER) ? 'Employer' : 'Jobseeker';
+                $_SESSION['error'] = "This email is already registered as {$roleText}. Please use a different Google account.";
                 header('Location: ?page=login-' . $userType);
                 exit;
             }
-            // Create jobseeker or employer profile
+            
+            $userId = $existingUser['user_id'];
+            $roleId = $existingUser['role_id'];
+        } else {
+            // Create new user with correct role
+            $roleId = ($userType === 'employer') ? User::ROLE_EMPLOYER : User::ROLE_JOBSEEKER;
+            $status = ($userType === 'employer') ? 'pending' : 'active';
+            $userId = $this->userModel->createWithGoogle($email, $googleId, $name, $roleId, $status);
+            
+            if (!$userId) {
+                $_SESSION['error'] = 'This email is already registered. Please use a different Google account.';
+                header('Location: ?page=login-' . $userType);
+                exit;
+            }
+            
+            // Create profile
             if ($userType === 'employer') {
                 $this->employerModel->createMinimal($userId, $name, $email, $googleId);
             } else {
