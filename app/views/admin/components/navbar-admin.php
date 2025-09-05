@@ -3,7 +3,7 @@
         <div class="flex items-center gap-3">
             <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
             <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
-            <a href="?page=landing" class="font-medium nav-brand">Sikap <span class="text-secondary">Admin</span></a>
+            <a href="?page=landing" class="text-xl font-bold">Sikap <span class="text-secondary">Admin</span></a>
         </div>
 
     
