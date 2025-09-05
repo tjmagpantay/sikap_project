@@ -1,16 +1,54 @@
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <?php
-    include_once __DIR__ . '/components/admin_auth_check.php';
-    include __DIR__ . '/components/sidebar.php'; ?>
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Main Content Area -->
-    <div class="flex flex-col flex-1 overflow-hidden">
-        <!-- Top Navigation -->
-        <?php include __DIR__ . '/components/topbar.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>SIKAP Admin - View Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#092C4C',
+                        secondary: '#F3AF0E'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Ensure proper height and overflow for layout */
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50">
+        .main-content {
+            height: calc(100vh - 4rem);
+            /* Subtract topbar height */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Topbar (Sticky) -->
+    <?php include __DIR__ . '/components/topbar.php'; ?>
+
+    <div class="flex h-screen">
+        <!-- Sidebar (Fixed/Sticky) -->
+        <?php include __DIR__ . '/components/sidebar.php'; ?>
+
+        <!-- Main Content Area (Scrollable) -->
+        <div class="flex-1 lg:ml-80 main-content">
             <div class="p-6">
                 <!-- Header Section -->
                 <div class="mb-6">
@@ -346,9 +384,12 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-</div>
+
+</body>
+
+</html>
 
 <!-- Mobile Menu Overlay -->
 <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>

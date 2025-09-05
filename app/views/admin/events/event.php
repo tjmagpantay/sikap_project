@@ -1,12 +1,52 @@
-<div class="flex h-screen">
-    <?php
-    include_once __DIR__ . '/../components/admin_auth_check.php';
-    include __DIR__ . '/../components/sidebar.php'; ?>
+<?php
+include_once __DIR__ . '/../components/admin_auth_check.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="flex flex-col flex-1 overflow-hidden">
-        <?php include __DIR__ . '/../components/topbar.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>SIKAP Admin - Events & Programs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#092C4C',
+                        secondary: '#F3AF0E'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        <main class="flex-1 overflow-y-auto bg-gray-50">
+        .main-content {
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Topbar (Sticky) -->
+    <?php include __DIR__ . '/../components/topbar.php'; ?>
+
+    <div class="flex h-screen">
+        <!-- Sidebar (Fixed/Sticky) -->
+        <?php include __DIR__ . '/../components/sidebar.php'; ?>
+
+        <!-- Main Content Area (Scrollable) -->
+        <div class="flex-1 lg:ml-80 main-content">
             <div class="p-6">
                 <!-- Page Header -->
                 <div class="flex items-center justify-between mb-6">
@@ -485,358 +525,362 @@
                     <?php endif; ?>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-</div>
 
-<script>
-    let allRows = [];
-    let filteredRows = [];
-    let currentFilters = {
-        type: '',
-        adminStatus: '',
-        eventStatus: '',
-        pinStatus: ''
-    };
+    <!-- Keep all your existing JavaScript -->
+    <script>
+        let allRows = [];
+        let filteredRows = [];
+        let currentFilters = {
+            type: '',
+            adminStatus: '',
+            eventStatus: '',
+            pinStatus: ''
+        };
 
-    // Pagination variables
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let totalPages = 1;
+        // Pagination variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let totalPages = 1;
 
-    function confirmDelete(eventId) {
-        if (confirm('Are you sure you want to delete this event?')) {
-            window.location.href = `index.php?page=admin-event-delete&id=${eventId}`;
-        }
-    }
-
-    function togglePin(eventId, pinStatus) {
-        if (confirm(`Are you sure you want to ${pinStatus ? 'pin' : 'unpin'} this event?`)) {
-            // Create a form to submit the pin action
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'index.php?page=admin-event-pin';
-
-            const eventIdInput = document.createElement('input');
-            eventIdInput.type = 'hidden';
-            eventIdInput.name = 'event_id';
-            eventIdInput.value = eventId;
-
-            const pinStatusInput = document.createElement('input');
-            pinStatusInput.type = 'hidden';
-            pinStatusInput.name = 'pinned';
-            pinStatusInput.value = pinStatus ? '1' : '0';
-
-            form.appendChild(eventIdInput);
-            form.appendChild(pinStatusInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const eventRows = document.querySelectorAll('.event-row');
-        const visibleCount = document.getElementById('visibleCount');
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const eventsTable = document.getElementById('eventsTable');
-
-        allRows = Array.from(eventRows);
-        filteredRows = [...allRows];
-
-        // Initialize pagination
-        initializePagination();
-
-        // Apply initial filter
-        filterEvents();
-    });
-
-    // New Alpine.js dropdown filter functions
-    function filterByEventType(type) {
-        currentFilters.type = type;
-        applyFilters();
-    }
-
-    function filterByAdminStatus(status) {
-        currentFilters.adminStatus = status;
-        applyFilters();
-    }
-
-    function filterByEventStatus(status) {
-        currentFilters.eventStatus = status;
-        applyFilters();
-    }
-
-    function filterByPinStatus(status) {
-        currentFilters.pinStatus = status;
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-
-        filteredRows = allRows.filter(row => {
-            const title = row.getAttribute('data-title');
-            const type = row.getAttribute('data-type');
-            const adminStatus = row.getAttribute('data-admin-status');
-            const eventStatus = row.getAttribute('data-event-status');
-            const pinStatus = row.getAttribute('data-pin-status');
-
-            const matchesSearch = searchTerm === '' || title.includes(searchTerm);
-            const matchesType = currentFilters.type === '' || type === currentFilters.type;
-            const matchesAdminStatus = currentFilters.adminStatus === '' || adminStatus === currentFilters.adminStatus;
-            const matchesEventStatus = currentFilters.eventStatus === '' || eventStatus === currentFilters.eventStatus;
-            const matchesPinStatus = currentFilters.pinStatus === '' || pinStatus === currentFilters.pinStatus;
-
-            return matchesSearch && matchesType && matchesAdminStatus && matchesEventStatus && matchesPinStatus;
-        });
-
-        // Reset to first page when filters change
-        currentPage = 1;
-        updatePagination();
-        updateCounts();
-        updateResultsMessage();
-    }
-
-    function filterEvents() {
-        applyFilters();
-    }
-
-    function updateCounts() {
-        const visibleCount = filteredRows.length;
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-        document.getElementById('totalResults').textContent = visibleCount;
-    }
-
-    // Pagination Functions
-    function initializePagination() {
-        updatePagination();
-    }
-
-    function updatePagination() {
-        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-        // Hide/show pagination container based on whether pagination is needed
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (filteredRows.length <= itemsPerPage) {
-            paginationContainer.style.display = 'none';
-        } else {
-            paginationContainer.style.display = 'block';
-        }
-
-        // Show/hide rows based on current page
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-        for (let i = startIndex; i < endIndex; i++) {
-            if (filteredRows[i]) {
-                filteredRows[i].style.display = '';
+        function confirmDelete(eventId) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                window.location.href = `index.php?page=admin-event-delete&id=${eventId}`;
             }
         }
 
-        updatePaginationInfo();
-        updatePaginationControls();
-    }
+        function togglePin(eventId, pinStatus) {
+            if (confirm(`Are you sure you want to ${pinStatus ? 'pin' : 'unpin'} this event?`)) {
+                // Create a form to submit the pin action
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'index.php?page=admin-event-pin';
 
-    function updatePaginationInfo() {
-        const startIndex = (currentPage - 1) * itemsPerPage + 1;
-        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+                const eventIdInput = document.createElement('input');
+                eventIdInput.type = 'hidden';
+                eventIdInput.name = 'event_id';
+                eventIdInput.value = eventId;
 
-        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-        document.getElementById('showingEnd').textContent = endIndex;
-    }
+                const pinStatusInput = document.createElement('input');
+                pinStatusInput.type = 'hidden';
+                pinStatusInput.name = 'pinned';
+                pinStatusInput.value = pinStatus ? '1' : '0';
 
-    function updatePaginationControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const pageNumbers = document.getElementById('pageNumbers');
-
-        // Update Previous/Next button states
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-
-        // Add page number buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            pageNumbers.appendChild(createPageButton(1));
-            if (startPage > 2) {
-                pageNumbers.appendChild(createEllipsis());
+                form.appendChild(eventIdInput);
+                form.appendChild(pinStatusInput);
+                document.body.appendChild(form);
+                form.submit();
             }
         }
 
-        // Add visible page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.appendChild(createPageButton(i));
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const eventRows = document.querySelectorAll('.event-row');
+            const visibleCount = document.getElementById('visibleCount');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            const eventsTable = document.getElementById('eventsTable');
+
+            allRows = Array.from(eventRows);
+            filteredRows = [...allRows];
+
+            // Initialize pagination
+            initializePagination();
+
+            // Apply initial filter
+            filterEvents();
+        });
+
+        // New Alpine.js dropdown filter functions
+        function filterByEventType(type) {
+            currentFilters.type = type;
+            applyFilters();
         }
 
-        // Add ellipsis and last page if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pageNumbers.appendChild(createEllipsis());
+        function filterByAdminStatus(status) {
+            currentFilters.adminStatus = status;
+            applyFilters();
+        }
+
+        function filterByEventStatus(status) {
+            currentFilters.eventStatus = status;
+            applyFilters();
+        }
+
+        function filterByPinStatus(status) {
+            currentFilters.pinStatus = status;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            filteredRows = allRows.filter(row => {
+                const title = row.getAttribute('data-title');
+                const type = row.getAttribute('data-type');
+                const adminStatus = row.getAttribute('data-admin-status');
+                const eventStatus = row.getAttribute('data-event-status');
+                const pinStatus = row.getAttribute('data-pin-status');
+
+                const matchesSearch = searchTerm === '' || title.includes(searchTerm);
+                const matchesType = currentFilters.type === '' || type === currentFilters.type;
+                const matchesAdminStatus = currentFilters.adminStatus === '' || adminStatus === currentFilters.adminStatus;
+                const matchesEventStatus = currentFilters.eventStatus === '' || eventStatus === currentFilters.eventStatus;
+                const matchesPinStatus = currentFilters.pinStatus === '' || pinStatus === currentFilters.pinStatus;
+
+                return matchesSearch && matchesType && matchesAdminStatus && matchesEventStatus && matchesPinStatus;
+            });
+
+            // Reset to first page when filters change
+            currentPage = 1;
+            updatePagination();
+            updateCounts();
+            updateResultsMessage();
+        }
+
+        function filterEvents() {
+            applyFilters();
+        }
+
+        function updateCounts() {
+            const visibleCount = filteredRows.length;
+            document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+            document.getElementById('totalResults').textContent = visibleCount;
+        }
+
+        // Pagination Functions
+        function initializePagination() {
+            updatePagination();
+        }
+
+        function updatePagination() {
+            totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+            // Hide/show pagination container based on whether pagination is needed
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (filteredRows.length <= itemsPerPage) {
+                paginationContainer.style.display = 'none';
+            } else {
+                paginationContainer.style.display = 'block';
             }
-            pageNumbers.appendChild(createPageButton(totalPages));
-        }
-    }
 
-    function createPageButton(pageNum) {
-        const button = document.createElement('button');
-        button.textContent = pageNum;
-        button.onclick = () => changePage(pageNum);
+            // Show/hide rows based on current page
+            allRows.forEach(row => {
+                row.style.display = 'none';
+            });
 
-        if (pageNum === currentPage) {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-        } else {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
-        }
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
 
-        return button;
-    }
+            for (let i = startIndex; i < endIndex; i++) {
+                if (filteredRows[i]) {
+                    filteredRows[i].style.display = '';
+                }
+            }
 
-    function createEllipsis() {
-        const span = document.createElement('span');
-        span.textContent = '...';
-        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-        return span;
-    }
-
-    function changePage(direction) {
-        if (typeof direction === 'number') {
-            currentPage = direction;
-        } else if (direction === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            currentPage++;
+            updatePaginationInfo();
+            updatePaginationControls();
         }
 
-        updatePagination();
-    }
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
 
-    function updateResultsMessage() {
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const eventsTable = document.getElementById('eventsTable');
-
-        if (filteredRows.length === 0) {
-            noResultsMessage.classList.remove('hidden');
-            eventsTable.classList.add('hidden');
-        } else {
-            noResultsMessage.classList.add('hidden');
-            eventsTable.classList.remove('hidden');
-        }
-    }
-
-    function clearAllFilters() {
-        // Clear search input
-        document.getElementById('searchInput').value = '';
-
-        // Reset current filters
-        currentFilters.type = '';
-        currentFilters.adminStatus = '';
-        currentFilters.eventStatus = '';
-        currentFilters.pinStatus = '';
-
-        // Reset pagination
-        currentPage = 1;
-
-        // Reset Alpine.js dropdown selections
-        const eventTypeDropdown = document.querySelector('[x-data*="Event Type"]');
-        const adminStatusDropdown = document.querySelector('[x-data*="Admin Status"]');
-        const eventStatusDropdown = document.querySelector('[x-data*="Event Status"]');
-        const pinStatusDropdown = document.querySelector('[x-data*="Pin Status"]');
-
-        if (eventTypeDropdown && eventTypeDropdown._x_dataStack) {
-            eventTypeDropdown._x_dataStack[0].selected = 'Event Type';
-        }
-        if (adminStatusDropdown && adminStatusDropdown._x_dataStack) {
-            adminStatusDropdown._x_dataStack[0].selected = 'Admin Status';
-        }
-        if (eventStatusDropdown && eventStatusDropdown._x_dataStack) {
-            eventStatusDropdown._x_dataStack[0].selected = 'Event Status';
-        }
-        if (pinStatusDropdown && pinStatusDropdown._x_dataStack) {
-            pinStatusDropdown._x_dataStack[0].selected = 'Pin Status';
+            document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
+            document.getElementById('showingEnd').textContent = endIndex;
         }
 
-        applyFilters();
-    }
+        function updatePaginationControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageNumbers = document.getElementById('pageNumbers');
 
-    // Export functionality
-    function exportResults(format) {
-        // Export all filtered results, not just current page
-        const visibleData = filteredRows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                title: row.getAttribute('data-title'),
-                type: row.getAttribute('data-type'),
-                date: cells[1].textContent.trim(),
-                eventStatus: cells[2].textContent.trim(),
-                adminStatus: cells[3].textContent.trim()
-            };
+            // Update Previous/Next button states
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+            // Clear existing page numbers
+            pageNumbers.innerHTML = '';
+
+            // Add page number buttons
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust startPage if we're near the end
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Add first page and ellipsis if needed
+            if (startPage > 1) {
+                pageNumbers.appendChild(createPageButton(1));
+                if (startPage > 2) {
+                    pageNumbers.appendChild(createEllipsis());
+                }
+            }
+
+            // Add visible page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.appendChild(createPageButton(i));
+            }
+
+            // Add ellipsis and last page if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pageNumbers.appendChild(createEllipsis());
+                }
+                pageNumbers.appendChild(createPageButton(totalPages));
+            }
+        }
+
+        function createPageButton(pageNum) {
+            const button = document.createElement('button');
+            button.textContent = pageNum;
+            button.onclick = () => changePage(pageNum);
+
+            if (pageNum === currentPage) {
+                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
+            } else {
+                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
+            }
+
+            return button;
+        }
+
+        function createEllipsis() {
+            const span = document.createElement('span');
+            span.textContent = '...';
+            span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
+            return span;
+        }
+
+        function changePage(direction) {
+            if (typeof direction === 'number') {
+                currentPage = direction;
+            } else if (direction === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (direction === 'next' && currentPage < totalPages) {
+                currentPage++;
+            }
+
+            updatePagination();
+        }
+
+        function updateResultsMessage() {
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            const eventsTable = document.getElementById('eventsTable');
+
+            if (filteredRows.length === 0) {
+                noResultsMessage.classList.remove('hidden');
+                eventsTable.classList.add('hidden');
+            } else {
+                noResultsMessage.classList.add('hidden');
+                eventsTable.classList.remove('hidden');
+            }
+        }
+
+        function clearAllFilters() {
+            // Clear search input
+            document.getElementById('searchInput').value = '';
+
+            // Reset current filters
+            currentFilters.type = '';
+            currentFilters.adminStatus = '';
+            currentFilters.eventStatus = '';
+            currentFilters.pinStatus = '';
+
+            // Reset pagination
+            currentPage = 1;
+
+            // Reset Alpine.js dropdown selections
+            const eventTypeDropdown = document.querySelector('[x-data*="Event Type"]');
+            const adminStatusDropdown = document.querySelector('[x-data*="Admin Status"]');
+            const eventStatusDropdown = document.querySelector('[x-data*="Event Status"]');
+            const pinStatusDropdown = document.querySelector('[x-data*="Pin Status"]');
+
+            if (eventTypeDropdown && eventTypeDropdown._x_dataStack) {
+                eventTypeDropdown._x_dataStack[0].selected = 'Event Type';
+            }
+            if (adminStatusDropdown && adminStatusDropdown._x_dataStack) {
+                adminStatusDropdown._x_dataStack[0].selected = 'Admin Status';
+            }
+            if (eventStatusDropdown && eventStatusDropdown._x_dataStack) {
+                eventStatusDropdown._x_dataStack[0].selected = 'Event Status';
+            }
+            if (pinStatusDropdown && pinStatusDropdown._x_dataStack) {
+                pinStatusDropdown._x_dataStack[0].selected = 'Pin Status';
+            }
+
+            applyFilters();
+        }
+
+        // Export functionality
+        function exportResults(format) {
+            // Export all filtered results, not just current page
+            const visibleData = filteredRows.map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    title: row.getAttribute('data-title'),
+                    type: row.getAttribute('data-type'),
+                    date: cells[1].textContent.trim(),
+                    eventStatus: cells[2].textContent.trim(),
+                    adminStatus: cells[3].textContent.trim()
+                };
+            });
+
+            if (format === 'csv') {
+                exportToCSV(visibleData);
+            } else if (format === 'pdf') {
+                // PDF export would require a library like jsPDF
+                alert('PDF export functionality would require additional implementation');
+            }
+        }
+
+        function exportToCSV(data) {
+            const headers = ['Title', 'Type', 'Date', 'Event Status', 'Admin Status'];
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => [
+                    `"${row.title}"`,
+                    `"${row.type}"`,
+                    `"${row.date}"`,
+                    `"${row.eventStatus}"`,
+                    `"${row.adminStatus}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], {
+                type: 'text/csv'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `events_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + F to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+
+            // Escape to clear filters
+            if (e.key === 'Escape') {
+                clearAllFilters();
+            }
         });
+    </script>
 
-        if (format === 'csv') {
-            exportToCSV(visibleData);
-        } else if (format === 'pdf') {
-            // PDF export would require a library like jsPDF
-            alert('PDF export functionality would require additional implementation');
-        }
-    }
+</body>
 
-    function exportToCSV(data) {
-        const headers = ['Title', 'Type', 'Date', 'Event Status', 'Admin Status'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => [
-                `"${row.title}"`,
-                `"${row.type}"`,
-                `"${row.date}"`,
-                `"${row.eventStatus}"`,
-                `"${row.adminStatus}"`
-            ].join(','))
-        ].join('\n');
-
-        const blob = new Blob([csvContent], {
-            type: 'text/csv'
-        });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `events_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }
-
-    // Event listeners
-    document.getElementById('searchInput').addEventListener('input', applyFilters);
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + F to focus search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-            e.preventDefault();
-            document.getElementById('searchInput').focus();
-        }
-
-        // Escape to clear filters
-        if (e.key === 'Escape') {
-            clearAllFilters();
-        }
-    });
-</script>
+</html>

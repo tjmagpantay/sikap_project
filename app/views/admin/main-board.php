@@ -1,8 +1,8 @@
-<?php
+<!-- <?php
 include_once __DIR__ . '/components/admin_auth_check.php';
-?>
+?> -->
 
-<div class="p-6">
+<div class="p-2">
     <!-- Greeting Section -->
     <div class="mb-8">
         <div class="flex items-center justify-between">
@@ -226,6 +226,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             </div>
         </div>
     </div>
+
 
     <!-- Chart.js Integration -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

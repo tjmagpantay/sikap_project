@@ -1,16 +1,54 @@
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <?php
-    include_once __DIR__ . '/components/admin_auth_check.php';
-    include __DIR__ . '/components/sidebar.php'; ?>
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Main Content Area -->
-    <div class="flex flex-col flex-1 overflow-hidden">
-        <!-- Top Navigation -->
-        <?php include __DIR__ . '/components/topbar.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>SIKAP Admin - Job Post Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#092C4C',
+                        secondary: '#F3AF0E'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Ensure proper height and overflow for layout */
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50">
+        .main-content {
+            height: calc(100vh - 4rem);
+            /* Subtract topbar height */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Topbar (Sticky) -->
+    <?php include __DIR__ . '/components/topbar.php'; ?>
+
+    <div class="flex h-screen">
+        <!-- Sidebar (Fixed/Sticky) -->
+        <?php include __DIR__ . '/components/sidebar.php'; ?>
+
+        <!-- Main Content Area (Scrollable) -->
+        <div class="flex-1 lg:ml-80 main-content">
             <div class="p-6">
                 <!-- Header Section -->
                 <div class="mb-6">
@@ -521,386 +559,386 @@
                     <?php endif; ?>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-</div>
 
-<!-- Mobile Menu Overlay -->
-<div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
+    <!-- Hidden forms for status changes -->
+    <form id="statusChangeForm" method="POST" action="?page=admin-toggle-job-status" style="display: none;">
+        <input type="hidden" name="job_id" id="statusJobId">
+        <input type="hidden" name="status" id="statusValue">
+    </form>
 
-<!-- Hidden forms for status changes -->
-<form id="statusChangeForm" method="POST" action="?page=admin-toggle-job-status" style="display: none;">
-    <input type="hidden" name="job_id" id="statusJobId">
-    <input type="hidden" name="status" id="statusValue">
-</form>
+    <form id="deleteJobForm" method="POST" action="?page=admin-delete-job" style="display: none;">
+        <input type="hidden" name="job_id" id="deleteJobId">
+    </form>
 
-<form id="deleteJobForm" method="POST" action="?page=admin-delete-job" style="display: none;">
-    <input type="hidden" name="job_id" id="deleteJobId">
-</form>
-
-<script>
-    let allRows = [];
-    let filteredRows = [];
-    let currentFilters = {
-        status: '<?php echo $statusFilter; ?>',
-        search: '<?php echo $searchQuery; ?>',
-        date: ''
-    };
-
-    // Pagination variables
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let totalPages = 1;
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        allRows = Array.from(document.querySelectorAll('#jobsTableBody tr'));
-        filteredRows = [...allRows];
-        updateCounts();
-        initializePagination();
-    });
-
-    // Mobile menu toggle
-    function toggleSidebar() {
-        const sidebarMobile = document.getElementById('sidebar-mobile');
-        const overlay = document.getElementById('mobile-menu-overlay');
-
-        if (sidebarMobile) {
-            sidebarMobile.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-    }
-
-    // Close sidebar when clicking overlay
-    document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        currentFilters.search = this.value;
-        applyFilters();
-    });
-
-    // Filter functions
-    function filterByStatus(status) {
-        currentFilters.status = status;
-        applyFilters();
-    }
-
-    function filterByDate(dateRange) {
-        currentFilters.date = dateRange;
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const searchValue = currentFilters.search.toLowerCase();
-        const statusValue = currentFilters.status;
-        const dateValue = currentFilters.date;
-
-        filteredRows = allRows.filter(row => {
-            // Skip empty rows (like "no data" message)
-            if (!row.dataset.status) return false;
-
-            const searchMatch = !searchValue || (
-                row.textContent.toLowerCase().includes(searchValue)
-            );
-
-            const statusMatch = !statusValue || statusValue === 'all' ||
-                row.dataset.status === statusValue;
-
-            const dateMatch = !dateValue || matchesDateFilter(row.dataset.created, dateValue);
-
-            return searchMatch && statusMatch && dateMatch;
-        });
-
-        // Reset to first page when filters change
-        currentPage = 1;
-        updatePagination();
-        updateCounts();
-        updateResultsMessage();
-    }
-
-    function matchesDateFilter(dateString, filter) {
-        const rowDate = new Date(dateString);
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        switch (filter) {
-            case 'today':
-                const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
-                return rowToday.getTime() === today.getTime();
-
-            case 'week':
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return rowDate >= weekAgo;
-
-            case 'month':
-                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-                return rowDate >= monthAgo;
-
-            case 'year':
-                const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-                return rowDate >= yearAgo;
-
-            default:
-                return true;
-        }
-    }
-
-    function updateResultsMessage() {
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const jobsTable = document.getElementById('jobsTable');
-
-        if (filteredRows.length === 0) {
-            noResultsMessage.classList.remove('hidden');
-            jobsTable.classList.add('hidden');
-        } else {
-            noResultsMessage.classList.add('hidden');
-            jobsTable.classList.remove('hidden');
-        }
-    }
-
-    function updateCounts() {
-        const visibleCount = filteredRows.length;
-        const totalCount = allRows.filter(row => row.dataset.status).length; // Exclude empty rows
-
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-        document.getElementById('totalResults').textContent = visibleCount;
-    }
-
-    // Pagination Functions
-    function initializePagination() {
-        updatePagination();
-    }
-
-    function updatePagination() {
-        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-        // Hide/show pagination container based on whether pagination is needed
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (filteredRows.length <= itemsPerPage) {
-            paginationContainer.style.display = 'none';
-        } else {
-            paginationContainer.style.display = 'block';
-        }
-
-        // Show/hide rows based on current page
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-        for (let i = startIndex; i < endIndex; i++) {
-            if (filteredRows[i]) {
-                filteredRows[i].style.display = '';
-            }
-        }
-
-        updatePaginationInfo();
-        updatePaginationControls();
-    }
-
-    function updatePaginationInfo() {
-        const startIndex = (currentPage - 1) * itemsPerPage + 1;
-        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
-
-        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-        document.getElementById('showingEnd').textContent = endIndex;
-    }
-
-    function updatePaginationControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtnMobile = document.getElementById('prevBtnMobile');
-        const nextBtnMobile = document.getElementById('nextBtnMobile');
-        const pageNumbers = document.getElementById('pageNumbers');
-
-        // Update Previous/Next button states
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-        if (prevBtnMobile) prevBtnMobile.disabled = currentPage === 1;
-        if (nextBtnMobile) nextBtnMobile.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-
-        // Add page number buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            pageNumbers.appendChild(createPageButton(1));
-            if (startPage > 2) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-        }
-
-        // Add visible page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.appendChild(createPageButton(i));
-        }
-
-        // Add ellipsis and last page if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-            pageNumbers.appendChild(createPageButton(totalPages));
-        }
-    }
-
-    function createPageButton(pageNum) {
-        const button = document.createElement('button');
-        button.textContent = pageNum;
-        button.onclick = () => changePage(pageNum);
-
-        if (pageNum === currentPage) {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-        } else {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
-        }
-
-        return button;
-    }
-
-    function createEllipsis() {
-        const span = document.createElement('span');
-        span.textContent = '...';
-        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-        return span;
-    }
-
-    function changePage(direction) {
-        if (typeof direction === 'number') {
-            currentPage = direction;
-        } else if (direction === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            currentPage++;
-        }
-
-        updatePagination();
-    }
-
-    function clearAllFilters() {
-        currentFilters = {
-            status: '',
-            search: '',
+    <script>
+        let allRows = [];
+        let filteredRows = [];
+        let currentFilters = {
+            status: '<?php echo $statusFilter; ?>',
+            search: '<?php echo $searchQuery; ?>',
             date: ''
         };
 
-        document.getElementById('searchInput').value = '';
+        // Pagination variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let totalPages = 1;
 
-        // Reset Alpine.js dropdown selections
-        const statusDropdown = document.querySelector('[x-data*="Status"]');
-        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
-
-        if (statusDropdown && statusDropdown._x_dataStack) {
-            statusDropdown._x_dataStack[0].selected = 'Status';
-        }
-        if (dateDropdown && dateDropdown._x_dataStack) {
-            dateDropdown._x_dataStack[0].selected = 'Date Range';
-        }
-
-        applyFilters();
-    }
-
-    // Export functionality
-    function exportResults(format) {
-        // Export all filtered results, not just current page
-        const visibleData = filteredRows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                title: cells[0].textContent.trim(),
-                company: cells[1].textContent.trim(),
-                category: cells[2].textContent.trim(),
-                location: cells[3].textContent.trim(),
-                status: cells[4].textContent.trim(),
-                created: cells[5].textContent.trim(),
-                deadline: cells[6].textContent.trim()
-            };
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            allRows = Array.from(document.querySelectorAll('#jobsTableBody tr'));
+            filteredRows = [...allRows];
+            updateCounts();
+            initializePagination();
         });
 
-        if (format === 'csv') {
-            exportToCSV(visibleData);
+        // Mobile menu toggle
+        function toggleSidebar() {
+            const sidebarMobile = document.getElementById('sidebar-mobile');
+            const overlay = document.getElementById('mobile-menu-overlay');
+
+            if (sidebarMobile) {
+                sidebarMobile.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
         }
-    }
 
-    function exportToCSV(data) {
-        const headers = ['Job Title', 'Company', 'Category', 'Location', 'Status', 'Created', 'Deadline'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => [
-                `"${row.title}"`,
-                `"${row.company}"`,
-                `"${row.category}"`,
-                `"${row.location}"`,
-                `"${row.status}"`,
-                `"${row.created}"`,
-                `"${row.deadline}"`
-            ].join(','))
-        ].join('\n');
+        // Close sidebar when clicking overlay
+        document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
 
-        const blob = new Blob([csvContent], {
-            type: 'text/csv'
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            currentFilters.search = this.value;
+            applyFilters();
         });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `jobs_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }
 
-    // Sorting functionality
-    let sortDirection = {};
+        // Filter functions
+        function filterByStatus(status) {
+            currentFilters.status = status;
+            applyFilters();
+        }
 
-    function sortTable(columnIndex) {
-        const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
-        sortDirection[columnIndex] = direction;
+        function filterByDate(dateRange) {
+            currentFilters.date = dateRange;
+            applyFilters();
+        }
 
-        filteredRows.sort((a, b) => {
-            const aValue = a.cells[columnIndex].textContent.trim().toLowerCase();
-            const bValue = b.cells[columnIndex].textContent.trim().toLowerCase();
+        function applyFilters() {
+            const searchValue = currentFilters.search.toLowerCase();
+            const statusValue = currentFilters.status;
+            const dateValue = currentFilters.date;
 
-            if (columnIndex === 5) { // Date column
-                const aDate = new Date(aValue);
-                const bDate = new Date(bValue);
-                return direction === 'asc' ? aDate - bDate : bDate - aDate;
+            filteredRows = allRows.filter(row => {
+                // Skip empty rows (like "no data" message)
+                if (!row.dataset.status) return false;
+
+                const searchMatch = !searchValue || (
+                    row.textContent.toLowerCase().includes(searchValue)
+                );
+
+                const statusMatch = !statusValue || statusValue === 'all' ||
+                    row.dataset.status === statusValue;
+
+                const dateMatch = !dateValue || matchesDateFilter(row.dataset.created, dateValue);
+
+                return searchMatch && statusMatch && dateMatch;
+            });
+
+            // Reset to first page when filters change
+            currentPage = 1;
+            updatePagination();
+            updateCounts();
+            updateResultsMessage();
+        }
+
+        function matchesDateFilter(dateString, filter) {
+            const rowDate = new Date(dateString);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            switch (filter) {
+                case 'today':
+                    const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+                    return rowToday.getTime() === today.getTime();
+
+                case 'week':
+                    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return rowDate >= weekAgo;
+
+                case 'month':
+                    const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+                    return rowDate >= monthAgo;
+
+                case 'year':
+                    const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+                    return rowDate >= yearAgo;
+
+                default:
+                    return true;
+            }
+        }
+
+        function updateResultsMessage() {
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            const jobsTable = document.getElementById('jobsTable');
+
+            if (filteredRows.length === 0) {
+                noResultsMessage.classList.remove('hidden');
+                jobsTable.classList.add('hidden');
+            } else {
+                noResultsMessage.classList.add('hidden');
+                jobsTable.classList.remove('hidden');
+            }
+        }
+
+        function updateCounts() {
+            const visibleCount = filteredRows.length;
+            const totalCount = allRows.filter(row => row.dataset.status).length; // Exclude empty rows
+
+            document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+            document.getElementById('totalResults').textContent = visibleCount;
+        }
+
+        // Pagination Functions
+        function initializePagination() {
+            updatePagination();
+        }
+
+        function updatePagination() {
+            totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+            // Hide/show pagination container based on whether pagination is needed
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (filteredRows.length <= itemsPerPage) {
+                paginationContainer.style.display = 'none';
+            } else {
+                paginationContainer.style.display = 'block';
             }
 
-            return direction === 'asc' ?
-                aValue.localeCompare(bValue) :
-                bValue.localeCompare(aValue);
-        });
+            // Show/hide rows based on current page
+            allRows.forEach(row => {
+                row.style.display = 'none';
+            });
 
-        currentPage = 1;
-        updatePagination();
-    }
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
 
-    // Job status management
-    function changeJobStatus(jobId, status) {
-        if (confirm(`Are you sure you want to ${status} this job?`)) {
-            document.getElementById('statusJobId').value = jobId;
-            document.getElementById('statusValue').value = status;
-            document.getElementById('statusChangeForm').submit();
+            for (let i = startIndex; i < endIndex; i++) {
+                if (filteredRows[i]) {
+                    filteredRows[i].style.display = '';
+                }
+            }
+
+            updatePaginationInfo();
+            updatePaginationControls();
         }
-    }
 
-    function deleteJob(jobId) {
-        if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
-            document.getElementById('deleteJobId').value = jobId;
-            document.getElementById('deleteJobForm').submit();
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+
+            document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
+            document.getElementById('showingEnd').textContent = endIndex;
         }
-    }
-</script>
+
+        function updatePaginationControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtnMobile = document.getElementById('prevBtnMobile');
+            const nextBtnMobile = document.getElementById('nextBtnMobile');
+            const pageNumbers = document.getElementById('pageNumbers');
+
+            // Update Previous/Next button states
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+            if (prevBtnMobile) prevBtnMobile.disabled = currentPage === 1;
+            if (nextBtnMobile) nextBtnMobile.disabled = currentPage === totalPages || totalPages === 0;
+
+            // Clear existing page numbers
+            pageNumbers.innerHTML = '';
+
+            // Add page number buttons
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust startPage if we're near the end
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Add first page and ellipsis if needed
+            if (startPage > 1) {
+                pageNumbers.appendChild(createPageButton(1));
+                if (startPage > 2) {
+                    pageNumbers.appendChild(createEllipsis());
+                }
+            }
+
+            // Add visible page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.appendChild(createPageButton(i));
+            }
+
+            // Add ellipsis and last page if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pageNumbers.appendChild(createEllipsis());
+                }
+                pageNumbers.appendChild(createPageButton(totalPages));
+            }
+        }
+
+        function createPageButton(pageNum) {
+            const button = document.createElement('button');
+            button.textContent = pageNum;
+            button.onclick = () => changePage(pageNum);
+
+            if (pageNum === currentPage) {
+                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
+            } else {
+                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
+            }
+
+            return button;
+        }
+
+        function createEllipsis() {
+            const span = document.createElement('span');
+            span.textContent = '...';
+            span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
+            return span;
+        }
+
+        function changePage(direction) {
+            if (typeof direction === 'number') {
+                currentPage = direction;
+            } else if (direction === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (direction === 'next' && currentPage < totalPages) {
+                currentPage++;
+            }
+
+            updatePagination();
+        }
+
+        function clearAllFilters() {
+            currentFilters = {
+                status: '',
+                search: '',
+                date: ''
+            };
+
+            document.getElementById('searchInput').value = '';
+
+            // Reset Alpine.js dropdown selections
+            const statusDropdown = document.querySelector('[x-data*="Status"]');
+            const dateDropdown = document.querySelector('[x-data*="Date Range"]');
+
+            if (statusDropdown && statusDropdown._x_dataStack) {
+                statusDropdown._x_dataStack[0].selected = 'Status';
+            }
+            if (dateDropdown && dateDropdown._x_dataStack) {
+                dateDropdown._x_dataStack[0].selected = 'Date Range';
+            }
+
+            applyFilters();
+        }
+
+        // Export functionality
+        function exportResults(format) {
+            // Export all filtered results, not just current page
+            const visibleData = filteredRows.map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    title: cells[0].textContent.trim(),
+                    company: cells[1].textContent.trim(),
+                    category: cells[2].textContent.trim(),
+                    location: cells[3].textContent.trim(),
+                    status: cells[4].textContent.trim(),
+                    created: cells[5].textContent.trim(),
+                    deadline: cells[6].textContent.trim()
+                };
+            });
+
+            if (format === 'csv') {
+                exportToCSV(visibleData);
+            }
+        }
+
+        function exportToCSV(data) {
+            const headers = ['Job Title', 'Company', 'Category', 'Location', 'Status', 'Created', 'Deadline'];
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => [
+                    `"${row.title}"`,
+                    `"${row.company}"`,
+                    `"${row.category}"`,
+                    `"${row.location}"`,
+                    `"${row.status}"`,
+                    `"${row.created}"`,
+                    `"${row.deadline}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], {
+                type: 'text/csv'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `jobs_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Sorting functionality
+        let sortDirection = {};
+
+        function sortTable(columnIndex) {
+            const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+            sortDirection[columnIndex] = direction;
+
+            filteredRows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bValue = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+                if (columnIndex === 5) { // Date column
+                    const aDate = new Date(aValue);
+                    const bDate = new Date(bValue);
+                    return direction === 'asc' ? aDate - bDate : bDate - aDate;
+                }
+
+                return direction === 'asc' ?
+                    aValue.localeCompare(bValue) :
+                    bValue.localeCompare(aValue);
+            });
+
+            currentPage = 1;
+            updatePagination();
+        }
+
+        // Job status management
+        function changeJobStatus(jobId, status) {
+            if (confirm(`Are you sure you want to ${status} this job?`)) {
+                document.getElementById('statusJobId').value = jobId;
+                document.getElementById('statusValue').value = status;
+                document.getElementById('statusChangeForm').submit();
+            }
+        }
+
+        function deleteJob(jobId) {
+            if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+                document.getElementById('deleteJobId').value = jobId;
+                document.getElementById('deleteJobForm').submit();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

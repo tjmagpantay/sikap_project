@@ -1,16 +1,54 @@
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <?php
-    include_once __DIR__ . '/components/admin_auth_check.php';
-    include __DIR__ . '/components/sidebar.php'; ?>
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Main Content Area -->
-    <div class="flex flex-col flex-1 overflow-hidden">
-        <!-- Top Navigation -->
-        <?php include __DIR__ . '/components/topbar.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>SIKAP Admin - View Job</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#092C4C',
+                        secondary: '#F3AF0E'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Ensure proper height and overflow for layout */
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        <!-- Main Content Area -->
-        <main class="flex-1 px-6 overflow-y-auto bg-gray-50">
+        .main-content {
+            height: calc(100vh - 4rem);
+            /* Subtract topbar height */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Topbar (Sticky) -->
+    <?php include __DIR__ . '/components/topbar.php'; ?>
+
+    <div class="flex h-screen">
+        <!-- Sidebar (Fixed/Sticky) -->
+        <?php include __DIR__ . '/components/sidebar.php'; ?>
+
+        <!-- Main Content Area (Scrollable) -->
+        <div class="flex-1 lg:ml-80 main-content">
             <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
                 <!-- Header Section -->
                 <div class="mb-6">
@@ -376,49 +414,52 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-</div>
 
-<!-- Hidden forms for actions -->
-<form id="statusChangeForm" method="POST" action="?page=admin-toggle-job-status" style="display: none;">
-    <input type="hidden" name="job_id" id="statusJobId">
-    <input type="hidden" name="status" id="statusValue">
-</form>
+    <!-- Hidden forms for actions -->
+    <form id="statusChangeForm" method="POST" action="?page=admin-toggle-job-status" style="display: none;">
+        <input type="hidden" name="job_id" id="statusJobId">
+        <input type="hidden" name="status" id="statusValue">
+    </form>
 
-<form id="deleteJobForm" method="POST" action="?page=admin-delete-job" style="display: none;">
-    <input type="hidden" name="job_id" id="deleteJobId">
-</form>
+    <form id="deleteJobForm" method="POST" action="?page=admin-delete-job" style="display: none;">
+        <input type="hidden" name="job_id" id="deleteJobId">
+    </form>
 
-<script>
-    // Job status management
-    function changeJobStatus(jobId, status) {
-        let confirmMessage;
-        switch (status) {
-            case 'open':
-                confirmMessage = 'Are you sure you want to open this job for applications?';
-                break;
-            case 'paused':
-                confirmMessage = 'Are you sure you want to pause this job? New applications will be disabled.';
-                break;
-            case 'closed':
-                confirmMessage = 'Are you sure you want to close this job? No new applications will be accepted.';
-                break;
-            default:
-                confirmMessage = `Are you sure you want to change the status to ${status}?`;
+    <script>
+        // Job status management
+        function changeJobStatus(jobId, status) {
+            let confirmMessage;
+            switch (status) {
+                case 'open':
+                    confirmMessage = 'Are you sure you want to open this job for applications?';
+                    break;
+                case 'paused':
+                    confirmMessage = 'Are you sure you want to pause this job? New applications will be disabled.';
+                    break;
+                case 'closed':
+                    confirmMessage = 'Are you sure you want to close this job? No new applications will be accepted.';
+                    break;
+                default:
+                    confirmMessage = `Are you sure you want to change the status to ${status}?`;
+            }
+
+            if (confirm(confirmMessage)) {
+                document.getElementById('statusJobId').value = jobId;
+                document.getElementById('statusValue').value = status;
+                document.getElementById('statusChangeForm').submit();
+            }
         }
 
-        if (confirm(confirmMessage)) {
-            document.getElementById('statusJobId').value = jobId;
-            document.getElementById('statusValue').value = status;
-            document.getElementById('statusChangeForm').submit();
+        function deleteJob(jobId) {
+            if (confirm('Are you sure you want to delete this job? This action cannot be undone and will remove all associated applications.')) {
+                document.getElementById('deleteJobId').value = jobId;
+                document.getElementById('deleteJobForm').submit();
+            }
         }
-    }
+    </script>
 
-    function deleteJob(jobId) {
-        if (confirm('Are you sure you want to delete this job? This action cannot be undone and will remove all associated applications.')) {
-            document.getElementById('deleteJobId').value = jobId;
-            document.getElementById('deleteJobForm').submit();
-        }
-    }
-</script>
+</body>
+
+</html>

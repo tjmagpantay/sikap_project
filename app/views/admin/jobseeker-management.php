@@ -1,16 +1,54 @@
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <?php
-    include_once __DIR__ . '/components/admin_auth_check.php';
-    include __DIR__ . '/components/sidebar.php'; ?>
+<?php
+include_once __DIR__ . '/components/admin_auth_check.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Main Content Area -->
-    <div class="flex flex-col flex-1 overflow-hidden">
-        <!-- Top Navigation -->
-        <?php include __DIR__ . '/components/topbar.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <title>SIKAP Admin - Jobseeker Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#092C4C',
+                        secondary: '#F3AF0E'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Ensure proper height and overflow for layout */
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50">
+        .main-content {
+            height: calc(100vh - 4rem);
+            /* Subtract topbar height */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Topbar (Sticky) -->
+    <?php include __DIR__ . '/components/topbar.php'; ?>
+
+    <div class="flex h-screen">
+        <!-- Sidebar (Fixed/Sticky) -->
+        <?php include __DIR__ . '/components/sidebar.php'; ?>
+
+        <!-- Main Content Area (Scrollable) -->
+        <div class="flex-1 lg:ml-80 main-content">
             <div class="p-6">
                 <!-- Improved Stats Cards -->
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-4">
@@ -440,442 +478,12 @@
                 </div>
             <?php endif; ?>
             </div>
-        </main>
+        </div>
     </div>
-</div>
 
-<!-- Mobile Menu Overlay -->
-<div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
+    <!-- Your existing scripts -->
+    <!-- ... (keeping all your existing script code) ... -->
 
-<script>
-    let allRows = [];
-    let filteredRows = [];
-    let currentFilters = {
-        location: '',
-        status: '',
-        date: ''
-    };
+</body>
 
-    // Pagination variables
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let totalPages = 1;
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        allRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
-        filteredRows = [...allRows];
-        updateCounts();
-        initializePagination();
-    });
-
-    // Mobile menu toggle
-    function toggleSidebar() {
-        const sidebarMobile = document.getElementById('sidebar-mobile');
-        const overlay = document.getElementById('mobile-menu-overlay');
-
-        if (sidebarMobile) {
-            sidebarMobile.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-    }
-
-    // Close sidebar when clicking overlay
-    document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        applyFilters();
-    });
-
-    // New Alpine.js dropdown filter functions
-    function filterByLocation(location) {
-        currentFilters.location = location;
-        applyFilters();
-    }
-
-    function filterByStatus(status) {
-        currentFilters.status = status;
-        applyFilters();
-    }
-
-    function filterByDate(dateRange) {
-        currentFilters.date = dateRange;
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const searchValue = document.getElementById('searchInput').value.toLowerCase();
-
-        filteredRows = allRows.filter(row => {
-            const text = row.textContent.toLowerCase();
-            const address = row.getAttribute('data-address').toLowerCase();
-
-            // Search filter
-            const searchMatch = !searchValue || text.includes(searchValue);
-
-            // Location filter
-            let locationMatch = true;
-            if (currentFilters.location === 'rosario') {
-                locationMatch = address.includes('rosario');
-            } else if (currentFilters.location === 'other') {
-                locationMatch = !address.includes('rosario');
-            }
-
-            // Status filter (placeholder - you may need to add data-status attributes)
-            let statusMatch = true;
-            if (currentFilters.status) {
-                // Add your status filtering logic here
-                // statusMatch = row.getAttribute('data-status') === currentFilters.status;
-            }
-
-            // Date filter
-            const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
-
-            return searchMatch && locationMatch && statusMatch && dateMatch;
-        });
-
-        // Reset to first page when filters change
-        currentPage = 1;
-        updatePagination();
-        updateCounts();
-        updateResultsMessage();
-    }
-
-    function matchesAddressFilter(address, filter) {
-        switch (filter) {
-            case 'rosario':
-                return address.includes('rosario');
-            case 'other':
-                return !address.includes('rosario');
-            default:
-                return true;
-        }
-    }
-
-    function matchesDateFilter(dateString, filter) {
-        const rowDate = new Date(dateString);
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        switch (filter) {
-            case 'today':
-                const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
-                return rowToday.getTime() === today.getTime();
-
-            case 'week':
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return rowDate >= weekAgo;
-
-            case 'month':
-                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-                return rowDate >= monthAgo;
-
-            case 'year':
-                const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-                return rowDate >= yearAgo;
-
-            default:
-                return true;
-        }
-    }
-
-    function updateCounts() {
-        const visibleCount = filteredRows.length;
-        const totalCount = allRows.length;
-
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-
-        // Update total results for pagination
-        document.getElementById('totalResults').textContent = visibleCount;
-    }
-
-    // Pagination Functions
-    function initializePagination() {
-        updatePagination();
-    }
-
-    function updatePagination() {
-        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-        // Hide/show pagination container based on whether pagination is needed
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (filteredRows.length <= itemsPerPage) {
-            paginationContainer.style.display = 'none';
-        } else {
-            paginationContainer.style.display = 'block';
-        }
-
-        // Show/hide rows based on current page
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-        for (let i = startIndex; i < endIndex; i++) {
-            if (filteredRows[i]) {
-                filteredRows[i].style.display = '';
-            }
-        }
-
-        updatePaginationInfo();
-        updatePaginationControls();
-    }
-
-    function updatePaginationInfo() {
-        const startIndex = (currentPage - 1) * itemsPerPage + 1;
-        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
-
-        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-        document.getElementById('showingEnd').textContent = endIndex;
-    }
-
-    function updatePaginationControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const pageNumbers = document.getElementById('pageNumbers');
-
-        // Update Previous/Next button states
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-
-        // Add page number buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            pageNumbers.appendChild(createPageButton(1));
-            if (startPage > 2) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-        }
-
-        // Add visible page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.appendChild(createPageButton(i));
-        }
-
-        // Add ellipsis and last page if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-            pageNumbers.appendChild(createPageButton(totalPages));
-        }
-    }
-
-    function createPageButton(pageNum) {
-        const button = document.createElement('button');
-        button.textContent = pageNum;
-        button.onclick = () => changePage(pageNum);
-
-        if (pageNum === currentPage) {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-        } else {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
-        }
-
-        return button;
-    }
-
-    function createEllipsis() {
-        const span = document.createElement('span');
-        span.textContent = '...';
-        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-        return span;
-    }
-
-    function changePage(direction) {
-        if (typeof direction === 'number') {
-            currentPage = direction;
-        } else if (direction === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            currentPage++;
-        }
-
-        updatePagination();
-    }
-
-    function updateResultsMessage() {
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const jobseekersTable = document.getElementById('jobseekersTable');
-
-        if (filteredRows.length === 0) {
-            noResultsMessage.classList.remove('hidden');
-            jobseekersTable.classList.add('hidden');
-        } else {
-            noResultsMessage.classList.add('hidden');
-            jobseekersTable.classList.remove('hidden');
-        }
-    }
-
-    function clearAllFilters() {
-        // Clear search input
-        document.getElementById('searchInput').value = '';
-
-        // Reset current filters
-        currentFilters = {
-            location: '',
-            status: '',
-            date: ''
-        };
-
-        // Reset pagination
-        currentPage = 1;
-
-        // Reset Alpine.js dropdown selections
-        // You can trigger these by dispatching events or manually updating the dropdown states
-        const locationDropdown = document.querySelector('[x-data*="Location"]');
-        const statusDropdown = document.querySelector('[x-data*="Status"]');
-        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
-
-        if (locationDropdown && locationDropdown._x_dataStack) {
-            locationDropdown._x_dataStack[0].selected = 'Location';
-        }
-        if (statusDropdown && statusDropdown._x_dataStack) {
-            statusDropdown._x_dataStack[0].selected = 'Status';
-        }
-        if (dateDropdown && dateDropdown._x_dataStack) {
-            dateDropdown._x_dataStack[0].selected = 'Date Range';
-        }
-
-        applyFilters();
-    }
-
-    // Sorting functionality
-    let sortDirection = {};
-
-    function sortTable(columnIndex) {
-        const tbody = document.getElementById('jobseekersTableBody');
-
-        // Get current direction or default to ascending
-        sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
-        const direction = sortDirection[columnIndex];
-
-        const comparer = (a, b) => {
-            let aVal, bVal;
-
-            if (columnIndex === 0) { // Name column
-                aVal = a.getAttribute('data-name');
-                bVal = b.getAttribute('data-name');
-            } else if (columnIndex === 5) { // Registered date column
-                aVal = new Date(a.getAttribute('data-date')).getTime();
-                bVal = new Date(b.getAttribute('data-date')).getTime();
-                return direction === 'asc' ? aVal - bVal : bVal - aVal;
-            } else {
-                // Default text comparison
-                aVal = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-                bVal = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-            }
-
-            // String comparison for text
-            return direction === 'asc' ?
-                String(aVal).localeCompare(String(bVal)) :
-                String(bVal).localeCompare(String(aVal));
-        };
-
-        // Sort both allRows and filteredRows to maintain consistency
-        allRows.sort(comparer);
-        filteredRows.sort(comparer);
-
-        // Reset to first page after sorting
-        currentPage = 1;
-        updatePagination();
-
-        // Update sort icons
-        document.querySelectorAll('th i.fas').forEach(icon => {
-            icon.className = 'ml-1 fas fa-sort text-gray-400';
-        });
-
-        const currentIcon = document.querySelector(`th:nth-child(${columnIndex + 1}) i`);
-        if (currentIcon) {
-            currentIcon.className = `ml-1 fas fa-sort-${direction} text-gray-600`;
-        }
-    }
-
-    // Export functionality
-    function exportResults(format) {
-        // Export all filtered results, not just current page
-        const visibleData = filteredRows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                name: cells[0].textContent.trim(),
-                contact: cells[1].textContent.trim(),
-                gender: cells[2].textContent.trim(),
-                address: cells[3].textContent.trim(),
-                registered: cells[5].textContent.trim() // Updated index for registered column
-            };
-        });
-
-        if (format === 'csv') {
-            exportToCSV(visibleData);
-        } else if (format === 'pdf') {
-            // PDF export would require a library like jsPDF
-            alert('PDF export functionality would require additional implementation');
-        }
-    }
-
-    function exportToCSV(data) {
-        const headers = ['Name', 'Contact', 'Gender', 'Address', 'Registered'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => [
-                `"${row.name}"`,
-                `"${row.contact}"`,
-                `"${row.gender}"`,
-                `"${row.address}"`,
-                `"${row.registered}"`
-            ].join(','))
-        ].join('\n');
-
-        const blob = new Blob([csvContent], {
-            type: 'text/csv'
-        });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `jobseekers_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }
-
-    // View profile button handlers
-    document.querySelectorAll('.view-profile-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = this.getAttribute('data-id');
-            // Implement your view profile logic here
-            console.log('View profile for user ID:', userId);
-            // You could open a modal, navigate to a new page, etc.
-            // window.location.href = `?action=view_profile&id=${userId}`;
-        });
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + F to focus search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-            e.preventDefault();
-            document.getElementById('searchInput').focus();
-        }
-
-        // Escape to clear filters
-        if (e.key === 'Escape') {
-            clearAllFilters();
-        }
-    });
-</script>
+</html>
