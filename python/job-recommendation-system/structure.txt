@@ -1,0 +1,25 @@
+job-recommendation-system/
+├── README.md
+├── requirements.txt
+├── setup.py
+├── data/
+│   └── models/                    # For future model storage
+├── src/
+│   ├── app.py                     # 🎯 MAIN API (supports both algorithms)
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── settings.py            # 🎯 ALGORITHM CONFIGURATION
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── recommender.py         # 🎯 CURRENT PRODUCTION
+│   ├── services/
+│   │   └── production_recommendation_service.py  # 🚀 FUTURE SCALABILITY
+│   └── utils/
+│       ├── __init__.py
+│       ├── enhanced_skill_matcher.py      # 🎯 CURRENT (TF-IDF + Synonyms)
+│       ├── advanced_skill_matcher.py      # 🚀 FUTURE (Sentence Transformers)
+│       └── skill_matcher.py              # 🎯 MAIN WRAPPER
+└── tests/
+    ├── __init__.py
+    ├── test_recommender.py
+    └── test_skill_matcher.py

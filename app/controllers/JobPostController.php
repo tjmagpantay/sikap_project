@@ -575,8 +575,12 @@ class JobPostController
                 }
             }
         } else {
-            // Get all active jobs using the working method
-            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+            // UPDATED: Use skill matching version if jobseeker is logged in
+            if ($jobseeker_id) {
+                $jobs = $this->jobPostModel->getAllActiveJobsWithSkillMatch($jobseeker_id);
+            } else {
+                $jobs = $this->jobPostModel->getAllActiveJobs();
+            }
         }
 
         // Add saved status if user is logged in as jobseeker

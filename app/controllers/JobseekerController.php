@@ -214,10 +214,17 @@ class JobseekerController
         $jobseeker = $this->getJobseekerData();
         $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
 
-        // Get recent job listings for the dashboard
+        // Get recent job listings for the dashboard with skill matching
         try {
             $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
-            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+
+            // UPDATED: Use skill matching version
+            if ($jobseeker_id) {
+                $jobs = $this->jobPostModel->getAllActiveJobsWithSkillMatch($jobseeker_id);
+            } else {
+                $jobs = $this->jobPostModel->getAllActiveJobs();
+            }
+
             $jobs = array_slice($jobs, 0, 6);
         } catch (Exception $e) {
             error_log('Error fetching jobs for dashboard: ' . $e->getMessage());

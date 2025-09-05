@@ -20,6 +20,11 @@ class Jobseeker
         }
     }
 
+    public function getPdo()
+    {
+        return $this->db;
+    }
+
     public function create($user_id, $first_name, $last_name, $contact_no, $middle_name = null, $suffix = null, $date_of_birth = null, $sex = null, $address = null)
     {
         $stmt = $this->db->prepare("
@@ -238,7 +243,6 @@ class Jobseeker
             $data['currently_working'],
             $data['responsibilities']
         ]);
-    
     }
 
     public function deleteWorkExperience($jobseeker_id, $experience_id)
@@ -582,5 +586,44 @@ class Jobseeker
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$jobseeker_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getSkillsArray($jobseeker_id)
+    {
+        try {
+            $sql = "SELECT skill_name FROM jobseeker_skills 
+                    WHERE jobseeker_id = ? 
+                    ORDER BY proficiency_level DESC, skill_name ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$jobseeker_id]);
+            $skills = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Clean and normalize skills
+            $cleanSkills = [];
+            foreach ($skills as $skill) {
+                $cleanSkill = trim(strtolower($skill));
+                if (!empty($cleanSkill) && $cleanSkill !== 'n/a') {
+                    $cleanSkills[] = $cleanSkill;
+                }
+            }
+
+            return $cleanSkills;
+        } catch (PDOException $e) {
+            error_log('Error getting jobseeker skills array: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function findById($jobseeker_id)
+    {
+        try {
+            $sql = "SELECT * FROM jobseekers WHERE jobseeker_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$jobseeker_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error finding jobseeker by ID: ' . $e->getMessage());
+            return false;
+        }
     }
 }

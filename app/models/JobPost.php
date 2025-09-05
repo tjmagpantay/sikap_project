@@ -905,4 +905,100 @@ class JobPost
             return [];
         }
     }
+
+    // Add this method to JobPost class
+    public function getJobSkillsArray($job_id)
+    {
+        try {
+            $sql = "SELECT skill_name FROM job_post_skills WHERE job_id = :job_id ORDER BY job_skill_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['job_id' => $job_id]);
+            $skills = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Clean and normalize skills
+            $cleanSkills = [];
+            foreach ($skills as $skill) {
+                $cleanSkill = trim(strtolower($skill));
+                if (!empty($cleanSkill) && $cleanSkill !== 'n/a') {
+                    $cleanSkills[] = $cleanSkill;
+                }
+            }
+
+            return $cleanSkills;
+        } catch (PDOException $e) {
+            error_log('Error getting job skills array: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllJobSkills()
+    {
+        try {
+            $sql = "SELECT DISTINCT skill_name FROM job_post_skills 
+                    WHERE skill_name IS NOT NULL AND skill_name != '' AND skill_name != 'N/A'
+                    ORDER BY skill_name";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting all job skills: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Update getAllActiveJobs to include skill matching if jobseeker_id is provided
+    public function getAllActiveJobsWithSkillMatch($jobseeker_id = null)
+    {
+        try {
+            // Get basic job data
+            $jobs = $this->getAllActiveJobs($jobseeker_id);
+
+            if (!$jobseeker_id || empty($jobs)) {
+                return $jobs;
+            }
+
+            // Get jobseeker skills
+            require_once __DIR__ . '/Jobseeker.php';
+            $jobseekerModel = new Jobseeker();
+            $jobseekerSkills = $jobseekerModel->getSkillsArray($jobseeker_id);
+
+            if (empty($jobseekerSkills)) {
+                return $jobs;
+            }
+
+            // Get recommendation service
+            require_once __DIR__ . '/../services/JobRecommendationService.php';
+            $recommendationService = new JobRecommendationService();
+
+            // Check if Python API is available
+            if (!$recommendationService->testConnection()) {
+                error_log('Python API not available, returning jobs without skill matching');
+                return $jobs;
+            }
+
+            // Add skill match data to each job
+            foreach ($jobs as &$job) {
+                $jobSkills = $this->getJobSkillsArray($job['job_id']);
+
+                if (!empty($jobSkills)) {
+                    $matchResult = $recommendationService->calculateJobseekerJobMatch($jobseeker_id, $job['job_id']);
+
+                    $job['skill_match_percentage'] = $matchResult['match_percentage'] ?? 0;
+                    $job['matched_skills'] = $matchResult['matched_skills'] ?? [];
+                    $job['missing_skills'] = $matchResult['missing_skills'] ?? [];
+                    $job['skill_match_available'] = $matchResult['success'] ?? false;
+                } else {
+                    $job['skill_match_percentage'] = 0;
+                    $job['matched_skills'] = [];
+                    $job['missing_skills'] = [];
+                    $job['skill_match_available'] = false;
+                }
+            }
+
+            return $jobs;
+        } catch (Exception $e) {
+            error_log('Error in getAllActiveJobsWithSkillMatch: ' . $e->getMessage());
+            return $this->getAllActiveJobs($jobseeker_id); // Fallback to basic jobs
+        }
+    }
 }
