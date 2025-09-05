@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Validation rules with regex patterns and messages
     const validationRules = {
-        first_name: {
+        first_name: { 
             pattern: /^[A-Za-z]{2,}$/,
             message: 'First name must contain only letters and be at least 2 characters'
         },
