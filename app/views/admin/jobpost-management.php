@@ -77,7 +77,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-4 sm:mb-8 md:grid-cols-6">
                     <!-- Card 1: Total Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Total Jobs</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="total"><?php echo $stats['total']; ?></span>
@@ -93,7 +93,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 2: Open Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Open Jobs</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="open"><?php echo $stats['open']; ?></span>
@@ -109,7 +109,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 3: Paused Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Paused</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="paused"><?php echo $stats['paused']; ?></span>
@@ -125,7 +125,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 4: Draft Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Drafts</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="draft"><?php echo $stats['draft']; ?></span>
@@ -141,7 +141,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 5: Closed Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Closed</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="closed"><?php echo $stats['closed']; ?></span>
@@ -157,7 +157,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 6: Closed Jobs -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="0">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Employers</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="closed"><?php echo $stats['closed']; ?></span>
@@ -173,37 +173,32 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 </div>
 
                 <!-- Search and Filter Section -->
-                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
-                    <div class="flex flex-col gap-6 mx-auto">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="relative w-full py-4 rounded-xl">
+                    <div class="flex flex-col w-full gap-6 mx-auto">
+                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
 
                             <!-- Search Jobs (Much Wider) -->
-                            <div class="w-full lg:w-80">
+                            <div class="flex-1 min-w-[200px] max-w-xs">
                                 <div class="relative">
                                     <input type="text" id="searchInput" placeholder="Search by title, company, category..."
-                                        class="w-full px-4 py-2 pl-10 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         value="<?php echo htmlspecialchars($searchQuery); ?>">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
+                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 pointer-events-none right-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
                                 </div>
                             </div>
 
                             <!-- Status Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter === 'all' ? 'Status' : $statusFilter); ?>' }">
+                            <div class="flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter === 'all' ? 'Status' : $statusFilter); ?>' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="relative w-full px-4 py-2 text-sm text-left text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-default focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <span class="block truncate" x-text="selected"></span>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </span>
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -212,44 +207,43 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute z-50 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
-                                    <button @click="selected = 'Status'; open = false; filterByStatus('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        All Status
-                                    </button>
-                                    <button @click="selected = 'Open'; open = false; filterByStatus('open')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Open
-                                    </button>
-                                    <button @click="selected = 'Paused'; open = false; filterByStatus('paused')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Paused
-                                    </button>
-                                    <button @click="selected = 'Closed'; open = false; filterByStatus('closed')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Closed
-                                    </button>
-                                    <button @click="selected = 'Draft'; open = false; filterByStatus('draft')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Draft
-                                    </button>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Status'; open = false; filterByStatus('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Status
+                                        </button>
+                                        <button @click="selected = 'Open'; open = false; filterByStatus('open')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Open
+                                        </button>
+                                        <button @click="selected = 'Paused'; open = false; filterByStatus('paused')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Paused
+                                        </button>
+                                        <button @click="selected = 'Closed'; open = false; filterByStatus('closed')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Closed
+                                        </button>
+                                        <button @click="selected = 'Draft'; open = false; filterByStatus('draft')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Draft
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Date Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                            <div class="flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="relative w-full px-4 py-2 text-sm text-left text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-default focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <span class="block truncate" x-text="selected"></span>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </span>
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -258,40 +252,42 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute z-50 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
-                                    <button @click="selected = 'Date Range'; open = false; filterByDate('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        All Dates
-                                    </button>
-                                    <button @click="selected = 'Today'; open = false; filterByDate('today')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Today
-                                    </button>
-                                    <button @click="selected = 'This Week'; open = false; filterByDate('week')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Week
-                                    </button>
-                                    <button @click="selected = 'This Month'; open = false; filterByDate('month')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Month
-                                    </button>
-                                    <button @click="selected = 'This Year'; open = false; filterByDate('year')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Year
-                                    </button>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Date Range'; open = false; filterByDate('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Dates
+                                        </button>
+                                        <button @click="selected = 'Today'; open = false; filterByDate('today')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Today
+                                        </button>
+                                        <button @click="selected = 'This Week'; open = false; filterByDate('week')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Week
+                                        </button>
+                                        <button @click="selected = 'This Month'; open = false; filterByDate('month')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Month
+                                        </button>
+                                        <button @click="selected = 'This Year'; open = false; filterByDate('year')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Year
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex gap-2 lg:flex-shrink-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Clear Filters
+                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Clear
                                 </button>
                                 <button onclick="exportResults('csv')"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-transparent rounded-lg bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Export CSV
+                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    Export
                                 </button>
                             </div>
                         </div>
@@ -383,7 +379,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                                 <div class="text-sm font-medium text-gray-900">
                                                                     <?php echo htmlspecialchars($job['job_title'] ?? 'Untitled Job'); ?>
                                                                 </div>
-                                                                <div class="text-sm text-gray-500">
+                                                                <div class="text-xs text-gray-500">
                                                                     ID: <?php echo htmlspecialchars($job['job_id'] ?? 'N/A'); ?>
                                                                 </div>
                                                             </div>
@@ -392,23 +388,23 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                                                     <!-- Company -->
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-xs text-gray-900">
                                                             <?php echo htmlspecialchars($job['company_name'] ?? 'Unknown Company'); ?>
                                                         </div>
-                                                        <div class="text-sm text-gray-500">
+                                                        <div class="text-xs text-gray-500">
                                                             <?php echo htmlspecialchars(($job['employer_first_name'] ?? '') . ' ' . ($job['employer_last_name'] ?? '')); ?>
                                                         </div>
                                                     </td>
 
                                                     <!-- Category -->
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
+                                                        <span class="inline-flex px-2 py-2 text-xs font-semibold bg-blue-100 text-primary">
                                                             <?php echo htmlspecialchars($job['category_name'] ?? 'Uncategorized'); ?>
                                                         </span>
                                                     </td>
 
                                                     <!-- Location -->
-                                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                    <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                         <?php echo htmlspecialchars($job['location'] ?? 'Not specified'); ?>
                                                     </td>
 
@@ -423,13 +419,13 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                         ];
                                                         $statusClass = $statusClasses[$job['job_status'] ?? 'draft'] ?? 'bg-gray-100 text-gray-800';
                                                         ?>
-                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>">
+                                                        <span class="inline-flex px-2 py-2 text-xs font-semibold  <?php echo $statusClass; ?>">
                                                             <?php echo ucfirst($job['job_status'] ?? 'Draft'); ?>
                                                         </span>
                                                     </td>
 
                                                     <!-- Created Date -->
-                                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                    <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                         <?php if (!empty($job['created_at'])): ?>
                                                             <div class="flex items-center">
                                                                 <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,7 +439,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                     </td>
 
                                                     <!-- Deadline -->
-                                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                    <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                         <?php if (!empty($job['application_deadline'])): ?>
                                                             <div class="flex items-center">
                                                                 <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
