@@ -202,33 +202,32 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 </div>
 
                 <!-- Search and Filter Section -->
-                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
-                    <div class="flex flex-col gap-6 mx-auto">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="relative py-4 rounded-xl">
+                    <div class="flex flex-col w-full gap-6 mx-auto">
+                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
 
                             <!-- Search Employers (Much Wider) -->
-                            <div class="w-full lg:w-80">
+                            <div class="flex-1 min-w-[200px] max-w-xs">
                                 <div class="relative">
                                     <input type="text" id="searchInput"
-                                        class="w-full px-4 py-3 pl-12 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         placeholder="Search employers by name, company, or representative...">
-                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 pointer-events-none right-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                 </div>
                             </div>
 
-                            <!-- Status Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Status' }">
+                            <!-- Location Filter -->
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Location' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -237,27 +236,76 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
-                                        <button @click="selected = 'Status'; open = false; filterByStatus('')"
-                                            class="w-full px-4 py-2 text-sm font-normal text-left text-gray-700 hover:bg-gray-100">All Status</button>
+                                        <button @click="selected = 'All Locations'; open = false; filterByLocation('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Locations
+                                        </button>
+                                        <button @click="selected = 'Rosario'; open = false; filterByLocation('rosario')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Rosario
+                                        </button>
+                                        <button @click="selected = 'Other Areas'; open = false; filterByLocation('other')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Other Areas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Status' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'All Status'; open = false; filterByStatus('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Status
+                                        </button>
                                         <button @click="selected = 'Incomplete'; open = false; filterByStatus('incomplete')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Incomplete</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Incomplete
+                                        </button>
                                         <button @click="selected = 'Pending'; open = false; filterByStatus('pending verification')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Pending</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Pending
+                                        </button>
                                         <button @click="selected = 'Verified'; open = false; filterByStatus('verified')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Verified</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Verified
+                                        </button>
                                         <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Rejected</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Rejected
+                                        </button>
                                         <button @click="selected = 'Suspended'; open = false; filterByStatus('suspended')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Suspended</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Suspended
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Date Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
                                     class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -266,7 +314,6 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -275,25 +322,35 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
-                                        <button @click="selected = 'Date Range'; open = false; filterByDate('')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Time</button>
+                                        <button @click="selected = 'All Time'; open = false; filterByDate('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Time
+                                        </button>
                                         <button @click="selected = 'Today'; open = false; filterByDate('today')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Today</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Today
+                                        </button>
                                         <button @click="selected = 'This Week'; open = false; filterByDate('week')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Week</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Week
+                                        </button>
                                         <button @click="selected = 'This Month'; open = false; filterByDate('month')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Month</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Month
+                                        </button>
                                         <button @click="selected = 'This Year'; open = false; filterByDate('year')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">This Year</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Year
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex gap-2 lg:flex-shrink-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()"
                                     class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                     Clear
@@ -354,7 +411,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                     <?php echo htmlspecialchars($user['company_name']); ?>
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                 <?php echo htmlspecialchars($user['contact_no']); ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -364,7 +421,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                             <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
                                                         </span>
                                                     </div>
-                                                    <div class="text-sm font-medium text-gray-900">
+                                                    <div class="text-xs font-medium text-gray-600">
                                                         <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
                                                     </div>
                                                 </div>
@@ -384,17 +441,17 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                     <?php echo ucfirst($user['status']); ?>
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                 <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
                                             </td>
-                                            <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                            <td class="px-6 py-4 text-xs font-medium whitespace-nowrap">
                                                 <div class="flex space-x-2">
                                                     <?php if (strtolower($user['status']) === 'suspended'): ?>
                                                         <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
                                                             <i class="mr-1 fas fa-unlock"></i>Unsuspend
                                                         </button>
                                                     <?php else: ?>
-                                                        <button class="px-2 py-1 text-xs text-gray-600 bg-gray-100 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                        <button class="px-2 py-2 text-xs text-gray-600 bg-gray-100 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
                                                             <i class="mr-1 fas fa-ban"></i>Suspend
                                                         </button>
                                                     <?php endif; ?>
@@ -494,15 +551,22 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             applyFilters();
         }
 
+        function filterByLocation(location) {
+            currentFilters.location = location;
+            applyFilters();
+        }
+
         function applyFilters() {
             const searchValue = document.getElementById('searchInput').value.toLowerCase();
 
             filteredRows = allRows.filter(row => {
                 const text = row.textContent.toLowerCase();
                 const status = row.getAttribute('data-status').toLowerCase();
+                const company = row.getAttribute('data-company').toLowerCase();
+                const representative = row.getAttribute('data-representative').toLowerCase();
 
                 // Search filter
-                const searchMatch = !searchValue || text.includes(searchValue);
+                const searchMatch = !searchValue || text.includes(searchValue) || company.includes(searchValue) || representative.includes(searchValue);
 
                 // Status filter
                 const statusMatch = !currentFilters.status || status === currentFilters.status.toLowerCase();
@@ -510,7 +574,10 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 // Date filter
                 const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
 
-                return searchMatch && statusMatch && dateMatch;
+                // Location filter
+                const locationMatch = !currentFilters.location || row.getAttribute('data-location') === currentFilters.location;
+
+                return searchMatch && statusMatch && dateMatch && locationMatch;
             });
 
             // Reset to first page when filters change
@@ -697,7 +764,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             // Reset current filters
             currentFilters = {
                 status: '',
-                date: ''
+                date: '',
+                location: ''
             };
 
             // Reset pagination
@@ -706,12 +774,16 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             // Reset Alpine.js dropdown selections
             const statusDropdown = document.querySelector('[x-data*="Status"]');
             const dateDropdown = document.querySelector('[x-data*="Date Range"]');
+            const locationDropdown = document.querySelector('[x-data*="Location"]');
 
             if (statusDropdown && statusDropdown._x_dataStack) {
                 statusDropdown._x_dataStack[0].selected = 'Status';
             }
             if (dateDropdown && dateDropdown._x_dataStack) {
                 dateDropdown._x_dataStack[0].selected = 'Date Range';
+            }
+            if (locationDropdown && locationDropdown._x_dataStack) {
+                locationDropdown._x_dataStack[0].selected = 'Location';
             }
 
             applyFilters();

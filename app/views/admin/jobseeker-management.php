@@ -54,7 +54,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-4">
                     <!-- Card 1: Total Jobseekers -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Total Jobseekers</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="totalCount"><?php echo count($users); ?></span>
@@ -74,7 +74,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 2: Active Jobseekers -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Active</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="activeCount">
@@ -100,7 +100,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 3: From Rosario -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">From Rosario</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -125,7 +125,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 4: Other Areas -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Other Areas</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -152,12 +152,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <!-- End Stats Cards -->
 
                 <!-- Search and Filter Section -->
-                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
-                    <div class="flex flex-col gap-6 mx-auto">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="relative py-4 rounded-xl">
+                    <div class="flex flex-col w-full gap-6 mx-auto">
+                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
 
                             <!-- Search Jobseekers (Much Wider) -->
-                            <div class="w-full lg:w-80">
+                            <div class="flex-1 min-w-[200px] max-w-xs">
                                 <div class="relative">
                                     <input type="text" id="searchInput"
                                         class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
@@ -167,12 +167,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Location Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Location' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Location' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
@@ -185,7 +185,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'All Locations'; open = false; filterByLocation('')"
@@ -205,12 +205,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Status Filter -->
-                            <div class="w-full lg:w-36" x-data="{ open: false, selected: 'Status' }">
+                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Status' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
@@ -223,7 +223,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'All Status'; open = false; filterByStatus('')"
@@ -243,7 +243,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Date Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
                                     class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -261,7 +261,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'All Time'; open = false; filterByDate('')"
@@ -289,7 +289,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex gap-2 lg:flex-shrink-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()"
                                     class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                     Clear
@@ -364,9 +364,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                             </td>
 
                                             <!-- Contact column -->
-                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                 <div class="flex items-center">
-
                                                     <?php echo htmlspecialchars($user['contact_no']); ?>
                                                 </div>
                                             </td>
@@ -376,27 +375,27 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                 <?php
                                                 $sex = strtolower($user['sex'] ?? '');
                                                 if ($sex === 'male'): ?>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <span class="inline-flex items-center px-4 py-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-sm">
                                                         <i class="mr-1 fas fa-mars"></i>
                                                         Male
                                                     </span>
                                                 <?php elseif ($sex === 'female'): ?>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-red-100 text-red-800">
+                                                    <span class="inline-flex items-center px-2.5 py-2 rounded-sm text-xs font-medium bg-red-100 text-red-800">
                                                         <i class="mr-1 fas fa-venus"></i>
                                                         Female
                                                     </span>
                                                 <?php else: ?>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium bg-gray-100 text-gray-600">
+                                                    <span class="inline-flex items-center px-2.5 py-2 rounded-sm text-xs font-medium bg-gray-100 text-gray-600">
                                                         N/A
                                                     </span>
                                                 <?php endif; ?>
                                             </td>
 
                                             <!-- Address column -->
-                                            <td class="max-w-xs px-6 py-4 text-sm text-gray-500 truncate whitespace-nowrap" title="<?php echo htmlspecialchars($user['address']); ?>">
+                                            <td class="max-w-xs px-6 py-4 text-xs text-gray-500 truncate whitespace-nowrap" title="<?php echo htmlspecialchars($user['address']); ?>">
                                                 <div class="flex items-center">
 
-                                                    <span class="inline-flex items-center px-2 py-1 text-sm font-medium rounded-full <?php echo stripos($user['address'], 'rosario') !== false ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'; ?>">
+                                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full <?php echo stripos($user['address'], 'rosario') !== false ? ' text-gray-500' : ' text-gray-200'; ?>">
                                                         <?php echo htmlspecialchars($user['address']); ?>
                                                     </span>
                                                 </div>
@@ -424,12 +423,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                         <?php endforeach; ?>
                                                     </div>
                                                 <?php else: ?>
-                                                    <span class="text-sm text-gray-500">No applications</span>
+                                                    <span class="text-xs text-gray-500">No applications</span>
                                                 <?php endif; ?>
                                             </td>
 
                                             <!-- Registered column -->
-                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                 <div class="flex items-center">
 
                                                     <?php echo date('M j, Y', strtotime($user['created_at'])); ?>

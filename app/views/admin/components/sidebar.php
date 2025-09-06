@@ -6,7 +6,7 @@
 <div id="sidebar" class="fixed left-0 top-16 flex flex-col bg-white border-r border-gray-200 w-80 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0">
 
     <!-- Search Bar -->
-    <div class="flex-shrink-0 px-6 py-8 ">
+    <div class="flex-shrink-0 px-8 py-8 ">
         <div class="relative">
             <input
                 type="text"

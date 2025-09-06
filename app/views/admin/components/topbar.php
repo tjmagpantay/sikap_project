@@ -11,7 +11,7 @@
             <span class="text-lg font-semibold text-gray-900">
 
                 <!-- Logo Section -->
-                <div class="flex items-center justify-between flex-shrink-0 gap-6 px-6 ">
+                <div class="flex items-center justify-between flex-shrink-0 gap-6 px-3">
                     <!-- Left: Logos -->
                     <div class="flex items-center">
                         <div class="flex items-center gap-2">
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Right Section: Notifications and Profile -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center px-6 space-x-4">
             <!-- Notifications -->
             <button class="relative p-2 text-gray-400 transition-colors hover:text-gray-600">
                 <i class="w-5 h-5 fas fa-bell"></i>

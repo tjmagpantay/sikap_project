@@ -94,7 +94,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                     <div class="flex items-baseline">
                         <span class="text-2xl font-bold text-gray-900"><?php echo number_format($dashboardStats['pending_accreditations']); ?></span>
                         <?php if ($dashboardStats['pending_accreditations'] > 0): ?>
-                            <span class="ml-2 text-sm text-orange-600">Needs Review</span>
+                            <span class="ml-2 text-sm text-blue-600">Needs Review</span>
                         <?php else: ?>
                             <span class="ml-2 text-sm text-green-600">All Clear</span>
                         <?php endif; ?>
