@@ -182,21 +182,21 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                 <?php endif; ?>
 
                 <!-- Search and Filter Section -->
-                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
-                    <div class="flex flex-col gap-6 mx-auto">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="relative  mb-6">
+                    <div class="flex flex-col w-full gap-6 mx-auto">
+                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
 
-                            <!-- Search Events (Much Wider) -->
-                            <div class="w-full lg:w-80">
+                            <!-- Search Events (Wider) -->
+                            <div class="flex-1 min-w-[200px] max-w-xs">
                                 <div class="relative">
                                     <input type="text" id="searchInput"
-                                        class="w-full px-4 py-3 pl-12 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         placeholder="Search by event title...">
                                 </div>
                             </div>
 
                             <!-- Event Type Filter -->
-                            <div class="w-full lg:w-48" x-data="{ open: false, selected: 'Event Type' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Event Type' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
                                     class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -205,7 +205,6 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -214,25 +213,31 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'Event Type'; open = false; filterByEventType('')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Events</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Events
+                                        </button>
                                         <button @click="selected = 'Program'; open = false; filterByEventType('program')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Program</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Program
+                                        </button>
                                         <button @click="selected = 'Job Fair'; open = false; filterByEventType('jobfair')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Job Fair</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Job Fair
+                                        </button>
                                         <button @click="selected = 'Local Recruitment'; open = false; filterByEventType('local recruitment')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Local Recruitment</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Local Recruitment
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-
-
                             <!-- Event Status Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Event Status' }">
+                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Event Status' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
                                     class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -241,7 +246,6 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -250,23 +254,31 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'Event Status'; open = false; filterByEventStatus('')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Events</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Events
+                                        </button>
                                         <button @click="selected = 'Upcoming'; open = false; filterByEventStatus('upcoming')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Upcoming</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Upcoming
+                                        </button>
                                         <button @click="selected = 'Ongoing'; open = false; filterByEventStatus('ongoing')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Ongoing</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Ongoing
+                                        </button>
                                         <button @click="selected = 'Completed'; open = false; filterByEventStatus('completed')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Completed</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Completed
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Pin Status Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Pin Status' }">
+                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Pin Status' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
                                     class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -275,7 +287,6 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -284,21 +295,27 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <button @click="selected = 'Pin Status'; open = false; filterByPinStatus('')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">All Events</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Events
+                                        </button>
                                         <button @click="selected = 'Pinned'; open = false; filterByPinStatus('1')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Pinned Only</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Pinned Only
+                                        </button>
                                         <button @click="selected = 'Not Pinned'; open = false; filterByPinStatus('0')"
-                                            class="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">Not Pinned</button>
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Not Pinned
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex gap-2 lg:flex-shrink-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()"
                                     class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                     Clear
@@ -337,26 +354,26 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
 
                         <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="eventsTable">
                             <table class="w-full divide-y divide-gray-200 table-auto">
+                                <!-- Table Head -->
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Event
                                         </th>
-                                        <!-- Date & Time sortable column -->
-                                        <th id="sortDateHeader" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                                        <th id="sortDateHeader" class="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                                             Date & Time
                                             <i id="sortIcon" class="ml-1 fas fa-sort"></i>
                                         </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                        <th class="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Event Status
                                         </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                        <th class="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Admin Status
                                         </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">
+                                        <th class="px-3 py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">
                                             Pin Status
                                         </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">
+                                        <th class="px-3 py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">
                                             Actions
                                         </th>
                                     </tr>
@@ -382,11 +399,13 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                             data-event-status="<?php echo $eventStatus; ?>"
                                             data-pin-status="<?php echo isset($event['pinned']) && $event['pinned'] == 1 ? '1' : '0'; ?>"
                                             data-date="<?php echo date('Y-m-d H:i:s', strtotime($event['time_start'])); ?>">
-                                            <td class="px-6 py-4">
+
+                                            <!-- Event Column - Adapted from jobseeker management -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <div class="flex-shrink-0 w-12 h-12">
+                                                    <div class="flex-shrink-0 w-10 h-10">
                                                         <?php if (!empty($event['image'])): ?>
-                                                            <img class="object-cover w-12 h-12 rounded-full"
+                                                            <img class="object-cover w-10 h-10 rounded-full"
                                                                 src="<?php echo htmlspecialchars($event['image']); ?>"
                                                                 alt="">
                                                         <?php else: ?>
@@ -396,12 +415,24 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900 event-title">
-                                                            <?php echo htmlspecialchars($event['title']); ?>
+                                                        <div class="text-sm font-medium text-gray-900 event-title" title="<?php echo htmlspecialchars($event['title']); ?>">
+                                                            <?php
+                                                            $title = htmlspecialchars($event['title']);
+                                                            // Truncate title if longer than 40 characters
+                                                            if (strlen($title) > 40) {
+                                                                echo substr($title, 0, 40) . '...';
+                                                            } else {
+                                                                echo $title;
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                        <div class="text-sm text-gray-500">
+                                                            <?php echo ucfirst(htmlspecialchars($event['type'] ?? 'Event')); ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
+
                                             <td class="px-6 py-4 event-date">
                                                 <div class="text-sm text-gray-900">
                                                     <?php echo date('F j, Y', strtotime($event['time_start'])); ?>
@@ -432,7 +463,7 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                                     $statusText = 'Completed';
                                                 }
                                                 ?>
-                                                <span class="inline-flex px-2 text-xs font-semibold leading-5 <?php echo $statusClass; ?> rounded-full event-status">
+                                                <span class="inline-flex px-2 text-xs font-semibold leading-5 <?php echo $statusClass; ?> event-status">
                                                     <?php echo $statusText; ?>
                                                 </span>
                                             </td>
@@ -450,7 +481,7 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                                     $adminStatusText = 'Draft';
                                                 }
                                                 ?>
-                                                <span class="inline-flex px-2 text-xs font-semibold leading-5 <?php echo $adminStatusClass; ?> rounded-full admin-status">
+                                                <span class="inline-flex px-2 text-xs font-semibold leading-5 <?php echo $adminStatusClass; ?>  admin-status">
                                                     <?php echo $adminStatusText; ?>
                                                 </span>
                                             </td>
@@ -460,13 +491,11 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                                                 $isPinned = isset($event['pinned']) && $event['pinned'] == 1;
                                                 ?>
                                                 <?php if ($isPinned): ?>
-                                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
-                                                        <i class="mr-1 fas fa-thumbtack"></i>
+                                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 ">
                                                         Pinned
                                                     </span>
                                                 <?php else: ?>
-                                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 text-gray-600 bg-gray-100 rounded-full">
-                                                        <i class="mr-1 fas fa-thumbtack"></i>
+                                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 text-gray-600 bg-gray-100 ">
                                                         Not Pinned
                                                     </span>
                                                 <?php endif; ?>
