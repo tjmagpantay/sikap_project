@@ -75,7 +75,7 @@ $success = $_GET['success'] ?? '';
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-3">
                     <!-- Card 1: Pending Review -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Pending Review</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl"><?php echo count($pendingAccreditations); ?></span>
@@ -95,7 +95,7 @@ $success = $_GET['success'] ?? '';
 
                     <!-- Card 2: Approved -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Approved</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -119,7 +119,7 @@ $success = $_GET['success'] ?? '';
 
                     <!-- Card 3: Rejected -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Rejected</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -192,12 +192,12 @@ $success = $_GET['success'] ?? '';
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-500">
                                                             <?php echo htmlspecialchars($acc['business_name'] ?: $acc['company_name'] ?: 'N/A'); ?>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-500">
                                                             <?php echo htmlspecialchars($acc['business_industry'] ?: 'N/A'); ?>
                                                         </div>
                                                     </td>
@@ -317,12 +317,46 @@ $success = $_GET['success'] ?? '';
                         <h2 class="text-lg font-semibold text-gray-900">All Accreditations</h2>
                         <div class="flex items-center space-x-4">
                             <!-- Status Filter -->
-                            <select id="statusFilter" class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
-                                <option value="all">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
+                            <!-- Improved Status Filter Dropdown (Alpine.js) -->
+                            <div class="relative" x-data="{ open: false, selected: 'All Status' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-40 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                    x-cloak>
+                                    <div class="py-1">
+                                        <button @click="selected = 'All Status'; open = false; filterByStatus('all')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Status
+                                        </button>
+                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Pending
+                                        </button>
+                                        <button @click="selected = 'Approved'; open = false; filterByStatus('approved')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Approved
+                                        </button>
+                                        <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Rejected
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Search -->
                             <div class="relative">
                                 <input type="text" id="searchInput" placeholder="Search employers..."
@@ -378,7 +412,7 @@ $success = $_GET['success'] ?? '';
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="text-sm text-gray-900">
+                                                        <div class="text-sm text-gray-500">
                                                             <?php echo htmlspecialchars($acc['business_name'] ?: $acc['company_name'] ?: 'N/A'); ?>
                                                         </div>
                                                     </td>
@@ -391,14 +425,14 @@ $success = $_GET['success'] ?? '';
                                                         ];
                                                         $statusClass = $statusClasses[$acc['status']] ?? 'bg-gray-100 text-gray-800';
                                                         ?>
-                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>">
+                                                        <span class="inline-flex px-2 py-2 text-xs font-semibold  <?php echo $statusClass; ?>">
                                                             <?php echo ucfirst($acc['status']); ?>
                                                         </span>
                                                     </td>
                                                     <td class="px-6 py-4 text-sm text-gray-500">
                                                         <?php echo $acc['reviewed_by_name'] ? htmlspecialchars($acc['reviewed_by_name']) : '-'; ?>
                                                     </td>
-                                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                                    <td class="px-6 py-4 text-sm     text-gray-500">
                                                         <?php echo date('M j, Y', strtotime($acc['created_at'])); ?>
                                                     </td>
                                                     <td class="px-6 py-4">
@@ -600,13 +634,20 @@ $success = $_GET['success'] ?? '';
 
         // Filter and search functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const statusFilter = document.getElementById('statusFilter');
             const searchInput = document.getElementById('searchInput');
             const tableRows = document.querySelectorAll('.accreditation-row');
             const mobileCards = document.querySelectorAll('.accreditation-mobile-card');
 
+            // Store current filter values
+            let currentStatusFilter = 'all';
+
+            // Make filterByStatus function globally available
+            window.filterByStatus = function(status) {
+                currentStatusFilter = status;
+                filterAccreditations();
+            };
+
             function filterAccreditations() {
-                const statusValue = statusFilter.value;
                 const searchValue = searchInput.value.toLowerCase();
 
                 // Filter table rows
@@ -614,7 +655,7 @@ $success = $_GET['success'] ?? '';
                     const status = row.dataset.status;
                     const searchText = row.dataset.search;
 
-                    const statusMatch = statusValue === 'all' || status === statusValue;
+                    const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter;
                     const searchMatch = searchText.includes(searchValue);
 
                     row.style.display = statusMatch && searchMatch ? '' : 'none';
@@ -625,14 +666,13 @@ $success = $_GET['success'] ?? '';
                     const status = card.dataset.status;
                     const searchText = card.dataset.search;
 
-                    const statusMatch = statusValue === 'all' || status === statusValue;
+                    const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter;
                     const searchMatch = searchText.includes(searchValue);
 
                     card.style.display = statusMatch && searchMatch ? '' : 'none';
                 });
             }
 
-            statusFilter.addEventListener('change', filterAccreditations);
             searchInput.addEventListener('input', filterAccreditations);
         });
     </script>

@@ -46,20 +46,6 @@ if ($documents) {
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        /* Ensure proper height and overflow for layout */
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .main-content {
-            height: calc(100vh - 4rem);
-            /* Subtract topbar height */
-            overflow-y: auto;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -70,9 +56,9 @@ if ($documents) {
         <!-- Sidebar (Fixed/Sticky) -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
 
-        <!-- Main Content Area (Scrollable) -->
-        <div class="flex-1 lg:ml-80 main-content">
-            <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
+        <!-- Main Content Area -->
+        <div class="flex-1 lg:ml-80 overflow-auto">
+            <div class="p-6">
                 <!-- Header with breadcrumbs -->
                 <div class="mb-8">
                     <!-- Breadcrumb Navigation -->
@@ -105,289 +91,290 @@ if ($documents) {
                     </nav>
                 </div>
 
-                <!-- Main Flex Layout -->
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <!-- Left Section - Main Content (8/12 width) -->
-                    <div class="w-full space-y-6 md:w-8/12">
+                <!-- Main Layout - Two Column Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Section - Main Content (2/3 width) -->
+                    <div class="lg:col-span-2 space-y-6">
                         <!-- Header Card -->
-                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
+                        <div class="bg-white border border-gray-200 rounded-lg shadow">
                             <div class="p-6">
                                 <!-- Employer Name and Status Badges -->
                                 <div class="flex items-start justify-between mb-6">
                                     <div>
-                                        <h1 class="text-xl font-semibold text-gray-900">
+                                        <h1 class="text-2xl font-bold text-gray-900">
                                             <?php echo htmlspecialchars($accreditation['first_name'] . ' ' . $accreditation['last_name']); ?>
                                         </h1>
-                                        <p class="mt-1 text-sm text-gray-600"><?php echo htmlspecialchars($accreditation['email']); ?></p>
-                                        <div class="flex items-center gap-3 mt-2">
+                                        <p class="mt-1 text-gray-600 text-sm"><?php echo htmlspecialchars($accreditation['email']); ?></p>
+                                        <div class="flex items-center gap-3 mt-3">
                                             <!-- Status Badge -->
-                                            <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium
+                                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium uppercase
                                             <?php
-                                            echo $accreditation['status'] === 'approved' ? 'bg-green-100 text-green-800' : ($accreditation['status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
+                                            if ($accreditation['status'] === 'approved') {
+                                                echo 'bg-green-100 text-green-800';
+                                            } elseif ($accreditation['status'] === 'rejected') {
+                                                echo 'bg-red-100 text-red-800';
+                                            } else {
+                                                echo 'bg-yellow-100 text-yellow-800';
+                                            }
                                             ?>">
-                                                <?php echo strtoupper($accreditation['status']); ?>
+                                                <?php
+                                                // Display the actual status from database
+                                                echo strtoupper(str_replace('_', ' ', $accreditation['status']));
+                                                ?>
                                             </span>
 
                                             <!-- Document Status Badge -->
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
+                                            <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-100 text-primary">
                                                 <?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?> DOCUMENTS
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Employer Information Grid -->
+                                <!-- Personal Information -->
                                 <div class="mb-8">
-                                    <h2 class="mb-4 font-semibold text-primary text-md">Personal Information</h2>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <h2 class="mb-4 text-lg font-semibold text-gray-900">Personal Information</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <div class="text-xs text-gray-400">Position</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['position'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-400">Position</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['position'] ?? 'N/A'); ?></p>
                                         </div>
                                         <div>
-                                            <div class="text-xs text-gray-400">Contact Number</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['contact_no'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-400">Contact Number</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['contact_no'] ?? 'N/A'); ?></p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Business Information -->
                                 <div class="mb-8">
-                                    <h2 class="mb-4 font-semibold text-primary text-md">Business Information</h2>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <h2 class="mb-4 text-lg font-semibold text-gray-900">Business Information</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <div class="text-xs text-gray-400">Business Name</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['business_name'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-500">Business Name</label>
+                                            <p class="mt-1  text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['business_name'] ?? 'N/A'); ?></p>
                                         </div>
                                         <div>
-                                            <div class="text-xs text-gray-400">Business Type</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['business_type'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-500">Business Type</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['business_type'] ?? 'N/A'); ?></p>
                                         </div>
                                         <div>
-                                            <div class="text-xs text-gray-400">Industry</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['business_industry'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-500">Industry</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['business_industry'] ?? 'N/A'); ?></p>
                                         </div>
                                         <div>
-                                            <div class="text-xs text-gray-400">Team Size</div>
-                                            <div class="text-sm text-primary"><?php echo htmlspecialchars($accreditation['business_size'] ?? 'N/A'); ?></div>
+                                            <label class="block text-xs font-medium text-gray-500">Team Size</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo htmlspecialchars($accreditation['business_size'] ?? 'N/A'); ?></p>
                                         </div>
                                     </div>
 
                                     <?php if (!empty($accreditation['business_desc'])): ?>
                                         <div class="mt-6">
-                                            <h3 class="mb-2 font-semibold text-primary text-md">Business Description</h3>
-                                            <p class="text-sm font-light text-gray-600"><?php echo nl2br(htmlspecialchars($accreditation['business_desc'])); ?></p>
+                                            <label class="block text-xs font-medium text-gray-500">Business Description</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo nl2br(htmlspecialchars($accreditation['business_desc'])); ?></p>
                                         </div>
                                     <?php endif; ?>
 
                                     <?php if (!empty($accreditation['business_address'])): ?>
                                         <div class="mt-6">
-                                            <h3 class="mb-2 font-semibold text-primary text-md">Business Address</h3>
-                                            <p class="text-sm font-light text-gray-600"><?php echo nl2br(htmlspecialchars($accreditation['business_address'])); ?></p>
+                                            <label class="block text-xs font-medium text-gray-500">Business Address</label>
+                                            <p class="mt-1 text-gray-900 text-sm"><?php echo nl2br(htmlspecialchars($accreditation['business_address'])); ?></p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
+                            </div>
+                        </div>
 
-                                <!-- Required Documents -->
-                                <div>
-                                    <h2 class="mb-4 font-semibold text-primary text-md">Required Documents</h2>
-                                    <div class="space-y-3">
-                                        <?php foreach ($documentTypes as $type => $label): ?>
-                                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                                <div class="flex items-center">
-                                                    <!-- Document Icon -->
-                                                    <div class="flex items-center justify-center w-12 h-12 mr-4 overflow-hidden <?php echo !empty($documents[$type]) ? 'bg-green-100' : 'bg-red-100'; ?> rounded-lg">
-                                                        <?php if (!empty($documents[$type])): ?>
-                                                            <img src="../public/assets/icons/pdf-icon.png" alt="PDF" class="object-cover w-8 h-8" />
-                                                        <?php else: ?>
-                                                            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                            </svg>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-sm <?php echo !empty($documents[$type]) ? 'text-primary' : 'text-red-600'; ?> font-medium">
-                                                            <?php echo $label; ?>
-                                                        </div>
-                                                        <div class="text-xs text-gray-400">
-                                                            <?php echo !empty($documents[$type]) ? 'Uploaded' : 'Not uploaded'; ?>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex gap-2">
+                        <!-- Required Documents -->
+                        <div class="bg-white border border-gray-200 rounded-lg shadow">
+                            <div class="p-6">
+                                <h2 class="mb-6 text-lg font-semibold text-gray-900">Required Documents</h2>
+                                <div class="space-y-4">
+                                    <?php foreach ($documentTypes as $type => $label): ?>
+                                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                            <div class="flex items-center">
+                                                <!-- Document Icon -->
+                                                <div class="flex items-center justify-center w-10 h-10 mr-4 rounded-lg <?php echo !empty($documents[$type]) ? 'bg-green-100' : 'bg-red-100'; ?>">
                                                     <?php if (!empty($documents[$type])): ?>
-                                                        <a href="<?php echo htmlspecialchars($documents[$type]); ?>" target="_blank"
-                                                            class="px-3 py-1.5 text-sm font-medium transition-colors rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100">
-                                                            View
-                                                        </a>
-                                                        <a href="<?php echo htmlspecialchars($documents[$type]); ?>" download
-                                                            class="px-3 py-1.5 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                            Download ↓
-                                                        </a>
+                                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
                                                     <?php else: ?>
-                                                        <span class="px-3 py-1.5 text-xs text-red-500 bg-red-50 rounded-lg">Missing</span>
+                                                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
                                                     <?php endif; ?>
                                                 </div>
+                                                <div>
+                                                    <p class="font-medium text-gray-900 text-sm"><?php echo $label; ?></p>
+                                                    <p class="text-xs text-gray-400">
+                                                        <?php echo !empty($documents[$type]) ? 'Document uploaded' : 'Not uploaded'; ?>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        <?php endforeach; ?>
-                                    </div>
+
+                                            <div class="flex gap-2">
+                                                <?php if (!empty($documents[$type])): ?>
+                                                    <a href="<?php echo htmlspecialchars($documents[$type]); ?>" target="_blank"
+                                                        class="px-4 py-2 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                                        View
+                                                    </a>
+                                                    <a href="<?php echo htmlspecialchars($documents[$type]); ?>" download
+                                                        class="px-4 py-2 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                                        Download
+                                                    </a>
+                                                <?php else: ?>
+                                                    <span class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg">Missing</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Section - Sidebar (4/12 width) -->
-                    <div class="w-full md:w-4/12">
-                        <!-- Single Sidebar Card -->
-                        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
-                            <!-- Accreditation Status -->
-                            <div class="mb-8">
-                                <h3 class="mb-4 text-xl font-semibold text-gray-900">Accreditation Status</h3>
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                        <span class="text-sm font-light text-gray-600">Current Status:</span>
-                                        <span class="font-bold text-primary text-md"><?php echo ucfirst($accreditation['status']); ?></span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                        <span class="text-sm font-light text-gray-600">Documents:</span>
-                                        <span class="font-bold text-primary text-md"><?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?></span>
-                                    </div>
-                                    <?php if ($accreditation['reviewed_by_name']): ?>
-                                        <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                            <span class="text-sm font-light text-gray-600">Reviewed By:</span>
-                                            <span class="font-bold text-primary text-md"><?php echo htmlspecialchars($accreditation['reviewed_by_name']); ?></span>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Submission Details -->
-                            <div class="flex justify-between mb-8">
-                                <!-- Submitted Date -->
-                                <div class="flex-1 text-center">
-                                    <div class="mb-1 text-sm font-medium text-gray-500">Submitted</div>
-                                    <div class="text-sm font-semibold text-primary">
-                                        <?php echo date('M j, Y', strtotime($accreditation['created_at'])); ?>
-                                    </div>
-                                </div>
-
-                                <!-- Vertical Separator -->
-                                <div class="self-center h-12 border-r border-gray-600"></div>
-
-                                <!-- Review Date -->
-                                <div class="flex-1 text-center">
-                                    <div class="mb-1 text-sm text-gray-500">
-                                        <?php echo $accreditation['reviewed_at'] ? 'Reviewed' : 'Review Date'; ?>
-                                    </div>
-                                    <div class="text-sm font-semibold text-primary">
-                                        <?php echo $accreditation['reviewed_at'] ? date('M j, Y', strtotime($accreditation['reviewed_at'])) : 'Pending'; ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Decision Actions -->
-                            <?php if ($accreditation['status'] === 'pending'): ?>
+                    <!-- Right Section - Sidebar (1/3 width) -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white border border-gray-200 rounded-lg shadow sticky top-6">
+                            <div class="p-6">
+                                <!-- Accreditation Status -->
                                 <div class="mb-6">
-                                    <form method="POST" action="?page=admin-process-accreditation" class="space-y-4">
-                                        <input type="hidden" name="accreditation_id" value="<?php echo $accreditation['accreditation_id']; ?>">
+                                    <h3 class="mb-4 text-lg font-semibold text-gray-900">Accreditation Status</h3>
 
-                                        <div>
-                                            <label for="notes" class="block mb-2 text-sm font-medium text-gray-700">Review Notes</label>
-                                            <textarea id="notes" name="notes" rows="3"
-                                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                                placeholder="Add any comments..."></textarea>
-                                        </div>
-
-                                        <div class="space-y-3">
-                                            <!-- Approve Button -->
-                                            <button type="submit" name="status" value="approved"
-                                                onclick="return confirm('Are you sure you want to APPROVE this employer?')"
-                                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                APPROVE EMPLOYER
-                                            </button>
-
-                                            <!-- Reject Button -->
-                                            <button type="submit" name="status" value="rejected"
-                                                onclick="return confirm('Are you sure you want to REJECT this application?')"
-                                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                REJECT APPLICATION
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            <?php else: ?>
-                                <!-- Show current status prominently -->
-                                <div class="mb-6">
-                                    <div class="p-4 rounded-lg border <?php echo $accreditation['status'] === 'approved' ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'; ?>">
-                                        <div class="flex items-center">
-                                            <svg class="w-5 h-5 mr-2 <?php echo $accreditation['status'] === 'approved' ? 'text-green-600' : 'text-red-600'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <?php if ($accreditation['status'] === 'approved'): ?>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                <?php else: ?>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                <?php endif; ?>
-                                            </svg>
-                                            <span class="font-medium <?php echo $accreditation['status'] === 'approved' ? 'text-green-800' : 'text-red-800'; ?>">
-                                                <?php echo $accreditation['status'] === 'approved' ? 'EMPLOYER APPROVED' : 'APPLICATION REJECTED'; ?>
-                                            </span>
+                                    <!-- Current Status Display -->
+                                    <div class="mb-4 p-4 rounded-lg border-2 
+    <?php echo $accreditation['status'] === 'approved' ? 'border-green-200 bg-green-50' : ($accreditation['status'] === 'rejected' ? 'border-red-200 bg-red-50' : 'border-yellow-200 bg-yellow-50'); ?>">
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <div class="text-gray-400 text-sm">Current Status:</div>
+                                            <div class="font-medium text-sm 
+<?php echo $accreditation['status'] === 'approved' ? 'text-green-600' : ($accreditation['status'] === 'rejected' ? 'text-red-600' : 'text-yellow-600'); ?>">
+                                                <?php
+                                                // Display the actual status from database, formatted nicely
+                                                echo ucfirst(str_replace('_', ' ', $accreditation['status']));
+                                                ?>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <?php if ($accreditation['notes']): ?>
-                                        <div class="mt-4">
-                                            <label class="text-sm font-medium text-gray-500">Review Notes</label>
-                                            <p class="p-3 mt-1 text-sm text-gray-900 rounded bg-gray-50"><?php echo nl2br(htmlspecialchars($accreditation['notes'])); ?></p>
-                                        </div>
-                                    <?php endif; ?>
 
-                                    <!-- Option to change status -->
-                                    <div class="pt-4 mt-4 border-t">
-                                        <p class="mb-3 text-xs text-gray-500">Change Status</p>
-                                        <form method="POST" action="?page=admin-process-accreditation" class="space-y-2">
+                                    <!-- Stats -->
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                            <span class="text-sm font-medium text-gray-600">Documents:</span>
+                                            <span class="text-sm font-bold text-gray-900"><?php echo $uploadedDocs; ?>/<?php echo count($documentTypes); ?></span>
+                                        </div>
+                                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                            <span class="text-sm font-medium text-gray-600">Submitted:</span>
+                                            <span class="text-sm font-bold text-gray-900"><?php echo date('M j, Y', strtotime($accreditation['created_at'])); ?></span>
+                                        </div>
+                                        <?php if ($accreditation['reviewed_at']): ?>
+                                            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                                <span class="text-sm font-medium text-gray-600">Reviewed:</span>
+                                                <span class="text-sm font-bold text-gray-900"><?php echo date('M j, Y', strtotime($accreditation['reviewed_at'])); ?></span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Decision Actions -->
+                                <?php if ($accreditation['status'] === 'pending'): ?>
+                                    <div class="mb-6">
+                                        <h3 class="mb-2 text-lg font-semibold text-gray-900">Change Status</h3>
+                                        <form method="POST" action="?page=admin-process-accreditation" class="space-y-4">
                                             <input type="hidden" name="accreditation_id" value="<?php echo $accreditation['accreditation_id']; ?>">
+
+                                            <div>
+                                                <label for="notes" class="block mb-2 text-xs font-medium text-gray-400">Reason for status change...</label>
+                                                <textarea id="notes" name="notes" rows="3"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="Add any comments..."></textarea>
+                                            </div>
+
+                                            <div class="space-y-3">
+                                                <!-- Approve Button -->
+                                                <button type="submit" name="status" value="approved"
+                                                    onclick="return confirm('Are you sure you want to APPROVE this employer?')"
+                                                    class="w-full flex items-center justify-center px-4 py-3 text-white bg-green-100 rounded-lg border border-green-200 hover:bg-green-700 transition-colors">
+                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Set to Approved
+                                                </button>
+
+                                                <!-- Reject Button -->
+                                                <button type="submit" name="status" value="rejected"
+                                                    onclick="return confirm('Are you sure you want to REJECT this application?')"
+                                                    class="w-full flex items-center justify-center px-4 py-3 text-white bg-red-100 rounded-lg border border-red-200 hover:bg-red-700 transition-colors">
+                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    Set to Rejected
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                <?php else: ?>
+                                    <!-- Show review notes if available -->
+                                    <?php if ($accreditation['notes']): ?>
+                                        <div class="mb-6">
+                                            <h3 class="mb-2 text-sm font-medium text-gray-700">Review Notes</h3>
+                                            <p class="p-3 text-sm text-gray-900 bg-gray-50 rounded-lg"><?php echo nl2br(htmlspecialchars($accreditation['notes'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- Change Status Form -->
+                                    <div class="mb-6">
+                                        <h3 class="mb-4 text-lg font-semibold text-gray-900">Change Status</h3>
+                                        <form method="POST" action="?page=admin-process-accreditation" class="space-y-4">
+                                            <input type="hidden" name="accreditation_id" value="<?php echo $accreditation['accreditation_id']; ?>">
+
                                             <textarea name="notes" placeholder="Reason for status change..."
-                                                class="w-full px-3 py-2 text-xs border border-gray-300 rounded-md" rows="2"></textarea>
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3"></textarea>
 
                                             <div class="space-y-2">
-                                                <!-- Status Buttons -->
+                                                <!-- Approved Button -->
                                                 <button type="submit" name="status" value="approved"
                                                     onclick="return confirm('Set status to APPROVED?')"
-                                                    class="w-full py-2 px-3 text-xs rounded transition-colors <?php echo $accreditation['status'] === 'approved' ? 'bg-green-200 text-green-800 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'; ?>"
+                                                    class="w-full py-2 px-3 text-sm rounded-lg border transition-colors
+                    <?php echo $accreditation['status'] === 'approved'
+                                        ? 'bg-green-200 border-green-400 text-green-800 cursor-not-allowed'
+                                        : 'bg-white border-green-400 text-green-800  bg-green-50 hover:bg-green-100'; ?>"
                                                     <?php echo $accreditation['status'] === 'approved' ? 'disabled' : ''; ?>>
                                                     <?php echo $accreditation['status'] === 'approved' ? 'Currently Approved' : 'Set to Approved'; ?>
                                                 </button>
 
+                                                <!-- Rejected Button -->
                                                 <button type="submit" name="status" value="rejected"
                                                     onclick="return confirm('Set status to REJECTED?')"
-                                                    class="w-full py-2 px-3 text-xs rounded transition-colors <?php echo $accreditation['status'] === 'rejected' ? 'bg-red-200 text-red-800 cursor-not-allowed' : 'bg-red-600 text-white hover:bg-red-700'; ?>"
+                                                    class="w-full py-2 px-3 text-sm rounded-lg border transition-colors
+                    <?php echo $accreditation['status'] === 'rejected'
+                                        ? 'bg-red-200 border-red-400 text-red-800 cursor-not-allowed'
+                                        : 'bg-white border-red-400 text-red-800  bg-red-50 hover:bg-red-100'; ?>"
                                                     <?php echo $accreditation['status'] === 'rejected' ? 'disabled' : ''; ?>>
                                                     <?php echo $accreditation['status'] === 'rejected' ? 'Currently Rejected' : 'Set to Rejected'; ?>
                                                 </button>
 
+                                                <!-- Pending Button -->
                                                 <button type="submit" name="status" value="pending"
                                                     onclick="return confirm('Reset status to PENDING?')"
-                                                    class="w-full py-2 px-3 text-xs rounded transition-colors <?php echo $accreditation['status'] === 'pending' ? 'bg-yellow-200 text-yellow-800 cursor-not-allowed' : 'bg-yellow-600 text-white hover:bg-yellow-700'; ?>"
+                                                    class="w-full py-2 px-3 text-sm rounded-lg border transition-colors
+                    <?php echo $accreditation['status'] === 'pending'
+                                        ? 'bg-yellow-200 border-yellow-400 text-yellow-800 cursor-not-allowed'
+                                        : 'bg-white border-yellow-400 text-yellow-800 bg-yellow-50 hover:bg-yellow-100'; ?>"
                                                     <?php echo $accreditation['status'] === 'pending' ? 'disabled' : ''; ?>>
                                                     <?php echo $accreditation['status'] === 'pending' ? 'Currently Pending' : 'Reset to Pending'; ?>
                                                 </button>
                                             </div>
                                         </form>
                                     </div>
-                                </div>
-                            <?php endif; ?>
 
-                            <!-- Back to List Button -->
-                            <div>
+                                <?php endif; ?>
+
+                                <!-- Back to List Button -->
                                 <button onclick="window.location.href='?page=admin-accreditations'"
-                                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="w-full flex items-center justify-center px-4 py-3 text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                     </svg>
                                     Back to Accreditations
