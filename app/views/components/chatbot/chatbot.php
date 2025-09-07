@@ -4,134 +4,394 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Sikap Assistant</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'fade-in': 'fadeIn 0.4s ease-out',
-                        'pulse-soft': 'pulseSoft 2s infinite',
-                        'bounce-soft': 'bounceSoft 1s infinite',
-                    },
-                    keyframes: {
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.9)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' }
-                        },
-                        pulseSoft: {
-                            '0%, 100%': { opacity: '1' },
-                            '50%': { opacity: '0.7' }
-                        },
-                        bounceSoft: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-4px)' }
-                        }
-                    }
-                }
+    <style>
+        :root {
+            --sikap-bg: #ffffff;
+            --sikap-surface: #f8fafc;
+            --sikap-border: #e2e8f0;
+            --sikap-text: #334155;
+            --sikap-text-light: #64748b;
+            --sikap-primary: #3b82f6;
+            --sikap-primary-dark: #2563eb;
+            --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --sikap-online: #22c55e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --sikap-bg: #0f172a;
+                --sikap-surface: #1e293b;
+                --sikap-border: #334155;
+                --sikap-text: #f1f5f9;
+                --sikap-text-light: #94a3b8;
+                --sikap-primary: #60a5fa;
+                --sikap-primary-dark: #3b82f6;
+                --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+                --sikap-online: #4ade80;
             }
         }
-    </script>
-    <style>
+
+        .sikap-chatbot-wrapper {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 999999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .sikap-chatbot {
+            display: none;
+            background: var(--sikap-bg);
+            border-radius: 1.25rem;
+            box-shadow: var(--sikap-shadow);
+            border: 1px solid var(--sikap-border);
+            width: 380px;
+            height: 600px;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .sikap-chatbot.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sikap-chatbot-header {
+            padding: 1.25rem;
+            background: var(--sikap-surface);
+            color: var(--sikap-text);
+            border-bottom: 1px solid var(--sikap-border);
+        }
+
+        .sikap-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sikap-header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sikap-avatar {
+            width: 2.75rem;
+            height: 2.75rem;
+            background: var(--sikap-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .sikap-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            border: 2px solid var(--sikap-primary);
+            opacity: 0.3;
+        }
+
+        .sikap-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--sikap-text-light);
+        }
+
+        .sikap-status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: var(--sikap-online);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .sikap-status-dot::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: var(--sikap-online);
+            opacity: 0.3;
+            animation: pulse 2s ease-out infinite;
+        }
+
+        .sikap-close-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sikap-text-light);
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .sikap-close-btn:hover {
+            background: var(--sikap-border);
+            color: var(--sikap-text);
+            border-color: var(--sikap-border);
+        }
+
+        .sikap-messages {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background: var(--sikap-bg);
+        }
+
+        .sikap-input-area {
+            padding: 1.25rem;
+            border-top: 1px solid var(--sikap-border);
+            background: var(--sikap-surface);
+        }
+
+        .sikap-input-group {
+            display: flex;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .sikap-input {
+            flex: 1;
+            padding: 0.875rem 1.125rem;
+            border: 1px solid var(--sikap-border);
+            background: var(--sikap-bg);
+            border-radius: 1rem;
+            color: var(--sikap-text);
+            font-size: 0.9375rem;
+            transition: all 0.2s ease;
+        }
+
+        .sikap-input:focus {
+            outline: none;
+            border-color: var(--sikap-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .sikap-input::placeholder {
+            color: var(--sikap-text-light);
+        }
+
+        .sikap-send-btn {
+            padding: 0.875rem;
+            width: 3rem;
+            background: var(--sikap-primary);
+            color: white;
+            border: none;
+            border-radius: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sikap-send-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .sikap-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sikap-toggle-btn {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--sikap-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--sikap-shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .sikap-toggle-btn:hover {
+            background: var(--sikap-primary-dark);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .sikap-toggle-btn.hidden {
+            display: none;
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
         .typing-indicator {
             display: flex;
             gap: 4px;
-            padding: 8px 12px;
-            background: #f1f1f1;
-            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            background: var(--sikap-surface);
+            border: 1px solid var(--sikap-border);
+            border-radius: 1rem;
             width: fit-content;
         }
 
         .typing-indicator span {
             width: 6px;
             height: 6px;
-            background: #93c5fd;
+            background: var(--sikap-primary);
             border-radius: 50%;
             animation: bounce 1.5s infinite;
+            opacity: 0.7;
         }
 
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-
         .message-bubble {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(10px);
             animation: fadeIn 0.3s ease forwards;
+            padding: 1rem 1.25rem;
+            border-radius: 1.25rem;
+            max-width: 85%;
+            margin-bottom: 0.75rem;
+            position: relative;
+            transition: transform 0.2s ease;
+            line-height: 1.5;
+        }
+
+        .message-bubble.user {
+            background: var(--sikap-primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .message-bubble.bot {
+            background: var(--sikap-surface);
+            color: var(--sikap-text);
+            border: 1px solid var(--sikap-border);
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        .sikap-faq-button {
+            display: block;
+            width: 100%;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            background: var(--sikap-surface);
+            border: 1px solid var(--sikap-border);
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+            color: var(--sikap-text);
+            font-size: 0.9375rem;
+        }
+
+        .sikap-faq-button:hover {
+            background: var(--sikap-bg);
+            border-color: var(--sikap-primary);
+            transform: translateY(-1px);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        #chat-messages::-webkit-scrollbar {
-            width: 6px;
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: scale(1.5);
+                opacity: 0;
+            }
         }
 
-        #chat-messages::-webkit-scrollbar-track {
+        .sikap-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sikap-messages::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        #chat-messages::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
+        .sikap-messages::-webkit-scrollbar-thumb {
+            background: var(--sikap-border);
+            border-radius: 2px;
+        }
+
+        .sikap-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--sikap-text-light);
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
 
 
 <?php
 // Remove any output before this point
 ?>
-<div class="fixed bottom-4 right-4 z-[9999]">
-    <div id="chatbot" class="hidden bg-white rounded-2xl shadow-2xl w-[380px] h-[600px] flex flex-col overflow-hidden">
+<div class="sikap-chatbot-wrapper">
+    <div id="chatbot" class="sikap-chatbot">
         <!-- Header -->
-        <div class="p-4 text-white bg-gradient-to-r from-blue-600 to-blue-700">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/20">
+        <div class="sikap-chatbot-header">
+            <div class="sikap-header-content">
+                <div class="sikap-header-title">
+                    <div class="sikap-avatar">
                         <i class="text-xl fas fa-robot"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold">Sikap Assistant</h3>
-                        <div class="flex items-center gap-2 text-sm text-blue-100">
-                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <h3 style="font-size: 1.125rem; font-weight: bold;">Sikap Assistant</h3>
+                        <div class="sikap-status">
+                            <span class="sikap-status-dot"></span>
                             <span>Online</span>
                         </div>
                     </div>
                 </div>
-                <button id="close-chat" class="p-2 transition-colors rounded-full hover:bg-white/20">
+                <button id="close-chat" class="sikap-close-btn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
 
         <!-- Messages Area -->
-        <div id="chat-messages" class="flex-1 p-4 space-y-4 overflow-y-auto scroll-smooth"></div>
+        <div id="chat-messages" class="sikap-messages"></div>
 
         <!-- Input Area -->
-        <div class="p-4 border-t bg-white/80 backdrop-blur-sm">
-            <div class="flex gap-2">
+        <div class="sikap-input-area">
+            <div class="sikap-input-group">
                 <input type="text" 
                     id="chat-input"
-                    class="flex-1 px-4 py-3 text-gray-700 bg-gray-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="sikap-input"
                     placeholder="Type your question...">
-                <button id="send-message"
-                    class="px-4 py-3 text-white transition-colors bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button id="send-message" class="sikap-send-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -139,8 +399,7 @@
     </div>
 
     <!-- Toggle Button -->
-    <button id="chatbot-toggle" 
-        class="p-4 text-white transition-transform bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 hover:scale-110">
+    <button id="chatbot-toggle" class="sikap-toggle-btn">
         <i class="text-xl fas fa-comments"></i>
     </button>
 </div>
@@ -197,7 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let typingIndicator;
         if (sender === 'bot') {
             typingIndicator = document.createElement('div');
-            typingIndicator.className = 'flex justify-start';
+            typingIndicator.style.display = 'flex';
+            typingIndicator.style.justifyContent = 'flex-start';
             typingIndicator.innerHTML = `
                 <div class="typing-indicator">
                     <span></span>
@@ -216,14 +476,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            messageDiv.style.display = 'flex';
+            messageDiv.style.justifyContent = sender === 'user' ? 'flex-end' : 'flex-start';
             
-            const bubbleClass = sender === 'user' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-100 text-gray-800';
+            const bubbleClass = sender === 'user' ? 'user' : 'bot';
             
             messageDiv.innerHTML = `
-                <div class="message-bubble ${bubbleClass} rounded-2xl px-4 py-2 max-w-[80%] shadow-sm">
+                <div class="message-bubble ${bubbleClass}">
                     ${text}
                 </div>
             `;
@@ -233,23 +492,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }, sender === 'bot' ? 1000 : 0);
     }
 
-    function showFAQMenu() {
+    window.showFAQMenu = function() {
         addMessage('bot', `
-            <div class="space-y-3">
-                <p class="font-medium text-gray-700">Choose a category:</p>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <p style="font-weight: 600; color: var(--sikap-text); margin-bottom: 0.5rem;">
+                    <i class="fas fa-list-ul" style="color: var(--sikap-primary); margin-right: 0.5rem;"></i>
+                    How can I help you?
+                </p>
                 <button onclick="showFAQsByType('jobseeker')" 
-                    class="flex items-center w-full gap-2 p-3 text-left transition-colors bg-gray-50 hover:bg-gray-100 rounded-xl">
-                    <span class="flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-100 rounded-full">
-                        <i class="fas fa-user-tie"></i>
-                    </span>
-                    <span>Jobseeker FAQs</span>
+                    class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user-tie" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
+                        <span style="font-weight: 500;">Job Seeker Help Center</span>
+                        <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
+                            <i class="fa-solid fa-briefcase" style="margin-right: 0.375rem;"></i>
+                            Application guides and tips
+                        </span>
+                    </div>
                 </button>
                 <button onclick="showFAQsByType('employer')" 
-                    class="flex items-center w-full gap-2 p-3 text-left transition-colors bg-gray-50 hover:bg-gray-100 rounded-xl">
-                    <span class="flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-100 rounded-full">
-                        <i class="fas fa-building"></i>
-                    </span>
-                    <span>Employer FAQs</span>
+                    class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-building-circle-check" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
+                        <span style="font-weight: 500;">Employer Help Center</span>
+                        <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
+                            <i class="fa-solid fa-clipboard-list" style="margin-right: 0.375rem;"></i>
+                            Posting and management guides
+                        </span>
+                    </div>
                 </button>
             </div>
         `);
@@ -259,18 +533,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const faqs = SIKAP_FAQS[type];
         let faqButtons = faqs.map(faq => `
             <button onclick="showAnswer('${type}', '${faq.q.replace(/'/g, "\\'")}')"
-                class="block w-full p-2 mb-2 text-left bg-gray-200 rounded hover:bg-gray-300">
-                ${faq.q}
+                class="sikap-faq-button">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-question-circle" style="color: var(--sikap-primary);"></i>
+                    <span>${faq.q}</span>
+                </div>
             </button>
         `).join('');
 
         addMessage('bot', `
-            <div class="space-y-2">
-                <p class="mb-2 font-medium">${type.charAt(0).toUpperCase() + type.slice(1)} FAQs:</p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <i class="fas ${type === 'jobseeker' ? 'fa-user-tie' : 'fa-building'}" 
+                       style="color: var(--sikap-primary); font-size: 1.25rem;"></i>
+                    <p style="font-weight: 600; color: var(--sikap-text);">
+                        ${type === 'jobseeker' ? 'Job Seeker Help Center' : 'Employer Help Center'}
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <i class="fas fa-info-circle" style="color: var(--sikap-primary);"></i>
+                    <p style="color: var(--sikap-text-light); font-size: 0.875rem;">
+                        ${type === 'jobseeker' ? 'Find answers about your job search journey' : 'Learn about managing job postings and candidates'}
+                    </p>
+                </div>
                 ${faqButtons}
                 <button onclick="showFAQMenu()" 
-                    class="block w-full p-2 text-left bg-gray-300 rounded hover:bg-gray-400">
-                    ← Back to Categories
+                    class="sikap-faq-button" style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-chevron-left" style="color: var(--sikap-primary);"></i>
+                    <span>Return to Help Topics</span>
                 </button>
             </div>
         `);
@@ -329,14 +619,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     chatbotToggle.addEventListener('click', () => {
-        chatbot.classList.remove('hidden');
+        chatbot.classList.add('active');
         chatbotToggle.classList.add('hidden');
         addMessage('bot', 'Hello! How can I help you today?');
         showFAQMenu();
     });
 
     closeChat.addEventListener('click', () => {
-        chatbot.classList.add('hidden');
+        chatbot.classList.remove('active');
         chatbotToggle.classList.remove('hidden');
         chatMessages.innerHTML = '';
     });

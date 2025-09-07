@@ -805,6 +805,27 @@ require_once __DIR__ . '/../vendor/autoload.php';
         case 'career-training':
         include __DIR__ . '/../app/views/components/footer/career-training.php';
         break;
+
+        // Employer Footer Routes
+        case 'post-guide':
+        include __DIR__ . '/../app/views/components/footer/post-guide.php';
+        break;
+
+        case 'employer-registration':
+        include __DIR__ . '/../app/views/components/footer/employer-registration.php';
+        break;
+
+        case 'employer-partnerships':
+        include __DIR__ . '/../app/views/components/footer/employer-partnerships.php';
+        break;
+
+        case 'hiring-laws':
+        include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
+        break;
+
+        case 'employer-reports':
+        include __DIR__ . '/../app/views/components/footer/employer-reports.php';
+        break;
    
         }
       
@@ -813,7 +834,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
     'landing',
 
     // Jobseeker routes
-    //'login-jobseeker', 'signup-jobseeker', 
+    'login-jobseeker', 'signup-jobseeker', 
     'jobseeker-dashboard',
     'profile-jobseeker', 'profile-tab-content', 'upload-profile-photo',
     'jobseeker-documents', 'download-document', 'jobseeker-applications',
@@ -825,7 +846,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
     'save-job', 'unsave-job',
 
     // Employer routes
-    //'login-employer', 'signup-employer', 
+    'login-employer', 'signup-employer', 
     'employer-dashboard',
     'view-all-applicants', 'view-applicants', 'manage-applications',
     'review-application', 'complete-employer-profile',

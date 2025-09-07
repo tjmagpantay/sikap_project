@@ -35,11 +35,11 @@
     <div>
       <h4 class="mb-3 font-medium">Employers</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">Post Guide</a></li>
-        <li><a href="#">Registration</a></li>
-        <li><a href="#">Partnerships</a></li>
-        <li><a href="#">Hiring Laws</a></li>
-        <li><a href="#">Reports</a></li>
+        <li><a href="?page=post-guide" class="transition-colors hover:text-white">Post Guide</a></li>
+        <li><a href="?page=employer-registration" class="transition-colors hover:text-white">Registration</a></li>
+        <li><a href="?page=employer-partnerships" class="transition-colors hover:text-white">Partnerships</a></li>
+        <li><a href="?page=hiring-laws" class="transition-colors hover:text-white">Hiring Laws</a></li>
+        <li><a href="?page=employer-reports" class="transition-colors hover:text-white">Reports</a></li>
       </ul>
     </div>
 
