@@ -991,4 +991,74 @@ class JobseekerController
         }
         exit;
     }
+
+    public function exploreCompanies()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker profile for navbar
+        $jobseeker = $this->getJobseekerData();
+
+        // Get companies/employers data
+        require_once __DIR__ . '/../models/Employer.php';
+        $employerModel = new Employer();
+        $employers = $employerModel->getAllVerifiedEmployersWithJobCount();
+
+        include __DIR__ . '/../views/jobseekers/explore-companies.php';
+    }
+
+    public function programsJobseeker()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker profile for navbar
+        $jobseeker = $this->getJobseekerData();
+
+        // Get events data
+        require_once __DIR__ . '/EventProgramController.php';
+        $eventController = new EventProgramController();
+        $allEvents = $eventController->getActiveEvents();
+
+        include __DIR__ . '/../views/jobseekers/programs-jobseeker.php';
+    }
+
+    public function viewEmployerProfile()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker profile for navbar
+        $jobseeker = $this->getJobseekerData();
+
+        // Get employer data
+        $employer_id = $_GET['employer_id'] ?? null;
+        if (!$employer_id) {
+            header('Location: ?page=explore-companies');
+            exit;
+        }
+
+        require_once __DIR__ . '/../models/Employer.php';
+        $employerModel = new Employer();
+        $employer = $employerModel->getDetailedEmployerProfile($employer_id);
+
+        if (!$employer) {
+            header('Location: ?page=explore-companies');
+            exit;
+        }
+
+        // Get active jobs for this employer
+        require_once __DIR__ . '/../models/JobPost.php';
+        $jobModel = new JobPost();
+        $activeJobs = $jobModel->getActiveJobsByEmployer($employer_id);
+
+        include __DIR__ . '/../views/jobseekers/view-employer-profile.php';
+    }
 }

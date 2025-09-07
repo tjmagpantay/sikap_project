@@ -2,22 +2,6 @@
 include_once __DIR__ . '/components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
-
-// Get events data from EventProgramController
-require_once __DIR__ . '/../../controllers/EventProgramController.php';
-$eventController = new EventProgramController();
-$allEvents = $eventController->getActiveEvents();
-
-// Separate events by type for filtering
-$programs = array_filter($allEvents, function ($event) {
-    return $event['type'] === 'program';
-});
-$jobFairs = array_filter($allEvents, function ($event) {
-    return $event['type'] === 'jobfair';
-});
-$localRecruitment = array_filter($allEvents, function ($event) {
-    return $event['type'] === 'local recruitment';
-});
 ?>
 
 <div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
@@ -152,9 +136,9 @@ $localRecruitment = array_filter($allEvents, function ($event) {
                 <div class="sticky top-8">
 
                     <!-- Upcoming Events Card -->
-                    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+                    <div class="p-6 bg-white border border-gray-100 rounded-lg shadow-sm">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900">Upcoming Events</h3>
-                        <div class="space-y-3">
+                        <div class="space-y-4">
                             <?php
                             $upcomingEvents = array_filter($allEvents, function ($event) {
                                 return strtotime($event['time_start']) > time();
@@ -164,15 +148,19 @@ $localRecruitment = array_filter($allEvents, function ($event) {
                             <?php if (!empty($upcomingEvents)): ?>
                                 <?php foreach ($upcomingEvents as $event): ?>
                                     <div class="pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
-                                        <h4 class="text-sm font-medium text-gray-900 line-clamp-1">
-                                            <?php echo htmlspecialchars($event['title']); ?>
-                                        </h4>
+                                        <!-- Title and Tag on Same Row -->
+                                        <div class="flex items-start justify-between gap-3 mb-1">
+                                            <h4 class="flex-1 text-sm font-medium leading-tight text-gray-900">
+                                                <?php echo htmlspecialchars($event['title']); ?>
+                                            </h4>
+                                            <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-blue-600 bg-blue-50">
+                                                <?php echo ucwords($event['type']); ?>
+                                            </span>
+                                        </div>
+                                        <!-- Date Below -->
                                         <p class="text-xs text-gray-500">
                                             <?php echo date('M j, Y - g:i A', strtotime($event['time_start'])); ?>
                                         </p>
-                                        <span class="inline-block px-2 py-1 mt-1 text-xs text-blue-600 rounded-full bg-blue-50">
-                                            <?php echo ucwords($event['type']); ?>
-                                        </span>
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>

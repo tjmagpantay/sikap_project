@@ -30,7 +30,7 @@
       <div class="flex items-center gap-3">
         <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
         <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
-        <a href="?page=landing" class="text-xl font-bold text-primary">Sikap</a>
+        <a href="?page=landing" class="text-lg font-medium nav-brand">Sikap</a>
       </div>
 
       <!-- Desktop Menu -->

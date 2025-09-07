@@ -816,4 +816,43 @@ class Employer
             return [];
         }
     }
+
+    // Add to your Employer.php model if it doesn't exist
+    public function getAllVerifiedEmployersWithJobCount()
+    {
+        try {
+            $sql = "SELECT e.*, eb.*, 
+       COUNT(CASE WHEN jp.job_status = 'open' THEN jp.job_id END) as active_jobs_count
+FROM employer e
+LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+LEFT JOIN job_post jp ON e.employer_id = jp.employer_id
+WHERE e.status = 'verified'
+GROUP BY e.employer_id
+ORDER BY e.created_at DESC";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting verified employers: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getDetailedEmployerProfile($employer_id)
+    {
+        try {
+            $sql = "SELECT e.*, eb.* 
+                    FROM employer e
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE e.employer_id = ? AND e.status = 'verified'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting detailed employer profile: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

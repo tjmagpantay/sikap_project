@@ -52,7 +52,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
         case 'about-us':
             include __DIR__ . '/../app/views/pages/about-us.php';
             break;
-            
+
         case 'program-events':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
@@ -210,10 +210,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Jobseeker Programs Routes
         case 'programs-jobseeker':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $eventController = new EventProgramController();
-            $allEvents = $eventController->getActiveEvents();
-            include __DIR__ . '/../app/views/jobseekers/programs-jobseeker.php';
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->programsJobseeker();
             break;
 
         case 'event-info-jobseeker':
@@ -540,14 +539,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         case 'view-employer-profile':
-            require_once __DIR__ . '/../app/controllers/JobPostController.php';
-            $controller = new JobPostController();
-            $controller->viewEmployerProfileForJobseeker();
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->viewEmployerProfile();
             break;
 
         case 'explore-companies':
-            require_once __DIR__ . '/../app/controllers/JobPostController.php';
-            $controller = new JobPostController();
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
             $controller->exploreCompanies();
             break;
 
@@ -758,114 +757,143 @@ require_once __DIR__ . '/../vendor/autoload.php';
         case 'customer-support':
             include __DIR__ . '/../app/views/pages/customer-support.php';
             break;
-   
 
 
-    // FOOTER ROUTES
+
+        // FOOTER ROUTES
         case 'privacy-policy':
-        include __DIR__ . '/../app/views/components/footer/privacy-policy.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/privacy-policy.php';
+            break;
 
         case 'terms-use':
-        include __DIR__ . '/../app/views/components/footer/terms-use.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/terms-use.php';
+            break;
 
         case 'accessibility':
-        include __DIR__ . '/../app/views/components/footer/accessibility.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/accessibility.php';
+            break;
 
         case 'accreditation':
-        include __DIR__ . '/../app/views/components/footer/accreditation.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/accreditation.php';
+            break;
 
         case 'faqs':
-        include __DIR__ . '/../app/views/components/footer/faqs.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/faqs.php';
+            break;
 
         case 'help-center':
-        include __DIR__ . '/../app/views/components/footer/help-center.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/help-center.php';
+            break;
 
         case 'contact-support':
-        include __DIR__ . '/../app/views/components/footer/contact-support.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/contact-support.php';
+            break;
 
         case 'feedback':
-        include __DIR__ . '/../app/views/components/footer/feedback.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/feedback.php';
+            break;
 
         case 'how-to-apply':
-        include __DIR__ . '/../app/views/components/footer/how-to-apply.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/how-to-apply.php';
+            break;
 
         case 'resume-tips':
-        include __DIR__ . '/../app/views/components/footer/resume-tips.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/resume-tips.php';
+            break;
 
         case 'govt-programs':
-        include __DIR__ . '/../app/views/components/footer/govt-programs.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/govt-programs.php';
+            break;
 
         case 'career-training':
-        include __DIR__ . '/../app/views/components/footer/career-training.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/career-training.php';
+            break;
 
         // Employer Footer Routes
         case 'post-guide':
-        include __DIR__ . '/../app/views/components/footer/post-guide.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/post-guide.php';
+            break;
 
         case 'employer-registration':
-        include __DIR__ . '/../app/views/components/footer/employer-registration.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/employer-registration.php';
+            break;
 
         case 'employer-partnerships':
-        include __DIR__ . '/../app/views/components/footer/employer-partnerships.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/employer-partnerships.php';
+            break;
 
         case 'hiring-laws':
-        include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
-        break;
+            include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
+            break;
 
         case 'employer-reports':
-        include __DIR__ . '/../app/views/components/footer/employer-reports.php';
-        break;
-   
-        }
-      
-    
+            include __DIR__ . '/../app/views/components/footer/employer-reports.php';
+            break;
+    }
+
+
     $chatbotAllowedPages = [
-    'landing',
+        'landing',
 
-    // Jobseeker routes
-    'login-jobseeker', 'signup-jobseeker', 
-    'jobseeker-dashboard',
-    'profile-jobseeker', 'profile-tab-content', 'upload-profile-photo',
-    'jobseeker-documents', 'download-document', 'jobseeker-applications',
-    'settings-jobseeker', 'update-jobseeker-settings', 'verify-otp',
-    'resend-otp', 'programs-jobseeker', 'event-info-jobseeker',
-    'complete-jobseeker-profile', 'profile-completion-success',
-    'my-applications', 'apply-job', 'application-success',
-    'view-application', 'withdraw-application', 'saved-jobs',
-    'save-job', 'unsave-job',
+        // Jobseeker routes
+        'login-jobseeker',
+        'signup-jobseeker',
+        'jobseeker-dashboard',
+        'profile-jobseeker',
+        'profile-tab-content',
+        'upload-profile-photo',
+        'jobseeker-documents',
+        'download-document',
+        'jobseeker-applications',
+        'settings-jobseeker',
+        'update-jobseeker-settings',
+        'verify-otp',
+        'resend-otp',
+        'programs-jobseeker',
+        'event-info-jobseeker',
+        'complete-jobseeker-profile',
+        'profile-completion-success',
+        'my-applications',
+        'apply-job',
+        'application-success',
+        'view-application',
+        'withdraw-application',
+        'saved-jobs',
+        'save-job',
+        'unsave-job',
 
-    // Employer routes
-    'login-employer', 'signup-employer', 
-    'employer-dashboard',
-    'view-all-applicants', 'view-applicants', 'manage-applications',
-    'review-application', 'complete-employer-profile',
-    'employer-personal-profile', 'complete-employer-business',
-    'profile-employer', 'employer-profile-completion-success',
-    'post-job', 'job-post-success', 'manage-jobs', 'view-job',
-    'view-employer-profile', 'explore-companies', 'view-employer-job',
-    'browse-jobs', 'edit-job', 'delete-job', 'toggle-job-status',
-    'setting-employer', 'update-employer-settings'
-];
+        // Employer routes
+        'login-employer',
+        'signup-employer',
+        'employer-dashboard',
+        'view-all-applicants',
+        'view-applicants',
+        'manage-applications',
+        'review-application',
+        'complete-employer-profile',
+        'employer-personal-profile',
+        'complete-employer-business',
+        'profile-employer',
+        'employer-profile-completion-success',
+        'post-job',
+        'job-post-success',
+        'manage-jobs',
+        'view-job',
+        'view-employer-profile',
+        'explore-companies',
+        'view-employer-job',
+        'browse-jobs',
+        'edit-job',
+        'delete-job',
+        'toggle-job-status',
+        'setting-employer',
+        'update-employer-settings'
+    ];
 
-// If current page is allowed, show chatbot
-if (in_array($page, $chatbotAllowedPages)) {
-    include __DIR__ . '/../app/views/components/chatbot/chatbot.php';
-}
+    // If current page is allowed, show chatbot
+    if (in_array($page, $chatbotAllowedPages)) {
+        include __DIR__ . '/../app/views/components/chatbot/chatbot.php';
+    }
     ?>
 </body>
 

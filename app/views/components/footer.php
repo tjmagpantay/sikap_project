@@ -50,7 +50,8 @@
         <li><a href="?page=faqs" class="transition-colors hover:text-white">FAQs</a></li>
         <li><a href="?page=help-center" class="transition-colors hover:text-white">Help Center</a></li>
         <li><a href="?page=contact-support" class="transition-colors hover:text-white">Contact Support</a></li>
-        <li><a href="?page=feedback" class="transition-colors hover:text-white">Feedback</a></li>
+        <li><a href="?page=feedback" class="transition-colors hover:text-white">Feedback</a></li> 
+        <li><a href="?page=admin-login" class="transition-colors hover:text-white">Admin Login</a></li>
       </ul>
     </div>
   </div>

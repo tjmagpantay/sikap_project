@@ -1,7 +1,10 @@
 <?php
+// Only keep these - no model connections
 include_once __DIR__ . '/components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
+
+// All data ($jobseeker, $employers) should come from the controller
 ?>
 
 <div class="min-h-screen bg-gray-50">

@@ -1001,4 +1001,22 @@ class JobPost
             return $this->getAllActiveJobs($jobseeker_id); // Fallback to basic jobs
         }
     }
+
+    public function getActiveJobsByEmployer($employer_id, $limit = 5)
+    {
+        try {
+            $sql = "SELECT job_id, job_title, location, application_deadline, created_at
+                FROM job_post 
+                WHERE employer_id = ? AND job_status = 'open'
+                ORDER BY created_at DESC
+                LIMIT ?";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer_id, $limit]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting active jobs by employer: ' . $e->getMessage());
+            return [];
+        }
+    }
 }
