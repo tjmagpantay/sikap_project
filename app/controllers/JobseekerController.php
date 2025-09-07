@@ -697,6 +697,15 @@ class JobseekerController
         $completionPercentage = $this->jobseekerModel->calculateProfileCompletion($_SESSION['user_id']);
         if ($completionPercentage === false) $completionPercentage = 0;
 
+        // Get hired applications for the applications tab
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+        $hiredApplications = [];
+
+        if ($jobseeker && $jobseeker['jobseeker_id']) {
+            $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus($jobseeker['jobseeker_id'], 'hired');
+        }
+
         // Include the profile view with all data
         include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
     }
@@ -1060,5 +1069,99 @@ class JobseekerController
         $activeJobs = $jobModel->getActiveJobsByEmployer($employer_id);
 
         include __DIR__ . '/../views/jobseekers/view-employer-profile.php';
+    }
+
+    public function profileJobseeker()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker profile for navbar
+        $jobseeker = $this->getJobseekerData();
+
+        // Get other profile data (education, work experience, etc.)
+        // ... your existing profile data code ...
+
+        // Get hired applications for the applications tab
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+        $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus($_SESSION['jobseeker_id'], 'hired');
+
+        include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
+    }
+
+    public function profileTabContent()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('HTTP/1.1 401 Unauthorized');
+            echo json_encode(['error' => 'Unauthorized']);
+            exit;
+        }
+
+        $tab = $_GET['tab'] ?? 'profile';
+
+        // Get jobseeker data
+        $jobseeker = $this->getJobseekerData();
+
+        // Route to appropriate tab content based on the tab parameter
+        switch ($tab) {
+            case 'profile':
+                $this->loadProfileTab($jobseeker);
+                break;
+            case 'documents':
+                $this->loadDocumentsTab($jobseeker);
+                break;
+            case 'applications':
+                $this->loadApplicationsTab($jobseeker);
+                break;
+            default:
+                $this->loadProfileTab($jobseeker);
+                break;
+        }
+        exit;
+    }
+
+    private function loadProfileTab($jobseeker)
+    {
+        // Load all profile data
+        $education = $this->jobseekerModel->getEducation($_SESSION['user_id']);
+        $workExperience = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']);
+        $skills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
+        $certificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']);
+
+        // Convert false results to empty arrays
+        if ($education === false) $education = [];
+        if ($workExperience === false) $workExperience = [];
+        if ($skills === false) $skills = [];
+        if ($certificates === false) $certificates = [];
+        if ($jobseeker === false) {
+            $jobseeker = ['first_name' => '', 'last_name' => '', 'middle_name' => '', 'suffix' => '', 'date_of_birth' => null, 'sex' => '', 'address' => '', 'contact_no' => ''];
+        }
+
+        include __DIR__ . '/../views/jobseekers/profile-components/profile-content.php';
+    }
+
+    private function loadDocumentsTab($jobseeker)
+    {
+        $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']);
+        if ($documents === false) $documents = [];
+
+        include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
+    }
+
+    private function loadApplicationsTab($jobseeker)
+    {
+        // Get hired applications through the controller (proper MVC)
+        $hiredApplications = [];
+
+        if ($jobseeker && $jobseeker['jobseeker_id']) {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus($jobseeker['jobseeker_id'], 'hired');
+        }
+
+        include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
     }
 }

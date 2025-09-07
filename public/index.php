@@ -125,47 +125,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
             if (isset($_GET['tab']) && in_array($_GET['tab'], ['profile', 'documents', 'applications'])) {
                 // Check if it's an AJAX request
                 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                    // Don't include navigation bars for AJAX content
-                    $tab = $_GET['tab'];
-
-                    switch ($tab) {
-                        case 'profile':
-                            // Load jobseeker data for profile tab
-                            require_once __DIR__ . '/../app/models/Jobseeker.php';
-                            $jobseekerModel = new Jobseeker();
-                            $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-                            $education = $jobseekerModel->getEducation($_SESSION['user_id']);
-                            $workExperience = $jobseekerModel->getWorkExperience($_SESSION['user_id']);
-                            $skills = $jobseekerModel->getSkills($_SESSION['user_id']);
-                            $certificates = $jobseekerModel->getCertificates($_SESSION['user_id']);
-
-                            // Convert false results to empty arrays
-                            if ($education === false) $education = [];
-                            if ($workExperience === false) $workExperience = [];
-                            if ($skills === false) $skills = [];
-                            if ($certificates === false) $certificates = [];
-                            if ($jobseeker === false) {
-                                $jobseeker = ['first_name' => '', 'last_name' => '', 'middle_name' => '', 'suffix' => '', 'date_of_birth' => null, 'sex' => '', 'address' => '', 'contact_no' => ''];
-                            }
-
-                            include __DIR__ . '/../app/views/jobseekers/profile-components/profile-content.php';
-                            break;
-
-                        case 'documents':
-                            require_once __DIR__ . '/../app/models/Jobseeker.php';
-                            $jobseekerModel = new Jobseeker();
-                            $documents = $jobseekerModel->getDocuments($_SESSION['user_id']);
-                            if ($documents === false) $documents = [];
-
-                            include __DIR__ . '/../app/views/jobseekers/profile-components/documents-content.php';
-                            break;
-
-                        case 'applications':
-                            // For now, just include the applications content
-                            include __DIR__ . '/../app/views/jobseekers/profile-components/applications-contents.php';
-                            break;
-                    }
-                    exit; // Important: Exit after AJAX response
+                    // Use the controller method instead of direct model access
+                    require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+                    $controller = new JobseekerController();
+                    $controller->profileTabContent();
                 }
             }
             break;

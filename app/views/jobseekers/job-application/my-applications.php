@@ -7,7 +7,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 <div class="min-h-screen">
     <div class="px-6 py-8 ">
         <div class="mx-auto max-w-7xl">
-            <!-- Page Header -->
+            <!-- Page Header with Filter -->
             <div class="mb-8">
                 <div class="sm:flex sm:items-center sm:justify-between">
                     <div>
@@ -15,6 +15,102 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         <p class="mt-1 text-sm text-gray-600">Track the status of your job applications</p>
                     </div>
 
+                    <!-- Filter Section (Similar to Browse Jobs) -->
+                    <div class="flex items-center gap-4 mt-4 sm:mt-0">
+                        <!-- Status Filter -->
+                        <div class="relative" x-data="{ open: false, selected: 'All Status' }">
+                            <button @click="open = !open" @click.away="open = false"
+                                class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
+                                <span x-text="selected" class="text-gray-700 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute right-0 z-50 w-48 mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'All Status'; open = false; filterByStatus('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Status
+                                    </button>
+                                    <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Pending
+                                    </button>
+                                    <button @click="selected = 'Under Review'; open = false; filterByStatus('reviewed')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Under Review
+                                    </button>
+                                    <button @click="selected = 'Shortlisted'; open = false; filterByStatus('shortlisted')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Shortlisted
+                                    </button>
+                                    <button @click="selected = 'Hired'; open = false; filterByStatus('hired')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Hired
+                                    </button>
+                                    <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Rejected
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interview Filter -->
+                        <div class="relative" x-data="{ open: false, selected: 'All Applications' }">
+                            <button @click="open = !open" @click.away="open = false"
+                                class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
+                                <span x-text="selected" class="text-gray-700 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute right-0 z-50 w-48 mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'All Applications'; open = false; filterByInterview('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        All Applications
+                                    </button>
+                                    <button @click="selected = 'With Interview'; open = false; filterByInterview('with_interview')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        With Interview
+                                    </button>
+                                    <button @click="selected = 'No Interview'; open = false; filterByInterview('no_interview')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        No Interview
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clear Filter Button -->
+                        <button type="button" id="clearFilters" onclick="clearAllFilters()"
+                            class="px-4 py-3 text-sm font-medium text-white transition-all rounded-sm shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
+                            Clear Filters
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -31,80 +127,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 </div>
             <?php endif; ?>
 
-            <!-- Applications Statistics -->
-            <?php
-            $totalApplications = count($applications);
-            $pendingCount = count(array_filter($applications, function ($app) {
-                return $app['application_status'] === 'pending';
-            }));
-            $reviewedCount = count(array_filter($applications, function ($app) {
-                return $app['application_status'] === 'reviewed';
-            }));
-            $shortlistedCount = count(array_filter($applications, function ($app) {
-                return $app['application_status'] === 'shortlisted';
-            }));
-            $rejectedCount = count(array_filter($applications, function ($app) {
-                return $app['application_status'] === 'rejected';
-            }));
-            $hiredCount = count(array_filter($applications, function ($app) {
-                return $app['application_status'] === 'hired';
-            }));
-            $interviewCount = count(array_filter($applications, function ($app) {
-                return !empty($app['interview_date']) && $app['interview_date'] !== '0000-00-00 00:00:00';
-            }));
-            ?>
-
-            <!-- Summary Cards - Single Row Layout -->
-            <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 md:gap-6">
-                <!-- Card 1: Total Applications -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-gray-900 md:text-3xl"><?php echo $totalApplications; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Total Applications</p>
-                    </div>
-                </div>
-
-                <!-- Card 2: Pending -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-yellow-600 md:text-3xl"><?php echo $pendingCount; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Pending</p>
-                    </div>
-                </div>
-
-                <!-- Card 3: Interviews -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-purple-600 md:text-3xl"><?php echo $interviewCount; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Interviews</p>
-                    </div>
-                </div>
-
-                <!-- Card 4: Shortlisted -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-blue-600 md:text-3xl"><?php echo $shortlistedCount; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Shortlisted</p>
-                    </div>
-                </div>
-
-                <!-- Card 5: Hired -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-green-600 md:text-3xl"><?php echo $hiredCount; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Hired</p>
-                    </div>
-                </div>
-
-                <!-- Card 6: Rejected -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:p-6">
-                    <div class="text-center">
-                        <span class="text-2xl font-bold text-red-600 md:text-3xl"><?php echo $rejectedCount; ?></span>
-                        <p class="mt-1 text-xs font-medium text-gray-500 md:text-sm">Rejected</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Applications Table -->
             <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm">
                 <!-- Table Header -->
@@ -115,7 +137,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 All Applications
                             </h3>
                             <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                <?php echo $totalApplications; ?>
+                                <span id="applicationsCount"><?php echo count($applications ?? []); ?></span>
                             </span>
                         </div>
                     </div>
@@ -140,6 +162,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         </div>
                     </div>
                 <?php else: ?>
+                    <!-- Keep existing table structure -->
                     <div class="w-full overflow-visible">
                         <table class="w-full divide-y divide-gray-300 table-fixed">
                             <!-- Table Header -->
@@ -367,11 +390,92 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         </div>
     </div>
 
-
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
+        // Add filtering functionality
+        let allApplications = [];
+        let filteredApplications = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFiltering();
+        });
+
+        function initializeFiltering() {
+            allApplications = Array.from(document.querySelectorAll('tr[data-application-id]'));
+            filteredApplications = [...allApplications];
+        }
+
+        function filterByStatus(status) {
+            applyFilters({
+                status: status
+            });
+        }
+
+        function filterByInterview(interview) {
+            applyFilters({
+                interview: interview
+            });
+        }
+
+        function applyFilters(newFilter) {
+            filteredApplications = allApplications.filter(row => {
+                let shouldShow = true;
+
+                if (newFilter.status && newFilter.status !== '') {
+                    const statusElement = row.querySelector('.text-yellow-600, .text-blue-600, .text-purple-600, .text-green-600, .text-red-600');
+                    const statusText = statusElement ? statusElement.textContent.toLowerCase().trim() : '';
+
+                    if (newFilter.status === 'reviewed' && !statusText.includes('review')) shouldShow = false;
+                    else if (newFilter.status !== 'reviewed' && !statusText.includes(newFilter.status)) shouldShow = false;
+                }
+
+                if (newFilter.interview && newFilter.interview !== '') {
+                    const hasInterview = row.textContent.includes('Scheduled');
+                    if (newFilter.interview === 'with_interview' && !hasInterview) shouldShow = false;
+                    if (newFilter.interview === 'no_interview' && hasInterview) shouldShow = false;
+                }
+
+                return shouldShow;
+            });
+
+            updateDisplay();
+        }
+
+        function clearAllFilters() {
+            filteredApplications = [...allApplications];
+            updateDisplay();
+
+            // Reset dropdown selections
+            document.querySelectorAll('[x-data]').forEach(dropdown => {
+                if (dropdown._x_dataStack) {
+                    const data = dropdown._x_dataStack[0];
+                    if (data.selected && data.selected.includes('Status')) {
+                        data.selected = 'All Status';
+                    } else if (data.selected && data.selected.includes('Applications')) {
+                        data.selected = 'All Applications';
+                    }
+                }
+            });
+        }
+
+        function updateDisplay() {
+            allApplications.forEach(row => {
+                if (filteredApplications.includes(row)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update count
+            const countElement = document.getElementById('applicationsCount');
+            if (countElement) {
+                countElement.textContent = filteredApplications.length;
+            }
+        }
+
         function toggleSaveJob(jobId, button) {
             const isSaved = button.getAttribute('data-saved') === 'true';
             const action = isSaved ? 'unsave-job' : 'save-job';

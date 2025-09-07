@@ -185,6 +185,34 @@ class JobApplication
         }
     }
 
+    public function getApplicationsByJobseekerAndStatus($jobseeker_id, $status)
+    {
+        try {
+            // Fixed query - using jobseeker_id directly
+            $sql = "SELECT ja.application_id, ja.jobseeker_id, ja.job_id, ja.application_status, 
+                       ja.applied_at, ja.reviewed_at, ja.is_finalized,
+                       jp.job_title, 
+                       COALESCE(eb.business_name, e.company_name) as company_name
+                FROM job_application ja
+                INNER JOIN job_post jp ON ja.job_id = jp.job_id
+                INNER JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE ja.jobseeker_id = ? AND ja.application_status = ? AND ja.is_finalized = 1
+                ORDER BY ja.reviewed_at DESC, ja.applied_at DESC";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$jobseeker_id, $status]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("DEBUG: getApplicationsByJobseekerAndStatus - jobseeker_id: $jobseeker_id, status: $status, results: " . count($results));
+
+            return $results;
+        } catch (PDOException $e) {
+            error_log('Error getting applications by status: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getApplicationDetails($application_id, $jobseeker_id = null)
     {
         try {
