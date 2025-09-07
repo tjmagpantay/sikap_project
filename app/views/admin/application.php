@@ -77,7 +77,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-6">
                     <!-- Card 1: Total Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Total Applications</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="total"><?php echo $stats['total']; ?></span>
@@ -93,7 +93,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 2: Pending Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Pending</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="pending"><?php echo $stats['pending']; ?></span>
@@ -109,7 +109,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 3: Reviewed Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Reviewed</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="reviewed"><?php echo $stats['reviewed']; ?></span>
@@ -125,7 +125,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 4: Shortlisted Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Shortlisted</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="shortlisted"><?php echo $stats['shortlisted']; ?></span>
@@ -141,7 +141,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 5: Hired Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Hired</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="hired"><?php echo $stats['hired']; ?></span>
@@ -157,7 +157,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                     <!-- Card 6: Rejected Applications -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="mb-4 sm:mb-6">
+                        <div class="">
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Rejected</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" data-stat="rejected"><?php echo $stats['rejected']; ?></span>
@@ -173,37 +173,33 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 </div>
 
                 <!-- Search and Filter Section -->
-                <div class="relative px-6 py-4 mb-6 bg-white shadow-sm sm:px-6 lg:px-6 rounded-xl">
-                    <div class="flex flex-col gap-6 mx-auto">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-3">
+                <div class="relative py-4 rounded-xl w-full">
+                    <div class="flex flex-col w-full gap-6 mx-auto">
+                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
 
                             <!-- Search Applications (Much Wider) -->
-                            <div class="w-full lg:w-80">
+                            <div class="flex-1 min-w-[200px] max-w-xs">
                                 <div class="relative">
-                                    <input type="text" id="searchInput" placeholder="Search by applicant name, job title, company..."
-                                        class="w-full px-4 py-2 pl-10 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                    <input type="text" id="searchInput"
+                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                        placeholder="Search by applicant, job title, company..."
                                         value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
+                                    <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
                                 </div>
                             </div>
 
                             <!-- Status Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter === 'all' ? 'Status' : $statusFilter); ?>' }">
+                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter === 'all' ? 'Status' : $statusFilter); ?>' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="relative w-full px-4 py-2 text-sm text-left text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-default focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <span class="block truncate" x-text="selected"></span>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </span>
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -212,48 +208,47 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute z-50 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
-                                    <button @click="selected = 'Status'; open = false; filterByStatus('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        All Status
-                                    </button>
-                                    <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Pending
-                                    </button>
-                                    <button @click="selected = 'Reviewed'; open = false; filterByStatus('reviewed')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Reviewed
-                                    </button>
-                                    <button @click="selected = 'Shortlisted'; open = false; filterByStatus('shortlisted')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Shortlisted
-                                    </button>
-                                    <button @click="selected = 'Hired'; open = false; filterByStatus('hired')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Hired
-                                    </button>
-                                    <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Rejected
-                                    </button>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Status'; open = false; filterByStatus('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Status
+                                        </button>
+                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Pending
+                                        </button>
+                                        <button @click="selected = 'Reviewed'; open = false; filterByStatus('reviewed')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Reviewed
+                                        </button>
+                                        <button @click="selected = 'Shortlisted'; open = false; filterByStatus('shortlisted')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Shortlisted
+                                        </button>
+                                        <button @click="selected = 'Hired'; open = false; filterByStatus('hired')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Hired
+                                        </button>
+                                        <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Rejected
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Job Filter -->
-                            <div class="w-full lg:w-48" x-data="{ open: false, selected: 'Job Filter' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Job Filter' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="relative w-full px-4 py-2 text-sm text-left text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-default focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <span class="block truncate" x-text="selected"></span>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </span>
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -262,34 +257,35 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute z-50 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
-                                    <button @click="selected = 'Job Filter'; open = false; filterByJob('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        All Jobs
-                                    </button>
-                                    <?php foreach ($jobs as $job): ?>
-                                        <button @click="selected = '<?php echo htmlspecialchars($job['job_title']); ?>'; open = false; filterByJob('<?php echo $job['job_id']; ?>')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                            <?php echo htmlspecialchars($job['job_title']); ?> - <?php echo htmlspecialchars($job['company_name']); ?>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Job Filter'; open = false; filterByJob('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Jobs
                                         </button>
-                                    <?php endforeach; ?>
+                                        <?php if (!empty($jobs)): ?>
+                                            <?php foreach ($jobs as $job): ?>
+                                                <button @click="selected = '<?php echo htmlspecialchars($job['job_title']); ?>'; open = false; filterByJob('<?php echo $job['job_id']; ?>')"
+                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <?php echo htmlspecialchars($job['job_title']); ?> - <?php echo htmlspecialchars($job['company_name']); ?>
+                                                </button>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Date Filter -->
-                            <div class="w-full lg:w-40" x-data="{ open: false, selected: 'Date Range' }">
+                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="relative w-full px-4 py-2 text-sm text-left text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-default focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <span class="block truncate" x-text="selected"></span>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </span>
+                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected"></span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-
                                 <!-- Dropdown Menu -->
                                 <div x-show="open"
                                     x-transition:enter="transition ease-out duration-100"
@@ -298,40 +294,42 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute z-50 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     x-cloak>
-                                    <button @click="selected = 'Date Range'; open = false; filterByDate('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        All Dates
-                                    </button>
-                                    <button @click="selected = 'Today'; open = false; filterByDate('today')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        Today
-                                    </button>
-                                    <button @click="selected = 'This Week'; open = false; filterByDate('week')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Week
-                                    </button>
-                                    <button @click="selected = 'This Month'; open = false; filterByDate('month')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Month
-                                    </button>
-                                    <button @click="selected = 'This Year'; open = false; filterByDate('year')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                                        This Year
-                                    </button>
+                                    <div class="py-1">
+                                        <button @click="selected = 'Date Range'; open = false; filterByDate('')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            All Dates
+                                        </button>
+                                        <button @click="selected = 'Today'; open = false; filterByDate('today')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Today
+                                        </button>
+                                        <button @click="selected = 'This Week'; open = false; filterByDate('week')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Week
+                                        </button>
+                                        <button @click="selected = 'This Month'; open = false; filterByDate('month')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Month
+                                        </button>
+                                        <button @click="selected = 'This Year'; open = false; filterByDate('year')"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            This Year
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex gap-2 lg:flex-shrink-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Clear Filters
+                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Clear
                                 </button>
                                 <button onclick="exportResults('csv')"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-transparent rounded-lg bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Export CSV
+                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    Export
                                 </button>
                             </div>
                         </div>
@@ -363,142 +361,115 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                         <!-- Applications Table -->
                         <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="applicationsTable">
-                            <div class="overflow-x-auto">
-                                <table class="w-full divide-y divide-gray-200 table-auto">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
-                                                Applicant
-                                                <i class="ml-1 text-gray-400 fas fa-sort"></i>
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(1)">
-                                                Job Title
-                                                <i class="ml-1 text-gray-400 fas fa-sort"></i>
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                Company
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                Location
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                Status
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(5)">
-                                                Applied
-                                                <i class="ml-1 text-gray-400 fas fa-sort"></i>
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                Contact
-                                            </th>
-                                            <th scope="col" class="relative px-6 py-3">
-                                                <span class="sr-only">Actions</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
-                                        <?php foreach ($applications as $application): ?>
-                                            <tr class="hover:bg-gray-50"
-                                                data-status="<?php echo htmlspecialchars($application['application_status']); ?>"
-                                                data-job="<?php echo htmlspecialchars($application['job_id']); ?>"
-                                                data-applied="<?php echo htmlspecialchars($application['applied_at']); ?>"
-                                                data-name="<?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>">
+                            <table class="w-full divide-y divide-gray-200 table-auto">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
+                                            Applicant <i class="ml-1 text-gray-400 fas fa-sort"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(1)">
+                                            Job Title <i class="ml-1 text-gray-400 fas fa-sort"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                            Company
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                            Status
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(4)">
+                                            Applied Date <i class="ml-1 text-gray-400 fas fa-sort"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
+                                    <?php foreach ($applications as $application): ?>
+                                        <tr class="hover:bg-gray-50"
+                                            data-status="<?php echo htmlspecialchars($application['application_status']); ?>"
+                                            data-job="<?php echo htmlspecialchars($application['job_id']); ?>"
+                                            data-applied="<?php echo htmlspecialchars($application['applied_at']); ?>"
+                                            data-name="<?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>"
+                                            data-company="<?php echo htmlspecialchars($application['company_name']); ?>"
+                                            data-job-title="<?php echo htmlspecialchars($application['job_title']); ?>">
 
-                                                <!-- Applicant -->
-                                                <td class="px-6 py-4 whitespace-nowrap">
+                                            <!-- Applicant -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-primary">
+                                                        <span class="text-xs font-medium text-white">
+                                                            <?php echo strtoupper(substr($application['first_name'], 0, 1) . substr($application['last_name'], 0, 1)); ?>
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- Job Title -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></div>
+                                                <div class="text-sm text-gray-500"><?php echo htmlspecialchars($application['employment_type'] ?? 'N/A'); ?></div>
+                                            </td>
+
+                                            <!-- Company -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900"><?php echo htmlspecialchars($application['company_name']); ?></div>
+                                                <div class="text-sm text-gray-500">
+                                                    <?php echo htmlspecialchars(($application['employer_first_name'] ?? '') . ' ' . ($application['employer_last_name'] ?? '')); ?>
+                                                </div>
+                                            </td>
+
+                                            <!-- Status -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <?php
+                                                $statusClasses = [
+                                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                                    'reviewed' => 'bg-blue-100 text-blue-800',
+                                                    'shortlisted' => 'bg-green-100 text-green-800',
+                                                    'rejected' => 'bg-red-100 text-red-800',
+                                                    'hired' => 'bg-emerald-100 text-emerald-800'
+                                                ];
+                                                $statusClass = $statusClasses[$application['application_status']] ?? 'bg-gray-100 text-gray-800';
+                                                ?>
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold <?php echo $statusClass; ?>">
+                                                    <?php echo ucfirst($application['application_status']); ?>
+                                                </span>
+                                            </td>
+
+                                            <!-- Applied Date -->
+                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                <?php if (!empty($application['applied_at'])): ?>
                                                     <div class="flex items-center">
-                                                        <div class="flex-shrink-0 w-10 h-10">
-                                                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary">
-                                                                <span class="text-sm font-medium text-white">
-                                                                    <?php echo strtoupper(substr($application['first_name'], 0, 1) . substr($application['last_name'], 0, 1)); ?>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ml-4">
-                                                            <div class="text-sm font-medium text-gray-900">
-                                                                <?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>
-                                                            </div>
-                                                            <div class="text-sm text-gray-500">
-                                                                <?php echo htmlspecialchars($application['age']); ?> years, <?php echo htmlspecialchars($application['gender']); ?>
-                                                            </div>
-                                                        </div>
+                                                        <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        </svg>
+                                                        <?php echo date('M j, Y', strtotime($application['applied_at'])); ?>
                                                     </div>
-                                                </td>
+                                                <?php else: ?>
+                                                    <span class="text-gray-400">-</span>
+                                                <?php endif; ?>
+                                            </td>
 
-                                                <!-- Job Title -->
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></div>
-                                                    <div class="text-sm text-gray-500"><?php echo htmlspecialchars($application['employment_type']); ?></div>
-                                                </td>
-
-                                                <!-- Company -->
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm text-gray-900"><?php echo htmlspecialchars($application['company_name']); ?></div>
-                                                    <div class="text-sm text-gray-500">
-                                                        <?php echo htmlspecialchars($application['employer_first_name'] . ' ' . $application['employer_last_name']); ?>
-                                                    </div>
-                                                </td>
-
-                                                <!-- Location -->
-                                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                    <?php echo htmlspecialchars($application['job_location']); ?>
-                                                </td>
-
-                                                <!-- Status -->
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <?php
-                                                    $statusClasses = [
-                                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                                        'reviewed' => 'bg-blue-100 text-blue-800',
-                                                        'shortlisted' => 'bg-green-100 text-green-800',
-                                                        'rejected' => 'bg-red-100 text-red-800',
-                                                        'hired' => 'bg-emerald-100 text-emerald-800'
-                                                    ];
-                                                    $statusClass = $statusClasses[$application['application_status']] ?? 'bg-gray-100 text-gray-800';
-                                                    ?>
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>">
-                                                        <?php echo ucfirst($application['application_status']); ?>
-                                                    </span>
-                                                </td>
-
-                                                <!-- Applied Date -->
-                                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                    <?php if (!empty($application['applied_at'])): ?>
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                            </svg>
-                                                            <?php echo date('M j, Y', strtotime($application['applied_at'])); ?>
-                                                        </div>
-                                                    <?php else: ?>
-                                                        <span class="text-gray-400">-</span>
-                                                    <?php endif; ?>
-                                                </td>
-
-                                                <!-- Contact -->
-                                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                    <div><?php echo htmlspecialchars($application['email']); ?></div>
-                                                    <div><?php echo htmlspecialchars($application['phone'] ?? 'N/A'); ?></div>
-                                                </td>
-
-                                                <!-- Actions -->
-                                                <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                                    <div class="flex items-center space-x-2">
-                                                        <!-- View Application -->
-                                                        <a href="?page=admin-view-application&id=<?php echo $application['application_id']; ?>"
-                                                            class="text-primary hover:text-primary-dark" title="View Details">
-                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <!-- Actions -->
+                                            <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                                                <div class="flex items-center space-x-2">
+                                                    <!-- View Application Summary -->
+                                                    <button onclick="viewApplicationSummary(<?php echo $application['application_id']; ?>)"
+                                                        class="text-primary hover:text-primary-dark" title="View Summary">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
 
                             <!-- Pagination -->
                             <div class="py-4 border-t border-gray-200" id="paginationContainer">
@@ -534,7 +505,36 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         </div>
     </div>
 
-    <!-- Keep all your existing JavaScript -->
+    <!-- Application Summary Modal -->
+    <div id="applicationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="closeModal()"></div>
+
+            <!-- Modal content -->
+            <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="w-full">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">
+                                Application Summary
+                            </h3>
+                            <div class="mt-4" id="modal-content">
+                                <!-- Content will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeModal()"
+                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let allRows = [];
         let filteredRows = [];
@@ -557,20 +557,6 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             updateCounts();
             initializePagination();
         });
-
-        // Mobile menu toggle
-        function toggleSidebar() {
-            const sidebarMobile = document.getElementById('sidebar-mobile');
-            const overlay = document.getElementById('mobile-menu-overlay');
-
-            if (sidebarMobile) {
-                sidebarMobile.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
-            }
-        }
-
-        // Close sidebar when clicking overlay
-        document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function() {
@@ -602,7 +588,9 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
             filteredRows = allRows.filter(row => {
                 const searchMatch = !searchValue || (
-                    row.textContent.toLowerCase().includes(searchValue)
+                    row.dataset.name.toLowerCase().includes(searchValue) ||
+                    row.dataset.company.toLowerCase().includes(searchValue) ||
+                    row.dataset.jobTitle.toLowerCase().includes(searchValue)
                 );
 
                 const statusMatch = !statusValue || statusValue === 'all' ||
@@ -652,8 +640,6 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
         function updateCounts() {
             const visibleCount = filteredRows.length;
-            const totalCount = allRows.length;
-
             document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
             document.getElementById('totalResults').textContent = visibleCount;
         }
@@ -831,10 +817,13 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 if (columnIndex === 0) { // Applicant name column
                     aValue = a.dataset.name;
                     bValue = b.dataset.name;
-                } else if (columnIndex === 5) { // Applied date column
+                } else if (columnIndex === 4) { // Applied date column
                     aValue = new Date(a.dataset.applied).getTime();
                     bValue = new Date(b.dataset.applied).getTime();
                     return direction === 'asc' ? aValue - bValue : bValue - aValue;
+                } else if (columnIndex === 1) { // Job title column
+                    aValue = a.dataset.jobTitle;
+                    bValue = b.dataset.jobTitle;
                 } else {
                     // Default text comparison
                     aValue = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
@@ -869,10 +858,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                     applicant: cells[0].textContent.trim(),
                     job_title: cells[1].textContent.trim(),
                     company: cells[2].textContent.trim(),
-                    location: cells[3].textContent.trim(),
-                    status: cells[4].textContent.trim(),
-                    applied: cells[5].textContent.trim(),
-                    contact: cells[6].textContent.trim()
+                    status: cells[3].textContent.trim(),
+                    applied: cells[4].textContent.trim()
                 };
             });
 
@@ -882,17 +869,15 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         }
 
         function exportToCSV(data) {
-            const headers = ['Applicant', 'Job Title', 'Company', 'Location', 'Status', 'Applied', 'Contact'];
+            const headers = ['Applicant', 'Job Title', 'Company', 'Status', 'Applied'];
             const csvContent = [
                 headers.join(','),
                 ...data.map(row => [
                     `"${row.applicant}"`,
                     `"${row.job_title}"`,
                     `"${row.company}"`,
-                    `"${row.location}"`,
                     `"${row.status}"`,
-                    `"${row.applied}"`,
-                    `"${row.contact}"`
+                    `"${row.applied}"`
                 ].join(','))
             ].join('\n');
 
@@ -907,6 +892,28 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
+        }
+
+        // Application summary modal
+        function viewApplicationSummary(applicationId) {
+            document.getElementById('modal-content').innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i> Loading...</div>';
+            document.getElementById('applicationModal').classList.remove('hidden');
+
+            // Here you would fetch application summary data
+            // For now, showing a placeholder
+            setTimeout(() => {
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="space-y-3">
+                        <p><strong>Application ID:</strong> ${applicationId}</p>
+                        <p><strong>Note:</strong> Full application details are confidential and only viewable by the employer and jobseeker.</p>
+                        <p class="text-sm text-gray-600">This summary shows only basic application information for administrative purposes.</p>
+                    </div>
+                `;
+            }, 500);
+        }
+
+        function closeModal() {
+            document.getElementById('applicationModal').classList.add('hidden');
         }
     </script>
 

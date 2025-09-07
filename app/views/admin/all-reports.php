@@ -39,7 +39,7 @@ $applicationStatusData = [
 ];
 ?>
 
-<div class="min-h-screen p-6 bg-gray-50">
+<div class="min-h-screen ">
     <!-- Page Header -->
     <div class="mb-8">
         <div class="flex items-center justify-between">

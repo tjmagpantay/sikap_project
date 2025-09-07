@@ -17,81 +17,81 @@ class AdminController
         $this->jobPostModel = new JobPost();
     }
 
-  public function login()
-{
-    if (!isset($_SESSION['login_attempts'])) {
-        $_SESSION['login_attempts'] = 0;
-        $_SESSION['last_attempt_time'] = null;
-    }
+    public function login()
+    {
+        if (!isset($_SESSION['login_attempts'])) {
+            $_SESSION['login_attempts'] = 0;
+            $_SESSION['last_attempt_time'] = null;
+        }
 
-    $popupMessage = '';
-    $popupType = 'error'; // default modal type
+        $popupMessage = '';
+        $popupType = 'error'; // default modal type
 
-    // Check if locked
-    if ($_SESSION['login_attempts'] >= 5) {
-        $timeSinceLast = time() - $_SESSION['last_attempt_time'];
-        if ($timeSinceLast < 300) { // 5 minutes
-            $remaining = ceil((300 - $timeSinceLast) / 60);
-            $popupMessage = "Too many failed attempts. Please try again in {$remaining} minute(s).";
-            include __DIR__ . '/../views/admin/login-admin.php';
-            echo "<script>
+        // Check if locked
+        if ($_SESSION['login_attempts'] >= 5) {
+            $timeSinceLast = time() - $_SESSION['last_attempt_time'];
+            if ($timeSinceLast < 300) { // 5 minutes
+                $remaining = ceil((300 - $timeSinceLast) / 60);
+                $popupMessage = "Too many failed attempts. Please try again in {$remaining} minute(s).";
+                include __DIR__ . '/../views/admin/login-admin.php';
+                echo "<script>
                 Swal.fire({
                     icon: 'error',
                     title: 'Access Blocked',
-                    text: '".addslashes($popupMessage)."'
+                    text: '" . addslashes($popupMessage) . "'
                 });
             </script>";
-            return;
-        } else {
-            $_SESSION['login_attempts'] = 0; // reset after cooldown
-        }
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-
-        if (empty($email) || empty($password)) {
-            $popupMessage = 'Please fill in all fields.';
-        } else {
-            $admin = $this->adminModel->authenticate($email, $password);
-
-            if ($admin) {
-                $_SESSION['login_attempts'] = 0;
-                $_SESSION['user_id'] = $admin['user_id'];
-                $_SESSION['admin_id'] = $admin['admin_id'];
-                $_SESSION['role'] = 'admin';
-                $_SESSION['admin_name'] = $admin['admin_name'];
-
-                header('Location: ?page=admin-dashboard');
-                exit;
+                return;
             } else {
-                $_SESSION['login_attempts']++;
-                $_SESSION['last_attempt_time'] = time();
+                $_SESSION['login_attempts'] = 0; // reset after cooldown
+            }
+        }
 
-                $remainingAttempts = 5 - $_SESSION['login_attempts'];
-                if ($remainingAttempts <= 0) {
-                    $popupMessage = 'Too many failed attempts. Please wait 5 minutes before trying again.';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            if (empty($email) || empty($password)) {
+                $popupMessage = 'Please fill in all fields.';
+            } else {
+                $admin = $this->adminModel->authenticate($email, $password);
+
+                if ($admin) {
+                    $_SESSION['login_attempts'] = 0;
+                    $_SESSION['user_id'] = $admin['user_id'];
+                    $_SESSION['admin_id'] = $admin['admin_id'];
+                    $_SESSION['role'] = 'admin';
+                    $_SESSION['admin_name'] = $admin['admin_name'];
+
+                    header('Location: ?page=admin-dashboard');
+                    exit;
                 } else {
-                    $popupMessage = "Invalid credentials. You have {$remainingAttempts} attempt(s) left.";
+                    $_SESSION['login_attempts']++;
+                    $_SESSION['last_attempt_time'] = time();
+
+                    $remainingAttempts = 5 - $_SESSION['login_attempts'];
+                    if ($remainingAttempts <= 0) {
+                        $popupMessage = 'Too many failed attempts. Please wait 5 minutes before trying again.';
+                    } else {
+                        $popupMessage = "Invalid credentials. You have {$remainingAttempts} attempt(s) left.";
+                    }
                 }
             }
         }
-    }
 
-    include __DIR__ . '/../views/admin/login-admin.php';
+        include __DIR__ . '/../views/admin/login-admin.php';
 
-    if (!empty($popupMessage)) {
-        echo "<script>
+        if (!empty($popupMessage)) {
+            echo "<script>
             Swal.fire({
                 icon: 'error',
                 title: 'Login Failed',
-                text: '".addslashes($popupMessage)."',
+                text: '" . addslashes($popupMessage) . "',
                 confirmButtonColor: '#2563eb'
             });
         </script>";
+        }
     }
-}
 
 
 
@@ -359,7 +359,7 @@ class AdminController
         try {
             require_once __DIR__ . '/../models/JobApplication.php';
             $jobApplicationModel = new JobApplication();
-            return $jobApplicationModel->getJobApplicationStats($job_id);
+            return $jobApplicationModel->getApplicationStatsForAdmin($job_id);
         } catch (Exception $e) {
             error_log('Error getting job application stats: ' . $e->getMessage());
             return [
@@ -390,19 +390,39 @@ class AdminController
             $searchQuery = $_GET['search'] ?? '';
             $jobFilter = $_GET['job'] ?? '';
 
+            // DEBUG: Log the filters
+            error_log("DEBUG ApplicationManagement - Filters: status=$statusFilter, search=$searchQuery, job=$jobFilter");
+
             // Get applications using model method
             $applications = $jobApplicationModel->getAllApplicationsForAdmin($statusFilter, $searchQuery, $jobFilter);
+
+            // DEBUG: Log the applications data
+            error_log("DEBUG ApplicationManagement - Found " . count($applications) . " applications");
+            error_log("DEBUG ApplicationManagement - Applications data: " . json_encode($applications));
 
             // Get application statistics using model method
             $stats = $jobApplicationModel->getApplicationStatsForAdmin();
 
+            // DEBUG: Log the stats
+            error_log("DEBUG ApplicationManagement - Stats: " . json_encode($stats));
+
             // Get all jobs for filter dropdown using model method
             $jobs = $jobApplicationModel->getJobsForFilterDropdown();
+
+            // DEBUG: Log the jobs
+            error_log("DEBUG ApplicationManagement - Jobs for filter: " . count($jobs) . " jobs");
+
+            // Set error/success messages
+            $error = $_GET['error'] ?? '';
+            $success = $_GET['success'] ?? '';
+
+            // DEBUG: Final check before loading view
+            error_log("DEBUG ApplicationManagement - About to load view with " . count($applications) . " applications");
 
             require __DIR__ . '/../views/admin/application.php';
         } catch (Exception $e) {
             error_log('Error in application management: ' . $e->getMessage());
-            $error = 'Failed to load applications';
+            $error = 'Failed to load applications: ' . $e->getMessage();
             $applications = [];
             $stats = ['total' => 0, 'pending' => 0, 'reviewed' => 0, 'shortlisted' => 0, 'rejected' => 0, 'hired' => 0];
             $jobs = [];
@@ -467,6 +487,4 @@ class AdminController
     {
         return isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin';
     }
-
-    
 }

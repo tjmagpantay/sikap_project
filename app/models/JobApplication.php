@@ -481,48 +481,44 @@ class JobApplication
         return $this->db;
     }
 
-    // Admin methods for application management
     public function getAllApplicationsForAdmin($statusFilter = 'all', $searchQuery = '', $jobFilter = '')
     {
         try {
             $sql = "SELECT 
-                        ja.application_id,
-                        ja.jobseeker_id,
-                        ja.job_id,
-                        ja.application_status,
-                        ja.applied_at,
-                        ja.updated_at,
-                        jp.job_title,
-                        jp.company_name,
-                        jp.location as job_location,
-                        jp.employment_type,
-                        js.first_name,
-                        js.last_name,
-                        js.email,
-                        js.phone,
-                        js.address,
-                        js.gender,
-                        js.age,
-                        e.company_name as employer_company,
-                        e.first_name as employer_first_name,
-                        e.last_name as employer_last_name
-                    FROM job_application ja
-                    JOIN job_post jp ON ja.job_id = jp.job_id
-                    JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
-                    JOIN employer e ON jp.employer_id = e.employer_id
-                    WHERE ja.is_finalized = 1";
+                    ja.application_id,
+                    ja.jobseeker_id,
+                    ja.job_id,
+                    ja.application_status,
+                    ja.applied_at,
+                    jp.job_title,
+                    jp.job_type,
+                    jp.location,
+                    COALESCE(js.first_name, 'Unknown') AS first_name,
+                    COALESCE(js.last_name, 'User') AS last_name,
+                    COALESCE(u.email, 'N/A') AS email,
+                    COALESCE(eb.business_name, e.company_name, 'Unknown Company') AS company_name,
+                    e.first_name AS employer_first_name,
+                    e.last_name AS employer_last_name
+                FROM job_application ja
+                LEFT JOIN job_post jp ON ja.job_id = jp.job_id
+                LEFT JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                LEFT JOIN users u ON js.user_id = u.user_id
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE ja.is_finalized = 1";
 
             $params = [];
 
-            // Add status filter
             if ($statusFilter && $statusFilter !== 'all') {
                 $sql .= " AND ja.application_status = ?";
                 $params[] = $statusFilter;
             }
 
-            // Add search filter
             if ($searchQuery) {
-                $sql .= " AND (jp.job_title LIKE ? OR js.first_name LIKE ? OR js.last_name LIKE ? OR jp.company_name LIKE ?)";
+                $sql .= " AND (jp.job_title LIKE ? 
+                        OR js.first_name LIKE ? 
+                        OR js.last_name LIKE ? 
+                        OR COALESCE(eb.business_name, e.company_name) LIKE ?)";
                 $searchParam = "%$searchQuery%";
                 $params[] = $searchParam;
                 $params[] = $searchParam;
@@ -530,7 +526,6 @@ class JobApplication
                 $params[] = $searchParam;
             }
 
-            // Add job filter
             if ($jobFilter) {
                 $sql .= " AND ja.job_id = ?";
                 $params[] = $jobFilter;
@@ -540,6 +535,7 @@ class JobApplication
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute($params);
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting all applications for admin: ' . $e->getMessage());
@@ -551,18 +547,29 @@ class JobApplication
     {
         try {
             $sql = "SELECT 
-                        COUNT(*) as total,
-                        SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
-                        SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
-                        SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected,
-                        SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired
-                    FROM job_application 
-                    WHERE is_finalized = 1";
+                    COUNT(*) as total,
+                    SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
+                    SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
+                    SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+                    SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired
+                FROM job_application 
+                WHERE is_finalized = 1";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("DEBUG Admin Stats: " . json_encode($result));
+
+            return $result ?: [
+                'total' => 0,
+                'pending' => 0,
+                'reviewed' => 0,
+                'shortlisted' => 0,
+                'rejected' => 0,
+                'hired' => 0
+            ];
         } catch (PDOException $e) {
             error_log('Error getting application stats for admin: ' . $e->getMessage());
             return [
@@ -576,66 +583,53 @@ class JobApplication
         }
     }
 
-    public function getJobApplicationStats($job_id)
+    public function getJobsForFilterDropdown()
     {
         try {
-            $sql = "SELECT 
-                        COUNT(*) as total_applications,
-                        SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
-                        SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
-                        SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected,
-                        SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired
-                    FROM job_application 
-                    WHERE job_id = ? AND is_finalized = 1";
+            $sql = "SELECT DISTINCT jp.job_id, jp.job_title, COALESCE(eb.business_name, e.company_name) as company_name 
+                FROM job_post jp 
+                JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE jp.job_status = 'open' 
+                ORDER BY jp.job_title";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$job_id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log('Error getting job application stats: ' . $e->getMessage());
-            return [
-                'total_applications' => 0,
-                'pending' => 0,
-                'reviewed' => 0,
-                'shortlisted' => 0,
-                'rejected' => 0,
-                'hired' => 0
-            ];
+            error_log('Error getting jobs for filter dropdown: ' . $e->getMessage());
+            return [];
         }
     }
+
+
 
     public function getDetailedApplicationForAdmin($application_id)
     {
         try {
             $sql = "SELECT 
-                        ja.*,
-                        jp.job_title,
-                        jp.job_description,
-                        jp.requirements,
-                        jp.company_name,
-                        jp.location as job_location,
-                        jp.employment_type,
-                        jp.salary_range,
-                        js.first_name,
-                        js.last_name,
-                        js.email,
-                        js.phone,
-                        js.address,
-                        js.gender,
-                        js.age,
-                        js.education,
-                        js.experience,
-                        js.skills,
-                        e.company_name as employer_company,
-                        e.first_name as employer_first_name,
-                        e.last_name as employer_last_name,
-                        e.email as employer_email
-                    FROM job_application ja
-                    JOIN job_post jp ON ja.job_id = jp.job_id
-                    JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
-                    JOIN employer e ON jp.employer_id = e.employer_id
-                    WHERE ja.application_id = ? AND ja.is_finalized = 1";
+                ja.*,
+                jp.job_title,
+                jp.job_summary,
+                jp.full_description,
+                jp.location as job_location,
+                jp.job_type,
+                jp.salary,
+                js.first_name,
+                js.last_name,
+                js.email,
+                js.contact_no,
+                js.address,
+                COALESCE(eb.business_name, e.company_name) as company_name,
+                e.first_name as employer_first_name,
+                e.last_name as employer_last_name,
+                e.contact_no as employer_contact
+            FROM job_application ja
+            JOIN job_post jp ON ja.job_id = jp.job_id
+            JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+            JOIN employer e ON jp.employer_id = e.employer_id
+            LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+            WHERE ja.application_id = ? AND ja.is_finalized = 1";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$application_id]);
@@ -643,19 +637,6 @@ class JobApplication
         } catch (PDOException $e) {
             error_log('Error getting detailed application for admin: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    public function getJobsForFilterDropdown()
-    {
-        try {
-            $sql = "SELECT job_id, job_title, company_name FROM job_post WHERE job_status = 'open' ORDER BY job_title";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error getting jobs for filter dropdown: ' . $e->getMessage());
-            return [];
         }
     }
 
