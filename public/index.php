@@ -49,6 +49,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
+        case 'about-us':
+            include __DIR__ . '/../app/views/pages/about-us.php';
+            break;
+            
         case 'program-events':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
