@@ -13,10 +13,10 @@
     <div>
       <h4 class="mb-3 font-medium">Quick Link</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Use</a></li>
-        <li><a href="#">Accessibility</a></li>
-        <li><a href="#">Accreditation</a></li>
+        <li><a href="?page=privacy-policy" class="transition-colors hover:text-white">Privacy Policy</a></li>
+        <li><a href="?page=terms-use" class="transition-colors hover:text-white">Terms of Use</a></li>
+        <li><a href="?page=accessibility" class="transition-colors hover:text-white">Accessibility</a></li>
+        <li><a href="?page=accreditation" class="transition-colors hover:text-white">Accreditation</a></li>
       </ul>
     </div>
 
@@ -24,10 +24,10 @@
     <div>
       <h4 class="mb-3 font-medium">Candidate</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">How to Apply</a></li>
-        <li><a href="#">Resume Tips</a></li>
-        <li><a href="#">Gov't Programs</a></li>
-        <li><a href="#">Career Training</a></li
+        <li><a href="?page=how-to-apply" class="transition-colors hover:text-white">How to Apply</a></li>
+        <li><a href="?page=resume-tips" class="transition-colors hover:text-white">Resume Tips</a></li>
+        <li><a href="?page=govt-programs" class="transition-colors hover:text-white">Gov't Programs</a></li>
+        <li><a href="?page=career-training" class="transition-colors hover:text-white">Career Training</a></li>
       </ul>
     </div>
 
@@ -35,11 +35,11 @@
     <div>
       <h4 class="mb-3 font-medium">Employers</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">Post Guide</a></li>
-        <li><a href="#">Registration</a></li>
-        <li><a href="#">Partnerships</a></li>
-        <li><a href="#">Hiring Laws</a></li>
-        <li><a href="#">Reports</a></li>
+        <li><a href="?page=post-guide" class="transition-colors hover:text-white">Post Guide</a></li>
+        <li><a href="?page=employer-registration" class="transition-colors hover:text-white">Registration</a></li>
+        <li><a href="?page=employer-partnerships" class="transition-colors hover:text-white">Partnerships</a></li>
+        <li><a href="?page=hiring-laws" class="transition-colors hover:text-white">Hiring Laws</a></li>
+        <li><a href="?page=employer-reports" class="transition-colors hover:text-white">Reports</a></li>
       </ul>
     </div>
 
@@ -47,10 +47,10 @@
     <div>
       <h4 class="mb-3 font-medium">Support</h4>
       <ul class="space-y-4 text-gray-400">
-        <li><a href="#">FAQs</a></li>
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Contact Support</a></li>
-        <li><a href="?page=admin-login">Feedback</a></li>
+        <li><a href="?page=faqs" class="transition-colors hover:text-white">FAQs</a></li>
+        <li><a href="?page=help-center" class="transition-colors hover:text-white">Help Center</a></li>
+        <li><a href="?page=contact-support" class="transition-colors hover:text-white">Contact Support</a></li>
+        <li><a href="?page=feedback" class="transition-colors hover:text-white">Feedback</a></li>
       </ul>
     </div>
   </div>
