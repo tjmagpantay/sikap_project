@@ -40,71 +40,62 @@ include_once __DIR__ . '/navbar-jobseeker.php';
       <!-- Main Dashboard Content - Same as Dashboard -->
       <div class="flex flex-col gap-6 lg:flex-row">
         <!-- Left Side - 1/3 Width (Same as Dashboard) -->
-        <div class="w-full lg:!w-1/3 lg:max-w-md">
+        <!-- Left Side - 1/3 Width (Same as Dashboard) -->
+        <div class="w-full mx-auto lg:w-1/3 lg:max-w-md">
           <div class="sticky top-8">
-            <div class="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-2xl">
-              <!-- Profile Header with Gradient Background -->
-              <div class="relative p-6 pb-4 bg-gradient-to-br from-primary to-primary/80">
-                <div class="absolute inset-0 bg-black/10"></div>
-                <div class="relative z-10">
-                  <!-- Profile Photo -->
-                  <div class="flex justify-center">
-                    <div class="relative group">
-                      <div class="p-1 bg-white rounded-full">
-                        <img src="<?php
-                                  if (!empty($jobseeker['profile_picture'])) {
-                                    echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
-                                  } else {
-                                    echo '/sikap/public/assets/images/default-avatar.jpg';
-                                  }
-                                  ?>" alt="Profile" class="object-cover w-16 h-16 border-4 border-white rounded-full shadow-lg">
-                      </div>
-                      <button type="button"
-                        class="absolute flex items-center justify-center w-8 h-8 text-white transition-all duration-200 border-2 border-white rounded-full shadow-lg bg-primary -bottom-1 -right-1 hover:bg-primary-dark hover:shadow-xl group-hover:scale-110"
-                        onclick="document.getElementById('profile-picture-input').click()" title="Change profile photo">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                        </svg>
-                      </button>
-                      <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this);">
-                    </div>
+            <div class="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
+              <div class="p-6 border-b border-gray-200" style="background-image: url('assets/images/profile-header-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                <div class="flex items-center space-x-4">
+                  <!-- Profile Logo/Image -->
+                  <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
+                    <img src="<?php if (!empty($jobseeker['profile_picture'])) {
+                                echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
+                              } else {
+                                echo '/sikap/public/assets/images/default-avatar.jpg';
+                              } ?>" alt="Profile" class="object-cover w-full h-full">
                   </div>
 
-                  <!-- Name & Title -->
-                  <div class="mt-4 text-center">
-                    <h2 class="text-xl font-bold text-white">
+                  <div class="flex-1">
+                    <h1 class="text-lg font-bold text-white">
                       <?php echo htmlspecialchars(trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['middle_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? '') . ' ' . ($jobseeker['suffix'] ?? ''))); ?>
-                    </h2>
-                    <p class="mt-1 text-sm text-white/90"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'Job Seeker'); ?></p>
+                    </h1>
+                    <p class="text-sm text-gray-200"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'Job Seeker'); ?></p>
+
+                    <!-- Edit Photo Button -->
+                    <button type="button" class="flex items-center mt-2 text-xs text-primary hover:text-secondary" onclick="document.getElementById('profile-picture-input').click()" title="Change profile photo">
+                      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                      </svg>
+                      Change Photo
+                    </button>
+                    <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this);">
                   </div>
                 </div>
               </div>
 
               <!-- Profile Content -->
               <div class="p-6">
-                <!-- Profile Completion Card -->
-                <div class="p-4 mb-6 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50">
+
+                <!-- Profile Completion Progress Bar -->
+                <div class="mb-6">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-sm font-semibold text-gray-700">Profile Completion</span>
                     <span class="text-sm font-bold text-primary"><?php echo round($completionPercentage); ?>%</span>
                   </div>
-                  <div class="w-full h-3 overflow-hidden bg-gray-200 rounded-full">
-                    <div class="h-full transition-all duration-500 ease-out bg-gradient-to-r from-primary to-secondary"
+                  <div class="w-full h-2 mb-2 overflow-hidden bg-gray-200 ">
+                    <div class="h-full transition-all duration-300 bg-primary"
                       style="width: <?php echo $completionPercentage; ?>%"></div>
                   </div>
-                  <p class="mt-2 text-xs text-gray-600">
-                    <?php if ($completionPercentage < 100): ?>
-                      Complete your profile to increase visibility to employers
-                    <?php else: ?>
-                      🎉 Your profile is complete!
-                    <?php endif; ?>
-                  </p>
+                  <div class="flex justify-between text-xs text-gray-500">
+                    <span><?php echo $completionPercentage < 100 ? 'Complete your profile' : 'Profile complete'; ?></span>
+                    <span><?php echo round($completionPercentage); ?>% Done</span>
+                  </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="mb-6 space-y-3">
                   <a href="?page=complete-jobseeker-profile"
-                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:shadow-lg transform hover:-translate-y-0.5">
+                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-all duration-200 border-2 rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
@@ -120,61 +111,102 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                   </a>
                 </div>
 
-                <!-- Contact Information Card -->
-                <div class="p-4 rounded-xl bg-gray-50">
-                  <h3 class="flex items-center mb-3 text-sm font-semibold text-gray-700">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    Contact Information
-                  </h3>
-                  <div class="space-y-3">
-                    <div class="flex items-center p-2 bg-white rounded-lg">
-                      <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
-                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0 ml-3">
-                        <p class="text-xs text-gray-500">Email</p>
-                        <p class="text-sm text-gray-900 truncate"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
-                      </div>
+                <!-- Profile Details -->
+                <div class="mb-6">
+                  <h2 class="mb-3 text-lg font-semibold text-primary">Profile Details</h2>
+                  <div class="space-y-4">
+                    <!-- Email -->
+                    <div>
+                      <div class="mb-1 text-xs font-medium text-gray-500">Email</div>
+                      <div class="text-sm text-gray-900"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></div>
                     </div>
 
+                    <!-- Phone -->
                     <?php if (!empty($jobseeker['contact_no'])): ?>
-                      <div class="flex items-center p-2 bg-white rounded-lg">
-                        <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg">
-                          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                          </svg>
-                        </div>
-                        <div class="flex-1 min-w-0 ml-3">
-                          <p class="text-xs text-gray-500">Phone</p>
-                          <p class="text-sm text-gray-900"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></p>
+                      <div>
+                        <div class="mb-1 text-xs font-medium text-gray-500">Phone</div>
+                        <div class="text-sm text-gray-900"><?php echo htmlspecialchars($jobseeker['contact_no']); ?></div>
+                      </div>
+                    <?php endif; ?>
+
+                    <!-- Experience Level -->
+                    <?php if (!empty($jobseeker['experience_level'])): ?>
+                      <div>
+                        <div class="mb-1 text-xs font-medium text-gray-500">Experience Level</div>
+                        <div class="text-sm text-gray-900"><?php echo htmlspecialchars($jobseeker['experience_level']); ?></div>
+                      </div>
+                    <?php endif; ?>
+
+                    <!-- Skills -->
+                    <?php if (!empty($skills) && is_array($skills)): ?>
+                      <div>
+                        <div class="mb-1 text-xs font-medium text-gray-500">Skills</div>
+                        <div class="text-sm text-gray-900">
+                          <?php
+                          $skillNames = array_column($skills, 'skill_name');
+                          echo htmlspecialchars(implode(', ', array_slice($skillNames, 0, 3)));
+                          if (count($skillNames) > 3) echo ' +' . (count($skillNames) - 3) . ' more';
+                          ?>
                         </div>
                       </div>
                     <?php endif; ?>
 
-                    <?php if (!empty($jobseeker['address'])): ?>
-                      <div class="flex items-center p-2 bg-white rounded-lg">
-                        <div class="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
-                          <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                          </svg>
-                        </div>
-                        <div class="flex-1 min-w-0 ml-3">
-                          <p class="text-xs text-gray-500">Location</p>
-                          <p class="text-sm text-gray-900"><?php echo htmlspecialchars($jobseeker['address']); ?></p>
-                        </div>
+                    <!-- Date Registered -->
+                    <?php if (!empty($jobseeker['created_at'])): ?>
+                      <div>
+                        <div class="mb-1 text-xs font-medium text-gray-500">Member Since</div>
+                        <div class="text-sm text-gray-900"><?php echo date('M Y', strtotime($jobseeker['created_at'])); ?></div>
                       </div>
                     <?php endif; ?>
+                  </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div>
+                  <h2 class="mb-3 text-lg font-semibold text-primary">Activity Stats</h2>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 text-center rounded-lg bg-gray-50">
+                      <div class="text-lg font-bold text-primary">
+                        <?php
+                        // You'll need to add this query to count applications
+                        // For now, using placeholder - replace with actual count
+                        echo isset($applicationCount) ? $applicationCount : '0';
+                        ?>
+                      </div>
+                      <div class="text-xs text-gray-600">Applications</div>
+                    </div>
+                    <div class="p-3 text-center rounded-lg bg-gray-50">
+                      <div class="text-lg font-bold text-primary">
+                        <?php
+                        // You'll need to add this query to count interviews
+                        // For now, using placeholder - replace with actual count
+                        echo isset($interviewCount) ? $interviewCount : '0';
+                        ?>
+                      </div>
+                      <div class="text-xs text-gray-600">Interviews</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <?php
+        // Add these queries to your PHP file to get the stats data:
+
+        /*
+// Count total applications for this jobseeker
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM job_applications WHERE jobseeker_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$applicationCount = $stmt->fetchColumn();
+
+// Count interviews (assuming you have an interviews table or status field)
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM job_applications WHERE jobseeker_id = ? AND status IN ('interview_scheduled', 'interviewed')");
+$stmt->execute([$_SESSION['user_id']]);
+$interviewCount = $stmt->fetchColumn();
+*/
+        ?>
 
         <!-- Right Side - 2/3 Width (Same as Dashboard) -->
         <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">

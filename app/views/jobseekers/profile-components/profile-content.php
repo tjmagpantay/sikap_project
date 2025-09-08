@@ -41,52 +41,6 @@
         <p class="text-sm"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
     </div>
 </div>
-
-<!-- Employment Status Section -->
-<div class="mb-8">
-    <div class="flex items-center justify-between mb-4">
-        <h4 class="text-base font-semibold text-primary">Employment Status</h4>
-        <a href="?page=complete-jobseeker-profile&step=5"
-            class="flex items-center text-sm text-primary hover:text-primary-600">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            Edit
-        </a>
-    </div>
-
-    <?php if (!empty($workExperience) && is_array($workExperience) && isset($workExperience[0]['currently_working']) && $workExperience[0]['currently_working'] === 'Yes'): ?>
-        <p class="mb-4 text-sm text-gray-500">
-            Currently working as <?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?>
-            at <?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?>.
-        </p>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-                <p class="text-xs text-gray-500">Current Job</p>
-                <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['job_title'] ?? 'N/A'); ?></p>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500">Company</p>
-                <p class="text-sm font-medium"><?php echo htmlspecialchars($workExperience[0]['company_name'] ?? 'N/A'); ?></p>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500">Employment Type</p>
-                <p class="text-sm font-medium"><?php echo htmlspecialchars(ucfirst($workExperience[0]['employment_type'] ?? 'N/A')); ?></p>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500">Start Date</p>
-                <p class="text-sm font-medium">
-                    <?php echo !empty($workExperience[0]['start_date']) ? date('M Y', strtotime($workExperience[0]['start_date'])) : 'N/A'; ?>
-                </p>
-            </div>
-        </div>
-    <?php else: ?>
-        <p class="p-3 text-xs text-gray-500 border border-gray-200 rounded bg-gray-50">
-            Currently seeking employment opportunities.
-        </p>
-    <?php endif; ?>
-</div>
-
 <!-- Work Experience Card -->
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">

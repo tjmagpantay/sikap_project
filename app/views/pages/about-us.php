@@ -43,44 +43,67 @@ include_once __DIR__ . '/../components/navbar.php';
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 
-<body class="font-inter antialiased">
+<body class="antialiased font-inter">
     <main class="relative">
-        <!-- Hero Section - Similar to landing page hero -->
-        <section class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[700px] flex items-center"
-            style="background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)), 
-                   url('assets/images/abt-hero-bg.jpg');
-                   background-blend-mode: overlay;
-                   background-size: cover;
-                   background-position: center;">
+<!-- Hero Section - Similar to landing page hero -->
+<section class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[700px] flex items-center"
+    style="background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)), 
+           url('assets/images/abt-hero-bg.jpg');
+           background-blend-mode: overlay;
+           background-size: cover;
+           background-position: center;">
 
-            <div class="w-full mx-auto max-w-7xl">
-                <div class="relative flex flex-col items-center justify-center w-full text-center">
-                    <h1 class="mb-6 text-2xl font-bold sm:text-5xl lg:text-6xl"
-                        style="background: linear-gradient(to top right, #1567B2, #092C4C); 
-                               -webkit-background-clip: text; 
-                               -webkit-text-fill-color: transparent; 
-                               background-clip: text;"
-                        data-aos="fade-up"
-                        data-aos-duration="1000"
-                        data-aos-delay="200">
-                        Public Employment Service Office (PESO) <br>
-                        Rosario Batangas
-                    </h1>
+    <div class="w-full mx-auto max-w-7xl">
+        <div class="relative flex flex-col items-center justify-center w-full text-center">
+                      <h1 class="mb-6 text-lg font-bold leading-tight sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight"
+                style="background: linear-gradient(to top right, #1567B2, #092C4C); 
+                       -webkit-background-clip: text; 
+                       -webkit-text-fill-color: transparent; 
+                       background-clip: text;
+                       word-wrap: break-word;
+                       hyphens: auto;"
+                data-aos="fade-up"
+                data-aos-duration="1000"
+                data-aos-delay="200">
+                Public Employment Service Office (PESO) <br>
+                Rosario Batangas
+            </h1>
 
-                    <p class="mx-auto mb-8 max-w-[600px] text-md text-primary leading-relaxed"
-                        data-aos="fade-up"
-                        data-aos-duration="1000"
-                        data-aos-delay="300">
-                        The Public Employment Service Office (PESO) in Rosario, Batangas provides free employment services, career guidance, and job matching to connect jobseekers with opportunities both locally and abroad.
-                    </p>
+            <p class="mx-auto mb-12 max-w-[600px] text-md text-gray-700 leading-relaxed"
+                data-aos="fade-up"
+                data-aos-duration="1000"
+                data-aos-delay="300">
+                The Public Employment Service Office (PESO) in Rosario, Batangas provides free employment services, career guidance, and job matching to connect jobseekers with opportunities both locally and abroad.
+            </p>
 
-
-                </div>
+            <!-- Buttons Section -->
+            <div class="flex flex-col items-center justify-center gap-4 sm:flex-row"
+                data-aos="fade-up"
+                data-aos-duration="1000"
+                data-aos-delay="400">
+                
+                <!-- Dark Blue Button -->
+                <button class="px-8 py-4 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-w-[200px]"
+                    style="background-color: #092C4C;"
+                    onmouseover="this.style.backgroundColor='#0a3558'"
+                    onmouseout="this.style.backgroundColor='#092C4C'">
+                    Find Jobs
+                </button>
+                
+                <!-- Light Blue Button -->
+                <button class="px-8 py-4 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-w-[200px] border-2"
+                    style="background-color: #E3F2FD; color: #092C4C; border-color: #092C4C;"
+                    onmouseover="this.style.backgroundColor='#BBDEFB'; this.style.borderColor='#0a3558'"
+                    onmouseout="this.style.backgroundColor='#E3F2FD'; this.style.borderColor='#092C4C'">
+                    Our Services
+                </button>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <!-- Mission & Vision Section -->
-        <section id="mission" class="relative w-full px-4 py-24 sm:px-6 md:px-16 lg:px-24 bg-white">
+        <section id="mission" class="relative w-full px-4 py-24 bg-white sm:px-6 md:px-16 lg:px-24">
             <div class="w-full mx-auto max-w-7xl">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
                     <!-- Mission Content -->
@@ -115,12 +138,12 @@ include_once __DIR__ . '/../components/navbar.php';
                             <!-- Tab Content (only this part changes) -->
                             <div>
                                 <div class="tabs-content" id="content-mission">
-                                    <p class="mb-4 text-gray-600 leading-relaxed">
+                                    <p class="mb-4 leading-relaxed text-gray-600">
                                         To provide continuous and sustainable employment to all, to strengthen the existing employment facilitation services both local and overseas through the establishment of concrete system and mechanism to effectively address the concern of their constituents information system.
                                     </p>
                                 </div>
                                 <div class="hidden tabs-content" id="content-vision">
-                                    <p class="mb-4 text-gray-600 leading-relaxed">
+                                    <p class="mb-4 leading-relaxed text-gray-600">
                                         Identification and development of strong workforce led by pro-active and integrity driven leaders that provides suitable job opportunities and updated labor market information.
                                     </p>
                                 </div>
@@ -166,13 +189,13 @@ include_once __DIR__ . '/../components/navbar.php';
                         <div class="relative max-w-lg">
                             <img src="assets/images/abt-peso.png"
                                 alt="PESO Rosario Team"
-                                class="w-full rounded-xl shadow-lg">
+                                class="w-full shadow-lg rounded-xl">
 
                             <!-- Floating Stats Cards -->
-                            <div class="absolute -top-4 -left-4 p-4 bg-white rounded-lg shadow-lg">
+                            <div class="absolute p-4 bg-white rounded-lg shadow-lg -top-4 -left-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                                        <i class="fas fa-users text-white"></i>
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
+                                        <i class="text-white fas fa-users"></i>
                                     </div>
                                     <div>
                                         <p class="text-xl font-bold text-primary">500+</p>
@@ -181,10 +204,10 @@ include_once __DIR__ . '/../components/navbar.php';
                                 </div>
                             </div>
 
-                            <div class="absolute -bottom-4 -right-4 p-4 bg-white rounded-lg shadow-lg">
+                            <div class="absolute p-4 bg-white rounded-lg shadow-lg -bottom-4 -right-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                                        <i class="fas fa-building text-white"></i>
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-secondary">
+                                        <i class="text-white fas fa-building"></i>
                                     </div>
                                     <div>
                                         <p class="text-xl font-bold text-primary">100+</p>
@@ -201,7 +224,7 @@ include_once __DIR__ . '/../components/navbar.php';
         <!-- Services Section -->
         <section class="relative w-full px-4 py-24 sm:px-6 md:px-16 lg:px-24 bg-gray-50">
             <div class="w-full mx-auto max-w-7xl">
-                <div class="text-center mb-12">
+                <div class="mb-12 text-center">
                     <h6 class="mb-2 text-lg font-semibold text-secondary"
                         data-aos="fade-up"
                         data-aos-duration="800">
@@ -213,7 +236,7 @@ include_once __DIR__ . '/../components/navbar.php';
                         data-aos-delay="100">
                         How We Help You Succeed
                     </h2>
-                    <p class="mx-auto max-w-2xl text-gray-600 leading-relaxed"
+                    <p class="max-w-2xl mx-auto leading-relaxed text-gray-600"
                         data-aos="fade-up"
                         data-aos-duration="800"
                         data-aos-delay="200">
@@ -221,87 +244,87 @@ include_once __DIR__ . '/../components/navbar.php';
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                     <!-- Service 1 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="100">
-                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-search text-primary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-primary/10">
+                            <i class="text-xl fas fa-search text-primary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">ML-Powered Job Matching</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">ML-Powered Job Matching</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Our intelligent system matches job seekers with opportunities based on skills, experience, and career preferences.
                         </p>
                     </div>
 
                     <!-- Service 2 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="200">
-                        <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-graduation-cap text-secondary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-secondary/10">
+                            <i class="text-xl fas fa-graduation-cap text-secondary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">Skills Development</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">Skills Development</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Access training programs and workshops to enhance your skills and improve your employability.
                         </p>
                     </div>
 
                     <!-- Service 3 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="300">
-                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-handshake text-primary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-primary/10">
+                            <i class="text-xl fas fa-handshake text-primary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">Career Counseling</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">Career Counseling</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Get personalized guidance from our career experts to help you make informed career decisions.
                         </p>
                     </div>
 
                     <!-- Service 4 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="400">
-                        <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-calendar-alt text-secondary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-secondary/10">
+                            <i class="text-xl fas fa-calendar-alt text-secondary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">Job Fairs & Events</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">Job Fairs & Events</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Participate in our regular job fairs and networking events to connect directly with employers.
                         </p>
                     </div>
 
                     <!-- Service 5 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="500">
-                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-chart-line text-primary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-primary/10">
+                            <i class="text-xl fas fa-chart-line text-primary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">Employer Solutions</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">Employer Solutions</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Comprehensive recruitment solutions to help businesses find and hire the right talent efficiently.
                         </p>
                     </div>
 
                     <!-- Service 6 -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:transform hover:-translate-y-2"
+                    <div class="p-6 transition-all duration-300 bg-white shadow-sm rounded-xl hover:shadow-md hover:transform hover:-translate-y-2"
                         data-aos="fade-up"
                         data-aos-duration="600"
                         data-aos-delay="600">
-                        <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
-                            <i class="fas fa-headset text-secondary text-xl"></i>
+                        <div class="flex items-center justify-center w-12 h-12 mb-4 rounded-lg bg-secondary/10">
+                            <i class="text-xl fas fa-headset text-secondary"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-primary mb-3">24/7 Support</h3>
-                        <p class="text-gray-600 leading-relaxed">
+                        <h3 class="mb-3 text-xl font-semibold text-primary">24/7 Support</h3>
+                        <p class="leading-relaxed text-gray-600">
                             Round-the-clock support to assist you throughout your job search or recruitment process.
                         </p>
                     </div>
@@ -310,23 +333,23 @@ include_once __DIR__ . '/../components/navbar.php';
         </section>
 
         <!-- Statistics Section -->
-        <section class="relative w-full px-4 py-16 sm:px-6 md:px-16 lg:px-24 bg-primary text-white">
+        <section class="relative w-full px-4 py-16 text-white sm:px-6 md:px-16 lg:px-24 bg-primary">
             <div class="w-full mx-auto max-w-7xl">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
                     <div>
-                        <h3 class="text-4xl font-bold mb-2">1,000+</h3>
+                        <h3 class="mb-2 text-4xl font-bold">1,000+</h3>
                         <p class="text-white/90">Successful Placements</p>
                     </div>
                     <div>
-                        <h3 class="text-4xl font-bold mb-2">150+</h3>
+                        <h3 class="mb-2 text-4xl font-bold">150+</h3>
                         <p class="text-white/90">Partner Companies</p>
                     </div>
                     <div>
-                        <h3 class="text-4xl font-bold mb-2">98%</h3>
+                        <h3 class="mb-2 text-4xl font-bold">98%</h3>
                         <p class="text-white/90">Satisfaction Rate</p>
                     </div>
                     <div>
-                        <h3 class="text-4xl font-bold mb-2">5+</h3>
+                        <h3 class="mb-2 text-4xl font-bold">5+</h3>
                         <p class="text-white/90">Years of Excellence</p>
                     </div>
                 </div>
@@ -336,52 +359,52 @@ include_once __DIR__ . '/../components/navbar.php';
         <!-- Contact Section -->
         <section id="contact" class="relative w-full px-4 py-16 sm:px-6 md:px-16 lg:px-24 ">
             <div class="w-full mx-auto max-w-7xl">
-                <div class="text-center mb-12">
+                <div class="mb-12 text-center">
                     <h6 class="mb-2 text-lg font-semibold text-secondary">Get In Touch</h6>
                     <h2 class="mb-6 text-3xl font-bold text-primary lg:text-4xl">
                         Ready to Start Your Journey?
                     </h2>
-                    <p class="mx-auto max-w-2xl text-gray-600 leading-relaxed">
+                    <p class="max-w-2xl mx-auto leading-relaxed text-gray-600">
                         Whether you're looking for your next career opportunity or seeking top talent for your business, we're here to help.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
                     <!-- Contact Information -->
                     <div class="space-y-6">
                         <div class="flex items-start space-x-4">
                             <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-primary">
-                                <i class="fas fa-map-marker-alt text-white"></i>
+                                <i class="text-white fas fa-map-marker-alt"></i>
                             </div>
                             <div>
-                                <h4 class="text-lg font-semibold text-primary mb-1">Visit Our Office</h4>
+                                <h4 class="mb-1 text-lg font-semibold text-primary">Visit Our Office</h4>
                                 <p class="text-gray-600">PESO Rosario, Municipal Hall<br>Rosario, Batangas, Philippines</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
                             <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-secondary">
-                                <i class="fas fa-phone text-white"></i>
+                                <i class="text-white fas fa-phone"></i>
                             </div>
                             <div>
-                                <h4 class="text-lg font-semibold text-primary mb-1">Call Us</h4>
+                                <h4 class="mb-1 text-lg font-semibold text-primary">Call Us</h4>
                                 <p class="text-gray-600">+63 (43) 123-4567<br>+63 (43) 765-4321</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
                             <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-primary">
-                                <i class="fas fa-envelope text-white"></i>
+                                <i class="text-white fas fa-envelope"></i>
                             </div>
                             <div>
-                                <h4 class="text-lg font-semibold text-primary mb-1">Email Us</h4>
+                                <h4 class="mb-1 text-lg font-semibold text-primary">Email Us</h4>
                                 <p class="text-gray-600">info@peso-rosario.gov.ph<br>support@sikap-peso.com</p>
                             </div>
                         </div>
 
                         <!-- Office Hours -->
-                        <div class="mt-8  bg-white rounded-xl">
-                            <h4 class="text-lg font-semibold text-primary mb-4">Office Hours</h4>
+                        <div class="mt-8 bg-white rounded-xl">
+                            <h4 class="mb-4 text-lg font-semibold text-primary">Office Hours</h4>
                             <div class="space-y-2 text-sm text-gray-600">
                                 <div class="flex justify-between">
                                     <span>Monday - Friday:</span>
@@ -400,25 +423,25 @@ include_once __DIR__ . '/../components/navbar.php';
                     </div>
 
                     <!-- Contact Form -->
-                    <div class="bg-white p-8 rounded-xl shadow-sm">
-                        <h3 class="text-xl font-semibold text-primary mb-6">Send us a Message</h3>
+                    <div class="p-8 bg-white shadow-sm rounded-xl">
+                        <h3 class="mb-6 text-xl font-semibold text-primary">Send us a Message</h3>
                         <form class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                    <label class="block mb-2 text-sm font-medium text-gray-700">First Name</label>
                                     <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Your first name">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                    <label class="block mb-2 text-sm font-medium text-gray-700">Last Name</label>
                                     <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Your last name">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-700">Email</label>
                                 <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="your@email.com">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-700">Subject</label>
                                 <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                                     <option>General Inquiry</option>
                                     <option>Job Seeker Support</option>
@@ -427,10 +450,10 @@ include_once __DIR__ . '/../components/navbar.php';
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-700">Message</label>
                                 <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Tell us how we can help you..."></textarea>
                             </div>
-                            <button type="submit" class="w-full btn-primary py-4 rounded-lg">
+                            <button type="submit" class="w-full py-4 rounded-lg btn-primary">
                                 Send Message
                             </button>
                         </form>
