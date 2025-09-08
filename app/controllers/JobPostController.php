@@ -5,9 +5,9 @@ require_once __DIR__ . '/../models/Employer.php';
 require_once __DIR__ . '/../models/JobPost.php';
 require_once __DIR__ . '/../models/User.php';
 
-// FOR FIREBASE NOTIFICATION
-require_once __DIR__ . '/../services/NotificationService.php';
-NotificationService::notifyUsersBySkills($job_id, $job_title, "/public/view-job.php?id={$job_id}");
+// // FOR FIREBASE NOTIFICATION
+// require_once __DIR__ . '/../services/NotificationService.php';
+// NotificationService::notifyUsersBySkills($job_id, $job_title, "/public/view-job.php?id={$job_id}");
 
 
 class JobPostController
