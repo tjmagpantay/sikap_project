@@ -1,0 +1,493 @@
+Nice — I updated the full step-by-step guide so it uses the **FCM HTTP v1 API + service account** (the replacement for the deprecated legacy server key). I matched it to your workspace (`c:\xampp\htdocs\sikap\`) and included exact file locations, code, and best practices (token caching, where to put the `firebase-adminsdk.json`, how to call the sender from your job flow).
+
+Below is the fixed, ready-to-follow guide.
+
+---
+
+# 0) Prerequisites / notes
+
+* Your site must be served over **HTTPS** for push (localhost is usually allowed as secure origin).
+* PHP `curl` and `openssl` must be enabled on XAMPP / Hostinger.
+* I assume DB connection is `config/sikap_db.php` and exposes `$conn`.
+* **Never** put the service account JSON in a public repo. Keep it in `config/` and add it to `.gitignore`.
+
+---
+
+# 1) Create Firebase project & Web app (quick)
+
+1. Go to [https://console.firebase.google.com](https://console.firebase.google.com) → Add project → follow prompts.
+2. In your project → **Project Settings (gear) → General**:
+
+   * Under **Your apps** register a **Web app** (`</>`), name it `sikap-web`.
+   * Copy the **Firebase config** object (apiKey, authDomain, projectId, appId, messagingSenderId) — used in client JS.
+   * Add authorized domains: add `localhost` and your Hostinger domain.
+3. In Project Settings → **Cloud Messaging**:
+
+   * Do **not** rely on deprecated Legacy Server Key. Instead:
+   * Go to **Service accounts** tab → **Generate new private key** → this downloads `firebase-adminsdk-XXXXX.json`. Save it into your project (see step 3 below).
+   * In **Cloud Messaging → Web configuration** create **VAPID keys** and copy the **public VAPID key** (used in `getToken()` on client).
+4. In Google Cloud Console enable the **Firebase Cloud Messaging API (v1)** for your project (if not already).
+
+---
+
+# 2) Where to put the keys in your workspace
+
+Save files in your project:
+
+```
+c:\xampp\htdocs\sikap\
+  ├─ config\
+  │   ├─ sikap_db.php                // existing DB config
+  │   ├─ firebase-adminsdk.json      // the downloaded service account JSON (KEEP PRIVATE)
+  │   └─ firebase.php                // small config loader (see code)
+  └─ public\
+      ├─ firebase-messaging-sw.js
+      └─ assets\js\firebase-config.js
+      └─ assets\js\firebase-init.js
+      └─ api\save_token.php
+      └─ api\mark_read.php
+      └─ api\test_send.php
+  └─ app\services\NotificationService.php
+```
+
+Add `config/firebase-adminsdk.json` to `.gitignore`.
+
+---
+
+# 3) `config/firebase.php` (server config loader)
+
+Create `config/firebase.php`:
+
+```php
+<?php
+// config/firebase.php
+// Keep this file in config/ and DO NOT commit the JSON service account file publicly.
+return [
+    'service_account_json' => __DIR__ . '/firebase-adminsdk.json',  // path to downloaded JSON
+    'firebase_config' => [   // web config (safe to expose in client)
+        'apiKey' => 'YOUR_API_KEY',
+        'authDomain' => 'your-project.firebaseapp.com',
+        'projectId' => 'your-project-id',
+        'storageBucket' => 'your-project.appspot.com',
+        'messagingSenderId' => 'YOUR_SENDER_ID',
+        'appId' => 'YOUR_APP_ID'
+    ],
+    'vapid_public_key' => 'YOUR_VAPID_PUBLIC_KEY' // the web push VAPID public key
+];
+```
+
+Fill placeholders from Firebase Console (General → Web app config and Cloud Messaging → Web push key).
+
+---
+
+# 4) DB changes (notifications + token)
+
+Run SQL (phpMyAdmin):
+
+```sql
+ALTER TABLE users ADD COLUMN fcm_token VARCHAR(255) DEFAULT NULL;
+
+CREATE TABLE notifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  type ENUM('job_application','job_post','event','system') NOT NULL,
+  message TEXT NOT NULL,
+  data JSON NULL,
+  is_read TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(user_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+(If MySQL has no JSON, use `TEXT` for `data`.)
+
+---
+
+# 5) Service worker — `public/firebase-messaging-sw.js`
+
+Place at `public/firebase-messaging-sw.js` (must be served at site root):
+
+```js
+// public/firebase-messaging-sw.js
+importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function(payload) {
+  const title = payload.notification?.title || 'New notification';
+  const options = {
+    body: payload.notification?.body || '',
+    icon: payload.notification?.icon || '/assets/images/default-avatar.jpg',
+    data: payload.data || {}
+  };
+  self.registration.showNotification(title, options);
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (let client of windowClients) {
+        if (client.url === url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
+});
+```
+
+Replace `YOUR_*` fields with the same `firebase_config` values.
+
+---
+
+# 6) Client config file — `public/assets/js/firebase-config.js`
+
+This can be publicly visible (contains client config & VAPID public key):
+
+```js
+// public/assets/js/firebase-config.js
+window.FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+window.FIREBASE_VAPID = "YOUR_VAPID_PUBLIC_KEY";
+```
+
+Load this BEFORE `firebase-init.js` in your pages.
+
+---
+
+# 7) Client init — `public/assets/js/firebase-init.js`
+
+(Place in `public/assets/js/` and load with `<script type="module">` in your dashboard view)
+
+```js
+// public/assets/js/firebase-init.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging.js";
+
+const cfg = window.FIREBASE_CONFIG;
+const vapidKey = window.FIREBASE_VAPID;
+const app = initializeApp(cfg);
+const messaging = getMessaging(app);
+
+async function registerSW() {
+  if ('serviceWorker' in navigator) {
+    try {
+      await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      console.log('SW registered');
+    } catch (e) {
+      console.error('SW register failed', e);
+    }
+  }
+}
+
+async function requestAndSendToken() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log('Notification permission denied');
+      return;
+    }
+    const currentToken = await getToken(messaging, { vapidKey });
+    if (currentToken) {
+      console.log('FCM token', currentToken);
+      // send to server
+      await fetch('/public/api/save_token.php', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: currentToken })
+      });
+    } else {
+      console.log('No registration token available.');
+    }
+  } catch (err) {
+    console.error('Error get token', err);
+  }
+}
+
+onMessage(messaging, (payload) => {
+  console.log('Message in foreground: ', payload);
+  if (Notification.permission === 'granted') {
+    const notif = payload.notification || {};
+    new Notification(notif.title || 'New', { body: notif.body || '', icon: notif.icon || '/assets/images/default-avatar.jpg' });
+  }
+  if (window.appendNotificationToDOM) window.appendNotificationToDOM(payload);
+});
+
+window.addEventListener('load', async () => {
+  await registerSW();
+  await requestAndSendToken();
+});
+```
+
+**Where to load**: add to your jobseeker layout / dashboard view (e.g. inside `app/views/jobseekers/navbar-jobseeker.php` or `dashboard.php`):
+
+```html
+<script src="/public/assets/js/firebase-config.js"></script>
+<script type="module" src="/public/assets/js/firebase-init.js"></script>
+```
+
+(adjust leading slash depending how your webroot is mapped).
+
+---
+
+# 8) Save token endpoint — `public/api/save_token.php`
+
+Saves token into `users.fcm_token` (protected by session):
+
+```php
+<?php
+// public/api/save_token.php
+session_start();
+header('Content-Type: application/json');
+require_once __DIR__ . '/../../config/sikap_db.php';
+
+if (!isset($_SESSION['user_id'])) { http_response_code(401); echo json_encode(['error'=>'Not authenticated']); exit; }
+
+$input = json_decode(file_get_contents('php://input'), true);
+$token = $input['token'] ?? '';
+if (!$token) { http_response_code(400); echo json_encode(['error'=>'Missing token']); exit; }
+
+$user_id = intval($_SESSION['user_id']);
+$stmt = $conn->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
+$stmt->bind_param("si", $token, $user_id);
+if ($stmt->execute()) echo json_encode(['ok'=>true]); else { http_response_code(500); echo json_encode(['error'=>'DB']); }
+```
+
+---
+
+# 9) Server: sending notifications using FCM v1 (service account)
+
+Create `app/services/NotificationService.php` (core code below). This code *creates a short-lived OAuth2 access token using the service account JSON*, caches it to a temp file to avoid requesting a token every single send, and sends messages using the v1 endpoint.
+
+**Important:** v1 sends one token per message (or send to topics). To notify many users, either loop tokens (re-using cached access token) or use topics.
+
+```php
+<?php
+// app/services/NotificationService.php
+
+class NotificationService
+{
+    protected static function getServiceAccount()
+    {
+        $cfg = require __DIR__ . '/../../config/firebase.php';
+        $path = $cfg['service_account_json'];
+        if (!file_exists($path)) throw new Exception("Service account JSON not found: $path");
+        return json_decode(file_get_contents($path), true);
+    }
+
+    // base64url encode
+    protected static function base64UrlEncode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    // Get cached access token or request a new one
+    protected static function getAccessToken() {
+        $cfg = require __DIR__ . '/../../config/firebase.php';
+        $sa = self::getServiceAccount();
+        $cacheFile = __DIR__ . '/../../config/fcm_token_cache.json';
+
+        // use cached token if still valid
+        if (file_exists($cacheFile)) {
+            $cached = json_decode(file_get_contents($cacheFile), true);
+            if (!empty($cached['access_token']) && !empty($cached['expiry']) && $cached['expiry'] > time() + 30) {
+                return $cached['access_token'];
+            }
+        }
+
+        $now = time();
+        $header = ['alg' => 'RS256', 'typ' => 'JWT'];
+        $claim = [
+            'iss' => $sa['client_email'],
+            'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'exp' => $now + 3600,
+            'iat' => $now
+        ];
+
+        $jwt = self::base64UrlEncode(json_encode($header)) . '.' . self::base64UrlEncode(json_encode($claim));
+
+        $privateKey = $sa['private_key'];
+        $pkey = openssl_pkey_get_private($privateKey);
+        if (!$pkey) throw new Exception("Invalid service account private key");
+
+        $signature = null;
+        openssl_sign($jwt, $signature, $pkey, OPENSSL_ALGO_SHA256);
+        openssl_free_key($pkey);
+        $jwt_signed = $jwt . '.' . self::base64UrlEncode($signature);
+
+        // Request access token
+        $ch = curl_init('https://oauth2.googleapis.com/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt_signed
+        ]));
+        $res = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $json = json_decode($res, true);
+        if ($http !== 200 || empty($json['access_token'])) {
+            throw new Exception("Failed to obtain access token: $res");
+        }
+        $accessToken = $json['access_token'];
+        $expiry = $now + intval($json['expires_in'] ?? 3600);
+
+        file_put_contents($cacheFile, json_encode(['access_token' => $accessToken, 'expiry' => $expiry]));
+        return $accessToken;
+    }
+
+    // Send a single message to a device token using FCM v1
+    public static function sendToToken(string $token, string $title, string $body, array $data = []) {
+        $sa = self::getServiceAccount();
+        $projectId = $sa['project_id'];
+        $accessToken = self::getAccessToken();
+
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+        $payload = [
+            'message' => [
+                'token' => $token,
+                'notification' => ['title' => $title, 'body' => $body],
+                'data' => $data,
+                'android' => ['priority' => 'high'],
+                'apns' => ['headers' => ['apns-priority' => '10']],
+            ]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$accessToken}",
+            "Content-Type: application/json; charset=utf-8"
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        $res = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return ['http' => $http, 'result' => json_decode($res, true), 'raw' => $res];
+    }
+
+    // Bulk send to multiple tokens (loop; re-uses cached access token)
+    public static function sendToTokens(array $tokens, string $title, string $body, array $data = []) {
+        $results = [];
+        foreach ($tokens as $t) {
+            $results[] = self::sendToToken($t, $title, $body, $data);
+        }
+        return $results;
+    }
+
+    // Example: notify users by skills (call from job creation)
+    public static function notifyUsersBySkills(int $job_id, string $job_title, string $job_url = '/') {
+        global $conn;
+        // get tokens for users matching job skills (example query)
+        $stmt = $conn->prepare("
+            SELECT DISTINCT u.id, u.fcm_token
+            FROM users u
+            JOIN user_skills us ON us.user_id = u.id
+            JOIN job_skills js ON js.skill_id = us.skill_id
+            WHERE js.job_id = ? AND u.fcm_token IS NOT NULL
+        ");
+        $stmt->bind_param("i", $job_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        $tokens = []; $userIds = [];
+        while ($r = $res->fetch_assoc()) {
+            $tokens[] = $r['fcm_token'];
+            $userIds[] = $r['id'];
+        }
+        $stmt->close();
+
+        if (!empty($tokens)) {
+            // send (loop). For large scale, consider topic messaging or batching external service.
+            self::sendToTokens($tokens, "New job: {$job_title}", "Click to view job.", ['url' => $job_url, 'job_id' => (string)$job_id]);
+
+            // save rows to notifications table
+            $stmt2 = $conn->prepare("INSERT INTO notifications (user_id, type, message, data) VALUES (?, 'job_post', ?, ?)");
+            foreach ($userIds as $uid) {
+                $msg = "New job posted: {$job_title}";
+                $jsonData = json_encode(['job_id' => $job_id, 'url' => $job_url]);
+                $stmt2->bind_param("iss", $uid, $msg, $jsonData);
+                $stmt2->execute();
+            }
+            $stmt2->close();
+        }
+    }
+}
+```
+
+> Notes:
+>
+> * The function caches the OAuth access token in `config/fcm_token_cache.json`. You may change location or use a better cache.
+> * This code loops tokens to send messages. For a very large user base, consider using FCM **topics** (subscribe users to a topic and push a single message to that topic) or a background job worker.
+
+---
+
+# 10) How to call from your job creation controller
+
+After you `INSERT INTO jobs` in your job creation controller (e.g. `app/controllers/JobController.php`), call:
+
+```php
+require_once __DIR__ . '/../services/NotificationService.php';
+NotificationService::notifyUsersBySkills($job_id, $job_title, "/public/view-job.php?id={$job_id}");
+```
+
+Adjust include paths to your project layout.
+
+---
+
+# 11) Test flow
+
+1. Open a jobseeker dashboard page with `firebase-init.js` loaded. Accept notifications.
+2. In DB, check `users.fcm_token` updated for your user.
+3. Use `NotificationService::sendToToken($token, 'Test', 'Hello', ['url' => '/']);` (or create a quick test script) to send a test message.
+4. Confirm you receive the notification (foreground and/or background).
+5. Create a job to test the full notify-by-skills path.
+
+---
+
+# 12) Tips & gotchas
+
+* Service worker file must be accessible from the domain root (`/firebase-messaging-sw.js`). If your app uses subfolder deployment, ensure the SW path is correct and matches registration scope.
+* For broadcasting to many users: consider using FCM **topics** (subscribe tokens to topics) or a server-side worker to send in batches. FCM v1 does not accept `registration_ids` like the legacy API.
+* Keep service account JSON secure. If compromised, rotate keys in Firebase Console.
+* iOS Safari push support is limited—test current cross-platform behaviour.
+* If Hostinger blocks outgoing connections to `oauth2.googleapis.com` or `fcm.googleapis.com`, contact Hostinger support or use another server/VPS.
+
+---
+
+If you want, I can now:
+
+1. Paste the **full exact file contents** (ready-to-drop) for:
+
+   * `config/firebase.php`
+   * `public/firebase-messaging-sw.js`
+   * `public/assets/js/firebase-config.js`
+   * `public/assets/js/firebase-init.js`
+   * `public/api/save_token.php`
+   * `app/services/NotificationService.php`
+2. OR give the **one-liner** to add to your job creation controller to invoke `NotificationService::notifyUsersBySkills()`.
+
+Which do you want next?

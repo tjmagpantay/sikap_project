@@ -1,3 +1,5 @@
+// FOR FIREBASE NOTIFICATION
+
 <?php
 // Remove direct model access - data should come from controller
 // All jobseeker data is now passed from the controller
@@ -154,3 +156,6 @@
   </div>
   </div>
 </nav>
+
+<script src="/public/assets/js/firebase-config.js"></script>
+<script type="module" src="/public/assets/js/firebase-init.js"></script>

@@ -934,3 +934,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         }
     </script>
 </div>
+
+<script src="/public/assets/js/firebase-config.js"></script>
+<script type="module" src="/public/assets/js/firebase-init.js"></script>
