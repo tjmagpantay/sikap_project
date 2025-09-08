@@ -1,4 +1,4 @@
-// FOR FIREBASE NOTIFICATION
+
 
 <?php
 // Remove direct model access - data should come from controller

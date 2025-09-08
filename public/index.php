@@ -721,6 +721,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/customer-support.php';
             break;
 
+        case 'review-parsed-data':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->reviewParsedData();
+            break;
 
 
         // FOOTER ROUTES

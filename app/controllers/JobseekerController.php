@@ -354,53 +354,60 @@ class JobseekerController
         }
     }
 
-    private function handleStep1($data, &$error, &$success)
-    {
-        // Documents Upload - Step 1
-        // Get the actual jobseeker record first
+// Update the existing handleStep1 method to use the new parsing function
+private function handleStep1($data, &$error, &$success)
+{
+    // Documents - Step 1
+    // Get the actual jobseeker record first
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+    if (!$jobseeker) {
+        // Create a basic jobseeker record if it doesn't exist
+        $result = $this->jobseekerModel->create(
+            $_SESSION['user_id'],
+            'N/A',
+            'N/A',
+            'N/A',
+            '',
+            '',
+            null,
+            'Male',
+            ''
+        );
+
+        if (!$result) {
+            $error = 'Failed to create profile. Please try again.';
+            return;
+        }
+
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-
-        if (!$jobseeker) {
-            // Create a basic jobseeker record if it doesn't exist
-            $result = $this->jobseekerModel->create(
-                $_SESSION['user_id'],
-                'N/A',
-                'N/A',
-                'N/A',
-                '',
-                '',
-                null,
-                'Male',
-                ''
-            );
-
-            if (!$result) {
-                $error = 'Failed to create profile. Please try again.';
-                return;
-            }
-
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        }
-
-        $jobseeker_id = $jobseeker['jobseeker_id'];
-
-        // Handle resume/CV upload
-        if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
-            // Delete existing resume first
-            $this->jobseekerModel->deleteDocumentByType($jobseeker_id, 'resume');
-            $this->handleFileUpload($_FILES['resume'], 'resume', $jobseeker_id, $error, $success);
-        }
-        if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
-            // Delete existing CV first
-            $this->jobseekerModel->deleteDocumentByType($jobseeker_id, 'cv');
-            $this->handleFileUpload($_FILES['cv'], 'cv', $jobseeker_id, $error, $success);
-        }
-
-        if (empty($error)) {
-            header('Location: ?page=complete-jobseeker-profile&step=2');
-            exit;
-        }
     }
+
+    $jobseeker_id = $jobseeker['jobseeker_id'];
+
+    // Handle resume/CV upload with parsing
+    if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
+        // Delete existing resume first
+        $this->jobseekerModel->deleteDocumentByType($jobseeker_id, 'resume');
+        $this->handleFileUploadWithParsing($_FILES['resume'], 'resume', $jobseeker_id, $error, $success);
+    }
+    if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
+        // Delete existing CV first
+        $this->jobseekerModel->deleteDocumentByType($jobseeker_id, 'cv');
+        $this->handleFileUploadWithParsing($_FILES['cv'], 'cv', $jobseeker_id, $error, $success);
+    }
+
+    if (empty($error)) {
+        // Check if we have parsing results to show
+        if (isset($_SESSION['show_parsing_results']) && $_SESSION['show_parsing_results']) {
+            // Redirect to a special review page or step 2 with parsing results
+            header('Location: ?page=complete-jobseeker-profile&step=2&parsed=1');
+        } else {
+            header('Location: ?page=complete-jobseeker-profile&step=2');
+        }
+        exit;
+    }
+}
 
     private function handleStep2($data, &$error, &$success)
     {
@@ -580,34 +587,45 @@ class JobseekerController
         exit;
     }
 
-    private function handleStep6($data, &$error, &$success)
-    {
-        // Certificates - Step 6
-        // Get jobseeker_id
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $jobseeker_id = $jobseeker['jobseeker_id'];
+private function handleStep6($data, &$error, &$success)
+{
+    // Certificates - Step 6
+    // Get jobseeker_id
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+    $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Check if certificate data already exists
-        $existingCertificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']);
-
-        // Certificates & Licenses
-        $certData = [
-            'certificate_title' => $data['certificate_title'] ?? 'N/A',
-            'issuing_organization' => $data['issuing_organization'] ?? 'N/A',
-            'date_issued' => $data['date_issued'] ?? null
-        ];
-
-        if (!empty($existingCertificates)) {
-            // Update the first/latest certificate
-            $this->jobseekerModel->updateCertificate($jobseeker_id, $certData, $existingCertificates[0]['certificate_id']);
-        } else {
-            // Create new certificate record
-            $this->jobseekerModel->saveCertificate($jobseeker_id, $certData);
+    // Delete existing certificates before adding new ones
+    $existingCertificates = $this->jobseekerModel->getCertificates($jobseeker_id);
+    if (!empty($existingCertificates)) {
+        foreach ($existingCertificates as $cert) {
+            $stmt = $this->jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_certificates WHERE certificate_id = ?");
+            $stmt->execute([$cert['certificate_id']]);
         }
-
-        header('Location: ?page=complete-jobseeker-profile&step=7');
-        exit;
     }
+
+    // Handle multiple certificates
+    if (isset($data['certificates']) && is_array($data['certificates'])) {
+        foreach ($data['certificates'] as $certData) {
+            // Only save if certificate title is provided
+            if (!empty($certData['certificate_title'])) {
+                $certificate = [
+                    'certificate_title' => $certData['certificate_title'],
+                    'issuing_organization' => $certData['issuing_organization'] ?? 'Unknown',
+                    'date_issued' => $certData['date_issued'] ?? date('Y-m-d')
+                ];
+                $this->jobseekerModel->saveCertificate($jobseeker_id, $certificate);
+            }
+        }
+    }
+
+    // Clear parsed data from session since we've processed it
+    unset($_SESSION['parsed_resume_data']);
+    unset($_SESSION['show_parsing_results']);
+
+    header('Location: ?page=complete-jobseeker-profile&step=7');
+    exit;
+}
+
 
     private function handleStep7($data, &$error, &$success)
     {
@@ -1164,4 +1182,120 @@ class JobseekerController
 
         include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
     }
+
+    private function handleFileUploadWithParsing($file, $type, $jobseeker_id, &$error, &$success)
+{
+    $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!in_array($file['type'], $allowedTypes)) {
+        $error = 'Invalid file type. Only PDF, DOC, and DOCX files are allowed.';
+        return false;
+    }
+
+    if ($file['size'] > $maxSize) {
+        $error = 'File size exceeds 5MB limit.';
+        return false;
+    }
+
+    // Generate unique filename
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . '_' . time() . '.' . $extension;
+    $uploadPath = __DIR__ . '/../../uploads/documents/';
+    
+    // Ensure directory exists
+    if (!file_exists($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+    }
+    
+    $filepath = $uploadPath . $filename;
+    $relativePath = 'uploads/documents/' . $filename;
+
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        // Save to database
+        $result = $this->jobseekerModel->saveDocument($jobseeker_id, $relativePath, $type, $file['name']);
+        
+        if ($result) {
+            $success = ucfirst($type) . ' uploaded successfully!';
+            
+            // Attempt to parse resume if it's a PDF and type is 'resume'
+            if ($type === 'resume' && strtolower($extension) === 'pdf') {
+                $this->attemptResumeParsing($filepath, $_SESSION['user_id'], $success);
+            }
+            
+            return true;
+        } else {
+            unlink($filepath); // Delete file if database save failed
+            $error = 'Database error occurred while saving file.';
+            return false;
+        }
+    } else {
+        $error = 'Failed to upload file.';
+        return false;
+    }
+}
+
+private function attemptResumeParsing($filePath, $userId, &$success)
+{
+    try {
+        require_once __DIR__ . '/../models/ResumeParser.php';
+        $parser = new ResumeParser();
+        
+        // Parse the resume
+        $parsedData = $parser->parseResumeFile($filePath);
+        
+        // Update jobseeker profile with parsed data
+        $result = $parser->updateJobseekerProfileFromParsedData($userId, $parsedData);
+        
+        if ($result['success']) {
+            $success .= ' Resume data has been automatically extracted and used to pre-fill your profile!';
+            
+            // Store parsed data in session for user review
+            $_SESSION['parsed_resume_data'] = $parsedData;
+            $_SESSION['show_parsing_results'] = true;
+        } else {
+            error_log("Resume parsing failed: " . $result['message']);
+            $success .= ' (Note: Automatic data extraction was not available for this file)';
+        }
+        
+    } catch (Exception $e) {
+        error_log("Resume parsing error: " . $e->getMessage());
+        $success .= ' (Note: Automatic data extraction was not available for this file)';
+    }
+}
+
+// Add a new method to handle parsed data review
+public function reviewParsedData()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+        header('Location: ?page=login-jobseeker');
+        exit;
+    }
+
+    if (!isset($_SESSION['parsed_resume_data'])) {
+        header('Location: ?page=complete-jobseeker-profile&step=1');
+        exit;
+    }
+
+    $parsedData = $_SESSION['parsed_resume_data'];
+    $jobseeker = $this->getJobseekerData();
+
+    // Handle form submission to accept or modify parsed data
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['accept_parsed_data'])) {
+            // User accepts the parsed data, clear session and continue
+            unset($_SESSION['parsed_resume_data']);
+            unset($_SESSION['show_parsing_results']);
+            header('Location: ?page=complete-jobseeker-profile&step=2');
+            exit;
+        } elseif (isset($_POST['modify_data'])) {
+            // User wants to modify, keep data in session for pre-filling
+            header('Location: ?page=complete-jobseeker-profile&step=2&modify=1');
+            exit;
+        }
+    }
+
+    include __DIR__ . '/../views/jobseekers/profile-completion/review-parsed-data.php';
+}
+
 }

@@ -1,7 +1,14 @@
 <?php
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
+include_once __DIR__ . '/../navbar-jobseeker.php';
+
+// Check if we have parsed data in session
+$parsedCertificates = [];
+if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['parsed_resume_data']['certificates'])) {
+    $parsedCertificates = $_SESSION['parsed_resume_data']['certificates'];
+}
+?>
 
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
@@ -9,7 +16,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <div class="flex justify-center mb-4">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
             </div>
@@ -17,14 +24,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 Certificates & Licenses
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
-                Share any certifications or licenses you've earned (optional)
+                Add your professional certifications and licenses (Optional)
             </p>
         </div>
     </div>
 
     <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-            <!-- Progress bar with steps -->
+<!-- Progress bar with steps -->
             <div class="mb-6">
                 <!-- Step indicators -->
                 <div class="flex items-center justify-between w-full mb-4">
@@ -68,7 +75,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <span class="mt-1 text-xs text-gray-500">Skills</span>
                     </div>
 
-                    <!-- Step 6 -->
+                    <!-- Step 6 - Current -->
                     <div class="flex flex-col items-center">
                         <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
                             <span class="text-sm font-semibold">6</span>
@@ -91,61 +98,182 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 </div>
             </div>
 
+            <!-- Display parsed certificates if available -->
+            <?php if (!empty($parsedCertificates)): ?>
+                <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
+                    <h3 class="mb-2 text-sm font-medium text-green-800">
+                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Certificates extracted from your resume:
+                    </h3>
+                    <ul class="space-y-1 list-disc list-inside">
+                        <?php foreach ($parsedCertificates as $cert): ?>
+                            <li class="text-sm text-green-800"><?php echo htmlspecialchars($cert['certificate_title']); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <p class="mt-2 text-xs text-green-600">These certificates have been automatically added below. You can edit or add more.</p>
+                </div>
+            <?php endif; ?>
+
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=6">
-                <!-- Certificate Title -->
                 <div>
-                    <label for="certificate_title" class="block mb-1 text-xs font-medium text-gray-500">
-                        Certificate/License Title
-                    </label>
-                    <div class="mt-1">
-                        <input id="certificate_title" name="certificate_title" type="text"
-                            value="<?php echo htmlspecialchars(!empty($certificates) ? $certificates[0]['certificate_title'] : ''); ?>"
-                            placeholder="Certificate/License Title"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                    <label class="block mb-4 text-sm font-medium text-gray-700">Certificates & Licenses</label>
+                    <div id="certificates-container">
+                        <?php 
+                        $allCertificates = [];
+                        
+                        // First add parsed certificates
+                        if (!empty($parsedCertificates)) {
+                            foreach ($parsedCertificates as $cert) {
+                                $allCertificates[] = $cert;
+                            }
+                        }
+                        
+                        // Then add existing certificates from database
+                        if (!empty($certificates) && $certificates !== false) {
+                            foreach ($certificates as $cert) {
+                                $allCertificates[] = $cert;
+                            }
+                        }
+                        
+                        // If no certificates at all, add one empty row
+                        if (empty($allCertificates)) {
+                            $allCertificates[] = [
+                                'certificate_title' => '', 
+                                'issuing_organization' => '', 
+                                'date_issued' => ''
+                            ];
+                        }
+                        
+                        foreach ($allCertificates as $index => $cert): ?>
+                        <div class="p-4 mb-4 space-y-4 border border-gray-200 rounded-lg certificate-row" data-index="<?php echo $index; ?>">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
+                                <input type="text" 
+                                       name="certificates[<?php echo $index; ?>][certificate_title]" 
+                                       value="<?php echo htmlspecialchars($cert['certificate_title'] ?? ''); ?>"
+                                       placeholder="e.g., AWS Certified Solutions Architect" 
+                                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                                <input type="text" 
+                                       name="certificates[<?php echo $index; ?>][issuing_organization]" 
+                                       value="<?php echo htmlspecialchars($cert['issuing_organization'] ?? ''); ?>"
+                                       placeholder="e.g., Amazon Web Services" 
+                                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                                    <input type="date" 
+                                           name="certificates[<?php echo $index; ?>][date_issued]" 
+                                           value="<?php echo htmlspecialchars($cert['date_issued'] ?? ''); ?>"
+                                           class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                </div>
+                                
+                                <div class="flex items-end">
+                                    <button type="button" class="px-3 py-2 text-red-600 remove-certificate hover:text-red-800" onclick="removeCertificate(this)">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
-                </div>
 
-                <!-- Issuing Organization -->
-                <div>
-                    <label for="issuing_organization" class="block mb-1 text-xs font-medium text-gray-500">
-                        Issuing Organization
-                    </label>
-                    <div class="mt-1">
-                        <input id="issuing_organization" name="issuing_organization" type="text"
-                            value="<?php echo htmlspecialchars(!empty($certificates) ? $certificates[0]['issuing_organization'] : ''); ?>"
-                            placeholder="Issuing Organization"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
-                </div>
-
-                <!-- Date Issued -->
-                <div>
-                    <label for="date_issued" class="block mb-1 text-xs font-medium text-gray-500">
-                        Date Issued
-                    </label>
-                    <div class="mt-1">
-                        <input id="date_issued" name="date_issued" type="date"
-                            value="<?php echo htmlspecialchars(!empty($certificates) ? $certificates[0]['date_issued'] : ''); ?>"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                    </div>
+                    <button type="button" id="add-certificate" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Another Certificate
+                    </button>
                 </div>
 
                 <div class="flex justify-between">
-                    <a href="?page=complete-jobseeker-profile&step=5" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Previous Step
+                    <a href="?page=complete-jobseeker-profile&step=5"
+                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Previous
                     </a>
-                    <button type="submit" name="submit_step6"
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        <?php echo (!empty($certificates) ? 'Update & Continue' : 'Next Step'); ?>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Next
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let certificateCount = <?php echo count($allCertificates); ?>;
+        const addCertificateBtn = document.getElementById('add-certificate');
+        const certificatesContainer = document.getElementById('certificates-container');
+
+        function addEmptyCertificateRow() {
+            const certificateRow = document.createElement('div');
+            certificateRow.className = 'certificate-row space-y-4 p-4 border border-gray-200 rounded-lg mb-4';
+            certificateRow.setAttribute('data-index', certificateCount);
+
+            certificateRow.innerHTML = `
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
+                <input type="text" 
+                       name="certificates[${certificateCount}][certificate_title]" 
+                       placeholder="e.g., AWS Certified Solutions Architect" 
+                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                <input type="text" 
+                       name="certificates[${certificateCount}][issuing_organization]" 
+                       placeholder="e.g., Amazon Web Services" 
+                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+            </div>
+            
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                    <input type="date" 
+                           name="certificates[${certificateCount}][date_issued]" 
+                           class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                </div>
+                
+                <div class="flex items-end">
+                    <button type="button" class="px-3 py-2 text-red-600 remove-certificate hover:text-red-800" onclick="removeCertificate(this)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+
+            certificatesContainer.appendChild(certificateRow);
+            certificateCount++;
+        }
+
+        addCertificateBtn.addEventListener('click', function() {
+            addEmptyCertificateRow();
+        });
+
+        // Remove certificate function
+        window.removeCertificate = function(button) {
+            const certificateRows = document.querySelectorAll('.certificate-row');
+            if (certificateRows.length > 1) {
+                button.closest('.certificate-row').remove();
+            } else {
+                // Don't allow removing the last certificate row, just clear it
+                const inputs = button.closest('.certificate-row').querySelectorAll('input');
+                inputs.forEach(input => input.value = '');
+            }
+        };
+    });
+</script>

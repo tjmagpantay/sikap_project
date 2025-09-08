@@ -1,7 +1,14 @@
 <?php
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
+include_once __DIR__ . '/../navbar-jobseeker.php';
+
+// Check if we have parsed data in session
+$parsedSkills = [];
+if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed_resume_data']['skills'])) {
+    $parsedSkills = $_SESSION['parsed_resume_data']['skills'];
+}
+?>
 
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
@@ -9,7 +16,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             <div class="flex justify-center mb-4">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                 </div>
             </div>
@@ -17,7 +24,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 Skills & Expertise
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
-                Showcase your core skills and proficiency levels
+                Add your skills and proficiency levels
             </p>
         </div>
     </div>
@@ -60,7 +67,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <span class="mt-1 text-xs text-gray-500">Experience</span>
                     </div>
 
-                    <!-- Step 5 -->
+                    <!-- Step 5 - Current -->
                     <div class="flex flex-col items-center">
                         <div class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary">
                             <span class="text-sm font-semibold">5</span>
@@ -91,66 +98,98 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 </div>
             </div>
 
-            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5">
-                <div id="skills-container">
-                    <div class="grid grid-cols-1 gap-6 mb-6 skill-row sm:grid-cols-2">
-                        <div>
-                            <label for="skills_0" class="block mb-1 text-xs font-medium text-gray-500">
-                                Skill Name
-                            </label>
-                            <div class="mt-1">
-                                <input id="skills_0" name="skills[]" type="text"
-                                    placeholder="e.g., JavaScript, Communication, Project Management"
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="proficiency_0" class="block mb-1 text-xs font-medium text-gray-500">
-                                Proficiency Level
-                            </label>
-                            <div class="flex mt-1">
-                                <select id="proficiency_0" name="proficiency[]"
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate">Intermediate</option>
-                                    <option value="Advanced">Advanced</option>
-                                    <option value="Expert">Expert</option>
-                                </select>
-                                <button type="button" onclick="this.closest('.skill-row').remove()"
-                                    class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Display parsed skills if available -->
+            <?php if (!empty($parsedSkills)): ?>
+            <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
+                <h3 class="mb-2 text-sm font-medium text-green-800">
+                    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Skills extracted from your resume:
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                    <?php foreach ($parsedSkills as $skill): ?>
+                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md">
+                            <?php echo htmlspecialchars($skill['skill_name']); ?>
+                            <?php if (isset($skill['esco_uri']) && !empty($skill['esco_uri'])): ?>
+                                <span class="ml-1 text-xs text-green-600">(ESCO)</span>
+                            <?php endif; ?>
+                        </span>
+                    <?php endforeach; ?>
                 </div>
+                <p class="mt-2 text-xs text-green-600">These skills have been automatically added below. You can edit or add more.</p>
+            </div>
+            <?php endif; ?>
 
-                <div class="flex justify-center">
-                    <button type="button" id="add-skill"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5">
+                <div>
+                    <label class="block mb-4 text-sm font-medium text-gray-700">Skills</label>
+                    <div id="skills-container">
+                        <?php 
+                        $allSkills = [];
+                        
+                        // First add parsed skills
+                        if (!empty($parsedSkills)) {
+                            foreach ($parsedSkills as $skill) {
+                                $allSkills[] = $skill;
+                            }
+                        }
+                        
+                        // Then add existing skills from database
+                        if (!empty($skills) && $skills !== false) {
+                            foreach ($skills as $skill) {
+                                $allSkills[] = $skill;
+                            }
+                        }
+                        
+                        // If no skills at all, add one empty row
+                        if (empty($allSkills)) {
+                            $allSkills[] = ['skill_name' => '', 'proficiency_level' => 'Intermediate'];
+                        }
+                        
+                        foreach ($allSkills as $index => $skill): ?>
+                        <div class="flex gap-4 mb-4 skill-row" data-index="<?php echo $index; ?>">
+                            <div class="flex-1">
+                                <input type="text" 
+                                       name="skills[<?php echo $index; ?>][skill_name]" 
+                                       value="<?php echo htmlspecialchars($skill['skill_name'] ?? ''); ?>"
+                                       placeholder="Enter skill name" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                            </div>
+                            <div class="w-32">
+                                <select name="skills[<?php echo $index; ?>][proficiency_level]" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                    <option value="Beginner" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Beginner') ? 'selected' : ''; ?>>Beginner</option>
+                                    <option value="Intermediate" <?php echo (!isset($skill['proficiency_level']) || $skill['proficiency_level'] === 'Intermediate') ? 'selected' : ''; ?>>Intermediate</option>
+                                    <option value="Advanced" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Advanced') ? 'selected' : ''; ?>>Advanced</option>
+                                    <option value="Expert" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Expert') ? 'selected' : ''; ?>>Expert</option>
+                                </select>
+                            </div>
+                            <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeSkill(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <button type="button" id="add-skill" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                         Add Another Skill
                     </button>
                 </div>
 
                 <div class="flex justify-between">
-                    <a href="?page=complete-jobseeker-profile&step=4" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Previous Step
+                    <a href="?page=complete-jobseeker-profile&step=4" 
+                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Previous
                     </a>
-                    <button type="submit" name="submit_step5"
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        <?php echo (!empty($skills) ? 'Update & Continue' : 'Next Step'); ?>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Next
                     </button>
                 </div>
             </form>
@@ -159,110 +198,63 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let skillCount = 1;
-        const addSkillBtn = document.getElementById('add-skill');
-        const skillsContainer = document.getElementById('skills-container');
+document.addEventListener('DOMContentLoaded', function() {
+    let skillCount = <?php echo count($allSkills); ?>;
+    const addSkillBtn = document.getElementById('add-skill');
+    const skillsContainer = document.getElementById('skills-container');
 
-        // Load existing skills
-        <?php if (!empty($skills)): ?>
-            // Clear the default skill row first
-            skillsContainer.innerHTML = '';
-            skillCount = 0;
-
-            <?php foreach ($skills as $index => $skill): ?>
-                <?php if ($skill['skill_name'] !== 'N/A'): ?>
-                    const skillRow<?php echo $index; ?> = document.createElement('div');
-                    skillRow<?php echo $index; ?>.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
-                    skillRow<?php echo $index; ?>.innerHTML = `
-                    <div>
-                        <label for="skills_<?php echo $index; ?>" class="block mb-1 text-xs font-medium text-gray-500">
-                            Skill Name
-                        </label>
-                        <div class="mt-1">
-                            <input id="skills_<?php echo $index; ?>" name="skills[]" type="text"
-                                   value="<?php echo htmlspecialchars($skill['skill_name']); ?>"
-                                   placeholder="e.g., JavaScript, Communication, Project Management"
-                                   class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="proficiency_<?php echo $index; ?>" class="block mb-1 text-xs font-medium text-gray-500">
-                            Proficiency Level
-                        </label>
-                        <div class="flex mt-1">
-                            <select id="proficiency_<?php echo $index; ?>" name="proficiency[]" 
-                                    class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                <option value="Beginner" ${('<?php echo $skill['proficiency_level']; ?>' === 'Beginner') ? 'selected' : ''}>Beginner</option>
-                                <option value="Intermediate" ${('<?php echo $skill['proficiency_level']; ?>' === 'Intermediate') ? 'selected' : ''}>Intermediate</option>
-                                <option value="Advanced" ${('<?php echo $skill['proficiency_level']; ?>' === 'Advanced') ? 'selected' : ''}>Advanced</option>
-                                <option value="Expert" ${('<?php echo $skill['proficiency_level']; ?>' === 'Expert') ? 'selected' : ''}>Expert</option>
-                            </select>
-                            <button type="button" onclick="this.closest('.skill-row').remove()" 
-                                    class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                    skillsContainer.appendChild(skillRow<?php echo $index; ?>);
-                    skillCount++;
-                <?php endif; ?>
-            <?php endforeach; ?>
-
-            // If no valid skills exist, add empty row
-            if (skillCount === 0) {
-                addEmptySkillRow();
-            }
-        <?php endif; ?>
-
-        function addEmptySkillRow() {
-            const skillRow = document.createElement('div');
-            skillRow.className = 'skill-row grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6';
-            skillRow.innerHTML = `
-            <div>
-                <label for="skills_${skillCount}" class="block mb-1 text-xs font-medium text-gray-500">
-                    Skill Name
-                </label>
-                <div class="mt-1">
-                    <input id="skills_${skillCount}" name="skills[]" type="text"
-                           placeholder="e.g., JavaScript, Communication, Project Management"
-                           class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                </div>
+    function addEmptySkillRow() {
+        const skillRow = document.createElement('div');
+        skillRow.className = 'skill-row flex gap-4 mb-4';
+        skillRow.setAttribute('data-index', skillCount);
+        
+        skillRow.innerHTML = `
+            <div class="flex-1">
+                <input type="text" 
+                       name="skills[${skillCount}][skill_name]" 
+                       placeholder="Enter skill name" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
             </div>
-
-            <div>
-                <label for="proficiency_${skillCount}" class="block mb-1 text-xs font-medium text-gray-500">
-                    Proficiency Level
-                </label>
-                <div class="flex mt-1">
-                    <select id="proficiency_${skillCount}" name="proficiency[]" 
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                        <option value="Expert">Expert</option>
-                    </select>
-                    <button type="button" onclick="this.closest('.skill-row').remove()" 
-                            class="flex items-center justify-center px-3 py-2 ml-2 text-red-600 transition-colors bg-white border border-red-300 rounded-md shadow-sm hover:bg-red-50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
+            <div class="w-32">
+                <select name="skills[${skillCount}][proficiency_level]" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate" selected>Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                </select>
             </div>
+            <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeSkill(this)">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
         `;
-            skillsContainer.appendChild(skillRow);
-            skillCount++;
-        }
+        
+        skillsContainer.appendChild(skillRow);
+        skillCount++;
+    }
 
-        addSkillBtn.addEventListener('click', function() {
-            if (skillCount < 10) { // Limit to 10 skills
-                addEmptySkillRow();
-            }
-        });
+    addSkillBtn.addEventListener('click', function() {
+        addEmptySkillRow();
     });
+
+    // Remove skill function
+    window.removeSkill = function(button) {
+        const skillRows = document.querySelectorAll('.skill-row');
+        if (skillRows.length > 1) {
+            button.closest('.skill-row').remove();
+        } else {
+            // Don't allow removing the last skill row, just clear it
+            const inputs = button.closest('.skill-row').querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.tagName === 'INPUT') {
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 1; // Set to Intermediate
+                }
+            });
+        }
+    };
+});
 </script>
