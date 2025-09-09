@@ -441,36 +441,54 @@ private function handleStep1($data, &$error, &$success)
         }
     }
 
-    private function handleStep3($data, &$error, &$success)
-    {
-        // Education - Step 3
-        // Get jobseeker_id
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $jobseeker_id = $jobseeker['jobseeker_id'];
+private function handleStep3($data, &$error, &$success)
+{
+    // Education - Step 3
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+    $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Check if education data already exists
-        $existingEducation = $this->jobseekerModel->getEducation($_SESSION['user_id']);
+    // Check if education data already exists
+    $existingEducation = $this->jobseekerModel->getEducation($_SESSION['user_id']);
 
-        // Educational Background
-        $eduData = [
-            'school_name' => $data['school_name'] ?? 'N/A',
-            'education_level' => $data['education_level'] ?? 'N/A',
-            'field_of_study' => $data['field_of_study'] ?? 'N/A',
-            'start_date' => $data['start_year'] ? $data['start_year'] . '-01-01' : null,
-            'end_date' => $data['end_year'] ? $data['end_year'] . '-12-31' : null
-        ];
+    // Prepare education data with parsed data if available
+    $eduData = [
+        'school_name' => $data['school_name'] ?? '',
+        'education_level' => $data['education_level'] ?? '',
+        'field_of_study' => $data['field_of_study'] ?? '',
+        'start_date' => null,
+        'end_date' => null
+    ];
 
-        if (!empty($existingEducation)) {
-            // Update existing education record
-            $this->jobseekerModel->updateEducation($jobseeker_id, $eduData, $existingEducation[0]['education_id']);
-        } else {
-            // Create new education record
-            $this->jobseekerModel->saveEducation($jobseeker_id, $eduData);
-        }
-
-        header('Location: ?page=complete-jobseeker-profile&step=4');
-        exit;
+    // Handle date conversion
+    if (!empty($data['start_year'])) {
+        $eduData['start_date'] = $data['start_year'] . '-01-01';
     }
+    if (!empty($data['end_year'])) {
+        $eduData['end_date'] = $data['end_year'] . '-12-31';
+    }
+
+    // If no form data but we have parsed data in session, use it
+    if (empty($eduData['school_name']) && isset($_SESSION['parsed_resume_data']['education'])) {
+        $parsedEdu = $_SESSION['parsed_resume_data']['education'];
+        $eduData = [
+            'school_name' => $parsedEdu['school_name'] ?? '',
+            'education_level' => $parsedEdu['education_level'] ?? '',
+            'field_of_study' => $parsedEdu['field_of_study'] ?? '',
+            'start_date' => $parsedEdu['start_date'] ?? null,
+            'end_date' => $parsedEdu['end_date'] ?? null
+        ];
+    }
+
+    // Save or update education
+    if (!empty($existingEducation)) {
+        $this->jobseekerModel->updateEducation($jobseeker_id, $eduData, $existingEducation[0]['education_id']);
+    } else {
+        $this->jobseekerModel->saveEducation($jobseeker_id, $eduData);
+    }
+
+    header('Location: ?page=complete-jobseeker-profile&step=4');
+    exit;
+}
 
     private function handleStep4($data, &$error, &$success)
     {
@@ -554,38 +572,39 @@ private function handleStep1($data, &$error, &$success)
         }
     }
 
-    private function handleStep5($data, &$error, &$success)
-    {
-        // Skills - Step 5
-        // Get jobseeker_id
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        $jobseeker_id = $jobseeker['jobseeker_id'];
+// Fix the handleStep5 method
 
-        // Delete existing skills before adding new ones
-        $this->jobseekerModel->deleteSkills($jobseeker_id);
+private function handleStep5($data, &$error, &$success)
+{
+    // Skills - Step 5
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+    $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Skills & Expertise
-        if (isset($data['skills']) && is_array($data['skills'])) {
-            foreach ($data['skills'] as $index => $skill) {
-                if (!empty($skill)) {
-                    $skillData = [
-                        'skill_name' => $skill,
-                        'proficiency_level' => $data['proficiency'][$index] ?? 'Beginner'
-                    ];
-                    $this->jobseekerModel->saveSkill($jobseeker_id, $skillData);
-                }
+    // Delete existing skills before adding new ones
+    $this->jobseekerModel->deleteSkills($jobseeker_id);
+
+    // Handle multiple skills (updated to match new format)
+    if (isset($data['skills']) && is_array($data['skills'])) {
+        foreach ($data['skills'] as $skillData) {
+            // Only save if skill name is provided
+            if (!empty($skillData['skill_name'])) {
+                $skill = [
+                    'skill_name' => $skillData['skill_name'],
+                    'proficiency_level' => $skillData['proficiency_level'] ?? 'Intermediate',
+                    'esco_uri' => $skillData['esco_uri'] ?? null
+                ];
+                $this->jobseekerModel->saveSkill($jobseeker_id, $skill);
             }
-        } else {
-            // Save N/A skill if no skills provided
-            $this->jobseekerModel->saveSkill($jobseeker_id, [
-                'skill_name' => 'N/A',
-                'proficiency_level' => 'Beginner'
-            ]);
         }
-
-        header('Location: ?page=complete-jobseeker-profile&step=6');
-        exit;
     }
+
+    // Clear parsed data from session since we've processed it
+    unset($_SESSION['parsed_resume_data']);
+    unset($_SESSION['show_parsing_results']);
+
+    header('Location: ?page=complete-jobseeker-profile&step=6');
+    exit;
+}
 
 private function handleStep6($data, &$error, &$success)
 {

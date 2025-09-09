@@ -193,25 +193,26 @@ class Jobseeker
         ]);
     }
 
-    public function updateEducation($jobseeker_id, $data, $education_id)
+    public function updateEducation($jobseeker_id, $eduData, $education_id)
     {
         try {
             $stmt = $this->db->prepare("
                 UPDATE jobseeker_education 
-                SET school_name = ?, education_level = ?, field_of_study = ?, start_date = ?, end_date = ?, updated_at = NOW()
+                SET school_name = ?, education_level = ?, field_of_study = ?, start_date = ?, end_date = ?
                 WHERE education_id = ? AND jobseeker_id = ?
             ");
+
             return $stmt->execute([
-                $data['school_name'],
-                $data['education_level'],
-                $data['field_of_study'],
-                $data['start_date'],
-                $data['end_date'],
+                $eduData['school_name'],
+                $eduData['education_level'],
+                $eduData['field_of_study'],
+                $eduData['start_date'],
+                $eduData['end_date'],
                 $education_id,
                 $jobseeker_id
             ]);
         } catch (PDOException $e) {
-            error_log('Error updating education: ' . $e->getMessage());
+            error_log("Error updating education: " . $e->getMessage());
             return false;
         }
     }
@@ -331,27 +332,11 @@ class Jobseeker
         }
     }
 
-    public function deleteDocumentByType($jobseeker_id, $file_type)
+    public function deleteDocumentByType($jobseeker_id, $type)
     {
         try {
-            // First get the file path to delete physical file
-            $stmt = $this->db->prepare("SELECT file_path FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
-            $stmt->execute([$jobseeker_id, $file_type]);
-            $document = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($document) {
-                // Delete physical file
-                $fullPath = __DIR__ . '/../../' . $document['file_path'];
-                if (file_exists($fullPath)) {
-                    unlink($fullPath);
-                }
-
-                // Delete database record
-                $stmt = $this->db->prepare("DELETE FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
-                return $stmt->execute([$jobseeker_id, $file_type]);
-            }
-
-            return true;
+            $stmt = $this->db->prepare("DELETE FROM jobseeker_documents WHERE jobseeker_id = ? AND file_type = ?");
+            return $stmt->execute([$jobseeker_id, $type]);
         } catch (PDOException $e) {
             error_log("Error deleting document: " . $e->getMessage());
             return false;
