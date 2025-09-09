@@ -92,13 +92,20 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             <span><i class="mr-1 fas fa-clock"></i><?php echo ucwords(str_replace('-', ' ', $fullJobData['job_type'] ?? '')); ?></span>
                             <span><i class="mr-1 fas fa-laptop"></i><?php echo ucfirst($fullJobData['workplace_option'] ?? 'onsite'); ?></span>
                         </div>
-                        <?php if (($fullJobData['show_pay'] ?? '1') == '1' && !empty($fullJobData['pay_range'])): ?>
-                            <div class="mb-2 text-lg font-semibold text-primary">
-                                <?php echo htmlspecialchars($fullJobData['pay_range']); ?>
-                                <?php if (!empty($fullJobData['pay_type'])): ?>
-                                    <span class="text-sm text-gray-500">/ <?php echo htmlspecialchars($fullJobData['pay_type']); ?></span>
-                                <?php endif; ?>
-                            </div>
+                        <?php if (!empty($fullJobData['pay_range']) || !empty($fullJobData['pay_type'])): ?>
+                            <?php if (($fullJobData['show_pay'] ?? '1') == '1'): ?>
+                                <div class="mb-2 text-lg font-semibold text-primary">
+                                    <?php echo htmlspecialchars($fullJobData['pay_range']); ?>
+                                    <?php if (!empty($fullJobData['pay_type'])): ?>
+                                        <span class="text-sm text-gray-500">/ <?php echo htmlspecialchars($fullJobData['pay_type']); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="mb-2 text-lg font-semibold text-gray-500">
+                                    Competitive Salary
+                                    <span class="text-xs text-gray-400">(Pay details hidden)</span>
+                                </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                         <div class="flex items-center space-x-4 text-sm">
                             <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -201,6 +208,12 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             <?php if (!empty($fullJobData['max_applicants'])): ?>
                                 <li><i class="mr-2 text-blue-500 fas fa-users"></i>Limited to <?php echo $fullJobData['max_applicants']; ?> applicants</li>
                             <?php endif; ?>
+
+                            <!-- Pay Visibility Status -->
+                            <li>
+                                <i class="mr-2 <?php echo (($fullJobData['show_pay'] ?? '1') == '1') ? 'text-green-500 fas fa-eye' : 'text-gray-400 fas fa-eye-slash'; ?>"></i>
+                                Salary information: <?php echo (($fullJobData['show_pay'] ?? '1') == '1') ? 'Visible to applicants' : 'Hidden from applicants'; ?>
+                            </li>
                         </ul>
                     </div>
                 </div>

@@ -142,6 +142,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     value="<?php echo htmlspecialchars($jobData['pay_range'] ?? $_POST['pay_range'] ?? ''); ?>"
                     placeholder="e.g., 20,000 - 40,000"
                     class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                <p class="mt-1 text-xs text-gray-400">You can choose to show or hide this in the application settings later</p>
             </div>
 
             <!-- Full Description -->

@@ -178,7 +178,7 @@ class JobPostController
                 'pay_type' => !empty($data['pay_type']) ? $data['pay_type'] : null,
                 'pay_range' => !empty($data['pay_range']) ? trim($data['pay_range']) : null,
                 'salary' => !empty($data['salary']) ? floatval($data['salary']) : null,
-                'show_pay' => isset($data['show_pay']) ? 1 : 0,
+                'show_pay' => 1, // Default to show, will be controlled in step 4
                 'job_summary' => trim($data['job_summary']),
                 'full_description' => !empty($data['full_description']) ? trim($data['full_description']) : null,
                 'application_start' => !empty($data['application_start']) ? $data['application_start'] : null,
@@ -333,9 +333,14 @@ class JobPostController
                 'is_highlighted' => isset($data['is_highlighted']) ? 1 : 0
             ];
 
+            // Handle show_pay setting by updating the job post directly
+            $showPay = isset($data['show_pay']) ? 1 : 0;
+            $jobUpdateResult = $this->jobPostModel->updateJobPost($job_id, ['show_pay' => $showPay]);
+
+            // Save application settings
             $result = $this->jobPostModel->saveApplicationSettings($job_id, $settings);
 
-            if ($result) {
+            if ($result && $jobUpdateResult) {
                 header("Location: ?page=post-job&step=5&job_id=$job_id&success=" . urlencode('Application settings saved!'));
             } else {
                 header("Location: ?page=post-job&step=4&job_id=$job_id&error=" . urlencode('Failed to save application settings.'));

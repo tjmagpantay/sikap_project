@@ -1019,4 +1019,35 @@ class JobPost
             return [];
         }
     }
+
+    public function getApplicationSettings($job_id)
+    {
+        try {
+            $sql = "SELECT jp.show_pay, jas.* 
+                    FROM job_post jp
+                    LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
+                    WHERE jp.job_id = :job_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['job_id' => $job_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // If no settings exist, return defaults
+            if (!$result) {
+                return [
+                    'show_pay' => 1,
+                    'resume_required' => 1,
+                    'allow_cover_letter' => 1,
+                    'screening_questions_enabled' => 0,
+                    'max_applicants' => null,
+                    'notify_on_new_application' => 1,
+                    'is_highlighted' => 0
+                ];
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error getting application settings: ' . $e->getMessage());
+            return [];
+        }
+    }
 }
