@@ -128,11 +128,7 @@ include_once __DIR__ . '/../components/navbar.php';
                                     onclick="showTab('vision')" id="tab-vision">
                                     Our Vision
                                 </button>
-                                <button type="button"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-primary hover:text-white tabs-link"
-                                    onclick="showTab('values')" id="tab-values">
-                                    Our Values
-                                </button>
+                                
                             </nav>
 
                             <!-- Tab Content (only this part changes) -->
@@ -147,40 +143,7 @@ include_once __DIR__ . '/../components/navbar.php';
                                         Identification and development of strong workforce led by pro-active and integrity driven leaders that provides suitable job opportunities and updated labor market information.
                                     </p>
                                 </div>
-                                <div class="hidden tabs-content" id="content-values">
-                                    <div class="space-y-4">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 mt-1 rounded-full bg-secondary"></div>
-                                            <div>
-                                                <h4 class="font-semibold text-primary">Excellence</h4>
-                                                <p class="text-sm text-gray-600">We strive for exceptional quality in every service we provide</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 mt-1 rounded-full bg-secondary"></div>
-                                            <div>
-                                                <h4 class="font-semibold text-primary">Innovation</h4>
-                                                <p class="text-sm text-gray-600">Continuously improving through technology and creative solutions</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 mt-1 rounded-full bg-secondary"></div>
-                                            <div>
-                                                <h4 class="font-semibold text-primary">Integrity</h4>
-                                                <p class="text-sm text-gray-600">Building trust through transparency and ethical practices</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 mt-1 rounded-full bg-secondary"></div>
-                                            <div>
-                                                <h4 class="font-semibold text-primary">Community</h4>
-                                                <p class="text-sm text-gray-600">Supporting local economic growth and development</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                            <!-- End Tab Content -->
                         </div>
                     </div>
 

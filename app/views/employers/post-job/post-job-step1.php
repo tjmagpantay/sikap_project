@@ -40,6 +40,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         <form class="mt-10 space-y-6 font-inter" method="POST" action="?page=post-job&step=1<?php echo $job_id ? '&job_id=' . $job_id : ''; ?>">
             <!-- Hidden field to ensure step progression -->
             <input type="hidden" name="continue_to_step2" value="1">
+
             <div>
                 <label for="job_title" class="block mb-1 text-sm font-medium text-primary">Job Title</label>
                 <input
@@ -52,6 +53,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     placeholder="e.g., Senior Web Developer"
                     class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary placeholder:text-xs">
             </div>
+
             <div>
                 <label for="job_category_id" class="block mb-1 text-sm font-medium text-primary">Job Category </label>
                 <select id="job_category_id" name="job_category_id" required
@@ -65,6 +67,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     <?php endforeach; ?>
                 </select>
             </div>
+
             <div>
                 <label for="job_type" class="block mb-1 text-sm font-medium text-primary">Job Type </span></label>
                 <select id="job_type" name="job_type" required
@@ -77,6 +80,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     <option value="freelance" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'freelance') ? 'selected' : ''; ?>>Freelance</option>
                 </select>
             </div>
+
             <div>
                 <label for="location" class="block mb-1 text-sm font-medium text-primary">Location </label>
                 <input id="location" name="location" type="text" required
@@ -84,6 +88,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     placeholder="e.g., Manila, Philippines"
                     class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
             </div>
+
             <div>
                 <label class="block mb-1 text-sm font-medium text-primary">Workplace Option</label>
                 <div class="flex mt-1 space-x-4">
@@ -107,6 +112,30 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     </label>
                 </div>
             </div>
+
+            <!-- Age Requirements -->
+            <div>
+                <label class="block mb-3 text-sm font-medium text-primary">Age Requirements</label>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="min_age" class="block mb-1 text-xs font-medium text-gray-600">Minimum Age</label>
+                        <input id="min_age" name="min_age" type="number" min="16" max="65"
+                            value="<?php echo htmlspecialchars($jobData['min_age'] ?? $_POST['min_age'] ?? ''); ?>"
+                            placeholder="18"
+                            class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label for="max_age" class="block mb-1 text-xs font-medium text-gray-600">Maximum Age</label>
+                        <input id="max_age" name="max_age" type="number" min="16" max="65"
+                            value="<?php echo htmlspecialchars($jobData['max_age'] ?? $_POST['max_age'] ?? ''); ?>"
+                            placeholder="60"
+                            class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+                <p class="mt-1 text-xs text-gray-400">Leave empty if no age restrictions apply. Age range should be between 16-65 years.</p>
+                <div id="age-error" class="hidden mt-1 text-xs text-red-600"></div>
+            </div>
+
             <div>
                 <label for="skills" class="block mb-1 text-sm font-medium text-primary">Required Skills</label>
                 <input id="skills" name="skills" type="text"
@@ -115,6 +144,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                 <p class="mt-1 text-xs text-gray-400">Separate skills with commas</p>
             </div>
+
             <div>
                 <label for="job_summary" class="block mb-1 text-sm font-medium text-primary">Job Summary </span></label>
                 <textarea id="job_summary" name="job_summary" rows="3" required
@@ -175,7 +205,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     <i class="mr-2 fas fa-arrow-left"></i>
                     Back to Dashboard
                 </a>
-                <button type="submit"
+                <button type="submit" id="submit-btn"
                     class="flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-primary hover:bg-primary">
                     Continue to Attachments
                     <i class="ml-2 fas fa-arrow-right"></i>
@@ -184,3 +214,71 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const minAgeInput = document.getElementById('min_age');
+        const maxAgeInput = document.getElementById('max_age');
+        const ageError = document.getElementById('age-error');
+        const submitBtn = document.getElementById('submit-btn');
+
+        function validateAgeRange() {
+            const minAge = parseInt(minAgeInput.value);
+            const maxAge = parseInt(maxAgeInput.value);
+
+            // Clear previous errors
+            ageError.classList.add('hidden');
+            ageError.textContent = '';
+
+            // Reset input styles
+            minAgeInput.classList.remove('border-red-500');
+            maxAgeInput.classList.remove('border-red-500');
+
+            let isValid = true;
+            let errorMessage = '';
+
+            // Validate individual ages
+            if (minAgeInput.value && (minAge < 16 || minAge > 65)) {
+                errorMessage = 'Minimum age must be between 16 and 65 years.';
+                minAgeInput.classList.add('border-red-500');
+                isValid = false;
+            }
+
+            if (maxAgeInput.value && (maxAge < 16 || maxAge > 65)) {
+                errorMessage = 'Maximum age must be between 16 and 65 years.';
+                maxAgeInput.classList.add('border-red-500');
+                isValid = false;
+            }
+
+            // Validate age range
+            if (minAgeInput.value && maxAgeInput.value && minAge >= maxAge) {
+                errorMessage = 'Maximum age must be greater than minimum age.';
+                minAgeInput.classList.add('border-red-500');
+                maxAgeInput.classList.add('border-red-500');
+                isValid = false;
+            }
+
+            // Show error if validation failed
+            if (!isValid) {
+                ageError.textContent = errorMessage;
+                ageError.classList.remove('hidden');
+            }
+
+            return isValid;
+        }
+
+        // Add event listeners for real-time validation
+        minAgeInput.addEventListener('input', validateAgeRange);
+        maxAgeInput.addEventListener('input', validateAgeRange);
+        minAgeInput.addEventListener('blur', validateAgeRange);
+        maxAgeInput.addEventListener('blur', validateAgeRange);
+
+        // Validate on form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validateAgeRange()) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>

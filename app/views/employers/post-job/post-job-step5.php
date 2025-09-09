@@ -160,12 +160,29 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         <div class="text-gray-600 whitespace-pre-line"><?php echo htmlspecialchars($fullJobData['full_description']); ?></div>
                     </div>
                 <?php endif; ?>
+
+                <!-- Age Requirements -->
+                <?php if (!empty($fullJobData['min_age']) || !empty($fullJobData['max_age'])): ?>
+                    <div class="mb-4">
+                        <h4 class="mb-2 font-medium text-gray-800">Age Requirements</h4>
+                        <p class="text-gray-600">
+                            <?php if (!empty($fullJobData['min_age']) && !empty($fullJobData['max_age'])): ?>
+                                Between <?php echo $fullJobData['min_age']; ?> and <?php echo $fullJobData['max_age']; ?> years old
+                            <?php elseif (!empty($fullJobData['min_age'])): ?>
+                                Minimum <?php echo $fullJobData['min_age']; ?> years old
+                            <?php elseif (!empty($fullJobData['max_age'])): ?>
+                                Maximum <?php echo $fullJobData['max_age']; ?> years old
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endif; ?>
+
                 <?php if (!empty($fullJobData['skills'])): ?>
                     <div>
                         <h4 class="mb-2 font-medium text-gray-800">Required Skills</h4>
                         <div class="flex flex-wrap gap-2">
                             <?php foreach ($fullJobData['skills'] as $skill): ?>
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full">
+                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-md">
                                     <?php echo htmlspecialchars($skill); ?>
                                 </span>
                             <?php endforeach; ?>

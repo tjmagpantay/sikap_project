@@ -165,6 +165,25 @@ class JobPostController
                 }
             }
 
+            // Validate age requirements if provided
+            $minAge = !empty($data['min_age']) ? (int)$data['min_age'] : null;
+            $maxAge = !empty($data['max_age']) ? (int)$data['max_age'] : null;
+
+            if ($minAge !== null && ($minAge < 16 || $minAge > 65)) {
+                header("Location: ?page=post-job&step=1&error=" . urlencode("Minimum age must be between 16 and 65 years."));
+                exit;
+            }
+
+            if ($maxAge !== null && ($maxAge < 16 || $maxAge > 65)) {
+                header("Location: ?page=post-job&step=1&error=" . urlencode("Maximum age must be between 16 and 65 years."));
+                exit;
+            }
+
+            if ($minAge !== null && $maxAge !== null && $minAge >= $maxAge) {
+                header("Location: ?page=post-job&step=1&error=" . urlencode("Maximum age must be greater than minimum age."));
+                exit;
+            }
+
             // Prepare job data
             $jobData = [
                 'employer_id' => $employer['employer_id'],
@@ -182,7 +201,9 @@ class JobPostController
                 'job_summary' => trim($data['job_summary']),
                 'full_description' => !empty($data['full_description']) ? trim($data['full_description']) : null,
                 'application_start' => !empty($data['application_start']) ? $data['application_start'] : null,
-                'application_deadline' => !empty($data['application_deadline']) ? $data['application_deadline'] : null
+                'application_deadline' => !empty($data['application_deadline']) ? $data['application_deadline'] : null,
+                'min_age' => $minAge,
+                'max_age' => $maxAge
             ];
 
             if ($job_id) {

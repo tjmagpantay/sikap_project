@@ -82,6 +82,13 @@ class JobApplicationController
             exit;
         }
 
+        // Check age eligibility
+        $ageCheck = $this->checkAgeEligibility($job, $jobseeker);
+        if (!$ageCheck['eligible']) {
+            header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode($ageCheck['message']));
+            exit;
+        }
+
         // Check if already applied (and application is finalized)
         $existingApplication = $this->jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
         if ($existingApplication && $existingApplication['is_finalized']) {
@@ -1030,5 +1037,42 @@ class JobApplicationController
             error_log("Error saving/updating profile document: " . $e->getMessage());
             return false;
         }
+    }
+
+    // Add this method to check age eligibility:
+
+    private function checkAgeEligibility($job, $jobseeker)
+    {
+        // Skip if no age requirements
+        if (empty($job['min_age']) && empty($job['max_age'])) {
+            return ['eligible' => true, 'message' => ''];
+        }
+
+        // Get jobseeker's age from date_of_birth
+        if (empty($jobseeker['date_of_birth'])) {
+            return ['eligible' => true, 'message' => 'Age verification not required - no birth date on file'];
+        }
+
+        $birthdate = new DateTime($jobseeker['date_of_birth']);
+        $today = new DateTime();
+        $age = $today->diff($birthdate)->y;
+
+        $ageRequirement = '';
+        if (!empty($job['min_age']) && !empty($job['max_age'])) {
+            $ageRequirement = "between {$job['min_age']} and {$job['max_age']} years old";
+            $eligible = $age >= $job['min_age'] && $age <= $job['max_age'];
+        } elseif (!empty($job['min_age'])) {
+            $ageRequirement = "at least {$job['min_age']} years old";
+            $eligible = $age >= $job['min_age'];
+        } elseif (!empty($job['max_age'])) {
+            $ageRequirement = "no more than {$job['max_age']} years old";
+            $eligible = $age <= $job['max_age'];
+        }
+
+        $message = $eligible
+            ? "You meet the age requirement ($ageRequirement)"
+            : "This position requires applicants to be $ageRequirement. Your current age is $age.";
+
+        return ['eligible' => $eligible, 'message' => $message, 'age' => $age];
     }
 }

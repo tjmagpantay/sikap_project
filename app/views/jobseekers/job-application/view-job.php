@@ -149,6 +149,27 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <div class="text-xs text-gray-400">Workplace</div>
                                         <div class="text-sm text-primary"><?php echo ucfirst($job['workplace_option'] ?? 'Onsite'); ?></div>
                                     </div>
+
+                                    <!-- Age Requirements -->
+                                    <?php if (!empty($job['min_age']) || !empty($job['max_age'])): ?>
+                                        <div>
+                                            <div class="text-xs text-gray-400">Age Requirement</div>
+                                            <div class="text-sm text-primary">
+                                                <?php
+                                                if (!empty($job['min_age']) && !empty($job['max_age'])) {
+                                                    echo $job['min_age'] . ' - ' . $job['max_age'] . ' years old';
+                                                } elseif (!empty($job['min_age'])) {
+                                                    echo 'Minimum ' . $job['min_age'] . ' years old';
+                                                } elseif (!empty($job['max_age'])) {
+                                                    echo 'Maximum ' . $job['max_age'] . ' years old';
+                                                } else {
+                                                    echo 'No age restriction';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
                                     <?php if ($job['show_pay'] && (!empty($job['salary']) || !empty($job['pay_range']))): ?>
                                         <div>
                                             <div class="text-xs text-gray-400">Salary Range</div>

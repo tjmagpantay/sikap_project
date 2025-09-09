@@ -5,7 +5,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
 <div class="min-h-screen bg-gray-50">
-    <div class="mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl py-8">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Header with breadcrumbs -->
         <div class="mb-8">
             <!-- Breadcrumb Navigation -->
@@ -192,6 +192,25 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <div class="text-xs text-gray-400">Workplace</div>
                                     <div class="text-sm text-primary"><?php echo ucfirst($job['workplace_option']); ?></div>
                                 </div>
+
+                                <!-- Age Requirements -->
+                                <?php if (!empty($job['min_age']) || !empty($job['max_age'])): ?>
+                                    <div>
+                                        <div class="text-xs text-gray-400">Age Requirement</div>
+                                        <div class="text-sm text-primary">
+                                            <?php
+                                            if (!empty($job['min_age']) && !empty($job['max_age'])) {
+                                                echo $job['min_age'] . ' - ' . $job['max_age'] . ' years old';
+                                            } elseif (!empty($job['min_age'])) {
+                                                echo 'Minimum ' . $job['min_age'] . ' years old';
+                                            } elseif (!empty($job['max_age'])) {
+                                                echo 'Maximum ' . $job['max_age'] . ' years old';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
                                 <?php if ($job['show_pay'] && ($job['salary'] || $job['pay_range'])): ?>
                                     <div>
                                         <div class="text-xs text-gray-400">Salary Range</div>

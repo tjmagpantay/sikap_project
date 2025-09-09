@@ -39,11 +39,13 @@ class JobPost
             $sql = "INSERT INTO job_post (
                 employer_id, posted_by_role, job_title, job_category_id, job_status, 
                 job_type, salary, location, workplace_option, pay_type, pay_range, 
-                show_pay, job_summary, full_description, application_start, application_deadline
+                show_pay, job_summary, full_description, application_start, application_deadline,
+                min_age, max_age
             ) VALUES (
                 :employer_id, :posted_by_role, :job_title, :job_category_id, :job_status,
                 :job_type, :salary, :location, :workplace_option, :pay_type, :pay_range,
-                :show_pay, :job_summary, :full_description, :application_start, :application_deadline
+                :show_pay, :job_summary, :full_description, :application_start, :application_deadline,
+                :min_age, :max_age
             )";
 
             $stmt = $this->db->prepare($sql);
@@ -76,7 +78,9 @@ class JobPost
                 'job_summary',
                 'full_description',
                 'application_start',
-                'application_deadline'
+                'application_deadline',
+                'min_age',
+                'max_age'
             ];
 
             foreach ($data as $field => $value) {
@@ -252,6 +256,10 @@ class JobPost
                 $result['notify_on_new_application'] = (int)($result['notify_on_new_application'] ?? 0);
                 $result['is_highlighted'] = (int)($result['is_highlighted'] ?? 0);
 
+                // Ensure age fields are properly typed
+                $result['min_age'] = !empty($result['min_age']) ? (int)$result['min_age'] : null;
+                $result['max_age'] = !empty($result['max_age']) ? (int)$result['max_age'] : null;
+
                 // Set display name priority: business_name > company_name > first_name + last_name
                 if (!empty($result['business_name'])) {
                     $result['display_company_name'] = $result['business_name'];
@@ -265,6 +273,7 @@ class JobPost
                 $result['display_logo'] = $result['business_logo'] ?? $result['profile_picture'] ?? null;
 
                 error_log("DEBUG getFullJobData: job_id=$job_id, screening_questions_enabled=" . $result['screening_questions_enabled']);
+                error_log("DEBUG getFullJobData: min_age=" . ($result['min_age'] ?? 'null') . ", max_age=" . ($result['max_age'] ?? 'null'));
             }
 
             return $result;

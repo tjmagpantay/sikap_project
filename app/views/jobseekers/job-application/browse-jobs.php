@@ -344,6 +344,24 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 <?php echo htmlspecialchars(substr($currentJob['job_summary'], 0, 150)) . (strlen($currentJob['job_summary']) > 150 ? '...' : ''); ?>
                             </p>
 
+                            <!-- Age Requirements (if any) -->
+                            <?php if (!empty($currentJob['min_age']) || !empty($currentJob['max_age'])): ?>
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <i class="mr-1 fas fa-users"></i>
+                                    <span>
+                                        <?php
+                                        if (!empty($currentJob['min_age']) && !empty($currentJob['max_age'])) {
+                                            echo 'Ages ' . $currentJob['min_age'] . '-' . $currentJob['max_age'];
+                                        } elseif (!empty($currentJob['min_age'])) {
+                                            echo 'Min age ' . $currentJob['min_age'];
+                                        } elseif (!empty($currentJob['max_age'])) {
+                                            echo 'Max age ' . $currentJob['max_age'];
+                                        }
+                                        ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
                             <!-- Footer: Posted Date and Match Percentage -->
                             <div class="flex items-center justify-between pt-4 mt-2">
                                 <span class="text-xs text-gray-500">
