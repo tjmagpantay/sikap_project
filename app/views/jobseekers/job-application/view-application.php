@@ -113,7 +113,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     <p class="text-xs text-gray-500">Uploaded <?php echo date('M j, Y', strtotime($cvAttachment['uploaded_at'])); ?></p>
                                                 </div>
                                             </div>
-<a href="../<?php echo htmlspecialchars($cvAttachment['file_path']); ?>" target="_blank"
+                                            <a href="../<?php echo htmlspecialchars($cvAttachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -320,6 +320,9 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                         case 'hired':
                                                             echo 'Congratulations!';
                                                             break;
+                                                        case 'resigned':
+                                                            echo 'Employee has resigned from the position';
+                                                            break;
                                                         default:
                                                             echo 'Status unknown';
                                                     }
@@ -332,21 +335,110 @@ $currentStatus = $application['application_status'] ?? 'pending';
                             <?php endif; ?>
 
                             <!-- Action Buttons -->
-                            <div class="flex gap-3">
+                            <div class="flex flex-col gap-3">
                                 <?php if (!$application['is_finalized']): ?>
                                     <a href="?page=apply-job&job_id=<?php echo $application['job_id']; ?>&application_id=<?php echo $application['application_id']; ?>&step=<?php echo $application['current_step']; ?>"
-                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 12h12" />
+                                        </svg>
                                         Continue Application
                                     </a>
                                 <?php endif; ?>
-                                <?php if ($application['application_status'] === 'pending'): ?>
+
+                                <?php if ($resignationRequest && $resignationRequest['request_status'] === 'pending'): ?>
+                                    <!-- Pending Resignation Request -->
+                                    <div class="p-4 border border-orange-200 rounded-lg bg-orange-50">
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-medium text-orange-800">Resignation Request Pending</p>
+                                                <p class="text-xs text-orange-600">Waiting for employer approval</p>
+                                                <p class="mt-1 text-xs text-orange-500">
+                                                    Submitted: <?php echo date('M j, Y g:i A', strtotime($resignationRequest['requested_at'])); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php elseif ($resignationRequest && $resignationRequest['request_status'] === 'approved'): ?>
+                                    <!-- Approved Resignation Request -->
+                                    <div class="p-4 border border-green-200 rounded-lg bg-green-50">
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-medium text-green-800">Resignation Approved</p>
+                                                <p class="text-xs text-green-600">Your resignation has been approved by the employer</p>
+                                                <p class="mt-1 text-xs text-green-500">
+                                                    Approved: <?php echo date('M j, Y g:i A', strtotime($resignationRequest['reviewed_at'])); ?>
+                                                </p>
+                                                <?php if (!empty($resignationRequest['employer_notes'])): ?>
+                                                    <p class="mt-1 text-xs text-green-600">
+                                                        <strong>Notes:</strong> <?php echo htmlspecialchars($resignationRequest['employer_notes']); ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php elseif ($resignationRequest && $resignationRequest['request_status'] === 'rejected'): ?>
+                                    <!-- Rejected Resignation Request -->
+                                    <div class="p-4 border border-red-200 rounded-lg bg-red-50">
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-medium text-red-800">Resignation Request Rejected</p>
+                                                <p class="text-xs text-red-600">Your resignation request was not approved</p>
+                                                <p class="mt-1 text-xs text-red-500">
+                                                    Rejected: <?php echo date('M j, Y g:i A', strtotime($resignationRequest['reviewed_at'])); ?>
+                                                </p>
+                                                <?php if (!empty($resignationRequest['employer_notes'])): ?>
+                                                    <p class="mt-1 text-xs text-red-600">
+                                                        <strong>Reason:</strong> <?php echo htmlspecialchars($resignationRequest['employer_notes']); ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Allow resubmission -->
+                                    <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        Submit New Resignation Request
+                                    </a>
+                                <?php elseif ($application['application_status'] === 'hired' && !$resignationRequest): ?>
+                                    <!-- Can submit resignation request -->
+                                    <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        Request Resignation
+                                    </a>
+                                <?php elseif ($application['application_status'] === 'pending'): ?>
                                     <button onclick="withdrawApplication()"
-                                        class="flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 transition-colors border border-red-200 rounded-lg bg-red-50 hover:bg-red-100">
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 transition-colors border border-red-200 rounded-lg bg-red-50 hover:bg-red-100">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                         Withdraw Application
                                     </button>
+                                <?php endif; ?>
+
+                                <?php if ($application['application_status'] === 'resigned'): ?>
+                                    <div class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-orange-700 border border-orange-200 rounded-lg bg-orange-50">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        Employment Ended
+                                    </div>
                                 <?php endif; ?>
                             </div>
 
@@ -417,7 +509,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         <div class="flex items-start">
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 bg-gray-300 border-4 border-white rounded-full shadow-sm">
                                                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                 </svg>
                                             </div>
                                             <div class="flex-1 min-w-0 ml-4">
@@ -508,7 +600,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         <div class="flex items-start">
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full <?php echo $hasInterview ? 'bg-secondary' : (in_array($currentStatus, ['shortlisted']) ? 'bg-yellow-400' : 'bg-gray-300'); ?> border-4 border-white shadow-sm">
                                                 <svg class="w-4 h-4 <?php echo $hasInterview ? 'text-white' : 'text-white'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                 </svg>
                                             </div>
                                             <div class="flex-1 min-w-0 ml-4">
@@ -578,6 +670,68 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                             </div>
                                         </div>
 
+                                        <!-- Step 5: Resignation Process (if applicable) -->
+                                        <?php if (isset($resignationRequest) && $resignationRequest): ?>
+                                            <div class="flex items-start">
+                                                <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-4 border-white shadow-sm 
+                                                    <?php echo $resignationRequest['request_status'] === 'approved' ? 'bg-green-500' : ($resignationRequest['request_status'] === 'rejected' ? 'bg-red-500' : 'bg-orange-500'); ?>">
+                                                    <?php if ($resignationRequest['request_status'] === 'approved'): ?>
+                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    <?php elseif ($resignationRequest['request_status'] === 'rejected'): ?>
+                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    <?php else: ?>
+                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="flex-1 min-w-0 ml-4">
+                                                    <div class="flex items-center justify-between gap-3">
+                                                        <p class="text-sm font-medium text-gray-900">
+                                                            Resignation Request
+                                                            <?php echo ucfirst($resignationRequest['request_status']); ?>
+                                                        </p>
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
+                                                            <?php echo $resignationRequest['request_status'] === 'approved' ? 'bg-green-100 text-green-700' : ($resignationRequest['request_status'] === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'); ?>">
+                                                            <?php
+                                                            if ($resignationRequest['request_status'] === 'pending') {
+                                                                echo date('M j, Y g:i A', strtotime($resignationRequest['requested_at']));
+                                                            } else {
+                                                                echo date('M j, Y g:i A', strtotime($resignationRequest['reviewed_at']));
+                                                            }
+                                                            ?>
+                                                        </span>
+                                                    </div>
+                                                    <p class="mt-1 text-xs text-gray-500">
+                                                        <?php
+                                                        if ($resignationRequest['request_status'] === 'pending') {
+                                                            echo 'Resignation request submitted and awaiting employer approval.';
+                                                        } elseif ($resignationRequest['request_status'] === 'approved') {
+                                                            echo 'Resignation request approved. Employment status updated to resigned.';
+                                                        } else {
+                                                            echo 'Resignation request was rejected. You may submit a new request.';
+                                                        }
+                                                        ?>
+                                                    </p>
+
+                                                    <?php if (!empty($resignationRequest['resignation_reason'])): ?>
+                                                        <div class="p-2 mt-2 text-xs text-gray-600 bg-gray-100 rounded">
+                                                            <strong>Your reason:</strong> <?php echo nl2br(htmlspecialchars($resignationRequest['resignation_reason'])); ?>
+                                                        </div>
+                                                    <?php endif; ?>
+
+                                                    <?php if (!empty($resignationRequest['employer_notes']) && $resignationRequest['request_status'] !== 'pending'): ?>
+                                                        <div class="p-2 mt-2 text-xs text-gray-600 bg-gray-100 rounded">
+                                                            <strong>Employer response:</strong> <?php echo nl2br(htmlspecialchars($resignationRequest['employer_notes'])); ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
                             </div>

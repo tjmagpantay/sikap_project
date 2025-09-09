@@ -63,6 +63,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                         class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                         Rejected
                                     </button>
+                                    <button @click="selected = 'Resigned'; open = false; filterByStatus('resigned')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Resigned
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -270,6 +274,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                             </div>';
                                                             echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
                                                             break;
+                                                        case 'resigned':
+                                                            echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-orange-600 rounded-full">
+                                                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                                                </svg>
+                                                            </div>';
+                                                            echo '<span class="text-sm font-medium text-orange-600">Resigned</span>';
+                                                            break;
                                                         default:
                                                             echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
                                                                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,7 +340,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 <!-- View Application Button -->
                                                 <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
                                                     class="inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-
                                                     View
                                                 </a>
 
@@ -367,7 +378,13 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                                 <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
                                                             </button>
 
-                                                            <?php if ($application['application_status'] === 'pending'): ?>
+                                                            <?php if ($application['application_status'] === 'hired'): ?>
+                                                                <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
+                                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                    <i class="mr-3 text-orange-400 fas fa-sign-out-alt"></i>
+                                                                    Resign from Job
+                                                                </a>
+                                                            <?php elseif ($application['application_status'] === 'pending'): ?>
                                                                 <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
                                                                     onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
                                                                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

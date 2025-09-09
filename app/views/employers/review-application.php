@@ -37,7 +37,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         </li>
                     </ol>
                 </nav>
-                
+
             </div>
 
         </div>
@@ -191,58 +191,102 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                     <div class="pt-6">
                         <h4 class="mb-3 text-sm font-semibold text-gray-900">Quick Actions</h4>
+
+                        <?php if ($resignationRequest && $resignationRequest['request_status'] === 'pending'): ?>
+                            <!-- Resignation Request Pending Actions -->
+                            <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
+                                <h5 class="text-sm font-medium text-orange-800">Pending Resignation Request</h5>
+                                <p class="mt-1 text-xs text-orange-600">This employee has requested to resign from their position.</p>
+
+                                <?php if (!empty($resignationRequest['resignation_reason'])): ?>
+                                    <div class="mt-2">
+                                        <p class="text-xs font-medium text-orange-700">Reason:</p>
+                                        <p class="text-xs text-orange-600"><?php echo nl2br(htmlspecialchars($resignationRequest['resignation_reason'])); ?></p>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="flex gap-2 mt-3">
+                                    <form method="POST" action="?page=review-application&action=approveResignation&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                        <textarea name="employer_notes" placeholder="Optional notes..." class="w-full mb-2 text-xs border border-orange-300 rounded"></textarea>
+                                        <button type="submit"
+                                            onclick="return confirm('Are you sure you want to approve this resignation request?')"
+                                            class="px-3 py-2 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700">
+                                            Approve Resignation
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="?page=review-application&action=rejectResignation&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                        <textarea name="employer_notes" placeholder="Reason for rejection..." class="w-full mb-2 text-xs border border-red-300 rounded"></textarea>
+                                        <button type="submit"
+                                            onclick="return confirm('Are you sure you want to reject this resignation request?')"
+                                            class="px-3 py-2 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700">
+                                            Reject Request
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
                             <!-- Accept Application Button -->
-                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
-                                <input type="hidden" name="application_status" value="hired">
-                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Accept
-                                </button>
-                            </form>
+                            <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'resigned'): ?>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                    <input type="hidden" name="status" value="hired">
+                                    <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Accept
+                                    </button>
+                                </form>
+                            <?php endif; ?>
 
                             <!-- Reject Application Button -->
-                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
-                                <input type="hidden" name="application_status" value="rejected">
-                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Reject
-                                </button>
-                            </form>
+                            <?php if ($application['application_status'] !== 'rejected' && $application['application_status'] !== 'resigned'): ?>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Reject
+                                    </button>
+                                </form>
+                            <?php endif; ?>
 
-                            <!-- Reviewed Application Button -->
-                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
-                                <input type="hidden" name="application_status" value="reviewed">
-                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    Reviewed
-                                </button>
-                            </form>
+                            <!-- Mark as Reviewed Button -->
+                            <?php if ($application['application_status'] === 'pending'): ?>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                    <input type="hidden" name="status" value="reviewed">
+                                    <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        Reviewed
+                                    </button>
+                                </form>
+                            <?php endif; ?>
 
-                            <!-- Shortlisted Application Button -->
-                            <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
-                                <input type="hidden" name="application_status" value="shortlisted">
-                                <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
-                                    </svg>
-                                    Shortlisted
-                                </button>
-                            </form>
+                            <!-- Shortlist Button -->
+                            <?php if (in_array($application['application_status'], ['pending', 'reviewed'])): ?>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                    <input type="hidden" name="status" value="shortlisted">
+                                    <button type="submit" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
+                                        </svg>
+                                        Shortlist
+                                    </button>
+                                </form>
+                            <?php endif; ?>
 
                             <!-- Schedule Interview Button -->
                             <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
                                 <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                Schedule
+                                Schedule Interview
                             </button>
                         </div>
                     </div>
@@ -633,8 +677,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4">
                                     <div>
                                         <label class="block mb-2 text-sm font-medium text-gray-700">Status</label>
-                                        <select name="application_status" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs">
-                                            <?php foreach (['pending', 'reviewed', 'shortlisted', 'rejected', 'hired'] as $status): ?>
+                                        <select name="status" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs">
+                                            <?php foreach (['pending', 'reviewed', 'shortlisted', 'rejected', 'hired', 'resigned'] as $status): ?>
                                                 <option value="<?php echo $status; ?>" <?php if ($application['application_status'] == $status) echo 'selected'; ?>>
                                                     <?php echo ucfirst($status); ?>
                                                 </option>

@@ -708,4 +708,44 @@ class JobApplication
             return false;
         }
     }
+
+    public function resignFromJob($application_id, $jobseeker_id = null, $employer_id = null)
+    {
+        try {
+            if ($jobseeker_id) {
+                // Jobseeker resignation
+                $sql = "UPDATE job_application 
+                        SET application_status = 'resigned', reviewed_at = NOW()
+                        WHERE application_id = ? AND jobseeker_id = ? AND application_status = 'hired'";
+                $stmt = $this->db->prepare($sql);
+                return $stmt->execute([$application_id, $jobseeker_id]);
+            } elseif ($employer_id) {
+                // Employer setting resignation
+                $sql = "UPDATE job_application ja
+                        JOIN job_post jp ON ja.job_id = jp.job_id
+                        SET ja.application_status = 'resigned', ja.reviewed_at = NOW()
+                        WHERE ja.application_id = ? AND jp.employer_id = ? AND ja.application_status = 'hired'";
+                $stmt = $this->db->prepare($sql);
+                return $stmt->execute([$application_id, $employer_id]);
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log('Error updating resignation status: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function canResign($application_id, $jobseeker_id)
+    {
+        try {
+            $sql = "SELECT application_status FROM job_application 
+                    WHERE application_id = ? AND jobseeker_id = ? AND application_status = 'hired'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$application_id, $jobseeker_id]);
+            return $stmt->fetch() !== false;
+        } catch (PDOException $e) {
+            error_log('Error checking resignation eligibility: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

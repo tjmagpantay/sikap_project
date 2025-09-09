@@ -574,6 +574,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->withdrawApplication();
             break;
 
+        case 'resign-from-job':
+            require_once __DIR__ . '/../app/controllers/JobApplicationController.php';
+            $controller = new JobApplicationController();
+            $controller->resignFromJob();
+            break;
+
         // Admin Accreditation Routes
         case 'admin-accreditations':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
@@ -714,7 +720,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $jobseekerController->handleDeleteWorkExperience();
             break;
 
-            
+
         case 'delete-skill-simple':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
