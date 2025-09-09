@@ -375,6 +375,20 @@ class Jobseeker
         }
     }
 
+    public function deleteSkillById($jobseeker_id, $skill_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                DELETE FROM jobseeker_skills 
+                WHERE jobseeker_id = ? AND skill_id = ?
+            ");
+            return $stmt->execute([$jobseeker_id, $skill_id]);
+        } catch (PDOException $e) {
+            error_log("Error deleting skill: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function saveCertificate($jobseeker_id, $certData)
     {
         try {
@@ -739,54 +753,89 @@ class Jobseeker
         }
     }
 
-    public function deleteCertificate($jobseeker_id, $certificate_id)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                DELETE FROM jobseeker_certificates 
-                WHERE certificate_id = ? AND jobseeker_id = ?
-            ");
-            return $stmt->execute([$certificate_id, $jobseeker_id]);
-        } catch (PDOException $e) {
-            error_log("Error deleting certificate: " . $e->getMessage());
+public function deleteCertificate($jobseeker_id, $certificate_id)
+{
+    try {
+        error_log("DEBUG: Attempting to delete certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
+        
+        // First check if the certificate exists
+        $checkStmt = $this->db->prepare("
+            SELECT * FROM jobseeker_certificates 
+            WHERE certificate_id = ? AND jobseeker_id = ?
+        ");
+        $checkStmt->execute([$certificate_id, $jobseeker_id]);
+        $certificate = $checkStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$certificate) {
+            error_log("DEBUG: Certificate not found or doesn't belong to jobseeker");
             return false;
         }
+        
+        error_log("DEBUG: Certificate found: " . json_encode($certificate));
+        
+        // Now delete it
+        $deleteStmt = $this->db->prepare("
+            DELETE FROM jobseeker_certificates 
+            WHERE certificate_id = ? AND jobseeker_id = ?
+        ");
+        
+        $result = $deleteStmt->execute([$certificate_id, $jobseeker_id]);
+        $rowsAffected = $deleteStmt->rowCount();
+        
+        error_log("DEBUG: Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        error_log("DEBUG: Rows affected: " . $rowsAffected);
+        
+        return $result && $rowsAffected > 0;
+        
+    } catch (PDOException $e) {
+        error_log("ERROR: Database error in deleteCertificate: " . $e->getMessage());
+        return false;
     }
+}
 
-    public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                UPDATE jobseeker_certificates 
-                SET certificate_title = ?, issuing_organization = ?, date_issued = ?
-                WHERE certificate_id = ? AND jobseeker_id = ?
-            ");
+public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
+{
+    try {
+        error_log("DEBUG: Updating certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
+        
+        $stmt = $this->db->prepare("
+            UPDATE jobseeker_certificates 
+            SET certificate_title = ?, issuing_organization = ?, date_issued = ?
+            WHERE certificate_id = ? AND jobseeker_id = ?
+        ");
 
-            return $stmt->execute([
-                $certData['certificate_title'],
-                $certData['issuing_organization'] ?? 'Unknown',
-                $certData['date_issued'] ?? date('Y-m-d'),
-                $certificate_id,
-                $jobseeker_id
-            ]);
-        } catch (PDOException $e) {
-            error_log("Error updating certificate: " . $e->getMessage());
-            return false;
-        }
+        $result = $stmt->execute([
+            $certData['certificate_title'],
+            $certData['issuing_organization'] ?? 'Unknown',
+            $certData['date_issued'] ?? date('Y-m-d'),
+            $certificate_id,
+            $jobseeker_id
+        ]);
+        
+        $rowsAffected = $stmt->rowCount();
+        error_log("DEBUG: Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        error_log("DEBUG: Rows affected: " . $rowsAffected);
+        
+        return $result && $rowsAffected > 0;
+        
+    } catch (PDOException $e) {
+        error_log("ERROR: Database error in updateCertificateById: " . $e->getMessage());
+        return false;
     }
+}
 
-    public function getCertificateById($certificate_id, $jobseeker_id)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT * FROM jobseeker_certificates 
-                WHERE certificate_id = ? AND jobseeker_id = ?
-            ");
-            $stmt->execute([$certificate_id, $jobseeker_id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Error fetching certificate by ID: " . $e->getMessage());
-            return false;
-        }
+public function getCertificateById($certificate_id, $jobseeker_id)
+{
+    try {
+        $stmt = $this->db->prepare("
+            SELECT * FROM jobseeker_certificates 
+            WHERE certificate_id = ? AND jobseeker_id = ?
+        ");
+        $stmt->execute([$certificate_id, $jobseeker_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("ERROR: Database error in getCertificateById: " . $e->getMessage());
+        return false;
     }
+}
 }

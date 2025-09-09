@@ -669,73 +669,111 @@ class JobseekerController
         exit;
     }
 
-private function handleStep6($data, &$error, &$success)
-{
-    // Certificates - Step 6
-    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-    $jobseeker_id = $jobseeker['jobseeker_id'];
+    private function handleStep6($data, &$error, &$success)
+    {
+        // Certificates - Step 6
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        $jobseeker_id = $jobseeker['jobseeker_id'];
 
-    if (isset($data['certificates']) && is_array($data['certificates'])) {
-        foreach ($data['certificates'] as $certData) {
-            // Skip empty certificates
-            if (empty($certData['certificate_title']) && empty($certData['certificate_id'])) {
-                continue;
+        error_log("DEBUG: handleStep6 called for jobseeker_id: $jobseeker_id");
+        error_log("DEBUG: POST data: " . json_encode($data));
+
+        if (isset($data['certificates']) && is_array($data['certificates'])) {
+            $processedCount = 0;
+            $deletedCount = 0;
+            $updatedCount = 0;
+            $addedCount = 0;
+
+            foreach ($data['certificates'] as $index => $certData) {
+                error_log("DEBUG: Processing certificate $index: " . json_encode($certData));
+
+                // Skip completely empty certificates
+                if (empty($certData['certificate_title']) && empty($certData['certificate_id'])) {
+                    error_log("DEBUG: Skipping empty certificate at index $index");
+                    continue;
+                }
+
+                // Handle deletion of existing certificates
+                if (isset($certData['certificate_id']) && isset($certData['delete']) && $certData['delete'] == '1') {
+                    error_log("DEBUG: Attempting to delete certificate ID: " . $certData['certificate_id']);
+
+                    $result = $this->jobseekerModel->deleteCertificate($jobseeker_id, $certData['certificate_id']);
+
+                    if ($result) {
+                        $deletedCount++;
+                        error_log("DEBUG: Successfully deleted certificate ID: " . $certData['certificate_id']);
+                    } else {
+                        error_log("ERROR: Failed to delete certificate ID: " . $certData['certificate_id']);
+                    }
+                    continue;
+                }
+
+                // Handle updating existing certificates
+                if (isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
+                    error_log("DEBUG: Attempting to update certificate ID: " . $certData['certificate_id']);
+
+                    $updateData = [
+                        'certificate_title' => trim($certData['certificate_title']),
+                        'issuing_organization' => !empty($certData['issuing_organization']) ? trim($certData['issuing_organization']) : 'Unknown',
+                        'date_issued' => !empty($certData['date_issued']) ? $certData['date_issued'] : date('Y-m-d')
+                    ];
+
+                    $result = $this->jobseekerModel->updateCertificateById($certData['certificate_id'], $jobseeker_id, $updateData);
+
+                    if ($result) {
+                        $updatedCount++;
+                        error_log("DEBUG: Successfully updated certificate ID: " . $certData['certificate_id']);
+                    } else {
+                        error_log("ERROR: Failed to update certificate ID: " . $certData['certificate_id']);
+                    }
+                    continue;
+                }
+
+                // Handle adding new certificates (no certificate_id)
+                if (!isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
+                    error_log("DEBUG: Attempting to add new certificate: " . $certData['certificate_title']);
+
+                    $certificate = [
+                        'certificate_title' => trim($certData['certificate_title']),
+                        'issuing_organization' => !empty($certData['issuing_organization']) ? trim($certData['issuing_organization']) : 'Unknown',
+                        'date_issued' => !empty($certData['date_issued']) ? $certData['date_issued'] : date('Y-m-d')
+                    ];
+
+                    $result = $this->jobseekerModel->saveCertificate($jobseeker_id, $certificate);
+
+                    if ($result) {
+                        $addedCount++;
+                        error_log("DEBUG: Successfully added new certificate: " . $certificate['certificate_title']);
+                    } else {
+                        error_log("ERROR: Failed to add new certificate: " . $certificate['certificate_title']);
+                    }
+                }
+
+                $processedCount++;
             }
 
-            // Handle deletion of existing certificates
-            if (isset($certData['certificate_id']) && isset($certData['delete']) && $certData['delete'] == '1') {
-                $result = $this->jobseekerModel->deleteCertificate($jobseeker_id, $certData['certificate_id']);
-                if ($result) {
-                    error_log("DEBUG: Successfully deleted certificate ID: " . $certData['certificate_id']);
-                } else {
-                    error_log("DEBUG: Failed to delete certificate ID: " . $certData['certificate_id']);
-                }
-                continue;
-            }
-            
-            // Handle updating existing certificates
-            if (isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
-                $updateData = [
-                    'certificate_title' => trim($certData['certificate_title']),
-                    'issuing_organization' => !empty($certData['issuing_organization']) ? trim($certData['issuing_organization']) : 'Unknown',
-                    'date_issued' => !empty($certData['date_issued']) ? $certData['date_issued'] : date('Y-m-d')
-                ];
-                
-                $result = $this->jobseekerModel->updateCertificateById($certData['certificate_id'], $jobseeker_id, $updateData);
-                if ($result) {
-                    error_log("DEBUG: Successfully updated certificate ID: " . $certData['certificate_id']);
-                } else {
-                    error_log("DEBUG: Failed to update certificate ID: " . $certData['certificate_id']);
-                }
-                continue;
-            }
-            
-            // Handle adding new certificates (no certificate_id)
-            if (!isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
-                $certificate = [
-                    'certificate_title' => trim($certData['certificate_title']),
-                    'issuing_organization' => !empty($certData['issuing_organization']) ? trim($certData['issuing_organization']) : 'Unknown',
-                    'date_issued' => !empty($certData['date_issued']) ? $certData['date_issued'] : date('Y-m-d')
-                ];
-                
-                $result = $this->jobseekerModel->saveCertificate($jobseeker_id, $certificate);
-                if ($result) {
-                    error_log("DEBUG: Successfully added new certificate: " . $certificate['certificate_title']);
-                } else {
-                    error_log("DEBUG: Failed to add new certificate: " . $certificate['certificate_title']);
-                }
+            error_log("DEBUG: Processing complete. Added: $addedCount, Updated: $updatedCount, Deleted: $deletedCount");
+
+            // Set success message based on operations performed
+            $messages = [];
+            if ($addedCount > 0) $messages[] = "$addedCount certificate(s) added";
+            if ($updatedCount > 0) $messages[] = "$updatedCount certificate(s) updated";
+            if ($deletedCount > 0) $messages[] = "$deletedCount certificate(s) deleted";
+
+            if (!empty($messages)) {
+                $_SESSION['success_message'] = 'Certificates updated successfully! ' . implode(', ', $messages) . '.';
+            } else {
+                $_SESSION['success_message'] = 'Certificates updated successfully!';
             }
         }
+
+        // Clear parsed data from session since we've processed it
+        unset($_SESSION['parsed_resume_data']);
+        unset($_SESSION['show_parsing_results']);
+
+        header('Location: ?page=complete-jobseeker-profile&step=7');
+        exit;
     }
-
-    // Clear parsed data from session since we've processed it
-    unset($_SESSION['parsed_resume_data']);
-    unset($_SESSION['show_parsing_results']);
-
-    $_SESSION['success_message'] = 'Certificates updated successfully!';
-    header('Location: ?page=complete-jobseeker-profile&step=7');
-    exit;
-}
 
     private function handleStep7($data, &$error, &$success)
     {
@@ -1463,6 +1501,58 @@ private function handleStep6($data, &$error, &$success)
         }
 
         header('Location: ?page=complete-jobseeker-profile&step=4');
+        exit;
+    }
+
+    public function deleteSkillSimple()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        if ($_POST && isset($_POST['skill_id'])) {
+            $skill_id = $_POST['skill_id'];
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+            if ($jobseeker) {
+                $result = $this->jobseekerModel->deleteSkillById($jobseeker['jobseeker_id'], $skill_id);
+
+                if ($result) {
+                    $_SESSION['success_message'] = 'Skill deleted successfully!';
+                } else {
+                    $_SESSION['error_message'] = 'Failed to delete skill.';
+                }
+            }
+        }
+
+        header('Location: ?page=complete-jobseeker-profile&step=5');
+        exit;
+    }
+
+    public function deleteCertificateSimple()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        if ($_POST && isset($_POST['certificate_id'])) {
+            $certificate_id = $_POST['certificate_id'];
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+            if ($jobseeker) {
+                $result = $this->jobseekerModel->deleteCertificate($jobseeker['jobseeker_id'], $certificate_id);
+
+                if ($result) {
+                    $_SESSION['success_message'] = 'Certificate deleted successfully!';
+                } else {
+                    $_SESSION['error_message'] = 'Failed to delete certificate.';
+                }
+            }
+        }
+
+        header('Location: ?page=complete-jobseeker-profile&step=6');
         exit;
     }
 }

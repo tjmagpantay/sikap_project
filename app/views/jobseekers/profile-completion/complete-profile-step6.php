@@ -186,14 +186,28 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                     </div>
 
                                     <div class="flex items-end">
-                                        <button type="button"
-                                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                            onclick="removeCertificate(this)"
-                                            title="Remove this certificate">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
+                                        <!-- Replace the complex delete button with this simple one: -->
+                                        <?php if (isset($cert['certificate_id']) && !empty($cert['certificate_id'])): ?>
+                                            <!-- Simple delete form for existing certificates -->
+                                            <form method="POST" action="?page=delete-certificate-simple" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this certificate?')">
+                                                <input type="hidden" name="certificate_id" value="<?php echo $cert['certificate_id']; ?>">
+                                                <button type="submit" class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <!-- JavaScript remove for new certificates -->
+                                            <button type="button"
+                                                class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                onclick="removeNewCertificate(this)"
+                                                title="Remove this certificate">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -345,6 +359,30 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     textInputs.forEach(input => input.value = '');
                     console.log('DEBUG: Cleared inputs of last remaining row');
                 }
+            }
+        };
+
+        // Add this function to handle new certificate removal
+        window.removeNewCertificate = function(button) {
+            const currentRow = button.closest('.certificate-row');
+            const visibleRows = document.querySelectorAll('.certificate-row:not(.deleted)');
+
+            // Check if the row has any data
+            const textInputs = currentRow.querySelectorAll('input[type="text"], input[type="date"]');
+            const hasData = Array.from(textInputs).some(input => input.value.trim() !== '');
+
+            // Confirm deletion if there's data
+            if (hasData && !confirm('Are you sure you want to remove this certificate?')) {
+                return;
+            }
+
+            // This is a new certificate - remove from DOM completely
+            if (visibleRows.length > 1) {
+                currentRow.remove();
+                updateIndices();
+            } else {
+                // If it's the last row, just clear the inputs
+                textInputs.forEach(input => input.value = '');
             }
         };
 

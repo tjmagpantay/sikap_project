@@ -691,16 +691,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->resetPassword();
             break;
 
-    case 'get-job-details-ajax':
-        // Clear any output buffers before AJAX response
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        require_once __DIR__ . '/../app/controllers/JobDetailsAjaxController.php';
-        $controller = new JobDetailsAjaxController();
-        $controller->getJobDetails();
-        exit; // Prevent any further output
-        break;
+        case 'get-job-details-ajax':
+            // Clear any output buffers before AJAX response
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            require_once __DIR__ . '/../app/controllers/JobDetailsAjaxController.php';
+            $controller = new JobDetailsAjaxController();
+            $controller->getJobDetails();
+            exit; // Prevent any further output
+            break;
 
         case 'get-work-experience':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
@@ -712,6 +712,19 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $jobseekerController = new JobseekerController();
             $jobseekerController->handleDeleteWorkExperience();
+            break;
+
+            
+        case 'delete-skill-simple':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->deleteSkillSimple();
+            break;
+
+        case 'delete-certificate-simple':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->deleteCertificateSimple();
             break;
 
 
