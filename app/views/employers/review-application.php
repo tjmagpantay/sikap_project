@@ -281,6 +281,20 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </form>
                             <?php endif; ?>
 
+                            <!-- Set Resigned Button (New) -->
+                            <?php if ($application['application_status'] === 'hired'): ?>
+                                <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
+                                    <button type="submit"
+                                        onclick="return confirm('Are you sure you want to set this employee as resigned? This action cannot be undone.')"
+                                        class="w-full px-3 py-3 text-sm font-medium text-center text-orange-600 transition-colors border rounded bg-orange-50 hover:bg-orange-600 hover:text-white">
+                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        Set Resigned
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+
                             <!-- Schedule Interview Button -->
                             <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
                                 <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -216,32 +216,27 @@ class JobApplication
     public function getApplicationDetails($application_id, $jobseeker_id = null)
     {
         try {
-            $sql = "SELECT ja.*, jp.job_title, jp.job_summary, jp.job_type, jp.location, jp.salary, jp.show_pay,
-                           e.first_name as employer_first_name, e.last_name as employer_last_name,
-                           eb.business_name as company_name, eb.business_desc, eb.business_logo,
-                           jam.interview_date, jam.interview_location, jam.notes
+            $sql = "SELECT ja.*, jp.job_title, jp.employer_id, jp.location, jp.job_type, jp.pay_range,
+                           e.company_name, eb.business_name, eb.business_logo
                     FROM job_application ja
                     JOIN job_post jp ON ja.job_id = jp.job_id
                     JOIN employer e ON jp.employer_id = e.employer_id
                     LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    LEFT JOIN job_application_management jam ON ja.application_id = jam.application_id
-                    WHERE ja.application_id = :application_id";
+                    WHERE ja.application_id = ?";
+
+            $params = [$application_id];
 
             if ($jobseeker_id) {
-                $sql .= " AND ja.jobseeker_id = :jobseeker_id";
+                $sql .= " AND ja.jobseeker_id = ?";
+                $params[] = $jobseeker_id;
             }
 
             $stmt = $this->db->prepare($sql);
-            $params = ['application_id' => $application_id];
-            if ($jobseeker_id) {
-                $params['jobseeker_id'] = $jobseeker_id;
-            }
-
             $stmt->execute($params);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting application details: ' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -671,12 +666,17 @@ class JobApplication
     public function getApplicationById($application_id)
     {
         try {
-            $sql = "SELECT * FROM job_application WHERE application_id = ?";
+            $sql = "SELECT ja.*, jp.job_title, jp.employer_id, jp.location, e.company_name, eb.business_name
+                    FROM job_application ja
+                    JOIN job_post jp ON ja.job_id = jp.job_id
+                    JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE ja.application_id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$application_id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log('Error getting application by ID: ' . $e->getMessage());
+            error_log('Error getting application: ' . $e->getMessage());
             return null;
         }
     }
@@ -709,26 +709,14 @@ class JobApplication
         }
     }
 
-    public function resignFromJob($application_id, $jobseeker_id = null, $employer_id = null)
+    public function resignFromJob($application_id, $reason = null, $employer_id = null)
     {
         try {
-            if ($jobseeker_id) {
-                // Jobseeker resignation
-                $sql = "UPDATE job_application 
-                        SET application_status = 'resigned', reviewed_at = NOW()
-                        WHERE application_id = ? AND jobseeker_id = ? AND application_status = 'hired'";
-                $stmt = $this->db->prepare($sql);
-                return $stmt->execute([$application_id, $jobseeker_id]);
-            } elseif ($employer_id) {
-                // Employer setting resignation
-                $sql = "UPDATE job_application ja
-                        JOIN job_post jp ON ja.job_id = jp.job_id
-                        SET ja.application_status = 'resigned', ja.reviewed_at = NOW()
-                        WHERE ja.application_id = ? AND jp.employer_id = ? AND ja.application_status = 'hired'";
-                $stmt = $this->db->prepare($sql);
-                return $stmt->execute([$application_id, $employer_id]);
-            }
-            return false;
+            $sql = "UPDATE job_application 
+                    SET application_status = 'resigned', reviewed_at = NOW() 
+                    WHERE application_id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$application_id]);
         } catch (PDOException $e) {
             error_log('Error updating resignation status: ' . $e->getMessage());
             return false;
@@ -742,7 +730,7 @@ class JobApplication
                     WHERE application_id = ? AND jobseeker_id = ? AND application_status = 'hired'";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$application_id, $jobseeker_id]);
-            return $stmt->fetch() !== false;
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log('Error checking resignation eligibility: ' . $e->getMessage());
             return false;

@@ -64,6 +64,9 @@ class ReviewApplicationController
             case 'rejectResignation':
                 $this->rejectResignation($application_id, $employer['employer_id']);
                 break;
+            case 'setResigned':
+                $this->setResignedStatus($application_id, $employer['employer_id']);
+                break;
             default:
                 header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Invalid action.'));
                 exit;
@@ -174,23 +177,34 @@ class ReviewApplicationController
                 exit;
             }
 
-            $employer_notes = $_POST['employer_notes'] ?? null;
+            $employer_notes = trim($_POST['employer_notes']) ?: null;
 
-            // Update resignation status to approved
-            $result1 = $resignationModel->updateResignationStatus(
-                $resignationRequest['resignation_id'],
-                'approved',
-                $employer_notes,
-                $_SESSION['user_id']
-            );
+            // Start transaction
+            $pdo = $resignationModel->getPdo();
+            $pdo->beginTransaction();
 
-            // Update application status to resigned
-            $result2 = $jobApplicationModel->resignFromJob($application_id, null, $employer_id);
+            try {
+                // Update resignation status to approved
+                $result1 = $resignationModel->updateResignationStatus(
+                    $resignationRequest['resignation_id'],
+                    'approved',
+                    $employer_notes,
+                    $_SESSION['user_id']
+                );
 
-            if ($result1 && $result2) {
-                header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request approved successfully.'));
-            } else {
-                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to approve resignation request.'));
+                // Update application status to resigned
+                $result2 = $jobApplicationModel->resignFromJob($application_id, null, $employer_id);
+
+                if ($result1 && $result2) {
+                    $pdo->commit();
+                    header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request approved successfully. Employee status updated to resigned.'));
+                } else {
+                    $pdo->rollback();
+                    header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to approve resignation request.'));
+                }
+            } catch (Exception $e) {
+                $pdo->rollback();
+                throw $e;
             }
         } catch (Exception $e) {
             error_log('Error approving resignation: ' . $e->getMessage());
@@ -212,7 +226,7 @@ class ReviewApplicationController
                 exit;
             }
 
-            $employer_notes = $_POST['employer_notes'] ?? null;
+            $employer_notes = trim($_POST['employer_notes']) ?: null;
 
             $result = $resignationModel->updateResignationStatus(
                 $resignationRequest['resignation_id'],
@@ -239,16 +253,20 @@ class ReviewApplicationController
             require_once __DIR__ . '/../models/JobApplication.php';
             $jobApplicationModel = new JobApplication();
 
+            // Check if application is hired first
+            $application = $jobApplicationModel->getApplicationById($application_id);
+            if (!$application || $application['application_status'] !== 'hired') {
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Can only resign hired employees.'));
+                exit;
+            }
+
+            // Update application status to resigned
             $result = $jobApplicationModel->resignFromJob($application_id, null, $employer_id);
 
             if ($result) {
-                // Log the status change using ReviewApplication model
-                $model = new ReviewApplication();
-                $model->logStatusChange($application_id, 'resigned', 'employer', 'Employer marked employee as resigned');
-
                 header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Employee status updated to resigned.'));
             } else {
-                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update status. Employee must be hired to be marked as resigned.'));
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update employee status.'));
             }
         } catch (Exception $e) {
             error_log('Error setting resigned status: ' . $e->getMessage());

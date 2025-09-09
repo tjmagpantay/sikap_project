@@ -1064,26 +1064,40 @@ class JobApplicationController
 
         // Handle resignation request submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_resignation'])) {
-            // Get application details to find employer
-            $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
-            if (!$application) {
-                header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
-                exit;
-            }
+            error_log('Processing resignation request for application: ' . $application_id);
 
-            $resignationData = [
-                'application_id' => $application_id,
-                'jobseeker_id' => $jobseeker['jobseeker_id'],
-                'employer_id' => $application['employer_id'],
-                'resignation_reason' => $_POST['resignation_reason'] ?? null
-            ];
+            try {
+                // Get application details to find employer
+                $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
+                if (!$application) {
+                    error_log('Application not found for ID: ' . $application_id);
+                    throw new Exception('Application not found.');
+                }
 
-            $result = $resignationModel->createResignationRequest($resignationData);
+                error_log('Application found - Employer ID: ' . $application['employer_id']);
 
-            if ($result) {
-                header('Location: ?page=view-application&id=' . $application_id . '&success=' . urlencode('Your resignation request has been submitted and is pending employer approval.'));
-            } else {
-                header('Location: ?page=my-applications&error=' . urlencode('Failed to submit resignation request. Please try again.'));
+                $resignationData = [
+                    'application_id' => $application_id,
+                    'jobseeker_id' => $jobseeker['jobseeker_id'],
+                    'employer_id' => $application['employer_id'],
+                    'resignation_reason' => trim($_POST['resignation_reason']) ?: null
+                ];
+
+                error_log('Resignation data: ' . json_encode($resignationData));
+
+                $result = $resignationModel->createResignationRequest($resignationData);
+
+                error_log('Resignation creation result: ' . ($result ? 'SUCCESS' : 'FAILED'));
+
+                if ($result) {
+                    error_log('Redirecting to success page');
+                    header('Location: ?page=view-application&id=' . $application_id . '&success=' . urlencode('Your resignation request has been submitted and is pending employer approval.'));
+                } else {
+                    throw new Exception('Failed to submit resignation request.');
+                }
+            } catch (Exception $e) {
+                error_log('Error in resignation submission: ' . $e->getMessage());
+                header('Location: ?page=resign-from-job&id=' . $application_id . '&error=' . urlencode($e->getMessage()));
             }
             exit;
         }

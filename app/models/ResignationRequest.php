@@ -7,22 +7,36 @@ class ResignationRequest
 
     public function __construct()
     {
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+
         try {
-            // Use the same connection method as other models
             $this->db = new PDO(
-                "mysql:host=localhost;dbname=sikap_db;charset=utf8mb4",
-                "root",
-                "",
+                "mysql:host={$config['db_host']};dbname={$config['db_name']};charset=utf8mb4",
+                $config['db_user'],
+                $config['db_pass'],
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]
             );
+
+            // Test the connection
+            $testQuery = $this->db->query("SELECT 1");
+            if (!$testQuery) {
+                throw new Exception('Database connection test failed');
+            }
+
+            error_log('ResignationRequest model: Database connection successful');
         } catch (PDOException $e) {
             error_log('Database connection failed: ' . $e->getMessage());
             throw new Exception('Database connection failed');
         }
+    }
+
+    public function getPdo()
+    {
+        return $this->db;
     }
 
     public function createResignationRequest($data)
@@ -31,9 +45,26 @@ class ResignationRequest
             $sql = "INSERT INTO resignation_requests (application_id, jobseeker_id, employer_id, resignation_reason) 
                     VALUES (:application_id, :jobseeker_id, :employer_id, :resignation_reason)";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute($data);
+
+            $result = $stmt->execute([
+                ':application_id' => $data['application_id'],
+                ':jobseeker_id' => $data['jobseeker_id'],
+                ':employer_id' => $data['employer_id'],
+                ':resignation_reason' => $data['resignation_reason']
+            ]);
+
+            if ($result) {
+                error_log('Resignation request created successfully for application: ' . $data['application_id']);
+                return true;
+            } else {
+                error_log('Failed to create resignation request - SQL execution failed');
+                return false;
+            }
         } catch (PDOException $e) {
             error_log('Error creating resignation request: ' . $e->getMessage());
+            error_log('SQL State: ' . $e->errorInfo[0]);
+            error_log('Error Code: ' . $e->errorInfo[1]);
+            error_log('Error Message: ' . $e->errorInfo[2]);
             return false;
         }
     }
