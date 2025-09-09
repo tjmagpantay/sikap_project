@@ -31,7 +31,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
 
     <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-<!-- Progress bar with steps -->
+            <!-- Progress bar with steps -->
             <div class="mb-6">
                 <!-- Step indicators -->
                 <div class="flex items-center justify-between w-full mb-4">
@@ -120,70 +120,83 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 <div>
                     <label class="block mb-4 text-sm font-medium text-gray-700">Certificates & Licenses</label>
                     <div id="certificates-container">
-                        <?php 
+                        <?php
                         $allCertificates = [];
-                        
-                        // First add parsed certificates
-                        if (!empty($parsedCertificates)) {
-                            foreach ($parsedCertificates as $cert) {
-                                $allCertificates[] = $cert;
-                            }
-                        }
-                        
-                        // Then add existing certificates from database
+
+                        // FIXED: Prioritize existing database certificates over parsed ones to avoid duplication
                         if (!empty($certificates) && $certificates !== false) {
+                            // Use existing database certificates (user has already been through this step)
                             foreach ($certificates as $cert) {
                                 $allCertificates[] = $cert;
                             }
+                        } else {
+                            // Only use parsed certificates if no database certificates exist
+                            if (!empty($parsedCertificates)) {
+                                foreach ($parsedCertificates as $cert) {
+                                    $allCertificates[] = $cert;
+                                }
+                            }
                         }
-                        
+
                         // If no certificates at all, add one empty row
                         if (empty($allCertificates)) {
                             $allCertificates[] = [
-                                'certificate_title' => '', 
-                                'issuing_organization' => '', 
+                                'certificate_title' => '',
+                                'issuing_organization' => '',
                                 'date_issued' => ''
                             ];
                         }
-                        
+
                         foreach ($allCertificates as $index => $cert): ?>
-                        <div class="p-4 mb-4 space-y-4 border border-gray-200 rounded-lg certificate-row" data-index="<?php echo $index; ?>">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
-                                <input type="text" 
-                                       name="certificates[<?php echo $index; ?>][certificate_title]" 
-                                       value="<?php echo htmlspecialchars($cert['certificate_title'] ?? ''); ?>"
-                                       placeholder="e.g., AWS Certified Solutions Architect" 
-                                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
-                                <input type="text" 
-                                       name="certificates[<?php echo $index; ?>][issuing_organization]" 
-                                       value="<?php echo htmlspecialchars($cert['issuing_organization'] ?? ''); ?>"
-                                       placeholder="e.g., Amazon Web Services" 
-                                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                            </div>
-                            
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <label class="block text-sm font-medium text-gray-700">Date Issued</label>
-                                    <input type="date" 
-                                           name="certificates[<?php echo $index; ?>][date_issued]" 
-                                           value="<?php echo htmlspecialchars($cert['date_issued'] ?? ''); ?>"
-                                           class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                            <div class="p-4 mb-4 space-y-4 border border-gray-200 rounded-lg certificate-row" data-index="<?php echo $index; ?>">
+
+                                <!-- Add hidden field for existing certificate ID -->
+                                <?php if (isset($cert['certificate_id'])): ?>
+                                    <input type="hidden" name="certificates[<?php echo $index; ?>][certificate_id]" value="<?php echo $cert['certificate_id']; ?>">
+                                <?php endif; ?>
+
+                                <!-- Mark for deletion field (hidden) -->
+                                <input type="hidden" name="certificates[<?php echo $index; ?>][delete]" value="0" class="delete-flag">
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
+                                    <input type="text"
+                                        name="certificates[<?php echo $index; ?>][certificate_title]"
+                                        value="<?php echo htmlspecialchars($cert['certificate_title'] ?? ''); ?>"
+                                        placeholder="e.g., AWS Certified Solutions Architect"
+                                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                                 </div>
-                                
-                                <div class="flex items-end">
-                                    <button type="button" class="px-3 py-2 text-red-600 remove-certificate hover:text-red-800" onclick="removeCertificate(this)">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                                    <input type="text"
+                                        name="certificates[<?php echo $index; ?>][issuing_organization]"
+                                        value="<?php echo htmlspecialchars($cert['issuing_organization'] ?? ''); ?>"
+                                        placeholder="e.g., Amazon Web Services"
+                                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <div class="flex-1">
+                                        <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                                        <input type="date"
+                                            name="certificates[<?php echo $index; ?>][date_issued]"
+                                            value="<?php echo htmlspecialchars($cert['date_issued'] ?? ''); ?>"
+                                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                    </div>
+
+                                    <div class="flex items-end">
+                                        <button type="button"
+                                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                            onclick="removeCertificate(this)"
+                                            title="Remove this certificate">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         <?php endforeach; ?>
                     </div>
 
@@ -197,11 +210,11 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
 
                 <div class="flex justify-between">
                     <a href="?page=complete-jobseeker-profile&step=5"
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Previous
                     </a>
                     <button type="submit"
-                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Next
                     </button>
                 </div>
@@ -216,12 +229,31 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
         const addCertificateBtn = document.getElementById('add-certificate');
         const certificatesContainer = document.getElementById('certificates-container');
 
+        function updateIndices() {
+            const certificateRows = document.querySelectorAll('.certificate-row:not(.deleted)');
+            certificateRows.forEach((row, index) => {
+                row.setAttribute('data-index', index);
+
+                // Update all input names within this row
+                const inputs = row.querySelectorAll('input');
+                inputs.forEach(input => {
+                    const name = input.name;
+                    if (name) {
+                        const newName = name.replace(/certificates\[\d+\]/, `certificates[${index}]`);
+                        input.name = newName;
+                    }
+                });
+            });
+        }
+
         function addEmptyCertificateRow() {
             const certificateRow = document.createElement('div');
             certificateRow.className = 'certificate-row space-y-4 p-4 border border-gray-200 rounded-lg mb-4';
             certificateRow.setAttribute('data-index', certificateCount);
 
             certificateRow.innerHTML = `
+            <input type="hidden" name="certificates[${certificateCount}][delete]" value="0" class="delete-flag">
+            
             <div>
                 <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
                 <input type="text" 
@@ -247,8 +279,11 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 </div>
                 
                 <div class="flex items-end">
-                    <button type="button" class="px-3 py-2 text-red-600 remove-certificate hover:text-red-800" onclick="removeCertificate(this)">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" 
+                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" 
+                            onclick="removeCertificate(this)"
+                            title="Remove this certificate">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                     </button>
@@ -264,16 +299,64 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
             addEmptyCertificateRow();
         });
 
-        // Remove certificate function
+        // Enhanced remove certificate function with better debugging
         window.removeCertificate = function(button) {
-            const certificateRows = document.querySelectorAll('.certificate-row');
-            if (certificateRows.length > 1) {
-                button.closest('.certificate-row').remove();
+            const currentRow = button.closest('.certificate-row');
+            const visibleRows = document.querySelectorAll('.certificate-row:not(.deleted)');
+
+            // Check if the row has any data
+            const textInputs = currentRow.querySelectorAll('input[type="text"], input[type="date"]');
+            const hasData = Array.from(textInputs).some(input => input.value.trim() !== '');
+
+            // Confirm deletion if there's data
+            if (hasData && !confirm('Are you sure you want to remove this certificate?')) {
+                return;
+            }
+
+            // Check if this is an existing certificate (has certificate_id)
+            const certificateIdInput = currentRow.querySelector('input[name*="[certificate_id]"]');
+
+            console.log('DEBUG: Certificate ID input:', certificateIdInput);
+            console.log('DEBUG: Certificate ID value:', certificateIdInput ? certificateIdInput.value : 'none');
+
+            if (certificateIdInput && certificateIdInput.value) {
+                // This is an existing certificate - mark for deletion
+                const deleteFlag = currentRow.querySelector('.delete-flag');
+                console.log('DEBUG: Delete flag input:', deleteFlag);
+
+                if (deleteFlag) {
+                    deleteFlag.value = '1';
+                    console.log('DEBUG: Set delete flag to 1 for certificate ID:', certificateIdInput.value);
+                }
+
+                // Hide the row visually but keep it in DOM for form submission
+                currentRow.style.display = 'none';
+                currentRow.classList.add('deleted');
+
+                console.log('DEBUG: Hidden row for existing certificate');
             } else {
-                // Don't allow removing the last certificate row, just clear it
-                const inputs = button.closest('.certificate-row').querySelectorAll('input');
-                inputs.forEach(input => input.value = '');
+                // This is a new certificate - remove from DOM completely
+                if (visibleRows.length > 1) {
+                    currentRow.remove();
+                    updateIndices();
+                    console.log('DEBUG: Removed new certificate row from DOM');
+                } else {
+                    // If it's the last row, just clear the inputs
+                    textInputs.forEach(input => input.value = '');
+                    console.log('DEBUG: Cleared inputs of last remaining row');
+                }
             }
         };
+
+        // Debug form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            console.log('DEBUG: Form submitting...');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                if (key.includes('certificates')) {
+                    console.log('DEBUG Form data:', key, '=', value);
+                }
+            }
+        });
     });
 </script>

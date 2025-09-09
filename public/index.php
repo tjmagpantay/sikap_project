@@ -691,28 +691,30 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->resetPassword();
             break;
 
-        case 'get-job-details-ajax':
-            // Clear any output buffers before AJAX response
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-            require_once __DIR__ . '/../app/controllers/JobDetailsAjaxController.php';
-            $controller = new JobDetailsAjaxController();
-            $controller->getJobDetails();
-            exit; // Prevent any further output
-            break;
-        case 'delete-work-experience':
-            $jobseekerController->deleteWorkExperience();
-            break;
+    case 'get-job-details-ajax':
+        // Clear any output buffers before AJAX response
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        require_once __DIR__ . '/../app/controllers/JobDetailsAjaxController.php';
+        $controller = new JobDetailsAjaxController();
+        $controller->getJobDetails();
+        exit; // Prevent any further output
+        break;
 
         case 'get-work-experience':
-            // Make sure jobseeker controller is instantiated
-            if (!isset($jobseekerController)) {
-                require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-                $jobseekerController = new JobseekerController();
-            }
-            $jobseekerController->getWorkExperience();
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $jobseekerController = new JobseekerController();
+            $jobseekerController->getWorkExperienceById();
             break;
+
+        case 'delete-work-experience':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $jobseekerController = new JobseekerController();
+            $jobseekerController->handleDeleteWorkExperience();
+            break;
+
+
         case 'abt-sikap':
             include __DIR__ . '/../app/views/pages/abt-sikap.php';
             break;

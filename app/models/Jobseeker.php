@@ -276,11 +276,12 @@ class Jobseeker
     {
         try {
             $stmt = $this->db->prepare("
-                SELECT COUNT(*) FROM jobseeker_work_experience 
-                WHERE jobseeker_id = ? AND currently_working = 'Yes'
-            ");
+            SELECT COUNT(*) as count FROM jobseeker_work_experience 
+            WHERE jobseeker_id = ? AND currently_working = 'Yes'
+        ");
             $stmt->execute([$jobseeker_id]);
-            return $stmt->fetchColumn() > 0;
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] > 0;
         } catch (PDOException $e) {
             error_log("Error checking current job: " . $e->getMessage());
             return false;
@@ -416,15 +417,21 @@ class Jobseeker
         }
     }
 
-    public function getSkills($jobseeker_id)
+    public function getSkills($user_id)
     {
         try {
+            // Get jobseeker_id first
+            $jobseeker = $this->findByUserId($user_id);
+            if (!$jobseeker) {
+                return [];
+            }
+
             $stmt = $this->db->prepare("
                 SELECT * FROM jobseeker_skills 
                 WHERE jobseeker_id = ? 
                 ORDER BY created_at DESC
             ");
-            $stmt->execute([$jobseeker_id]);
+            $stmt->execute([$jobseeker['jobseeker_id']]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error fetching skills: " . $e->getMessage());
@@ -432,19 +439,51 @@ class Jobseeker
         }
     }
 
-    public function getCertificates($jobseeker_id)
+    public function getCertificates($user_id)
     {
         try {
+            // Get jobseeker_id first
+            $jobseeker = $this->findByUserId($user_id);
+            if (!$jobseeker) {
+                return [];
+            }
+
             $stmt = $this->db->prepare("
-                SELECT * FROM jobseeker_certificates 
-                WHERE jobseeker_id = ? 
-                ORDER BY date_issued DESC
-            ");
-            $stmt->execute([$jobseeker_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            SELECT * FROM jobseeker_certificates 
+            WHERE jobseeker_id = ? 
+            ORDER BY date_issued DESC
+        ");
+            $stmt->execute([$jobseeker['jobseeker_id']]);
+            $certificates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return empty array if no certificates found
+            return $certificates ?: [];
         } catch (PDOException $e) {
             error_log("Error fetching certificates: " . $e->getMessage());
             return [];
+        }
+    }
+
+    // Add a method to check if certificates exist
+    public function hasCertificates($user_id)
+    {
+        try {
+            $jobseeker = $this->findByUserId($user_id);
+            if (!$jobseeker) {
+                return false;
+            }
+
+            $stmt = $this->db->prepare("
+            SELECT COUNT(*) as count FROM jobseeker_certificates 
+            WHERE jobseeker_id = ?
+        ");
+            $stmt->execute([$jobseeker['jobseeker_id']]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $result['count'] > 0;
+        } catch (PDOException $e) {
+            error_log("Error checking certificates: " . $e->getMessage());
+            return false;
         }
     }
 
@@ -696,6 +735,57 @@ class Jobseeker
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error finding jobseeker by ID: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deleteCertificate($jobseeker_id, $certificate_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                DELETE FROM jobseeker_certificates 
+                WHERE certificate_id = ? AND jobseeker_id = ?
+            ");
+            return $stmt->execute([$certificate_id, $jobseeker_id]);
+        } catch (PDOException $e) {
+            error_log("Error deleting certificate: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE jobseeker_certificates 
+                SET certificate_title = ?, issuing_organization = ?, date_issued = ?
+                WHERE certificate_id = ? AND jobseeker_id = ?
+            ");
+
+            return $stmt->execute([
+                $certData['certificate_title'],
+                $certData['issuing_organization'] ?? 'Unknown',
+                $certData['date_issued'] ?? date('Y-m-d'),
+                $certificate_id,
+                $jobseeker_id
+            ]);
+        } catch (PDOException $e) {
+            error_log("Error updating certificate: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getCertificateById($certificate_id, $jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT * FROM jobseeker_certificates 
+                WHERE certificate_id = ? AND jobseeker_id = ?
+            ");
+            $stmt->execute([$certificate_id, $jobseeker_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching certificate by ID: " . $e->getMessage());
             return false;
         }
     }

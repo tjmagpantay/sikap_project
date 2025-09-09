@@ -275,90 +275,107 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                     <?php endif; ?>
                 </div>
 
-                <!-- Skills Summary -->
-                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="flex items-center text-base font-semibold text-gray-900">
-                            <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                            Skills & Expertise
-                        </h3>
-                        <a href="?page=complete-jobseeker-profile&step=5" class="text-sm font-medium text-primary hover:text-blue-700">
-                            Edit
-                        </a>
-                    </div>
-                    <?php if (!empty($skills)): ?>
-                        <div class="p-3 bg-white rounded-md">
-                            <div class="flex flex-wrap gap-2">
-                                <?php foreach ($skills as $skill): ?>
-                                    <?php if ($skill['skill_name'] !== 'N/A'): ?>
-                                        <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 rounded-full">
-                                            <span class="font-medium text-gray-900"><?php echo htmlspecialchars($skill['skill_name']); ?></span>
-                                            <span class="ml-2 text-xs
-                                                <?php
-                                                switch ($skill['proficiency_level']) {
-                                                    case 'Expert':
-                                                        echo 'text-purple-600';
-                                                        break;
-                                                    case 'Advanced':
-                                                        echo 'text-green-600';
-                                                        break;
-                                                    case 'Intermediate':
-                                                        echo 'text-blue-600';
-                                                        break;
-                                                    default:
-                                                        echo 'text-gray-600';
-                                                }
-                                                ?>">
-                                                (<?php echo htmlspecialchars($skill['proficiency_level']); ?>)
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
+<!-- Skills Summary -->
+<div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="flex items-center text-base font-semibold text-gray-900">
+            <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Skills & Expertise
+            <span class="ml-2 text-xs text-gray-500">(<?php echo count($skills); ?> skills)</span>
+        </h3>
+        <a href="?page=complete-jobseeker-profile&step=5" class="text-sm font-medium text-primary hover:text-blue-700">
+            Edit
+        </a>
+    </div>
+    <?php if (!empty($skills)): ?>
+        <div class="p-3 bg-white rounded-md">
+            <div class="flex flex-wrap gap-2">
+                <?php foreach ($skills as $skill): ?>
+                    <?php if (!empty($skill['skill_name']) && $skill['skill_name'] !== 'N/A'): ?>
+                        <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 rounded-full">
+                            <span class="font-medium text-gray-900"><?php echo htmlspecialchars($skill['skill_name']); ?></span>
+                            <span class="ml-2 text-xs
+                                <?php
+                                switch ($skill['proficiency_level'] ?? 'Intermediate') {
+                                    case 'Expert':
+                                        echo 'text-purple-600';
+                                        break;
+                                    case 'Advanced':
+                                        echo 'text-green-600';
+                                        break;
+                                    case 'Intermediate':
+                                        echo 'text-blue-600';
+                                        break;
+                                    default:
+                                        echo 'text-gray-600';
+                                }
+                                ?>">
+                                (<?php echo htmlspecialchars($skill['proficiency_level'] ?? 'Intermediate'); ?>)
+                            </span>
                         </div>
-                    <?php else: ?>
-                        <p class="p-3 text-sm text-gray-600 bg-white rounded-md">No skills information provided.</p>
                     <?php endif; ?>
-                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <p class="p-3 text-sm text-gray-600 bg-white rounded-md">No skills information provided.</p>
+    <?php endif; ?>
+</div>
 
-                <!-- Certificates Summary -->
-                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="flex items-center text-base font-semibold text-gray-900">
-                            <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                            </svg>
-                            Certificates
-                        </h3>
-                        <a href="?page=complete-jobseeker-profile&step=6" class="text-sm font-medium text-primary hover:text-blue-700">
-                            Edit
-                        </a>
-                    </div>
-                    <?php if (!empty($certificates) && $certificates[0]['certificate_title'] !== 'N/A'): ?>
-                        <div class="p-3 bg-white rounded-md">
-                            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                <div>
-                                    <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Certificate/License</span>
-                                    <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($certificates[0]['certificate_title']); ?></p>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Issuing Organization</span>
-                                    <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($certificates[0]['issuing_organization']); ?></p>
-                                </div>
-                                <div class="col-span-1 md:col-span-2">
-                                    <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Date Issued</span>
-                                    <p class="mt-1 text-sm font-medium text-gray-900">
-                                        <?php echo $certificates[0]['date_issued'] ? date('F j, Y', strtotime($certificates[0]['date_issued'])) : 'N/A'; ?>
-                                    </p>
-                                </div>
+<!-- Certificates Summary -->
+<div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="flex items-center text-base font-semibold text-gray-900">
+            <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+            Certificates & Licenses
+            <span class="ml-2 text-xs text-gray-500">(<?php echo count($certificates); ?> certificates)</span>
+        </h3>
+        <a href="?page=complete-jobseeker-profile&step=6" class="text-sm font-medium text-primary hover:text-blue-700">
+            Edit
+        </a>
+    </div>
+    <?php if (!empty($certificates)): ?>
+        <div class="space-y-3">
+            <?php foreach ($certificates as $index => $cert): ?>
+                <?php if (!empty($cert['certificate_title']) && $cert['certificate_title'] !== 'N/A'): ?>
+                    <div class="p-3 bg-white border-l-4 border-blue-500 rounded-md">
+                        <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
+                            <div>
+                                <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Certificate</span>
+                                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($cert['certificate_title']); ?></p>
+                            </div>
+                            <div>
+                                <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Issuing Organization</span>
+                                <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($cert['issuing_organization'] ?? 'Unknown'); ?></p>
+                            </div>
+                            <div>
+                                <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Date Issued</span>
+                                <p class="mt-1 text-sm font-medium text-gray-900">
+                                    <?php echo $cert['date_issued'] ? date('F j, Y', strtotime($cert['date_issued'])) : 'N/A'; ?>
+                                </p>
                             </div>
                         </div>
-                    <?php else: ?>
-                        <p class="p-3 text-sm text-gray-600 bg-white rounded-md">No certificates or licenses information.</p>
-                    <?php endif; ?>
-                </div>
+                    </div>
+                    <?php 
+                    // Show only first 3 certificates to avoid cluttering
+                    if ($index >= 2) {
+                        if (count($certificates) > 3) {
+                            echo '<p class="p-2 text-xs text-center text-gray-500">... and ' . (count($certificates) - 3) . ' more certificate(s)</p>';
+                        }
+                        break;
+                    }
+                    ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <p class="p-3 text-sm text-gray-600 bg-white rounded-md">No certificates or licenses information.</p>
+    <?php endif; ?>
+</div>
             </div>
 
             <form method="POST" action="?page=complete-jobseeker-profile&step=7" class="mt-8">

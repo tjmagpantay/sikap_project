@@ -1,9 +1,18 @@
 <?php
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
+include_once __DIR__ . '/../navbar-jobseeker.php';
 
-<?php
+// Display success/error messages from session
+if (isset($_SESSION['success_message'])) {
+    $success = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
 // Use data from controller instead of direct model calls
 $currentWork = null;
 $additionalWorkExp = [];
@@ -22,11 +31,6 @@ if (!empty($workExperience)) {
         return !isset($exp['currently_working']) || $exp['currently_working'] !== 'Yes';
     });
 }
-
-// Debug output (remove this after testing)
-error_log("Current work: " . json_encode($currentWork));
-error_log("Additional work exp: " . json_encode($additionalWorkExp));
-error_log("All work experience: " . json_encode($workExperience));
 ?>
 
 <div class="min-h-screen py-6">
@@ -131,11 +135,15 @@ error_log("All work experience: " . json_encode($workExperience));
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                             </button>
-                            <button onclick="deleteExperience(<?php echo $currentWork['experience_id']; ?>)" class="text-red-600 hover:text-red-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
+                            <!-- Updated delete button to use form submission -->
+                            <form method="POST" action="?page=delete-work-experience" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this work experience?')">
+                                <input type="hidden" name="delete_experience_id" value="<?php echo $currentWork['experience_id']; ?>">
+                                <button type="submit" class="text-red-600 hover:text-red-800">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                     </div>
 
@@ -187,11 +195,15 @@ error_log("All work experience: " . json_encode($workExperience));
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <button onclick="deleteExperience(<?php echo $work['experience_id']; ?>)" class="text-red-600 hover:text-red-800">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                    <!-- Updated delete button to use form submission -->
+                                    <form method="POST" action="?page=delete-work-experience" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this work experience?')">
+                                        <input type="hidden" name="delete_experience_id" value="<?php echo $work['experience_id']; ?>">
+                                        <button type="submit" class="text-red-600 hover:text-red-800">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -258,7 +270,7 @@ error_log("All work experience: " . json_encode($workExperience));
                 <!-- Experience Type Selector -->
                 <div>
                     <label class="block mb-3 text-sm font-medium text-gray-700">
-                        What type of work experience would you like to add?
+                        What type of work experience would you like to add? (Optional)
                     </label>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <label class="relative flex p-4 bg-white border rounded-lg shadow-sm cursor-pointer focus:outline-none">
@@ -301,10 +313,10 @@ error_log("All work experience: " . json_encode($workExperience));
                 <!-- Job Title -->
                 <div>
                     <label for="job_title" class="block mb-1 text-xs font-medium text-gray-500">
-                        Job Title <span class="text-red-500">*</span>
+                        Job Title
                     </label>
                     <div class="mt-1">
-                        <input id="job_title" name="job_title" type="text" required
+                        <input id="job_title" name="job_title" type="text"
                             value="<?php echo htmlspecialchars($_POST['job_title'] ?? ''); ?>"
                             placeholder="e.g., Software Developer, Marketing Manager"
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
@@ -314,10 +326,10 @@ error_log("All work experience: " . json_encode($workExperience));
                 <!-- Company Name -->
                 <div>
                     <label for="company_name" class="block mb-1 text-xs font-medium text-gray-500">
-                        Company/Organization Name <span class="text-red-500">*</span>
+                        Company/Organization Name
                     </label>
                     <div class="mt-1">
-                        <input id="company_name" name="company_name" type="text" required
+                        <input id="company_name" name="company_name" type="text"
                             value="<?php echo htmlspecialchars($_POST['company_name'] ?? ''); ?>"
                             placeholder="Company/Organization Name"
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
@@ -401,12 +413,18 @@ error_log("All work experience: " . json_encode($workExperience));
                     <div class="flex space-x-3">
                         <button type="submit" name="add_another" id="addAnotherBtn"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                            <span id="addAnotherText">Add Another</span>
+                            <span id="addAnotherText">Add Experience</span>
                         </button>
 
                         <button type="submit" name="submit_step4" id="submitBtn"
                             class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                            <span id="submitBtnText"><?php echo (!empty($workExperience) ? 'Update & Continue' : 'Next Step'); ?></span>
+                            <span id="submitBtnText">
+                                <?php if (!empty($workExperience)): ?>
+                                    Continue
+                                <?php else: ?>
+                                    Skip & Continue
+                                <?php endif; ?>
+                            </span>
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
@@ -437,11 +455,6 @@ error_log("All work experience: " . json_encode($workExperience));
         const currentlyWorkingCheckbox = document.getElementById('currently_working');
         const endDateContainer = document.getElementById('end-date-container');
         const endDateInput = document.getElementById('end_date');
-        const formModeInput = document.getElementById('form_mode');
-        const experienceIdInput = document.getElementById('experience_id');
-        const addAnotherBtn = document.getElementById('addAnotherBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const updateBtn = document.getElementById('updateBtn');
 
         // Handle radio button selection visual feedback
         experienceTypeRadios.forEach(radio => {
@@ -488,6 +501,26 @@ error_log("All work experience: " . json_encode($workExperience));
                 endDateInput.value = '';
             } else {
                 endDateContainer.style.display = 'block';
+            }
+        });
+
+        // Form submission validation
+        document.getElementById('experienceForm').addEventListener('submit', function(e) {
+            const submitBtn = e.submitter;
+            const jobTitle = document.getElementById('job_title').value.trim();
+            const companyName = document.getElementById('company_name').value.trim();
+
+            // If "Add Experience" button and fields are empty, prevent submission
+            if (submitBtn && submitBtn.name === 'add_another' && (!jobTitle || !companyName)) {
+                e.preventDefault();
+                alert('Please fill in Job Title and Company Name to add experience.');
+                return;
+            }
+
+            // For "Skip & Continue" button, always allow submission
+            if (submitBtn && submitBtn.name === 'submit_step4') {
+                // Allow to continue even without experience
+                return true;
             }
         });
     });
@@ -539,33 +572,6 @@ error_log("All work experience: " . json_encode($workExperience));
             });
     }
 
-    function deleteExperience(experienceId) {
-        if (!confirm('Are you sure you want to delete this work experience?')) {
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('experience_id', experienceId);
-
-        fetch('?page=delete-work-experience', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting experience');
-            });
-    }
-
     function resetForm() {
         document.getElementById('experienceForm').reset();
         document.getElementById('form_mode').value = 'add';
@@ -583,29 +589,4 @@ error_log("All work experience: " . json_encode($workExperience));
             defaultRadioElement.dispatchEvent(new Event('change'));
         }
     }
-
-    // Add cancel button for edit mode
-    document.getElementById('updateBtn').insertAdjacentHTML('afterend', `
-    <button type="button" onclick="resetForm()" id="cancelBtn" style="display: none;"
-        class="inline-flex items-center px-4 py-2 ml-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-        Cancel
-    </button>
-    `);
-
-    const updateBtnObserver = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                const cancelBtn = document.getElementById('cancelBtn');
-                if (document.getElementById('updateBtn').style.display === 'none') {
-                    cancelBtn.style.display = 'none';
-                } else {
-                    cancelBtn.style.display = 'inline-flex';
-                }
-            }
-        });
-    });
-
-    updateBtnObserver.observe(document.getElementById('updateBtn'), {
-        attributes: true
-    });
 </script>

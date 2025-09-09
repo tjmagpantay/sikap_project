@@ -30,51 +30,50 @@ class ResumeParser
         $this->loadAllSkillData();
     }
 
-private function loadAllSkillData()
-{
-    try {
-        // Load manual skills with ESCO mapping FIRST (Higher Priority)
-        $stmt = $this->db->prepare("
+    private function loadAllSkillData()
+    {
+        try {
+            // Load manual skills with ESCO mapping FIRST (Higher Priority)
+            $stmt = $this->db->prepare("
             SELECT sd.skill_name, me.esco_skill_id, es.skill_name AS esco_name, es.concept_uri
             FROM skills_dictionary sd
             LEFT JOIN manual_to_esco me ON sd.id = me.manual_skill_id
             LEFT JOIN esco_skills es ON me.esco_skill_id = es.id
             ORDER BY sd.skill_name ASC
         ");
-        $stmt->execute();
-        $this->manualSkills = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->manualSkills[] = $row;
-        }
+            $stmt->execute();
+            $this->manualSkills = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $this->manualSkills[] = $row;
+            }
 
-        // Load ESCO skills (Lower Priority, Fallback only)
-        $stmt = $this->db->prepare("SELECT id, skill_name, concept_uri FROM esco_skills ORDER BY skill_name ASC");
-        $stmt->execute();
-        $this->escoSkills = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->escoSkills[$row['id']] = [
-                'name' => $row['skill_name'],
-                'uri' => $row['concept_uri']
-            ];
-        }
+            // Load ESCO skills (Lower Priority, Fallback only)
+            $stmt = $this->db->prepare("SELECT id, skill_name, concept_uri FROM esco_skills ORDER BY skill_name ASC");
+            $stmt->execute();
+            $this->escoSkills = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $this->escoSkills[$row['id']] = [
+                    'name' => $row['skill_name'],
+                    'uri' => $row['concept_uri']
+                ];
+            }
 
-        // Load ESCO aliases (Fallback only)
-        $stmt = $this->db->prepare("SELECT alias, skill_id FROM esco_skill_aliases ORDER BY alias ASC");
-        $stmt->execute();
-        $this->escoAliases = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->escoAliases[strtolower($row['alias'])] = $row['skill_id'];
-        }
+            // Load ESCO aliases (Fallback only)
+            $stmt = $this->db->prepare("SELECT alias, skill_id FROM esco_skill_aliases ORDER BY alias ASC");
+            $stmt->execute();
+            $this->escoAliases = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $this->escoAliases[strtolower($row['alias'])] = $row['skill_id'];
+            }
 
-        error_log("Loaded " . count($this->manualSkills) . " manual skills, " . count($this->escoSkills) . " ESCO skills");
-        
-    } catch (PDOException $e) {
-        error_log("Error loading skill data: " . $e->getMessage());
-        $this->escoSkills = [];
-        $this->escoAliases = [];
-        $this->manualSkills = [];
+            error_log("Loaded " . count($this->manualSkills) . " manual skills, " . count($this->escoSkills) . " ESCO skills");
+        } catch (PDOException $e) {
+            error_log("Error loading skill data: " . $e->getMessage());
+            $this->escoSkills = [];
+            $this->escoAliases = [];
+            $this->manualSkills = [];
+        }
     }
-}
 
     public function parseResumeFile($filePath)
     {
@@ -126,130 +125,158 @@ private function loadAllSkillData()
     }
 
     // Use the EXACT same hybrid skill extraction as your prototype
-private function extractSkillsHybrid($text)
-{
-    $foundSkills = [];
-    $foundUris = [];
+    private function extractSkillsHybrid($text)
+    {
+        $foundSkills = [];
+        $foundUris = [];
 
-    // STEP 1: Priority to Manual Skills Dictionary (More Accurate & Minimal)
-    foreach ($this->manualSkills as $skill) {
-        if (stripos($text, $skill['skill_name']) !== false) {
-            if ($skill['esco_skill_id']) {
-                // Store mapped ESCO skill with URI
-                $foundSkills[] = $skill['esco_name'];
-                $foundUris[] = $skill['concept_uri'];
-            } else {
-                // Store manual skill (no ESCO mapping yet)
-                $foundSkills[] = $skill['skill_name'];
-                $foundUris[] = null;
+        // STEP 1: Priority to Manual Skills Dictionary (More Accurate & Minimal)
+        foreach ($this->manualSkills as $skill) {
+            if (stripos($text, $skill['skill_name']) !== false) {
+                if ($skill['esco_skill_id']) {
+                    // Store mapped ESCO skill with URI
+                    $foundSkills[] = $skill['esco_name'];
+                    $foundUris[] = $skill['concept_uri'];
+                } else {
+                    // Store manual skill (no ESCO mapping yet)
+                    $foundSkills[] = $skill['skill_name'];
+                    $foundUris[] = null;
+                }
             }
         }
-    }
 
-    // STEP 2: Only use ESCO if we found fewer than 5 skills from manual dictionary
-    if (count($foundSkills) < 5) {
-        // Use stricter ESCO matching - only exact matches, no partial matches
-        $escoMatches = $this->strictEscoSkillMatch($text, $this->escoSkills, $this->escoAliases);
-        
-        foreach ($escoMatches as $skillName => $uri) {
-            // Avoid duplicates
-            if (!in_array($skillName, $foundSkills)) {
-                $foundSkills[] = $skillName;
-                $foundUris[] = $uri;
+        // STEP 2: Only use ESCO if we found fewer than 5 skills from manual dictionary
+        if (count($foundSkills) < 5) {
+            // Use stricter ESCO matching - only exact matches, no partial matches
+            $escoMatches = $this->strictEscoSkillMatch($text, $this->escoSkills, $this->escoAliases);
+
+            foreach ($escoMatches as $skillName => $uri) {
+                // Avoid duplicates
+                if (!in_array($skillName, $foundSkills)) {
+                    $foundSkills[] = $skillName;
+                    $foundUris[] = $uri;
+                }
             }
         }
-    }
 
-    // STEP 3: Deduplicate while keeping pairs aligned
-    $uniqueSkills = [];
-    $uniqueUris = [];
-    foreach ($foundSkills as $i => $skill) {
-        if (!in_array($skill, $uniqueSkills)) {
-            $uniqueSkills[] = $skill;
-            $uniqueUris[] = $foundUris[$i];
+        // STEP 3: Deduplicate while keeping pairs aligned
+        $uniqueSkills = [];
+        $uniqueUris = [];
+        foreach ($foundSkills as $i => $skill) {
+            if (!in_array($skill, $uniqueSkills)) {
+                $uniqueSkills[] = $skill;
+                $uniqueUris[] = $foundUris[$i];
+            }
         }
+
+        // Limit to top 10 most relevant skills
+        $uniqueSkills = array_slice($uniqueSkills, 0, 10);
+        $uniqueUris = array_slice($uniqueUris, 0, 10);
+
+        // Convert to format expected by the application
+        $skills = [];
+        foreach ($uniqueSkills as $i => $skillName) {
+            $skills[] = [
+                'skill_name' => $skillName,
+                'proficiency_level' => 'Intermediate',
+                'esco_uri' => $uniqueUris[$i]
+            ];
+        }
+
+        return $skills;
     }
 
-    // Limit to top 10 most relevant skills
-    $uniqueSkills = array_slice($uniqueSkills, 0, 10);
-    $uniqueUris = array_slice($uniqueUris, 0, 10);
+    // New stricter ESCO matching function
+    private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
+    {
+        $matches = [];
+        $text_lower = strtolower($text);
 
-    // Convert to format expected by the application
-    $skills = [];
-    foreach ($uniqueSkills as $i => $skillName) {
-        $skills[] = [
-            'skill_name' => $skillName,
-            'proficiency_level' => 'Intermediate',
-            'esco_uri' => $uniqueUris[$i]
+        // Define common technical skills that we want to prioritize
+        $prioritySkills = [
+            'javascript',
+            'python',
+            'java',
+            'php',
+            'html',
+            'css',
+            'react',
+            'vue',
+            'angular',
+            'node.js',
+            'express',
+            'laravel',
+            'django',
+            'flask',
+            'sql',
+            'mysql',
+            'postgresql',
+            'mongodb',
+            'git',
+            'docker',
+            'kubernetes',
+            'aws',
+            'azure',
+            'linux',
+            'windows',
+            'agile',
+            'scrum',
+            'project management',
+            'leadership',
+            'communication',
+            'problem solving',
+            'teamwork',
+            'critical thinking'
         ];
-    }
 
-    return $skills;
-}
+        // First, look for priority skills in ESCO
+        foreach ($escoSkills as $id => $skill) {
+            $skillName_lower = strtolower($skill['name']);
 
-// New stricter ESCO matching function
-private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
-{
-    $matches = [];
-    $text_lower = strtolower($text);
-
-    // Define common technical skills that we want to prioritize
-    $prioritySkills = [
-        'javascript', 'python', 'java', 'php', 'html', 'css', 'react', 'vue', 'angular',
-        'node.js', 'express', 'laravel', 'django', 'flask', 'sql', 'mysql', 'postgresql',
-        'mongodb', 'git', 'docker', 'kubernetes', 'aws', 'azure', 'linux', 'windows',
-        'agile', 'scrum', 'project management', 'leadership', 'communication',
-        'problem solving', 'teamwork', 'critical thinking'
-    ];
-
-    // First, look for priority skills in ESCO
-    foreach ($escoSkills as $id => $skill) {
-        $skillName_lower = strtolower($skill['name']);
-        
-        // Check if it's a priority skill and exists in text
-        foreach ($prioritySkills as $priority) {
-            if (stripos($skillName_lower, $priority) !== false && stripos($text_lower, $priority) !== false) {
-                $matches[$skill['name']] = $skill['uri'];
-                break;
+            // Check if it's a priority skill and exists in text
+            foreach ($prioritySkills as $priority) {
+                if (stripos($skillName_lower, $priority) !== false && stripos($text_lower, $priority) !== false) {
+                    $matches[$skill['name']] = $skill['uri'];
+                    break;
+                }
             }
         }
-    }
 
-    // Then look for exact word matches (not partial) for other skills
-    foreach ($escoSkills as $id => $skill) {
-        if (count($matches) >= 8) break; // Limit ESCO matches
-        
-        $skillName = $skill['name'];
-        $skillName_lower = strtolower($skillName);
-        
-        // Skip if already found
-        if (isset($matches[$skillName])) continue;
-        
-        // Use word boundary matching for exact matches only
-        if (preg_match('/\b' . preg_quote($skillName_lower, '/') . '\b/', $text_lower)) {
-            $matches[$skillName] = $skill['uri'];
-        }
-    }
+        // Then look for exact word matches (not partial) for other skills
+        foreach ($escoSkills as $id => $skill) {
+            if (count($matches) >= 8) break; // Limit ESCO matches
 
-    // Check aliases but be more selective
-    foreach ($escoAliases as $alias => $skill_id) {
-        if (count($matches) >= 8) break; // Limit total matches
-        
-        if (isset($escoSkills[$skill_id])) {
-            $skillName = $escoSkills[$skill_id]['name'];
-            
+            $skillName = $skill['name'];
+            $skillName_lower = strtolower($skillName);
+
             // Skip if already found
             if (isset($matches[$skillName])) continue;
-            
-            // Only match if alias is in priority list or exact word match
-            if (in_array($alias, $prioritySkills) || preg_match('/\b' . preg_quote($alias, '/') . '\b/', $text_lower)) {
-                $matches[$skillName] = $escoSkills[$skill_id]['uri'];
+
+            // Use word boundary matching for exact matches only
+            if (preg_match('/\b' . preg_quote($skillName_lower, '/') . '\b/', $text_lower)) {
+                $matches[$skillName] = $skill['uri'];
             }
         }
-    }
 
-    return $matches;
-}
+        // Check aliases but be more selective
+        foreach ($escoAliases as $alias => $skill_id) {
+            if (count($matches) >= 8) break; // Limit total matches
+
+            if (isset($escoSkills[$skill_id])) {
+                $skillName = $escoSkills[$skill_id]['name'];
+
+                // Skip if already found
+                if (isset($matches[$skillName])) continue;
+
+                // Only match if alias is in priority list or exact word match
+                if (in_array($alias, $prioritySkills) || preg_match('/\b' . preg_quote($alias, '/') . '\b/', $text_lower)) {
+                    $matches[$skillName] = $escoSkills[$skill_id]['uri'];
+                }
+            }
+        }
+
+        return $matches;
+    }
 
     // EXACT same function as prototype
     private function normalizeEscoSkill($text, $escoSkills, $escoAliases)
@@ -661,27 +688,32 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
         if (preg_match('/(?:education|academic|qualification|educational\s+background)[\s:]*([^\n]+(?:\n[^\n]*)*?)(?=\n\s*(?:experience|work|employment|skills|projects?|certificates?|languages?|references?|objective|summary|$))/is', $text, $match)) {
             $eduText = $match[1];
 
-            // Extract school/university name (improved pattern)
-            $schoolPatterns = [
-                '/([^\n]*(?:university|college|institute|school|academy)[^\n]*)/i',
-                '/([A-Z][^\n]*(?:University|College|Institute|School|Academy)[^\n]*)/i',
-                '/([^\n]*(?:UNIVERSITY|COLLEGE|INSTITUTE|SCHOOL|ACADEMY)[^\n]*)/i'
-            ];
+            // Use advanced school name extraction
+            $education['school_name'] = $this->extractSchoolNameAdvanced($eduText);
 
-            foreach ($schoolPatterns as $pattern) {
-                if (preg_match($pattern, $eduText, $schoolMatch)) {
-                    $schoolName = trim($schoolMatch[1]);
-                    // Clean up the school name
-                    $schoolName = preg_replace('/^[•\-\*\+\s]+/', '', $schoolName);
-                    $schoolName = preg_replace('/^\d+\.\s*/', '', $schoolName);
-                    if (strlen($schoolName) > 3) {
-                        $education['school_name'] = $schoolName;
-                        break;
+            // If advanced method didn't work, fall back to basic patterns
+            if (empty($education['school_name'])) {
+                $schoolPatterns = [
+                    '/([^\n]*(?:university|college|institute|school|academy)[^\n]*)/i',
+                    '/([A-Z][^\n]*(?:University|College|Institute|School|Academy)[^\n]*)/i',
+                ];
+
+                foreach ($schoolPatterns as $pattern) {
+                    if (preg_match($pattern, $eduText, $schoolMatch)) {
+                        $schoolName = $this->cleanSchoolName(trim($schoolMatch[1]));
+
+                        if (strlen($schoolName) > 3 && $this->isValidSchoolName($schoolName)) {
+                            $education['school_name'] = $schoolName;
+                            break;
+                        }
                     }
                 }
             }
 
-            // Extract degree level with better patterns
+            // Rest of the extraction logic remains the same...
+            // (degree level, field of study, dates)
+
+            // Extract degree level
             $degreePatterns = [
                 '/\b(bachelor(?:\'s)?(?:\s+(?:of\s+)?(?:science|arts|engineering|business|fine\s+arts))?)/i' => 'Bachelor',
                 '/\b(master(?:\'s)?(?:\s+(?:of\s+)?(?:science|arts|engineering|business|fine\s+arts))?)/i' => 'Master',
@@ -698,17 +730,18 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
                 }
             }
 
-            // Extract field of study (improved)
+            // Extract field of study
             $fieldPatterns = [
-                '/(?:bachelor(?:\'s)?|master(?:\'s)?|degree)\s+(?:of\s+)?(?:science\s+)?(?:in\s+)?([^,\n]+)/i',
-                '/(?:major(?:ing)?|field|study(?:ing)?|specialization)(?:\s+in)?\s*:?\s*([^,\n]+)/i',
-                '/\b(?:computer\s+science|information\s+technology|engineering|business\s+administration|marketing|psychology|education|nursing|medicine)\b/i'
+                '/(?:bachelor(?:\'s)?|master(?:\'s)?|degree)\s+(?:of\s+)?(?:science\s+)?(?:in\s+)?([^,\n\d]+)/i',
+                '/(?:major(?:ing)?|field|study(?:ing)?|specialization)(?:\s+in)?\s*:?\s*([^,\n\d]+)/i',
+                '/\b(computer\s+science|information\s+technology|engineering|business\s+administration|marketing|psychology|education|nursing|medicine)\b/i'
             ];
 
             foreach ($fieldPatterns as $pattern) {
                 if (preg_match($pattern, $eduText, $fieldMatch)) {
                     $field = trim($fieldMatch[1] ?? $fieldMatch[0]);
                     $field = preg_replace('/^[•\-\*\+\s]+/', '', $field);
+                    $field = preg_replace('/\s*\d{4}.*$/', '', $field); // Remove years
                     if (strlen($field) > 2) {
                         $education['field_of_study'] = $field;
                         break;
@@ -716,32 +749,46 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
                 }
             }
 
-            // Extract graduation year (improved patterns)
+            // Extract years with validation
             $yearPatterns = [
                 '/(?:graduated|graduation|completed).*?(\d{4})/i',
-                '/(\d{4})\s*[-–]\s*(\d{4})/i', // Range
+                '/(\d{4})\s*[-–]\s*(\d{4})/i',
                 '/(?:class\s+of|year).*?(\d{4})/i',
-                '/\b(\d{4})\b(?=\s*$|\s*[,\n])/m' // Year at end of line
+                '/\b(\d{4})\b(?=\s*$|\s*[,\n])/m'
             ];
 
             foreach ($yearPatterns as $pattern) {
                 if (preg_match($pattern, $eduText, $yearMatch)) {
                     if (isset($yearMatch[2])) {
-                        // It's a range
-                        $education['start_date'] = $yearMatch[1] . '-01-01';
-                        $education['end_date'] = $yearMatch[2] . '-12-31';
+                        $startYear = (int)$yearMatch[1];
+                        $endYear = (int)$yearMatch[2];
+
+                        if ($this->isValidEducationYear($startYear) && $this->isValidEducationYear($endYear) && $startYear <= $endYear) {
+                            $education['start_date'] = $startYear . '-01-01';
+                            $education['end_date'] = $endYear . '-12-31';
+                            break;
+                        }
                     } else {
-                        // Single year (graduation year)
-                        $gradYear = $yearMatch[1];
-                        $education['end_date'] = $gradYear . '-12-31';
-                        $education['start_date'] = ($gradYear - 4) . '-01-01'; // Assume 4-year program
+                        $gradYear = (int)$yearMatch[1];
+
+                        if ($this->isValidEducationYear($gradYear)) {
+                            $education['end_date'] = $gradYear . '-12-31';
+                            $education['start_date'] = ($gradYear - 4) . '-01-01';
+                            break;
+                        }
                     }
-                    break;
                 }
             }
         }
 
         return $education;
+    }
+
+    // Add helper method to validate education years
+    private function isValidEducationYear($year)
+    {
+        $currentYear = (int)date('Y');
+        return ($year >= 1900 && $year <= ($currentYear + 10)); // Allow future years for ongoing programs
     }
 
     private function extractCertificates($text)
@@ -819,7 +866,7 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
 
             $jobseekerModel->updateProfile($userId, $profileData);
 
-            // Add skills
+            // Update skills (delete existing and add new ones)
             if (!empty($parsedData['skills'])) {
                 $jobseekerModel->deleteSkills($jobseekerId);
                 foreach ($parsedData['skills'] as $skill) {
@@ -827,20 +874,47 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
                 }
             }
 
-            // Add work experience
+            // Update work experience (delete existing and add new ones to avoid duplicates)
             if (!empty($parsedData['experience'])) {
+                // Delete existing work experience from parsing
+                $existingExperience = $jobseekerModel->getWorkExperience($userId);
+                if (!empty($existingExperience)) {
+                    foreach ($existingExperience as $exp) {
+                        $jobseekerModel->deleteWorkExperience($jobseekerId, $exp['experience_id']);
+                    }
+                }
+
+                // Add new parsed work experience
                 foreach ($parsedData['experience'] as $exp) {
                     $jobseekerModel->saveWorkExperience($jobseekerId, $exp);
                 }
             }
 
-            // Add education
+            // Update education (replace existing with parsed data)
             if (!empty($parsedData['education']) && !empty($parsedData['education']['school_name'])) {
+                // Delete existing education first
+                $existingEducation = $jobseekerModel->getEducation($userId);
+                if (!empty($existingEducation)) {
+                    foreach ($existingEducation as $edu) {
+                        $stmt = $jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_education WHERE education_id = ?");
+                        $stmt->execute([$edu['education_id']]);
+                    }
+                }
+
+                // Add new parsed education
                 $jobseekerModel->saveEducation($jobseekerId, $parsedData['education']);
             }
 
-            // Add certificates
+            // Update certificates (delete existing and add new ones)
             if (!empty($parsedData['certificates'])) {
+                $existingCertificates = $jobseekerModel->getCertificates($jobseekerId);
+                if (!empty($existingCertificates)) {
+                    foreach ($existingCertificates as $cert) {
+                        $stmt = $jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_certificates WHERE certificate_id = ?");
+                        $stmt->execute([$cert['certificate_id']]);
+                    }
+                }
+
                 foreach ($parsedData['certificates'] as $cert) {
                     $jobseekerModel->saveCertificate($jobseekerId, $cert);
                 }
@@ -858,5 +932,86 @@ private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
                 'message' => 'Failed to update profile: ' . $e->getMessage()
             ];
         }
+    }
+
+    // Add this method to better extract school names from common formats:
+
+    private function extractSchoolNameAdvanced($eduText)
+    {
+        $schoolName = '';
+
+        // Common patterns for school names
+        $patterns = [
+            // Pattern 1: "University of [Location]" or "[Name] University"
+            '/\b([A-Z][a-zA-Z\s&\-\']+(?:University|College|Institute|School|Academy)(?:\s+of\s+[A-Z][a-zA-Z\s]+)?)\b/',
+            // Pattern 2: "[State] [Type] University"
+            '/\b([A-Z][a-zA-Z]+\s+(?:State\s+)?(?:University|College|Institute))\b/',
+            // Pattern 3: Full institution names
+            '/\b([A-Z][a-zA-Z\s&\-\']+(?:Community\s+College|Technical\s+Institute|Polytechnic|Seminary))\b/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $eduText, $match)) {
+                $candidate = trim($match[1]);
+
+                // Clean the candidate
+                $candidate = $this->cleanSchoolName($candidate);
+
+                // Validate it's a real school name (not just keywords)
+                if (strlen($candidate) > 5 && $this->isValidSchoolName($candidate)) {
+                    $schoolName = $candidate;
+                    break;
+                }
+            }
+        }
+
+        return $schoolName;
+    }
+
+    private function cleanSchoolName($name)
+    {
+        // Remove years and dates
+        $name = preg_replace('/\s*[\|\-–]\s*\d{4}.*$/', '', $name);
+        $name = preg_replace('/\s*\(\s*\d{4}.*?\)/', '', $name);
+        $name = preg_replace('/\s*,?\s*\d{4}\s*[-–]\s*\d{4}/', '', $name);
+        $name = preg_replace('/\s*,?\s*\d{4}\s*[-–]\s*(?:present|current)/i', '', $name);
+        $name = preg_replace('/\s*\d{4}\s*$/', '', $name);
+
+        // Remove degree abbreviations
+        $name = preg_replace('/\s*[-–]\s*(BS|BA|MS|MA|PhD|Dr\.|BSc|MSc|Bachelor|Master).*$/i', '', $name);
+
+        // Remove bullets and numbering
+        $name = preg_replace('/^[•\-\*\+\s\d\.]+/', '', $name);
+
+        // Final cleanup
+        $name = trim($name);
+        $name = rtrim($name, ',-|–');
+
+        return $name;
+    }
+
+    private function isValidSchoolName($name)
+    {
+        // Check if it's not just common words or abbreviations
+        $invalidNames = ['university', 'college', 'school', 'institute', 'academy', 'education', 'degree', 'bachelor', 'master'];
+
+        $nameLower = strtolower($name);
+        foreach ($invalidNames as $invalid) {
+            if ($nameLower === $invalid) {
+                return false;
+            }
+        }
+
+        // Must contain at least one letter
+        if (!preg_match('/[a-zA-Z]/', $name)) {
+            return false;
+        }
+
+        // Should not be mostly numbers
+        if (preg_match('/^\d+/', $name)) {
+            return false;
+        }
+
+        return true;
     }
 }
