@@ -572,59 +572,55 @@ class JobPostController
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
 
-    public function browseJobs()
-    {
-        // Simple and clean approach - get jobs directly
-        $jobseeker_id = null;
-        $employer = null;
+public function browseJobs()
+{
+    // Simple and clean approach - get jobs directly
+    $jobseeker_id = null;
+    $employer = null;
 
-        // Get jobseeker ID if logged in as jobseeker
-        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-            require_once __DIR__ . '/../models/Jobseeker.php';
-            $jobseekerModel = new Jobseeker();
-            $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-            if ($jobseeker && !empty($jobseeker['first_name']) && !empty($jobseeker['last_name'])) {
-                $jobseeker_id = $jobseeker['jobseeker_id'];
-            }
+    // Get jobseeker ID if logged in as jobseeker
+    if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+        require_once __DIR__ . '/../models/Jobseeker.php';
+        $jobseekerModel = new Jobseeker();
+        $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+        if ($jobseeker && !empty($jobseeker['first_name']) && !empty($jobseeker['last_name'])) {
+            $jobseeker_id = $jobseeker['jobseeker_id'];
         }
-
-        // Check for employer filter
-        $employer_id = $_GET['employer_id'] ?? null;
-
-        if ($employer_id) {
-            // Get employer info for display
-            $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
-            // Get jobs from specific employer only
-            $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
-
-            // Add application status for jobseeker
-            if ($jobseeker_id && !empty($jobs)) {
-                require_once __DIR__ . '/../models/JobApplication.php';
-                $jobApplicationModel = new JobApplication();
-                foreach ($jobs as &$job) {
-                    $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker_id, $job['job_id']);
-                }
-            }
-        } else {
-            // UPDATED: Use skill matching version if jobseeker is logged in
-            if ($jobseeker_id) {
-                $jobs = $this->jobPostModel->getAllActiveJobsWithSkillMatch($jobseeker_id);
-            } else {
-                $jobs = $this->jobPostModel->getAllActiveJobs();
-            }
-        }
-
-        // Add saved status if user is logged in as jobseeker
-        if ($jobseeker_id && !empty($jobs)) {
-            require_once __DIR__ . '/../models/SavedJobs.php';
-            $savedJobsModel = new SavedJobs();
-            foreach ($jobs as &$job) {
-                $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
-            }
-        }
-
-        include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
+
+    // Check for employer filter
+    $employer_id = $_GET['employer_id'] ?? null;
+
+    if ($employer_id) {
+        // Get employer info for display
+        $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
+        // Get jobs from specific employer only
+        $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+
+        // Add application status for jobseeker
+        if ($jobseeker_id && !empty($jobs)) {
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            foreach ($jobs as &$job) {
+                $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker_id, $job['job_id']);
+            }
+        }
+    } else {
+        // FIXED: Use the existing getAllActiveJobs method for all users
+        $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
+    }
+
+    // Add saved status if user is logged in as jobseeker
+    if ($jobseeker_id && !empty($jobs)) {
+        require_once __DIR__ . '/../models/SavedJobs.php';
+        $savedJobsModel = new SavedJobs();
+        foreach ($jobs as &$job) {
+            $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+        }
+    }
+
+    include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
+}
 
     public function editJob()
     {

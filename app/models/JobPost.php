@@ -955,62 +955,6 @@ class JobPost
         }
     }
 
-    // Update getAllActiveJobs to include skill matching if jobseeker_id is provided
-    public function getAllActiveJobsWithSkillMatch($jobseeker_id = null)
-    {
-        try {
-            // Get basic job data
-            $jobs = $this->getAllActiveJobs($jobseeker_id);
-
-            if (!$jobseeker_id || empty($jobs)) {
-                return $jobs;
-            }
-
-            // Get jobseeker skills
-            require_once __DIR__ . '/Jobseeker.php';
-            $jobseekerModel = new Jobseeker();
-            $jobseekerSkills = $jobseekerModel->getSkillsArray($jobseeker_id);
-
-            if (empty($jobseekerSkills)) {
-                return $jobs;
-            }
-
-            // Get recommendation service
-            require_once __DIR__ . '/../services/JobRecommendationService.php';
-            $recommendationService = new JobRecommendationService();
-
-            // Check if Python API is available
-            if (!$recommendationService->testConnection()) {
-                error_log('Python API not available, returning jobs without skill matching');
-                return $jobs;
-            }
-
-            // Add skill match data to each job
-            foreach ($jobs as &$job) {
-                $jobSkills = $this->getJobSkillsArray($job['job_id']);
-
-                if (!empty($jobSkills)) {
-                    $matchResult = $recommendationService->calculateJobseekerJobMatch($jobseeker_id, $job['job_id']);
-
-                    $job['skill_match_percentage'] = $matchResult['match_percentage'] ?? 0;
-                    $job['matched_skills'] = $matchResult['matched_skills'] ?? [];
-                    $job['missing_skills'] = $matchResult['missing_skills'] ?? [];
-                    $job['skill_match_available'] = $matchResult['success'] ?? false;
-                } else {
-                    $job['skill_match_percentage'] = 0;
-                    $job['matched_skills'] = [];
-                    $job['missing_skills'] = [];
-                    $job['skill_match_available'] = false;
-                }
-            }
-
-            return $jobs;
-        } catch (Exception $e) {
-            error_log('Error in getAllActiveJobsWithSkillMatch: ' . $e->getMessage());
-            return $this->getAllActiveJobs($jobseeker_id); // Fallback to basic jobs
-        }
-    }
-
     public function getActiveJobsByEmployer($employer_id, $limit = 5)
     {
         try {

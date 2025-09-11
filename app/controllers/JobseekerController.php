@@ -203,65 +203,94 @@ class JobseekerController
     //-----------------------------------------
 
 
-    public function dashboard()
-    {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            header('Location: ?page=login-jobseeker');
-            exit;
-        }
-
-        // Get jobseeker profile for navbar AND dashboard
-        $jobseeker = $this->getJobseekerData();
-        $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
-
-        // Get recent job listings for the dashboard with skill matching
-        try {
-            $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
-
-            // UPDATED: Use skill matching version
-            if ($jobseeker_id) {
-                $jobs = $this->jobPostModel->getAllActiveJobsWithSkillMatch($jobseeker_id);
-            } else {
-                $jobs = $this->jobPostModel->getAllActiveJobs();
-            }
-
-            $jobs = array_slice($jobs, 0, 6);
-        } catch (Exception $e) {
-            error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
-            $jobs = [];
-        }
-
-        // Get application statistics if profile exists
-        $applicationStats = [];
-        if ($hasProfile) {
-            try {
-                if (!class_exists('JobApplication')) {
-                    require_once __DIR__ . '/../models/JobApplication.php';
-                }
-
-                $jobApplicationModel = new JobApplication();
-                $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
-
-                $applicationStats = [
-                    'total' => count($applications),
-                    'pending' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'pending';
-                    })),
-                    'shortlisted' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
-                    })),
-                    'hired' => count(array_filter($applications, function ($app) {
-                        return isset($app['application_status']) && $app['application_status'] === 'hired';
-                    }))
-                ];
-            } catch (Exception $e) {
-                error_log('Error fetching application stats: ' . $e->getMessage());
-                $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
-            }
-        }
-
-        include __DIR__ . '/../views/jobseekers/dashboard.php';
+public function dashboard()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+        header('Location: ?page=login-jobseeker');
+        exit;
     }
+
+    // Get jobseeker profile for navbar AND dashboard
+    $jobseeker = $this->getJobseekerData();
+    $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
+
+    // Get recent job listings for the dashboard
+    try {
+        $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
+
+        // FIXED: Use standard method instead of non-existent skill matching method
+        $jobs = $this->jobPostModel->getAllActiveJobs();
+        
+        // Optional: Add basic skill-based sorting if jobseeker has skills
+        if ($jobseeker_id && $hasProfile) {
+            // Get jobseeker skills for basic matching
+            $jobseekerSkills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
+            
+            if (!empty($jobseekerSkills)) {
+                // Add a simple skill relevance score to jobs
+                foreach ($jobs as &$job) {
+                    $job['skill_match_count'] = 0;
+                    
+                    // Get job skills (if the method exists)
+                    if (method_exists($this->jobPostModel, 'getJobSkills')) {
+                        $jobSkills = $this->jobPostModel->getJobSkills($job['job_id']);
+                        
+                        // Count skill matches
+                        foreach ($jobseekerSkills as $userSkill) {
+                            foreach ($jobSkills as $jobSkill) {
+                                if (stripos($jobSkill['skill_name'], $userSkill['skill_name']) !== false ||
+                                    stripos($userSkill['skill_name'], $jobSkill['skill_name']) !== false) {
+                                    $job['skill_match_count']++;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Sort by skill matches (jobs with more matches first)
+                usort($jobs, function($a, $b) {
+                    return $b['skill_match_count'] - $a['skill_match_count'];
+                });
+            }
+        }
+
+        $jobs = array_slice($jobs, 0, 6);
+    } catch (Exception $e) {
+        error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
+        $jobs = [];
+    }
+
+    // Get application statistics if profile exists
+    $applicationStats = [];
+    if ($hasProfile) {
+        try {
+            if (!class_exists('JobApplication')) {
+                require_once __DIR__ . '/../models/JobApplication.php';
+            }
+
+            $jobApplicationModel = new JobApplication();
+            $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
+
+            $applicationStats = [
+                'total' => count($applications),
+                'pending' => count(array_filter($applications, function ($app) {
+                    return isset($app['application_status']) && $app['application_status'] === 'pending';
+                })),
+                'shortlisted' => count(array_filter($applications, function ($app) {
+                    return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
+                })),
+                'hired' => count(array_filter($applications, function ($app) {
+                    return isset($app['application_status']) && $app['application_status'] === 'hired';
+                }))
+            ];
+        } catch (Exception $e) {
+            error_log('Error fetching application stats: ' . $e->getMessage());
+            $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
+        }
+    }
+
+    include __DIR__ . '/../views/jobseekers/dashboard.php';
+}
 
     public function completeProfile()
     {

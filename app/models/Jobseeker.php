@@ -743,7 +743,7 @@ class Jobseeker
     public function findById($jobseeker_id)
     {
         try {
-            $sql = "SELECT * FROM jobseekers WHERE jobseeker_id = ?";
+            $sql = "SELECT * FROM jobseeker WHERE jobseeker_id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -753,89 +753,204 @@ class Jobseeker
         }
     }
 
-public function deleteCertificate($jobseeker_id, $certificate_id)
-{
-    try {
-        error_log("DEBUG: Attempting to delete certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
-        
-        // First check if the certificate exists
-        $checkStmt = $this->db->prepare("
+    public function deleteCertificate($jobseeker_id, $certificate_id)
+    {
+        try {
+            error_log("DEBUG: Attempting to delete certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
+
+            // First check if the certificate exists
+            $checkStmt = $this->db->prepare("
             SELECT * FROM jobseeker_certificates 
             WHERE certificate_id = ? AND jobseeker_id = ?
         ");
-        $checkStmt->execute([$certificate_id, $jobseeker_id]);
-        $certificate = $checkStmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$certificate) {
-            error_log("DEBUG: Certificate not found or doesn't belong to jobseeker");
-            return false;
-        }
-        
-        error_log("DEBUG: Certificate found: " . json_encode($certificate));
-        
-        // Now delete it
-        $deleteStmt = $this->db->prepare("
+            $checkStmt->execute([$certificate_id, $jobseeker_id]);
+            $certificate = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$certificate) {
+                error_log("DEBUG: Certificate not found or doesn't belong to jobseeker");
+                return false;
+            }
+
+            error_log("DEBUG: Certificate found: " . json_encode($certificate));
+
+            // Now delete it
+            $deleteStmt = $this->db->prepare("
             DELETE FROM jobseeker_certificates 
             WHERE certificate_id = ? AND jobseeker_id = ?
         ");
-        
-        $result = $deleteStmt->execute([$certificate_id, $jobseeker_id]);
-        $rowsAffected = $deleteStmt->rowCount();
-        
-        error_log("DEBUG: Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
-        error_log("DEBUG: Rows affected: " . $rowsAffected);
-        
-        return $result && $rowsAffected > 0;
-        
-    } catch (PDOException $e) {
-        error_log("ERROR: Database error in deleteCertificate: " . $e->getMessage());
-        return false;
-    }
-}
 
-public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
-{
-    try {
-        error_log("DEBUG: Updating certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
-        
-        $stmt = $this->db->prepare("
+            $result = $deleteStmt->execute([$certificate_id, $jobseeker_id]);
+            $rowsAffected = $deleteStmt->rowCount();
+
+            error_log("DEBUG: Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
+            error_log("DEBUG: Rows affected: " . $rowsAffected);
+
+            return $result && $rowsAffected > 0;
+        } catch (PDOException $e) {
+            error_log("ERROR: Database error in deleteCertificate: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
+    {
+        try {
+            error_log("DEBUG: Updating certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
+
+            $stmt = $this->db->prepare("
             UPDATE jobseeker_certificates 
             SET certificate_title = ?, issuing_organization = ?, date_issued = ?
             WHERE certificate_id = ? AND jobseeker_id = ?
         ");
 
-        $result = $stmt->execute([
-            $certData['certificate_title'],
-            $certData['issuing_organization'] ?? 'Unknown',
-            $certData['date_issued'] ?? date('Y-m-d'),
-            $certificate_id,
-            $jobseeker_id
-        ]);
-        
-        $rowsAffected = $stmt->rowCount();
-        error_log("DEBUG: Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
-        error_log("DEBUG: Rows affected: " . $rowsAffected);
-        
-        return $result && $rowsAffected > 0;
-        
-    } catch (PDOException $e) {
-        error_log("ERROR: Database error in updateCertificateById: " . $e->getMessage());
-        return false;
-    }
-}
+            $result = $stmt->execute([
+                $certData['certificate_title'],
+                $certData['issuing_organization'] ?? 'Unknown',
+                $certData['date_issued'] ?? date('Y-m-d'),
+                $certificate_id,
+                $jobseeker_id
+            ]);
 
-public function getCertificateById($certificate_id, $jobseeker_id)
-{
-    try {
-        $stmt = $this->db->prepare("
+            $rowsAffected = $stmt->rowCount();
+            error_log("DEBUG: Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
+            error_log("DEBUG: Rows affected: " . $rowsAffected);
+
+            return $result && $rowsAffected > 0;
+        } catch (PDOException $e) {
+            error_log("ERROR: Database error in updateCertificateById: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getCertificateById($certificate_id, $jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
             SELECT * FROM jobseeker_certificates 
             WHERE certificate_id = ? AND jobseeker_id = ?
         ");
-        $stmt->execute([$certificate_id, $jobseeker_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log("ERROR: Database error in getCertificateById: " . $e->getMessage());
-        return false;
+            $stmt->execute([$certificate_id, $jobseeker_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("ERROR: Database error in getCertificateById: " . $e->getMessage());
+            return false;
+        }
     }
-}
+
+/**
+     * Get all jobseeker data for ML recommendation system
+     */
+    public function getRecommendationData($jobseeker_id)
+    {
+        try {
+            // Get basic jobseeker info
+            $jobseeker = $this->findById($jobseeker_id);
+            if (!$jobseeker) {
+                return null;
+            }
+
+            // Get skills
+            $skills = $this->getJobseekerSkills($jobseeker_id);
+            
+            // Get work experience
+            $workExperience = $this->getJobseekerWorkExperience($jobseeker_id);
+            
+            // Get education
+            $education = $this->getJobseekerEducation($jobseeker_id);
+
+            return [
+                'jobseeker_id' => $jobseeker_id,
+                'full_name' => trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']),
+                'skills' => $skills,
+                'work_experience' => $workExperience,
+                'education' => $education
+            ];
+        } catch (PDOException $e) {
+            error_log('Error getting recommendation data: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get all skills for a jobseeker (for ML system)
+     */
+    public function getJobseekerSkills($jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT skill_name, proficiency_level, esco_uri
+                FROM jobseeker_skills 
+                WHERE jobseeker_id = ?
+                ORDER BY proficiency_level DESC, skill_name ASC
+            ");
+            $stmt->execute([$jobseeker_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobseeker skills: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all work experience for a jobseeker (for ML system)
+     */
+    public function getJobseekerWorkExperience($jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT job_title, company_name, start_date, end_date, 
+                       responsibilities, employment_type, currently_working, experience_type
+                FROM jobseeker_work_experience 
+                WHERE jobseeker_id = ?
+                ORDER BY start_date DESC
+            ");
+            $stmt->execute([$jobseeker_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobseeker work experience: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all education for a jobseeker (for ML system)
+     */
+    public function getJobseekerEducation($jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT school_name, education_level, start_date, end_date, field_of_study
+                FROM jobseeker_education 
+                WHERE jobseeker_id = ?
+                ORDER BY end_date DESC
+            ");
+            $stmt->execute([$jobseeker_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobseeker education: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all jobseekers for the recommendation dropdown
+     */
+    public function getAllJobseekers()
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT j.jobseeker_id, j.first_name, j.last_name, u.email
+                FROM jobseeker j
+                JOIN users u ON j.user_id = u.user_id
+                WHERE u.status = 'active'
+                ORDER BY j.first_name, j.last_name
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting all jobseekers: ' . $e->getMessage());
+            return [];
+        }
+    }
+
 }
