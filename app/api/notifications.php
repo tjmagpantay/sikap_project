@@ -39,6 +39,7 @@ try {
         $unreadCount = $notificationService->getUnreadCount($userId);
 
         error_log("✅ API: Found " . count($notifications) . " notifications, $unreadCount unread");
+        error_log("📋 API: Notifications data: " . json_encode($notifications)); // ADD THIS DEBUG LINE
 
         echo json_encode([
             'success' => true,

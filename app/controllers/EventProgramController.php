@@ -87,6 +87,25 @@ class EventProgramController
         );
 
         if ($success) {
+            // FIXED: Get the created event ID properly
+            $eventId = $this->model->getDatabase()->lastInsertId();
+
+            // Trigger notifications to jobseekers if event is visible
+            if ($_POST['status'] === 'show') {
+                try {
+                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($eventId);
+
+                    if ($notificationResult) {
+                        error_log("✅ Program notifications sent for event ID: $eventId");
+                    } else {
+                        error_log("⚠️ Program notifications may have failed for event ID: $eventId");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Failed to send program notifications: " . $e->getMessage());
+                    // Don't fail the event creation if notifications fail
+                }
+            }
+
             header('Location: index.php?page=admin-events&success=Event created successfully');
         } else {
             header('Location: index.php?page=admin-event-create&error=Failed to create event');
@@ -167,6 +186,23 @@ class EventProgramController
         );
 
         if ($success) {
+            // NEW: Trigger notifications if event status changed to 'show' 
+            // or if it's already 'show' and was updated
+            if ($_POST['status'] === 'show') {
+                try {
+                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
+
+                    if ($notificationResult) {
+                        error_log("✅ Program update notifications sent for event ID: $id");
+                    } else {
+                        error_log("⚠️ Program update notifications may have failed for event ID: $id");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Failed to send program update notifications: " . $e->getMessage());
+                    // Don't fail the event update if notifications fail
+                }
+            }
+
             header('Location: index.php?page=admin-events&success=Event updated successfully');
         } else {
             header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=Failed to update event');
@@ -244,6 +280,21 @@ class EventProgramController
         $success = $this->model->updateEventStatus($id, $newStatus);
 
         if ($success) {
+            // NEW: Trigger notifications when event status changes to 'show'
+            if ($newStatus === 'show') {
+                try {
+                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
+
+                    if ($notificationResult) {
+                        error_log("✅ Program visibility notifications sent for event ID: $id");
+                    } else {
+                        error_log("⚠️ Program visibility notifications may have failed for event ID: $id");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Failed to send program visibility notifications: " . $e->getMessage());
+                }
+            }
+
             header('Location: index.php?page=admin-events&success=Event status updated successfully');
         } else {
             header('Location: index.php?page=admin-events&error=Failed to update event status');

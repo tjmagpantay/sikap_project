@@ -278,17 +278,31 @@ class NotificationService
     // Get notifications for a user
     public function getUserNotifications($userId, $limit = 15, $offset = 0)
     {
-        $sql = "SELECT notification_id, type, title, message, link, status, data, created_at
-                FROM notifications
-                WHERE user_id = ?
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(1, $userId, PDO::PARAM_INT);
-        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
-        $stmt->bindValue(3, $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        try {
+            $sql = "SELECT notification_id, type, title, message, link, status, data, created_at
+                    FROM notifications
+                    WHERE user_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT ? OFFSET ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(1, $userId, PDO::PARAM_INT);
+            $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+            $stmt->bindValue(3, $offset, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            // DEBUG: Log the notifications we're returning
+            error_log("🔍 NotificationService: Returning " . count($notifications) . " notifications for user $userId");
+            if (!empty($notifications)) {
+                error_log("📋 First notification: " . json_encode($notifications[0]));
+            }
+
+            return $notifications;
+        } catch (Exception $e) {
+            error_log("❌ Error getting user notifications: " . $e->getMessage());
+            return [];
+        }
     }
 
     // Get unread count
@@ -387,6 +401,89 @@ class NotificationService
             return true;
         } catch (Exception $e) {
             error_log("❌ Error notifying jobseekers about new job: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Notify jobseekers about new program/event posted by admin
+     */
+    public function notifyJobseekersAboutNewProgram(int $eventId): bool
+    {
+        try {
+            // Get event/program details
+            $eventStmt = $this->db->prepare("
+                SELECT title, description, type, time_start, status
+                FROM events 
+                WHERE event_id = ? AND status = 'show'
+            ");
+            $eventStmt->execute([$eventId]);
+            $event = $eventStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$event) {
+                error_log("❌ Event not found or not visible: $eventId");
+                return false;
+            }
+
+            // Create appropriate notification based on event type
+            $eventType = ucfirst($event['type']);
+            $title = "New {$eventType}: " . $event['title'];
+
+            $eventDate = new DateTime($event['time_start']);
+            $formattedDate = $eventDate->format('F j, Y \a\t g:i A');
+
+            $message = "A new {$eventType} has been posted. Join us on {$formattedDate}. Don't miss out!";
+
+            // Link to the programs page with anchor to specific event
+            $link = "?page=programs-jobseeker#event-" . $eventId;
+
+            // Get all active jobseekers who want program notifications
+            $jobseekerStmt = $this->db->prepare("
+                SELECT j.user_id 
+                FROM jobseeker j
+                INNER JOIN users u ON j.user_id = u.user_id 
+                LEFT JOIN jobseeker_settings js ON j.jobseeker_id = js.jobseeker_id
+                WHERE u.status = 'active' 
+                AND COALESCE(js.programs_news, 1) = 1
+            ");
+            $jobseekerStmt->execute();
+            $jobseekers = $jobseekerStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($jobseekers)) {
+                error_log("ℹ️ No active jobseekers found to notify about program");
+                return true; // No jobseekers to notify, but not an error
+            }
+
+            // FIXED: Insert notifications for all eligible jobseekers
+            $insertStmt = $this->db->prepare("
+                INSERT INTO notifications (user_id, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'program', ?, ?, ?, 'unread', ?, NOW())
+            ");
+
+            $data = json_encode([
+                'event_id' => $eventId,
+                'event_title' => $event['title'],
+                'event_type' => $event['type'],
+                'event_date' => $event['time_start']
+            ]);
+
+            $notificationCount = 0;
+            foreach ($jobseekers as $jobseeker) {
+                if ($insertStmt->execute([
+                    $jobseeker['user_id'],
+                    $title,
+                    $message,
+                    $link,
+                    $data
+                ])) {
+                    $notificationCount++;
+                }
+            }
+
+            error_log("✅ Sent $notificationCount program notifications for event ID: $eventId");
+            return true;
+        } catch (Exception $e) {
+            error_log("❌ Error notifying jobseekers about new program: " . $e->getMessage());
             return false;
         }
     }

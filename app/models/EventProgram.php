@@ -174,4 +174,27 @@ class EventProgram
         $stmt->execute([$eventId]);
         return (bool) $stmt->fetchColumn();
     }
+
+    /**
+     * Notify jobseekers about new program/event
+     */
+    public function notifyJobseekersAboutNewProgram($eventId)
+    {
+        try {
+            require_once __DIR__ . '/../services/NotificationService.php';
+
+            // Use the same database connection from this model
+            $notificationService = new NotificationService($this->db);
+            return $notificationService->notifyJobseekersAboutNewProgram($eventId);
+        } catch (Exception $e) {
+            error_log("❌ Error in EventProgram::notifyJobseekersAboutNewProgram: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ADD: Public getter for database connection
+    public function getDatabase()
+    {
+        return $this->db;
+    }
 }

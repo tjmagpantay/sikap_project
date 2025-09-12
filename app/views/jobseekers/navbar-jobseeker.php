@@ -133,16 +133,27 @@
                         <!-- Notification Icon -->
                         <div class="flex items-start">
                           <div class="flex-shrink-0">
-                            <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+                            <!-- FIXED: Different background colors for different notification types -->
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                              :class="notification.type === 'program' ? 'bg-green-100' : 'bg-blue-100'">
+
+                              <!-- Job Post Icon -->
                               <template x-if="notification.type === 'job_post'">
-<svg class="w-5 h-5 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-  <path d="M28,8H21V6a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2V8H4a2,2,0,0,0-2,2V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10A2,2,0,0,0,28,8ZM13,6h6V8H13Zm15,4v9H4V10ZM4,26V21H28v5Z"></path>
-  <path d="M15,18h2a1,1,0,0,0,0-2H15a1,1,0,0,0,0,2Z"></path>
-</svg>
-
-
+                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                  <path d="M28,8H21V6a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2V8H4a2,2,0,0,0-2,2V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10A2,2,0,0,0,28,8ZM13,6h6V8H13Zm15,4v9H4V10ZM4,26V21H28v5Z"></path>
+                                  <path d="M15,18h2a1,1,0,0,0,0-2H15a1,1,0,0,0,0,2Z"></path>
+                                </svg>
                               </template>
-                              <template x-if="notification.type !== 'job_post'">
+
+                              <!-- Program/Event Icon -->
+                              <template x-if="notification.type === 'program'">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </template>
+
+                              <!-- Default Icon -->
+                              <template x-if="notification.type !== 'job_post' && notification.type !== 'program'">
                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
