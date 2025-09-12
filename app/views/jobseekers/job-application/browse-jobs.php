@@ -277,7 +277,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         data-location="<?php echo strtolower(htmlspecialchars($currentJob['location'])); ?>"
                         data-job-type="<?php echo strtolower(htmlspecialchars($currentJob['job_type'])); ?>"
                         data-category="<?php echo strtolower(htmlspecialchars($currentJob['category_name'] ?? '')); ?>"
-                        data-match-percentage="<?php echo htmlspecialchars($currentJob['match_percentage'] ?? '95'); ?>">
+                        data-match-percentage="<?php echo number_format($currentJob['match_percentage'] ?? 50, 1); ?>">
 
                         <!-- Header: Company Logo and Job Title with Gray Background and Rounded Top Corners -->
                         <div class="flex items-start gap-4 p-6 pb-4 rounded-t-lg bg-gray-50">
@@ -368,10 +368,53 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     Posted <?php echo isset($currentJob['created_at']) ? date('M d, Y', strtotime($currentJob['created_at'])) : 'Recently'; ?>
                                 </span>
 
-                                <div class="flex items-center gap-2 py-2 text-xs text-gray-500">
-                                    <span>Best Match:</span>
-                                    <span class="text-sm font-semibold text-primary"><?php echo htmlspecialchars($currentJob['match_percentage'] ?? '95'); ?>%</span>
+                                <!-- ENHANCED: Real Match Percentage with Color Coding and Low Match Warning -->
+                                <div class="flex flex-col items-end">
+                                    <?php
+                                    $matchPercentage = $currentJob['match_percentage'] ?? 50;
+                                    $hasRealRecommendation = $currentJob['has_recommendation'] ?? false;
+                                    $isLowMatch = $matchPercentage < 20;
+                                    ?>
+
+                                    <div class="flex items-center gap-2 text-right">
+                                        <!-- Show Percentage Only If >= 20 -->
+                                        <?php if (!$isLowMatch): ?>
+                                            <div class="text-sm font-bold <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">
+                                                <?= number_format($matchPercentage, 1) ?>%
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- Match Text -->
+                                        <div class="text-xs text-gray-400">
+                                            <?= $isLowMatch ? 'Poor Match' : ($hasRealRecommendation ? 'AI Match' : 'Est. Match') ?>
+                                        </div>
+
+                                        <!-- FIXED: Low Match Warning Icon with Better Positioned Tooltip -->
+                                        <?php if ($isLowMatch): ?>
+                                            <div class="relative tooltip-container">
+                                                <svg class="w-4 h-4 text-gray-400 transition-colors cursor-help hover:text-yellow-500"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+
+                                                <!-- FIXED: Better Positioned Tooltip -->
+                                                <div class="absolute right-0 z-50 px-3 py-2 mb-3 text-xs text-white transition-all duration-200 transform -translate-y-1 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content bottom-full whitespace-nowrap">
+                                                    <div class="text-center min-w-max">
+                                                        <div class="flex items-center gap-1 font-medium text-yellow-300">
+                                                            ⚠️ <span>Low Match</span>
+                                                        </div>
+                                                        <div class="mt-1">No strong matches found.</div>
+                                                        <div class="text-gray-300 mt-0.5">Consider improving your profile</div>
+                                                    </div>
+                                                    <!-- Tooltip Arrow -->
+                                                    <div class="absolute w-0 h-0 border-t-4 border-l-4 border-r-4 border-transparent top-full right-4 border-t-gray-900"></div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </a>
@@ -381,7 +424,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             <!-- No Results Message (Hidden by default) -->
             <div id="noResultsMessage" class="hidden py-12 text-center">
                 <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0012 15c-2.137 0-4.146-.832-5.657-2.343"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 12h6m-9-4h6m2 5.291A7.962 7.962 0 0012 15c-2.137 0-4.146-.832-5.657-2.343"></path>
                 </svg>
                 <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs found</h3>
                 <p class="text-sm text-gray-500">Try adjusting your filters or search terms</p>
@@ -390,6 +433,81 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     </div>
 </div>
 
+<style>
+    /* FIXED: Enhanced Tooltip Styling with Proper Z-index and Positioning */
+    .tooltip-container:hover .tooltip-content {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto;
+    }
+
+    /* Ensure tooltip appears above all other elements */
+    .tooltip-content {
+        z-index: 9999 !important;
+    }
+
+    /* Prevent tooltip from being clipped by parent containers */
+    .job-cards {
+        overflow: visible !important;
+    }
+
+    /* Fix for grid container not clipping tooltips */
+    #jobListingsContainer {
+        overflow: visible !important;
+    }
+
+    /* Smooth hover transitions */
+    .tooltip-container svg {
+        transition: color 0.2s ease-in-out;
+    }
+
+    /* Better tooltip arrow */
+    .tooltip-content::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        right: 16px;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #1f2937;
+    }
+
+    /* Make sure cards don't clip overflowing elements */
+    .job-cards {
+        position: relative;
+        overflow: visible;
+    }
+
+    .job-cards .relative {
+        overflow: visible;
+    }
+
+    /* Ensure grid container allows overflow */
+    #jobListingsContainer {
+        overflow: visible;
+    }
+
+    /* Fix any potential clipping from parent containers */
+    .max-w-7xl {
+        overflow: visible;
+    }
+
+    /* Additional fix for mobile responsiveness */
+    @media (max-width: 640px) {
+        .tooltip-content {
+            right: -20px;
+            left: auto;
+            transform: translateX(0);
+            min-width: 200px;
+        }
+
+        .tooltip-content::after {
+            right: 30px;
+        }
+    }
+</style>
 <!-- Alpine.js -->
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -401,6 +519,19 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
+        // FIXED: Ensure containers don't clip tooltips
+        const containers = [
+            document.getElementById('jobListingsContainer'),
+            document.querySelector('.max-w-7xl'),
+            document.querySelector('.px-6.py-8')
+        ];
+
+        containers.forEach(container => {
+            if (container) {
+                container.style.overflow = 'visible';
+            }
+        });
+
         initializeFiltering();
     });
 

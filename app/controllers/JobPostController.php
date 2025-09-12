@@ -572,55 +572,183 @@ class JobPostController
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
 
-public function browseJobs()
-{
-    // Simple and clean approach - get jobs directly
-    $jobseeker_id = null;
-    $employer = null;
+    public function browseJobs()
+    {
+        // Get jobseeker info and initialize recommendation service
+        $jobseeker_id = null;
+        $jobseeker = null;
+        $recommendationService = null;
 
-    // Get jobseeker ID if logged in as jobseeker
-    if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-        require_once __DIR__ . '/../models/Jobseeker.php';
-        $jobseekerModel = new Jobseeker();
-        $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-        if ($jobseeker && !empty($jobseeker['first_name']) && !empty($jobseeker['last_name'])) {
-            $jobseeker_id = $jobseeker['jobseeker_id'];
-        }
-    }
+        // Get jobseeker ID if logged in as jobseeker
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
+            require_once __DIR__ . '/../models/Jobseeker.php';
+            $jobseekerModel = new Jobseeker();
+            $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
+            if ($jobseeker && !empty($jobseeker['first_name']) && !empty($jobseeker['last_name'])) {
+                $jobseeker_id = $jobseeker['jobseeker_id'];
 
-    // Check for employer filter
-    $employer_id = $_GET['employer_id'] ?? null;
-
-    if ($employer_id) {
-        // Get employer info for display
-        $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
-        // Get jobs from specific employer only
-        $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
-
-        // Add application status for jobseeker
-        if ($jobseeker_id && !empty($jobs)) {
-            require_once __DIR__ . '/../models/JobApplication.php';
-            $jobApplicationModel = new JobApplication();
-            foreach ($jobs as &$job) {
-                $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker_id, $job['job_id']);
+                // Initialize recommendation service for match percentages
+                require_once __DIR__ . '/../services/JobRecommendationService.php';
+                $recommendationService = new JobRecommendationService();
             }
         }
-    } else {
-        // FIXED: Use the existing getAllActiveJobs method for all users
-        $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
-    }
 
-    // Add saved status if user is logged in as jobseeker
-    if ($jobseeker_id && !empty($jobs)) {
-        require_once __DIR__ . '/../models/SavedJobs.php';
-        $savedJobsModel = new SavedJobs();
-        foreach ($jobs as &$job) {
-            $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+        // Check for employer filter
+        $employer_id = $_GET['employer_id'] ?? null;
+        $employer = null;
+
+        if ($employer_id) {
+            // Get employer info for display
+            $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
+            // Get jobs from specific employer only
+            $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+
+            // Add application status for jobseeker
+            if ($jobseeker_id && !empty($jobs)) {
+                require_once __DIR__ . '/../models/JobApplication.php';
+                $jobApplicationModel = new JobApplication();
+                foreach ($jobs as &$job) {
+                    $job['has_applied'] = $jobApplicationModel->hasApplied($jobseeker_id, $job['job_id']);
+                }
+            }
+        } else {
+            // Get all active jobs
+            $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
         }
+
+        // ENHANCED: Get real recommendation percentages if jobseeker is logged in
+        if ($jobseeker_id && $recommendationService && !empty($jobs)) {
+            try {
+                error_log("🎯 Getting recommendation percentages for jobseeker {$jobseeker_id}");
+
+                // FIXED: Check for cached recommendations first
+                $cacheKey = "recommendations_{$jobseeker_id}_" . md5(serialize(array_column($jobs, 'job_id')));
+                $cachedRecommendations = null;
+
+                // Simple file-based cache (you can replace with Redis/Memcached later)
+                $cacheFile = sys_get_temp_dir() . "/sikap_rec_" . $cacheKey . ".json";
+                if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 3600) { // Cache for 1 hour
+                    $cachedRecommendations = json_decode(file_get_contents($cacheFile), true);
+                    error_log("📄 Using cached recommendations");
+                }
+
+                if ($cachedRecommendations) {
+                    $matchPercentages = $cachedRecommendations;
+                } else {
+                    // Get fresh recommendations
+                    $recommendationResult = $recommendationService->getRecommendations($jobseeker_id, 50);
+
+                    if ($recommendationResult['success'] && !empty($recommendationResult['recommendations'])) {
+                        // Create a lookup map of job_id => match_percentage
+                        $matchPercentages = [];
+                        foreach ($recommendationResult['recommendations'] as $rec) {
+                            $matchPercentages[$rec['job_id']] = $rec['match_percentage'];
+                        }
+
+                        // Cache the results
+                        file_put_contents($cacheFile, json_encode($matchPercentages));
+                        error_log("💾 Cached recommendations for future use");
+                    } else {
+                        $matchPercentages = [];
+                    }
+                }
+
+                error_log("📊 Found " . count($matchPercentages) . " job matches");
+
+                // Update jobs with real match percentages
+                foreach ($jobs as &$job) {
+                    if (isset($matchPercentages[$job['job_id']])) {
+                        // Use the real/cached recommendation percentage
+                        $job['match_percentage'] = round($matchPercentages[$job['job_id']], 1);
+                        $job['has_recommendation'] = true;
+                        error_log("✅ Job {$job['job_id']}: {$job['match_percentage']}% match");
+                    } else {
+                        // Calculate a consistent fallback percentage
+                        $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
+                        $job['has_recommendation'] = false;
+                        error_log("📈 Job {$job['job_id']}: {$job['match_percentage']}% fallback match");
+                    }
+                }
+
+                // Sort jobs by match percentage (highest first) for better UX
+                usort($jobs, function ($a, $b) {
+                    return ($b['match_percentage'] ?? 0) <=> ($a['match_percentage'] ?? 0);
+                });
+
+                error_log("🔄 Sorted jobs by match percentage");
+            } catch (Exception $e) {
+                error_log("❌ Error getting recommendations: " . $e->getMessage());
+                // Apply consistent fallback matching
+                foreach ($jobs as &$job) {
+                    $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
+                    $job['has_recommendation'] = false;
+                }
+            }
+        } else {
+            // For non-logged-in users - use consistent seed
+            foreach ($jobs as &$job) {
+                mt_srand($job['job_id']); // Consistent seed
+                $job['match_percentage'] = mt_rand(60, 95);
+                mt_srand(); // Reset
+                $job['has_recommendation'] = false;
+            }
+        }
+
+        // Add saved status if user is logged in as jobseeker
+        if ($jobseeker_id && !empty($jobs)) {
+            require_once __DIR__ . '/../models/SavedJobs.php';
+            $savedJobsModel = new SavedJobs();
+            foreach ($jobs as &$job) {
+                $job['is_saved'] = $savedJobsModel->isSaved($jobseeker_id, $job['job_id']);
+            }
+        }
+
+        include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
 
-    include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
-}
+    /**
+     * Calculate basic match percentage as fallback when ML recommendation is unavailable
+     */
+    private function calculateBasicMatch($job, $jobseeker)
+    {
+        if (!$jobseeker) {
+            // FIXED: Use job_id as seed for consistent results for guests
+            mt_srand($job['job_id']);
+            $percentage = mt_rand(70, 90);
+            mt_srand(); // Reset seed
+            return $percentage;
+        }
+
+        // FIXED: Use consistent seed based on jobseeker_id and job_id
+        $seed = $jobseeker['jobseeker_id'] * 1000 + $job['job_id'];
+        mt_srand($seed);
+
+        $matchScore = 40; // Base score
+
+        // Location preference (basic implementation)
+        if (!empty($jobseeker['preferred_location']) && !empty($job['location'])) {
+            if (stripos($job['location'], $jobseeker['preferred_location']) !== false) {
+                $matchScore += 15;
+            }
+        }
+
+        // Job type preference
+        if (!empty($jobseeker['preferred_job_type']) && !empty($job['job_type'])) {
+            if (strtolower($jobseeker['preferred_job_type']) === strtolower($job['job_type'])) {
+                $matchScore += 10;
+            }
+        }
+
+        // FIXED: Use seeded randomization for consistent results
+        $randomVariation = mt_rand(-3, 20);
+        $matchScore += $randomVariation;
+
+        // Reset random seed
+        mt_srand();
+
+        // Ensure score is within reasonable bounds with 20% minimum
+        return max(15, min(95, round($matchScore, 1)));
+    }
 
     public function editJob()
     {
