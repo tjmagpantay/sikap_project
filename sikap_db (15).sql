@@ -1,0 +1,1610 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Sep 12, 2025 at 08:21 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `sikap_db`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `accreditation`
+--
+
+CREATE TABLE `accreditation` (
+  `accreditation_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `reviewed_by` int(11) DEFAULT NULL,
+  `reviewed_at` datetime DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `admin_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `admin_name` varchar(100) DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `application_attachments`
+--
+
+CREATE TABLE `application_attachments` (
+  `attachment_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `file_type` enum('CV','Resume','Portfolio','Certificate','Transcript','Others') DEFAULT 'Others',
+  `uploaded_at` datetime DEFAULT current_timestamp(),
+  `profile_document_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `application_attachments`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_manual_delete_application_attachments` BEFORE DELETE ON `application_attachments` FOR EACH ROW BEGIN
+  SIGNAL SQLSTATE '45000'
+  SET MESSAGE_TEXT = 'You cannot delete application answers directly. Delete job_application instead.';
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employer`
+--
+
+CREATE TABLE `employer` (
+  `employer_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `middle_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `position` varchar(100) DEFAULT NULL,
+  `contact_no` varchar(20) DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `company_name` varchar(100) DEFAULT NULL,
+  `about_us` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `profile_completed` tinyint(1) DEFAULT 0,
+  `status` enum('incomplete','pending_verification','verified','rejected','suspended') DEFAULT 'incomplete'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employers_business`
+--
+
+CREATE TABLE `employers_business` (
+  `business_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `banner_image` text DEFAULT NULL,
+  `business_name` varchar(100) DEFAULT NULL,
+  `business_logo` text DEFAULT NULL,
+  `business_address` text DEFAULT NULL,
+  `business_type` enum('Corporation','Partnership','Sole Proprietorship','Non-Profit') NOT NULL,
+  `business_size` enum('micro','small','medium','large') DEFAULT NULL,
+  `business_desc` text DEFAULT NULL,
+  `business_email` varchar(100) DEFAULT NULL,
+  `business_contact` varchar(20) DEFAULT NULL,
+  `business_industry` varchar(100) DEFAULT NULL,
+  `business_team_size` varchar(50) DEFAULT NULL,
+  `business_established_year` date DEFAULT NULL,
+  `business_website` varchar(255) DEFAULT NULL,
+  `business_socials` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`business_socials`)),
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `business_completed` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employer_documents`
+--
+
+CREATE TABLE `employer_documents` (
+  `req_doc_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `letter_of_intent` varchar(100) DEFAULT NULL,
+  `company_profile` varchar(100) DEFAULT NULL,
+  `business_permit` varchar(100) DEFAULT NULL,
+  `cert_of_no_pending_case` varchar(100) DEFAULT NULL,
+  `dole_registration` varchar(100) DEFAULT NULL,
+  `cert_no_objection` varchar(100) DEFAULT NULL,
+  `poea_reg` varchar(100) DEFAULT NULL,
+  `job_vaccancies_qual` varchar(100) DEFAULT NULL,
+  `phil_jobnet_reg` varchar(100) DEFAULT NULL,
+  `upload_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employer_settings`
+--
+
+CREATE TABLE `employer_settings` (
+  `setting_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `application_notifications` tinyint(1) DEFAULT 1,
+  `candidate_matches` tinyint(1) DEFAULT 1,
+  `job_post_updates` tinyint(1) DEFAULT 1,
+  `platform_updates` tinyint(1) DEFAULT 0,
+  `company_profile_visibility` tinyint(1) DEFAULT 1,
+  `contact_information` tinyint(1) DEFAULT 1,
+  `job_post_analytics` tinyint(1) DEFAULT 1,
+  `auto_screen_applications` tinyint(1) DEFAULT 0,
+  `send_auto_replies` tinyint(1) DEFAULT 1,
+  `priority_candidate_alerts` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `esco_occupations`
+--
+
+CREATE TABLE `esco_occupations` (
+  `id` int(11) NOT NULL,
+  `concept_uri` varchar(255) NOT NULL,
+  `occupation_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `esco_occupation_skills`
+--
+
+CREATE TABLE `esco_occupation_skills` (
+  `id` int(11) NOT NULL,
+  `occupation_id` int(11) NOT NULL,
+  `skill_id` int(11) NOT NULL,
+  `relation_type` enum('essential','optional') DEFAULT 'essential'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `esco_skills`
+--
+
+CREATE TABLE `esco_skills` (
+  `id` int(11) NOT NULL,
+  `concept_uri` varchar(255) NOT NULL,
+  `skill_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `esco_skill_aliases`
+--
+
+CREATE TABLE `esco_skill_aliases` (
+  `id` int(11) NOT NULL,
+  `skill_id` int(11) NOT NULL,
+  `alias` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `events`
+--
+
+CREATE TABLE `events` (
+  `event_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `type` enum('program','jobfair','local recruitment') NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `time_start` datetime NOT NULL,
+  `time_end` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('show','hide','draft') NOT NULL DEFAULT 'draft',
+  `pinned` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker`
+--
+
+CREATE TABLE `jobseeker` (
+  `jobseeker_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `middle_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `suffix` varchar(50) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `sex` enum('Male','Female','Other') DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `contact_no` varchar(20) DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `profile_completion` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `profile_completed` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_certificates`
+--
+
+CREATE TABLE `jobseeker_certificates` (
+  `certificate_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `certificate_title` varchar(255) NOT NULL,
+  `issuing_organization` varchar(255) DEFAULT NULL,
+  `date_issued` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `certificate_url` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_documents`
+--
+
+CREATE TABLE `jobseeker_documents` (
+  `document_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `file_type` enum('resume','cv','certificate','other') NOT NULL,
+  `uploaded_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_education`
+--
+
+CREATE TABLE `jobseeker_education` (
+  `education_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `school_name` varchar(255) NOT NULL,
+  `education_level` enum('High School','Vocational','Associate','Bachelor','Master','Doctorate') NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `field_of_study` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_preferences`
+--
+
+CREATE TABLE `jobseeker_preferences` (
+  `preference_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `preference_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_saved_jobs`
+--
+
+CREATE TABLE `jobseeker_saved_jobs` (
+  `saved_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `saved_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_settings`
+--
+
+CREATE TABLE `jobseeker_settings` (
+  `setting_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `job_recommendations` tinyint(1) DEFAULT 1,
+  `application_updates` tinyint(1) DEFAULT 1,
+  `programs_news` tinyint(1) DEFAULT 0,
+  `profile_visibility` tinyint(1) DEFAULT 1,
+  `contact_information` tinyint(1) DEFAULT 1,
+  `resume_download` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_skills`
+--
+
+CREATE TABLE `jobseeker_skills` (
+  `skill_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `skill_name` varchar(100) NOT NULL,
+  `proficiency_level` enum('Beginner','Intermediate','Advanced','Expert') DEFAULT NULL,
+  `esco_uri` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobseeker_work_experience`
+--
+
+CREATE TABLE `jobseeker_work_experience` (
+  `experience_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `job_title` varchar(100) NOT NULL,
+  `company_name` varchar(255) NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `responsibilities` text DEFAULT NULL,
+  `achievements` text DEFAULT NULL,
+  `employment_type` enum('full-time','part-time','contract','freelance','internship','other') DEFAULT NULL,
+  `currently_working` enum('Yes','No') DEFAULT 'No',
+  `experience_type` enum('current','previous') DEFAULT 'previous'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_application`
+--
+
+CREATE TABLE `job_application` (
+  `application_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `application_status` enum('pending','reviewed','shortlisted','rejected','hired','resigned') DEFAULT 'pending',
+  `applied_at` datetime DEFAULT current_timestamp(),
+  `reviewed_at` datetime DEFAULT NULL,
+  `is_finalized` tinyint(1) DEFAULT 0,
+  `current_step` int(11) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_application_answers`
+--
+
+CREATE TABLE `job_application_answers` (
+  `answer_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL,
+  `answer` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `job_application_answers`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_manual_delete_application_answers` BEFORE DELETE ON `job_application_answers` FOR EACH ROW BEGIN
+  SIGNAL SQLSTATE '45000'
+  SET MESSAGE_TEXT = 'You cannot delete application answers directly. Delete job_application instead.';
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_application_eligibility`
+--
+
+CREATE TABLE `job_application_eligibility` (
+  `eligibility_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `interested_program` enum('None','SPES','TUPAD','GIP') DEFAULT 'None',
+  `priority_sector` enum('None','PWD','4Ps','Solo Parent','Senior Citizen','Youth') DEFAULT 'None'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `job_application_eligibility`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_manual_delete_job_application_eligibility` BEFORE DELETE ON `job_application_eligibility` FOR EACH ROW BEGIN
+  SIGNAL SQLSTATE '45000'
+  SET MESSAGE_TEXT = 'You cannot delete application answers directly. Delete job_application instead.';
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_application_management`
+--
+
+CREATE TABLE `job_application_management` (
+  `job_manage_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `managed_by_user_id` int(11) NOT NULL,
+  `interview_date` datetime DEFAULT NULL,
+  `interview_location` varchar(255) DEFAULT NULL,
+  `messaging_enabled` tinyint(1) DEFAULT 1,
+  `notes` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `job_application_management`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_manual_delete_job_application_management` BEFORE DELETE ON `job_application_management` FOR EACH ROW BEGIN
+  SIGNAL SQLSTATE '45000'
+  SET MESSAGE_TEXT = 'You cannot delete application answers directly. Delete job_application instead.';
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_application_status_logs`
+--
+
+CREATE TABLE `job_application_status_logs` (
+  `log_id` int(11) NOT NULL,
+  `application_id` int(11) DEFAULT NULL,
+  `status` enum('pending','reviewed','shortlisted','rejected','hired') DEFAULT NULL,
+  `changed_by_role` enum('jobseeker','employer','admin') DEFAULT NULL,
+  `changed_at` datetime DEFAULT current_timestamp(),
+  `remarks` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_category`
+--
+
+CREATE TABLE `job_category` (
+  `job_category_id` int(11) NOT NULL,
+  `category_name` enum('IT','Healthcare','Education','Engineering','Finance','Marketing','Construction','Others') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_post`
+--
+
+CREATE TABLE `job_post` (
+  `job_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `posted_by_role` enum('employer','admin') NOT NULL,
+  `job_title` varchar(100) NOT NULL,
+  `job_category_id` int(11) NOT NULL,
+  `job_status` enum('open','closed','draft','paused') DEFAULT 'open',
+  `job_type` enum('full-time','part-time','contract','internship','freelance') NOT NULL,
+  `salary` decimal(10,2) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `workplace_option` enum('onsite','remote','hybrid') DEFAULT 'onsite',
+  `pay_type` enum('monthly','hourly','weekly','project-based') DEFAULT NULL,
+  `pay_range` varchar(100) DEFAULT NULL,
+  `show_pay` tinyint(1) DEFAULT 1,
+  `job_summary` text DEFAULT NULL,
+  `full_description` text DEFAULT NULL,
+  `application_start` datetime DEFAULT NULL,
+  `application_deadline` datetime DEFAULT NULL,
+  `min_age` int(11) DEFAULT NULL,
+  `max_age` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_post_application_settings`
+--
+
+CREATE TABLE `job_post_application_settings` (
+  `setting_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `resume_required` tinyint(1) DEFAULT 1,
+  `allow_cover_letter` tinyint(1) DEFAULT 1,
+  `screening_questions_enabled` tinyint(1) DEFAULT 1,
+  `max_applicants` int(11) DEFAULT NULL,
+  `notify_on_new_application` tinyint(1) DEFAULT 1,
+  `is_highlighted` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_post_attachments`
+--
+
+CREATE TABLE `job_post_attachments` (
+  `attachment_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `file_path` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_post_questions`
+--
+
+CREATE TABLE `job_post_questions` (
+  `question_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `question_text` text NOT NULL,
+  `question_type` enum('text','radio','checkbox','dropdown') NOT NULL,
+  `question_option` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_post_skills`
+--
+
+CREATE TABLE `job_post_skills` (
+  `job_skill_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `skill_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `manual_to_esco`
+--
+
+CREATE TABLE `manual_to_esco` (
+  `id` int(11) NOT NULL,
+  `manual_skill_id` int(11) NOT NULL,
+  `esco_skill_id` int(11) NOT NULL,
+  `confidence_level` decimal(5,2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ml_jobseekers`
+--
+
+CREATE TABLE `ml_jobseekers` (
+  `id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `location` varchar(120) DEFAULT NULL,
+  `desired_role` varchar(255) DEFAULT NULL,
+  `skills_text` text NOT NULL,
+  `experience_text` text DEFAULT NULL,
+  `education_text` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ml_job_posts`
+--
+
+CREATE TABLE `ml_job_posts` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `location` varchar(120) DEFAULT NULL,
+  `employment_type` varchar(50) DEFAULT NULL,
+  `skills_text` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `notification_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `type` enum('job_post','job_application','application_update','accreditation') NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `link` varchar(500) DEFAULT NULL,
+  `status` enum('unread','read') DEFAULT 'unread',
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `req_document`
+--
+
+CREATE TABLE `req_document` (
+  `req_doc_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `letter_of_intent` varchar(100) DEFAULT NULL,
+  `company_profile` varchar(100) DEFAULT NULL,
+  `business_permit` varchar(100) DEFAULT NULL,
+  `cert_of_no_pending_case` varchar(100) DEFAULT NULL,
+  `dole_registration` varchar(100) DEFAULT NULL,
+  `cert_no_objection` varchar(100) DEFAULT NULL,
+  `poea_reg` varchar(100) DEFAULT NULL,
+  `job_vaccancies_qual` varchar(100) DEFAULT NULL,
+  `phil_jobnet_reg` varchar(100) DEFAULT NULL,
+  `upload_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `resignation_requests`
+--
+
+CREATE TABLE `resignation_requests` (
+  `resignation_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `jobseeker_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL,
+  `resignation_reason` text DEFAULT NULL,
+  `request_status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `requested_at` datetime DEFAULT current_timestamp(),
+  `reviewed_at` datetime DEFAULT NULL,
+  `reviewed_by` int(11) DEFAULT NULL,
+  `employer_notes` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `resumes_parsed_data`
+--
+
+CREATE TABLE `resumes_parsed_data` (
+  `id` int(11) NOT NULL,
+  `full_name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `skills` text DEFAULT NULL,
+  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `skills_uris` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `role_id` int(11) NOT NULL,
+  `role_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `skills_dictionary`
+--
+
+CREATE TABLE `skills_dictionary` (
+  `id` int(11) NOT NULL,
+  `skill_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `skill_aliases`
+--
+
+CREATE TABLE `skill_aliases` (
+  `id` int(11) NOT NULL,
+  `alias` varchar(255) NOT NULL,
+  `skill_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `status` enum('active','inactive','pending') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fcm_token` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_roles`
+--
+
+CREATE TABLE `user_roles` (
+  `user_role_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `accreditation`
+--
+ALTER TABLE `accreditation`
+  ADD PRIMARY KEY (`accreditation_id`),
+  ADD KEY `employer_id` (`employer_id`),
+  ADD KEY `reviewed_by` (`reviewed_by`);
+
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`admin_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `application_attachments`
+--
+ALTER TABLE `application_attachments`
+  ADD PRIMARY KEY (`attachment_id`),
+  ADD KEY `application_id` (`application_id`),
+  ADD KEY `application_attachments_ibfk_2` (`profile_document_id`);
+
+--
+-- Indexes for table `employer`
+--
+ALTER TABLE `employer`
+  ADD PRIMARY KEY (`employer_id`),
+  ADD KEY `fk_user_id` (`user_id`);
+
+--
+-- Indexes for table `employers_business`
+--
+ALTER TABLE `employers_business`
+  ADD PRIMARY KEY (`business_id`),
+  ADD KEY `fk_employer_id` (`employer_id`);
+
+--
+-- Indexes for table `employer_documents`
+--
+ALTER TABLE `employer_documents`
+  ADD PRIMARY KEY (`req_doc_id`),
+  ADD KEY `fk_employers_document_employer` (`employer_id`);
+
+--
+-- Indexes for table `employer_settings`
+--
+ALTER TABLE `employer_settings`
+  ADD PRIMARY KEY (`setting_id`),
+  ADD UNIQUE KEY `employer_id` (`employer_id`);
+
+--
+-- Indexes for table `esco_occupations`
+--
+ALTER TABLE `esco_occupations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `concept_uri` (`concept_uri`);
+
+--
+-- Indexes for table `esco_occupation_skills`
+--
+ALTER TABLE `esco_occupation_skills`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `occupation_id` (`occupation_id`),
+  ADD KEY `skill_id` (`skill_id`);
+
+--
+-- Indexes for table `esco_skills`
+--
+ALTER TABLE `esco_skills`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `concept_uri` (`concept_uri`);
+
+--
+-- Indexes for table `esco_skill_aliases`
+--
+ALTER TABLE `esco_skill_aliases`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `skill_id` (`skill_id`);
+
+--
+-- Indexes for table `events`
+--
+ALTER TABLE `events`
+  ADD PRIMARY KEY (`event_id`);
+
+--
+-- Indexes for table `jobseeker`
+--
+ALTER TABLE `jobseeker`
+  ADD PRIMARY KEY (`jobseeker_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `jobseeker_certificates`
+--
+ALTER TABLE `jobseeker_certificates`
+  ADD PRIMARY KEY (`certificate_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`),
+  ADD KEY `idx_jobseeker_certificates` (`jobseeker_id`),
+  ADD KEY `idx_certificate_title` (`certificate_title`);
+
+--
+-- Indexes for table `jobseeker_documents`
+--
+ALTER TABLE `jobseeker_documents`
+  ADD PRIMARY KEY (`document_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`);
+
+--
+-- Indexes for table `jobseeker_education`
+--
+ALTER TABLE `jobseeker_education`
+  ADD PRIMARY KEY (`education_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`);
+
+--
+-- Indexes for table `jobseeker_preferences`
+--
+ALTER TABLE `jobseeker_preferences`
+  ADD PRIMARY KEY (`preference_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`);
+
+--
+-- Indexes for table `jobseeker_saved_jobs`
+--
+ALTER TABLE `jobseeker_saved_jobs`
+  ADD PRIMARY KEY (`saved_id`),
+  ADD UNIQUE KEY `unique_jobseeker_job` (`jobseeker_id`,`job_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `jobseeker_settings`
+--
+ALTER TABLE `jobseeker_settings`
+  ADD PRIMARY KEY (`setting_id`),
+  ADD UNIQUE KEY `jobseeker_id` (`jobseeker_id`);
+
+--
+-- Indexes for table `jobseeker_skills`
+--
+ALTER TABLE `jobseeker_skills`
+  ADD PRIMARY KEY (`skill_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`);
+
+--
+-- Indexes for table `jobseeker_work_experience`
+--
+ALTER TABLE `jobseeker_work_experience`
+  ADD PRIMARY KEY (`experience_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`),
+  ADD KEY `idx_jobseeker_current` (`jobseeker_id`,`currently_working`),
+  ADD KEY `idx_jobseeker_type` (`jobseeker_id`,`experience_type`);
+
+--
+-- Indexes for table `job_application`
+--
+ALTER TABLE `job_application`
+  ADD PRIMARY KEY (`application_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `job_application_answers`
+--
+ALTER TABLE `job_application_answers`
+  ADD PRIMARY KEY (`answer_id`),
+  ADD KEY `application_id` (`application_id`),
+  ADD KEY `question_id` (`question_id`);
+
+--
+-- Indexes for table `job_application_eligibility`
+--
+ALTER TABLE `job_application_eligibility`
+  ADD PRIMARY KEY (`eligibility_id`),
+  ADD KEY `application_id` (`application_id`);
+
+--
+-- Indexes for table `job_application_management`
+--
+ALTER TABLE `job_application_management`
+  ADD PRIMARY KEY (`job_manage_id`),
+  ADD KEY `fk_jam_application` (`application_id`),
+  ADD KEY `fk_jam_user` (`managed_by_user_id`);
+
+--
+-- Indexes for table `job_application_status_logs`
+--
+ALTER TABLE `job_application_status_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `application_id` (`application_id`);
+
+--
+-- Indexes for table `job_category`
+--
+ALTER TABLE `job_category`
+  ADD PRIMARY KEY (`job_category_id`);
+
+--
+-- Indexes for table `job_post`
+--
+ALTER TABLE `job_post`
+  ADD PRIMARY KEY (`job_id`),
+  ADD KEY `employer_id` (`employer_id`),
+  ADD KEY `job_category_id` (`job_category_id`);
+
+--
+-- Indexes for table `job_post_application_settings`
+--
+ALTER TABLE `job_post_application_settings`
+  ADD PRIMARY KEY (`setting_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `job_post_attachments`
+--
+ALTER TABLE `job_post_attachments`
+  ADD PRIMARY KEY (`attachment_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `job_post_questions`
+--
+ALTER TABLE `job_post_questions`
+  ADD PRIMARY KEY (`question_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `job_post_skills`
+--
+ALTER TABLE `job_post_skills`
+  ADD PRIMARY KEY (`job_skill_id`),
+  ADD KEY `job_id` (`job_id`);
+
+--
+-- Indexes for table `manual_to_esco`
+--
+ALTER TABLE `manual_to_esco`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `manual_skill_id` (`manual_skill_id`),
+  ADD KEY `esco_skill_id` (`esco_skill_id`);
+
+--
+-- Indexes for table `ml_jobseekers`
+--
+ALTER TABLE `ml_jobseekers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `ml_job_posts`
+--
+ALTER TABLE `ml_job_posts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`notification_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `status` (`status`),
+  ADD KEY `created_at` (`created_at`);
+
+--
+-- Indexes for table `req_document`
+--
+ALTER TABLE `req_document`
+  ADD PRIMARY KEY (`req_doc_id`),
+  ADD KEY `fk_req_employer` (`employer_id`);
+
+--
+-- Indexes for table `resignation_requests`
+--
+ALTER TABLE `resignation_requests`
+  ADD PRIMARY KEY (`resignation_id`),
+  ADD KEY `application_id` (`application_id`),
+  ADD KEY `jobseeker_id` (`jobseeker_id`),
+  ADD KEY `employer_id` (`employer_id`);
+
+--
+-- Indexes for table `resumes_parsed_data`
+--
+ALTER TABLE `resumes_parsed_data`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`role_id`);
+
+--
+-- Indexes for table `skills_dictionary`
+--
+ALTER TABLE `skills_dictionary`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `skill_name` (`skill_name`),
+  ADD UNIQUE KEY `skill_name_2` (`skill_name`);
+
+--
+-- Indexes for table `skill_aliases`
+--
+ALTER TABLE `skill_aliases`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `alias` (`alias`),
+  ADD KEY `skill_id` (`skill_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD PRIMARY KEY (`user_role_id`),
+  ADD UNIQUE KEY `unique_user` (`user_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `role_id` (`role_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `accreditation`
+--
+ALTER TABLE `accreditation`
+  MODIFY `accreditation_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `application_attachments`
+--
+ALTER TABLE `application_attachments`
+  MODIFY `attachment_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `employer`
+--
+ALTER TABLE `employer`
+  MODIFY `employer_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `employers_business`
+--
+ALTER TABLE `employers_business`
+  MODIFY `business_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `employer_documents`
+--
+ALTER TABLE `employer_documents`
+  MODIFY `req_doc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `employer_settings`
+--
+ALTER TABLE `employer_settings`
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `esco_occupations`
+--
+ALTER TABLE `esco_occupations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `esco_occupation_skills`
+--
+ALTER TABLE `esco_occupation_skills`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `esco_skills`
+--
+ALTER TABLE `esco_skills`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `esco_skill_aliases`
+--
+ALTER TABLE `esco_skill_aliases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `events`
+--
+ALTER TABLE `events`
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker`
+--
+ALTER TABLE `jobseeker`
+  MODIFY `jobseeker_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_certificates`
+--
+ALTER TABLE `jobseeker_certificates`
+  MODIFY `certificate_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_documents`
+--
+ALTER TABLE `jobseeker_documents`
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_education`
+--
+ALTER TABLE `jobseeker_education`
+  MODIFY `education_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_preferences`
+--
+ALTER TABLE `jobseeker_preferences`
+  MODIFY `preference_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_saved_jobs`
+--
+ALTER TABLE `jobseeker_saved_jobs`
+  MODIFY `saved_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_settings`
+--
+ALTER TABLE `jobseeker_settings`
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_skills`
+--
+ALTER TABLE `jobseeker_skills`
+  MODIFY `skill_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobseeker_work_experience`
+--
+ALTER TABLE `jobseeker_work_experience`
+  MODIFY `experience_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_application`
+--
+ALTER TABLE `job_application`
+  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_application_answers`
+--
+ALTER TABLE `job_application_answers`
+  MODIFY `answer_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_application_eligibility`
+--
+ALTER TABLE `job_application_eligibility`
+  MODIFY `eligibility_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_application_management`
+--
+ALTER TABLE `job_application_management`
+  MODIFY `job_manage_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_application_status_logs`
+--
+ALTER TABLE `job_application_status_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_category`
+--
+ALTER TABLE `job_category`
+  MODIFY `job_category_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_post`
+--
+ALTER TABLE `job_post`
+  MODIFY `job_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_post_application_settings`
+--
+ALTER TABLE `job_post_application_settings`
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_post_attachments`
+--
+ALTER TABLE `job_post_attachments`
+  MODIFY `attachment_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_post_questions`
+--
+ALTER TABLE `job_post_questions`
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_post_skills`
+--
+ALTER TABLE `job_post_skills`
+  MODIFY `job_skill_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `manual_to_esco`
+--
+ALTER TABLE `manual_to_esco`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ml_jobseekers`
+--
+ALTER TABLE `ml_jobseekers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ml_job_posts`
+--
+ALTER TABLE `ml_job_posts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `req_document`
+--
+ALTER TABLE `req_document`
+  MODIFY `req_doc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `resignation_requests`
+--
+ALTER TABLE `resignation_requests`
+  MODIFY `resignation_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `resumes_parsed_data`
+--
+ALTER TABLE `resumes_parsed_data`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `skills_dictionary`
+--
+ALTER TABLE `skills_dictionary`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `skill_aliases`
+--
+ALTER TABLE `skill_aliases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_roles`
+--
+ALTER TABLE `user_roles`
+  MODIFY `user_role_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `accreditation`
+--
+ALTER TABLE `accreditation`
+  ADD CONSTRAINT `accreditation_ibfk_1` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `accreditation_ibfk_2` FOREIGN KEY (`reviewed_by`) REFERENCES `admin` (`admin_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `admin`
+--
+ALTER TABLE `admin`
+  ADD CONSTRAINT `admin_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `application_attachments`
+--
+ALTER TABLE `application_attachments`
+  ADD CONSTRAINT `application_attachments_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `application_attachments_ibfk_2` FOREIGN KEY (`profile_document_id`) REFERENCES `jobseeker_documents` (`document_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `employer`
+--
+ALTER TABLE `employer`
+  ADD CONSTRAINT `employer_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `employers_business`
+--
+ALTER TABLE `employers_business`
+  ADD CONSTRAINT `employers_business_ibfk_1` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_employer_id` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `employer_documents`
+--
+ALTER TABLE `employer_documents`
+  ADD CONSTRAINT `fk_employers_document_employer` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `employer_settings`
+--
+ALTER TABLE `employer_settings`
+  ADD CONSTRAINT `employer_settings_ibfk_1` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `esco_occupation_skills`
+--
+ALTER TABLE `esco_occupation_skills`
+  ADD CONSTRAINT `esco_occupation_skills_ibfk_1` FOREIGN KEY (`occupation_id`) REFERENCES `esco_occupations` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `esco_occupation_skills_ibfk_2` FOREIGN KEY (`skill_id`) REFERENCES `esco_skills` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `esco_skill_aliases`
+--
+ALTER TABLE `esco_skill_aliases`
+  ADD CONSTRAINT `esco_skill_aliases_ibfk_1` FOREIGN KEY (`skill_id`) REFERENCES `esco_skills` (`id`);
+
+--
+-- Constraints for table `jobseeker`
+--
+ALTER TABLE `jobseeker`
+  ADD CONSTRAINT `jobseeker_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_certificates`
+--
+ALTER TABLE `jobseeker_certificates`
+  ADD CONSTRAINT `fk_jobseeker_certificates_jobseeker` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `jobseeker_certificates_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_documents`
+--
+ALTER TABLE `jobseeker_documents`
+  ADD CONSTRAINT `jobseeker_documents_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_education`
+--
+ALTER TABLE `jobseeker_education`
+  ADD CONSTRAINT `jobseeker_education_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_preferences`
+--
+ALTER TABLE `jobseeker_preferences`
+  ADD CONSTRAINT `jobseeker_preferences_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_saved_jobs`
+--
+ALTER TABLE `jobseeker_saved_jobs`
+  ADD CONSTRAINT `jobseeker_saved_jobs_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `jobseeker_saved_jobs_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_settings`
+--
+ALTER TABLE `jobseeker_settings`
+  ADD CONSTRAINT `jobseeker_settings_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_skills`
+--
+ALTER TABLE `jobseeker_skills`
+  ADD CONSTRAINT `jobseeker_skills_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `jobseeker_work_experience`
+--
+ALTER TABLE `jobseeker_work_experience`
+  ADD CONSTRAINT `jobseeker_work_experience_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_application`
+--
+ALTER TABLE `job_application`
+  ADD CONSTRAINT `job_application_ibfk_1` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `job_application_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_application_answers`
+--
+ALTER TABLE `job_application_answers`
+  ADD CONSTRAINT `job_application_answers_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `job_application_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `job_post_questions` (`question_id`);
+
+--
+-- Constraints for table `job_application_eligibility`
+--
+ALTER TABLE `job_application_eligibility`
+  ADD CONSTRAINT `job_application_eligibility_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_application_management`
+--
+ALTER TABLE `job_application_management`
+  ADD CONSTRAINT `fk_jam_application` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_jam_user` FOREIGN KEY (`managed_by_user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_application_status_logs`
+--
+ALTER TABLE `job_application_status_logs`
+  ADD CONSTRAINT `job_application_status_logs_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `job_post`
+--
+ALTER TABLE `job_post`
+  ADD CONSTRAINT `job_post_ibfk_1` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `job_post_ibfk_2` FOREIGN KEY (`job_category_id`) REFERENCES `job_category` (`job_category_id`);
+
+--
+-- Constraints for table `job_post_application_settings`
+--
+ALTER TABLE `job_post_application_settings`
+  ADD CONSTRAINT `job_post_application_settings_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_post_attachments`
+--
+ALTER TABLE `job_post_attachments`
+  ADD CONSTRAINT `job_post_attachments_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_post_questions`
+--
+ALTER TABLE `job_post_questions`
+  ADD CONSTRAINT `job_post_questions_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_post_skills`
+--
+ALTER TABLE `job_post_skills`
+  ADD CONSTRAINT `job_post_skills_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job_post` (`job_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `manual_to_esco`
+--
+ALTER TABLE `manual_to_esco`
+  ADD CONSTRAINT `manual_to_esco_ibfk_1` FOREIGN KEY (`manual_skill_id`) REFERENCES `skills_dictionary` (`id`),
+  ADD CONSTRAINT `manual_to_esco_ibfk_2` FOREIGN KEY (`esco_skill_id`) REFERENCES `esco_skills` (`id`);
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `req_document`
+--
+ALTER TABLE `req_document`
+  ADD CONSTRAINT `fk_req_employer` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `resignation_requests`
+--
+ALTER TABLE `resignation_requests`
+  ADD CONSTRAINT `resignation_requests_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `job_application` (`application_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `resignation_requests_ibfk_2` FOREIGN KEY (`jobseeker_id`) REFERENCES `jobseeker` (`jobseeker_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `resignation_requests_ibfk_3` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `skill_aliases`
+--
+ALTER TABLE `skill_aliases`
+  ADD CONSTRAINT `skill_aliases_ibfk_1` FOREIGN KEY (`skill_id`) REFERENCES `skills_dictionary` (`id`);
+
+--
+-- Constraints for table `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

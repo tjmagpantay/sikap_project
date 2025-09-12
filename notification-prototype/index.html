@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Prototype - User Switcher</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .user-card { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 10px 0; }
+        .user-card h3 { margin-top: 0; color: #495057; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007cba; color: white; text-decoration: none; border-radius: 5px; margin: 5px 5px 5px 0; }
+        .btn:hover { background: #005a87; }
+        .btn-admin { background: #dc3545; }
+        .btn-admin:hover { background: #c82333; }
+        .btn-employer { background: #28a745; }
+        .btn-employer:hover { background: #218838; }
+        .btn-jobseeker { background: #ffc107; color: #000; }
+        .btn-jobseeker:hover { background: #e0a800; }
+        .workflow { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .step { margin: 10px 0; padding: 10px; background: white; border-left: 4px solid #007cba; }
+    </style>
+</head>
+<body>
+
+<h1>🔔 Notification Prototype Testing</h1>
+
+<div class="workflow">
+    <h2>Quick Test Workflow</h2>
+    <div class="step">
+        <strong>Step 1:</strong> Login as Employer → Go to Jobs → Post a job → Admin + Jobseeker get notifications
+    </div>
+    <div class="step">
+        <strong>Step 2:</strong> Login as Jobseeker → View dashboard → Check notifications (🔔 icon) → Apply to jobs
+    </div>
+    <div class="step">
+        <strong>Step 3:</strong> Login as Employer → Go to Applications → Update application status → Jobseeker gets notified
+    </div>
+    <div class="step">
+        <strong>Step 4:</strong> Login as Jobseeker → Check notifications → Click notifications to mark as read
+    </div>
+</div>
+
+<h2>👥 Switch Between Users</h2>
+
+<div class="user-card">
+    <h3>🔴 Alice Admin (ID: 1)</h3>
+    <p>Manages system and receives notifications about all job postings</p>
+    <a href="public/?route=dashboard&switch_user=1" class="btn btn-admin">Login as Admin</a>
+    <a href="public/?route=jobs&switch_user=1" class="btn btn-admin">Admin → Jobs</a>
+    <a href="public/?route=applications&switch_user=1" class="btn btn-admin">Admin → Applications</a>
+</div>
+
+<div class="user-card">
+    <h3>🟢 Bob Employer (ID: 2)</h3>
+    <p>Posts jobs and manages applications from jobseekers</p>
+    <a href="public/?route=dashboard&switch_user=2" class="btn btn-employer">Login as Employer</a>
+    <a href="public/?route=jobs&switch_user=2" class="btn btn-employer">Employer → Post Job</a>
+    <a href="public/?route=applications&switch_user=2" class="btn btn-employer">Employer → Applications</a>
+</div>
+
+<div class="user-card">
+    <h3>🟡 Charlie Jobseeker (ID: 3)</h3>
+    <p>Views available jobs, applies, and receives application status updates</p>
+    <a href="public/?route=dashboard&switch_user=3" class="btn btn-jobseeker">Login as Jobseeker</a>
+    <a href="public/?route=jobs&switch_user=3" class="btn btn-jobseeker">Jobseeker → View Jobs</a>
+</div>
+
+<div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <h3>📋 Features to Test</h3>
+    <ul>
+        <li>✅ User role-based dashboards</li>
+        <li>✅ Real-time notifications (polling every 10s)</li>
+        <li>✅ Notification bell icon with red badge count</li>
+        <li>✅ Dropdown notification history</li>
+        <li>✅ Mark notifications as read</li>
+        <li>✅ Job posting triggers notifications to Admin + Jobseekers</li>
+        <li>✅ Application updates trigger notifications to specific Jobseeker</li>
+        <li>✅ Easy user switching for testing</li>
+    </ul>
+</div>
+
+<div style="margin-top: 20px; text-align: center;">
+    <p><small>Make sure XAMPP is running with Apache and MySQL enabled</small></p>
+</div>
+
+</body>
+</html>
