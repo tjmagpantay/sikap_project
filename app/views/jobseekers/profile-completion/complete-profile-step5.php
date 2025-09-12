@@ -3,6 +3,16 @@ include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 
+// Display success/error messages from session (like Step 4)
+if (isset($_SESSION['success_message'])) {
+    $success = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
 // Check if we have parsed data in session
 $parsedSkills = [];
 if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed_resume_data']['skills'])) {
@@ -98,6 +108,52 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                 </div>
             </div>
 
+            <!-- Success/Error Messages (like Step 4) -->
+            <?php if (!empty($success)): ?>
+                <div class="p-4 mb-4 border border-green-200 rounded-md bg-green-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-600"><?php echo htmlspecialchars($success); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($error)): ?>
+                <div class="p-4 mb-4 border border-red-200 rounded-md bg-red-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-600"><?php echo htmlspecialchars($error); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Display existing skills if available -->
+            <?php if (!empty($skills) && is_array($skills) && count($skills) > 0): ?>
+                <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <h3 class="mb-4 text-lg font-medium text-gray-900">Your Current Skills</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <?php foreach ($skills as $skill): ?>
+                            <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                                <?php echo htmlspecialchars($skill['skill_name']); ?>
+                                <span class="ml-2 text-xs text-blue-600">
+                                    (<?php echo htmlspecialchars($skill['proficiency_level']); ?>)
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Display parsed skills if available -->
             <?php if (!empty($parsedSkills)): ?>
                 <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
@@ -121,7 +177,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5">
+            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5" id="skillsForm">
                 <div>
                     <label class="block mb-4 text-sm font-medium text-gray-700">Skills</label>
                     <div id="skills-container">
@@ -172,17 +228,14 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                     </select>
                                 </div>
 
-                                <!-- Delete button - Use form submission for existing skills -->
+                                <!-- FIXED: Delete button for existing skills -->
                                 <?php if (isset($skill['skill_id']) && !empty($skill['skill_id'])): ?>
-                                    <!-- Simple delete form for existing skills -->
-                                    <form method="POST" action="?page=delete-skill-simple" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this skill?')">
-                                        <input type="hidden" name="skill_id" value="<?php echo $skill['skill_id']; ?>">
-                                        <button type="submit" class="px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600"
+                                        onclick="deleteExistingSkill(<?php echo $skill['skill_id']; ?>)">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
                                 <?php else: ?>
                                     <!-- JavaScript remove for new skills -->
                                     <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeNewSkill(this)">
@@ -203,64 +256,89 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                     </button>
                 </div>
 
+                <!-- FIXED: Updated buttons to match Step 4 pattern exactly -->
                 <div class="flex justify-between">
                     <a href="?page=complete-jobseeker-profile&step=4"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Previous
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Previous Step
                     </a>
-                    <button type="submit"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Next
-                    </button>
+
+                    <div class="flex space-x-3">
+
+
+                        <!-- FIXED: Continue Button - matches Step 4 "Next Step" button exactly -->
+                        <button type="submit" name="submit_step5"
+                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <span>
+                                <?php if (!empty($skills)): ?>
+                                    Continue
+                                <?php else: ?>
+                                    Skip & Continue
+                                <?php endif; ?>
+                            </span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- FIXED: Updated JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let skillCount = <?php echo count($allSkills); ?>;
         const addSkillBtn = document.getElementById('add-skill');
         const skillsContainer = document.getElementById('skills-container');
 
+        // FIXED: Add new skill row function
         function addEmptySkillRow() {
             const skillRow = document.createElement('div');
             skillRow.className = 'skill-row flex gap-4 mb-4';
             skillRow.setAttribute('data-index', skillCount);
 
             skillRow.innerHTML = `
-            <div class="flex-1">
-                <input type="text" 
-                       name="skills[${skillCount}][skill_name]" 
-                       placeholder="Enter skill name" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-            </div>
-            <div class="w-32">
-                <select name="skills[${skillCount}][proficiency_level]" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate" selected>Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Expert">Expert</option>
-                </select>
-            </div>
-            <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeNewSkill(this)">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-            </button>
-        `;
+        <div class="flex-1">
+            <input type="text" 
+                   name="skills[${skillCount}][skill_name]" 
+                   placeholder="Enter skill name" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+        </div>
+        <div class="w-32">
+            <select name="skills[${skillCount}][proficiency_level]" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate" selected>Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Expert">Expert</option>
+            </select>
+        </div>
+        <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeNewSkill(this)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+        </button>
+    `;
 
             skillsContainer.appendChild(skillRow);
             skillCount++;
         }
 
-        addSkillBtn.addEventListener('click', function() {
-            addEmptySkillRow();
-        });
+        // FIXED: Event listener for add button
+        if (addSkillBtn) {
+            addSkillBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                addEmptySkillRow();
+            });
+        }
 
-        // Remove new skill function (for skills without skill_id)
+        // FIXED: Remove new skill function
         window.removeNewSkill = function(button) {
             const skillRows = document.querySelectorAll('.skill-row');
             if (skillRows.length > 1) {
@@ -277,5 +355,35 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                 });
             }
         };
+
+        // FIXED: Delete existing skill function
+        window.deleteExistingSkill = function(skillId) {
+            if (confirm('Are you sure you want to delete this skill?')) {
+                // Create and submit a hidden form for deletion
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '?page=delete-skill-simple';
+                form.style.display = 'none';
+
+                const skillIdInput = document.createElement('input');
+                skillIdInput.type = 'hidden';
+                skillIdInput.name = 'skill_id';
+                skillIdInput.value = skillId;
+
+                form.appendChild(skillIdInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        };
+
+        // FIXED: Form submission handling - remove all validation
+        const form = document.getElementById('skillsForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Let all form submissions go through without validation
+                console.log('Form submitted');
+                return true;
+            });
+        }
     });
 </script>

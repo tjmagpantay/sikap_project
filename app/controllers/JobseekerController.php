@@ -203,94 +203,96 @@ class JobseekerController
     //-----------------------------------------
 
 
-public function dashboard()
-{
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-        header('Location: ?page=login-jobseeker');
-        exit;
-    }
+    public function dashboard()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
 
-    // Get jobseeker profile for navbar AND dashboard
-    $jobseeker = $this->getJobseekerData();
-    $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
+        // Get jobseeker profile for navbar AND dashboard
+        $jobseeker = $this->getJobseekerData();
+        $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
 
-    // Get recent job listings for the dashboard
-    try {
-        $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
+        // Get recent job listings for the dashboard
+        try {
+            $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
 
-        // FIXED: Use standard method instead of non-existent skill matching method
-        $jobs = $this->jobPostModel->getAllActiveJobs();
-        
-        // Optional: Add basic skill-based sorting if jobseeker has skills
-        if ($jobseeker_id && $hasProfile) {
-            // Get jobseeker skills for basic matching
-            $jobseekerSkills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
-            
-            if (!empty($jobseekerSkills)) {
-                // Add a simple skill relevance score to jobs
-                foreach ($jobs as &$job) {
-                    $job['skill_match_count'] = 0;
-                    
-                    // Get job skills (if the method exists)
-                    if (method_exists($this->jobPostModel, 'getJobSkills')) {
-                        $jobSkills = $this->jobPostModel->getJobSkills($job['job_id']);
-                        
-                        // Count skill matches
-                        foreach ($jobseekerSkills as $userSkill) {
-                            foreach ($jobSkills as $jobSkill) {
-                                if (stripos($jobSkill['skill_name'], $userSkill['skill_name']) !== false ||
-                                    stripos($userSkill['skill_name'], $jobSkill['skill_name']) !== false) {
-                                    $job['skill_match_count']++;
+            // FIXED: Use standard method instead of non-existent skill matching method
+            $jobs = $this->jobPostModel->getAllActiveJobs();
+
+            // Optional: Add basic skill-based sorting if jobseeker has skills
+            if ($jobseeker_id && $hasProfile) {
+                // Get jobseeker skills for basic matching
+                $jobseekerSkills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
+
+                if (!empty($jobseekerSkills)) {
+                    // Add a simple skill relevance score to jobs
+                    foreach ($jobs as &$job) {
+                        $job['skill_match_count'] = 0;
+
+                        // Get job skills (if the method exists)
+                        if (method_exists($this->jobPostModel, 'getJobSkills')) {
+                            $jobSkills = $this->jobPostModel->getJobSkills($job['job_id']);
+
+                            // Count skill matches
+                            foreach ($jobseekerSkills as $userSkill) {
+                                foreach ($jobSkills as $jobSkill) {
+                                    if (
+                                        stripos($jobSkill['skill_name'], $userSkill['skill_name']) !== false ||
+                                        stripos($userSkill['skill_name'], $jobSkill['skill_name']) !== false
+                                    ) {
+                                        $job['skill_match_count']++;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    // Sort by skill matches (jobs with more matches first)
+                    usort($jobs, function ($a, $b) {
+                        return $b['skill_match_count'] - $a['skill_match_count'];
+                    });
                 }
-                
-                // Sort by skill matches (jobs with more matches first)
-                usort($jobs, function($a, $b) {
-                    return $b['skill_match_count'] - $a['skill_match_count'];
-                });
-            }
-        }
-
-        $jobs = array_slice($jobs, 0, 6);
-    } catch (Exception $e) {
-        error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
-        $jobs = [];
-    }
-
-    // Get application statistics if profile exists
-    $applicationStats = [];
-    if ($hasProfile) {
-        try {
-            if (!class_exists('JobApplication')) {
-                require_once __DIR__ . '/../models/JobApplication.php';
             }
 
-            $jobApplicationModel = new JobApplication();
-            $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
-
-            $applicationStats = [
-                'total' => count($applications),
-                'pending' => count(array_filter($applications, function ($app) {
-                    return isset($app['application_status']) && $app['application_status'] === 'pending';
-                })),
-                'shortlisted' => count(array_filter($applications, function ($app) {
-                    return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
-                })),
-                'hired' => count(array_filter($applications, function ($app) {
-                    return isset($app['application_status']) && $app['application_status'] === 'hired';
-                }))
-            ];
+            $jobs = array_slice($jobs, 0, 6);
         } catch (Exception $e) {
-            error_log('Error fetching application stats: ' . $e->getMessage());
-            $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
+            error_log('Error fetching jobs for dashboard: ' . $e->getMessage());
+            $jobs = [];
         }
-    }
 
-    include __DIR__ . '/../views/jobseekers/dashboard.php';
-}
+        // Get application statistics if profile exists
+        $applicationStats = [];
+        if ($hasProfile) {
+            try {
+                if (!class_exists('JobApplication')) {
+                    require_once __DIR__ . '/../models/JobApplication.php';
+                }
+
+                $jobApplicationModel = new JobApplication();
+                $applications = $jobApplicationModel->getApplicationsByJobseeker($jobseeker['jobseeker_id']);
+
+                $applicationStats = [
+                    'total' => count($applications),
+                    'pending' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'pending';
+                    })),
+                    'shortlisted' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'shortlisted';
+                    })),
+                    'hired' => count(array_filter($applications, function ($app) {
+                        return isset($app['application_status']) && $app['application_status'] === 'hired';
+                    }))
+                ];
+            } catch (Exception $e) {
+                error_log('Error fetching application stats: ' . $e->getMessage());
+                $applicationStats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'hired' => 0];
+            }
+        }
+
+        include __DIR__ . '/../views/jobseekers/dashboard.php';
+    }
 
     public function completeProfile()
     {
@@ -361,6 +363,11 @@ public function dashboard()
 
     private function handleStepSubmission($step, &$error, &$success)
     {
+        error_log("=== DEBUG STEP SUBMISSION START ===");
+        error_log("DEBUG: handleStepSubmission called with step: $step");
+        error_log("DEBUG: POST data: " . json_encode($_POST));
+        error_log("DEBUG: REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+
         $data = $_POST;
 
         switch ($step) {
@@ -377,6 +384,7 @@ public function dashboard()
                 $this->handleStep4($data, $error, $success);
                 break;
             case 5:
+                error_log("DEBUG: Calling handleStep5");
                 $this->handleStep5($data, $error, $success);
                 break;
             case 6:
@@ -388,6 +396,9 @@ public function dashboard()
             default:
                 $error = 'Invalid step.';
         }
+
+        error_log("DEBUG: After handling step, error: '$error', success: '$success'");
+        error_log("=== DEBUG STEP SUBMISSION END ===");
     }
 
     // Update the existing handleStep1 method to use the new parsing function
@@ -664,38 +675,145 @@ public function dashboard()
         }
     }
 
-    // Fix the handleStep5 method
-
     private function handleStep5($data, &$error, &$success)
     {
         // Skills - Step 5
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // Delete existing skills before adding new ones
-        $this->jobseekerModel->deleteSkills($jobseeker_id);
+        // ENHANCED DEBUG LOGGING
+        error_log("=== DEBUG HANDLESTEP5 START ===");
+        error_log("DEBUG: handleStep5 called for jobseeker_id: $jobseeker_id");
+        error_log("DEBUG: POST data: " . json_encode($data));
+        error_log("DEBUG: submit_step5 isset: " . (isset($data['submit_step5']) ? 'YES' : 'NO'));
+        error_log("DEBUG: save_skills isset: " . (isset($data['save_skills']) ? 'YES' : 'NO'));
+        error_log("DEBUG: skills data: " . json_encode($data['skills'] ?? 'NO SKILLS'));
 
-        // Handle multiple skills (updated to match new format)
-        if (isset($data['skills']) && is_array($data['skills'])) {
+        // Handle "Next Step" button - allow continuing without skills
+        if (isset($data['submit_step5'])) {
+            error_log("DEBUG: Processing submit_step5 button");
+
+            // Check if user is trying to continue without adding any skills
+            $hasExistingSkills = !empty($this->jobseekerModel->getSkills($_SESSION['user_id']));
+            $isAddingNewSkills = !empty($data['skills']);
+
+            error_log("DEBUG: hasExistingSkills: " . ($hasExistingSkills ? 'YES' : 'NO'));
+            error_log("DEBUG: isAddingNewSkills: " . ($isAddingNewSkills ? 'YES' : 'NO'));
+
+            // Process new skills if provided
+            if ($isAddingNewSkills) {
+                error_log("DEBUG: Processing new skills");
+                $processedCount = 0;
+
+                // Delete existing skills before adding new ones
+                $this->jobseekerModel->deleteSkills($jobseeker_id);
+                error_log("DEBUG: Deleted existing skills for jobseeker_id: $jobseeker_id");
+
+                foreach ($data['skills'] as $index => $skillData) {
+                    error_log("DEBUG: Processing skill $index: " . json_encode($skillData));
+
+                    // Only save if skill name is provided
+                    if (!empty($skillData['skill_name'])) {
+                        $skill = [
+                            'skill_name' => trim($skillData['skill_name']),
+                            'proficiency_level' => $skillData['proficiency_level'] ?? 'Intermediate',
+                            'esco_uri' => $skillData['esco_uri'] ?? null
+                        ];
+
+                        $result = $this->jobseekerModel->saveSkill($jobseeker_id, $skill);
+                        if ($result) {
+                            $processedCount++;
+                            error_log("DEBUG: Saved skill: " . $skill['skill_name']);
+                        } else {
+                            error_log("ERROR: Failed to save skill: " . $skill['skill_name']);
+                        }
+                    }
+                }
+
+                if ($processedCount > 0) {
+                    $_SESSION['success_message'] = "Successfully saved $processedCount skill(s)!";
+                    error_log("DEBUG: Set success message for $processedCount skills");
+                }
+            }
+
+            // Clear parsed data from session since we've processed it
+            unset($_SESSION['parsed_resume_data']);
+            unset($_SESSION['show_parsing_results']);
+            error_log("DEBUG: Cleared parsed data from session");
+
+            // Continue to next step
+            error_log("DEBUG: Redirecting to step 6");
+            header('Location: ?page=complete-jobseeker-profile&step=6');
+            exit;
+        }
+
+        // Handle "Save Skills" button
+        if (isset($data['save_skills'])) {
+            error_log("DEBUG: Processing save_skills button");
+
+            if (empty($data['skills'])) {
+                $error = 'Please add at least one skill to save.';
+                error_log("DEBUG: Error - no skills provided for save_skills");
+                return;
+            }
+
+            $processedCount = 0;
+
+            // Delete existing skills before adding new ones
+            $this->jobseekerModel->deleteSkills($jobseeker_id);
+
             foreach ($data['skills'] as $skillData) {
                 // Only save if skill name is provided
                 if (!empty($skillData['skill_name'])) {
                     $skill = [
-                        'skill_name' => $skillData['skill_name'],
+                        'skill_name' => trim($skillData['skill_name']),
                         'proficiency_level' => $skillData['proficiency_level'] ?? 'Intermediate',
                         'esco_uri' => $skillData['esco_uri'] ?? null
                     ];
-                    $this->jobseekerModel->saveSkill($jobseeker_id, $skill);
+
+                    $result = $this->jobseekerModel->saveSkill($jobseeker_id, $skill);
+                    if ($result) {
+                        $processedCount++;
+                    }
+                }
+            }
+
+            if ($processedCount > 0) {
+                $success = "Successfully saved $processedCount skill(s)!";
+            } else {
+                $error = 'No skills were saved. Please check your input.';
+            }
+
+            error_log("DEBUG: save_skills completed, staying on step 5");
+            return; // Stay on the same step to show success/error message
+        }
+
+        error_log("DEBUG: Neither submit_step5 nor save_skills was triggered");
+        error_log("=== DEBUG HANDLESTEP5 END ===");
+    }
+
+    private function processSkills($skillsData, $jobseeker_id)
+    {
+        $processedCount = 0;
+
+        // Delete existing skills
+        $this->jobseekerModel->deleteSkills($jobseeker_id);
+
+        foreach ($skillsData as $skillData) {
+            if (!empty($skillData['skill_name'])) {
+                $skill = [
+                    'skill_name' => trim($skillData['skill_name']),
+                    'proficiency_level' => $skillData['proficiency_level'] ?? 'Intermediate',
+                    'esco_uri' => $skillData['esco_uri'] ?? null
+                ];
+
+                if ($this->jobseekerModel->saveSkill($jobseeker_id, $skill)) {
+                    $processedCount++;
                 }
             }
         }
 
-        // Clear parsed data from session since we've processed it
-        unset($_SESSION['parsed_resume_data']);
-        unset($_SESSION['show_parsing_results']);
-
-        header('Location: ?page=complete-jobseeker-profile&step=6');
-        exit;
+        return $processedCount;
     }
 
     private function handleStep6($data, &$error, &$success)
