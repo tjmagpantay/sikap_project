@@ -1,43 +1,65 @@
 <?php
+// Turn off error display to prevent HTML in JSON response
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 session_start();
-require_once __DIR__ . '/../../config/database.php'; // Fixed path
+// FIXED: Correct path to database config
+require_once __DIR__ . '/../../config/sikap_db.php';
 require_once __DIR__ . '/../services/NotificationService.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+try {
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized - Please log in']);
+        exit;
+    }
 
-$notificationService = new NotificationService($pdo);
-$userId = $_SESSION['user_id'];
+    $userId = (int)$_SESSION['user_id'];
+    error_log("🔍 API: Fetching notifications for user ID: $userId");
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 15;
-    $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+    // Create PDO connection using config
+    $config = require __DIR__ . '/../../config/sikap_db.php';
+    $pdo = new PDO(
+        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+        $config['db_user'],
+        $config['db_pass']
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $notifications = $notificationService->getUserNotifications($userId, $limit, $offset);
-    $unreadCount = $notificationService->getUnreadCount($userId);
+    $notificationService = new NotificationService($pdo);
 
-    echo json_encode([
-        'notifications' => $notifications,
-        'unread_count' => $unreadCount
-    ]);
-}
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 15;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+        $notifications = $notificationService->getUserNotifications($userId, $limit, $offset);
+        $unreadCount = $notificationService->getUnreadCount($userId);
 
-    if (isset($input['action'])) {
+        error_log("✅ API: Found " . count($notifications) . " notifications, $unreadCount unread");
+
+        echo json_encode([
+            'success' => true,
+            'notifications' => $notifications,
+            'unread_count' => $unreadCount
+        ]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (!isset($input['action'])) {
+            echo json_encode(['error' => 'Action required']);
+            exit;
+        }
+
         switch ($input['action']) {
             case 'mark_as_read':
                 if (isset($input['notification_id'])) {
                     $success = $notificationService->markAsRead($input['notification_id'], $userId);
                     echo json_encode(['success' => $success]);
                 } else {
-                    echo json_encode(['error' => 'notification_id required']);
+                    echo json_encode(['error' => 'Notification ID required']);
                 }
                 break;
 
@@ -49,7 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default:
                 echo json_encode(['error' => 'Invalid action']);
         }
-    } else {
-        echo json_encode(['error' => 'Action required']);
     }
+} catch (Exception $e) {
+    error_log("❌ API Error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Server error: ' . $e->getMessage()
+    ]);
 }

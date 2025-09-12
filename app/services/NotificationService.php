@@ -278,24 +278,116 @@ class NotificationService
     // Get notifications for a user
     public function getUserNotifications($userId, $limit = 15, $offset = 0)
     {
-        return $this->notification->getUserNotifications($userId, $limit, $offset);
+        $sql = "SELECT notification_id, type, title, message, link, status, data, created_at
+                FROM notifications
+                WHERE user_id = ?
+                ORDER BY created_at DESC
+                LIMIT ? OFFSET ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(1, $userId, PDO::PARAM_INT);
+        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+        $stmt->bindValue(3, $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     // Get unread count
     public function getUnreadCount($userId)
     {
-        return $this->notification->getUnreadCount($userId);
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND status = 'unread'");
+        $stmt->execute([$userId]);
+        return (int)$stmt->fetchColumn();
     }
 
     // Mark as read
     public function markAsRead($notificationId, $userId)
     {
-        return $this->notification->markAsRead($notificationId, $userId);
+        $stmt = $this->db->prepare("UPDATE notifications SET status = 'read' WHERE notification_id = ? AND user_id = ?");
+        return $stmt->execute([$notificationId, $userId]);
     }
 
     // Mark all as read
     public function markAllAsRead($userId)
     {
-        return $this->notification->markAllAsRead($userId);
+        $stmt = $this->db->prepare("UPDATE notifications SET status = 'read' WHERE user_id = ? AND status = 'unread'");
+        return $stmt->execute([$userId]);
+    }
+
+    /**
+     * Notify jobseekers about new job post
+     */
+    public function notifyJobseekersAboutNewJob(int $jobId): bool
+    {
+        try {
+            // Get job details
+            $jobStmt = $this->db->prepare("
+                SELECT jp.job_title, jp.location, eb.business_name 
+                FROM job_post jp
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE jp.job_id = ? AND jp.job_status = 'open'
+            ");
+            $jobStmt->execute([$jobId]);
+            $job = $jobStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$job) {
+                error_log("❌ Job not found or not open: $jobId");
+                return false;
+            }
+
+            $companyName = $job['business_name'] ?: 'a company';
+            $title = "New Job Available: " . $job['job_title'];
+            $message = "New {$job['job_title']} position at {$companyName}" .
+                ($job['location'] ? " in {$job['location']}" : "") .
+                ". Apply now!";
+            $link = "?page=job-details&job_id=" . $jobId;
+
+            // Get all active jobseekers
+            $jobseekerStmt = $this->db->prepare("
+                SELECT j.user_id 
+                FROM jobseeker j
+                INNER JOIN users u ON j.user_id = u.user_id 
+                WHERE u.status = 'active'
+            ");
+            $jobseekerStmt->execute();
+            $jobseekers = $jobseekerStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($jobseekers)) {
+                error_log("ℹ️ No active jobseekers found to notify");
+                return true; // No jobseekers to notify, but not an error
+            }
+
+            // Insert notifications for all eligible jobseekers
+            $insertStmt = $this->db->prepare("
+                INSERT INTO notifications (user_id, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'job_post', ?, ?, ?, 'unread', ?, NOW())
+            ");
+
+            $data = json_encode([
+                'job_id' => $jobId,
+                'job_title' => $job['job_title'],
+                'company_name' => $companyName,
+                'location' => $job['location']
+            ]);
+
+            $notificationCount = 0;
+            foreach ($jobseekers as $jobseeker) {
+                if ($insertStmt->execute([
+                    $jobseeker['user_id'],
+                    $title,
+                    $message,
+                    $link,
+                    $data
+                ])) {
+                    $notificationCount++;
+                }
+            }
+
+            error_log("✅ Sent $notificationCount notifications for job ID: $jobId");
+            return true;
+        } catch (Exception $e) {
+            error_log("❌ Error notifying jobseekers about new job: " . $e->getMessage());
+            return false;
+        }
     }
 }

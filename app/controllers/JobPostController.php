@@ -382,6 +382,20 @@ class JobPostController
                 $result = $this->jobPostModel->publishJob($job_id);
 
                 if ($result) {
+                    // FIXED: Use model method to handle notifications (proper MVC pattern)
+                    try {
+                        $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
+
+                        if ($notificationResult) {
+                            error_log("✅ Notifications sent for job ID: $job_id");
+                        } else {
+                            error_log("⚠️ Notifications may have failed for job ID: $job_id");
+                        }
+                    } catch (Exception $e) {
+                        error_log("❌ Failed to send job notifications: " . $e->getMessage());
+                        // Don't fail the job publishing if notifications fail
+                    }
+
                     header("Location: ?page=job-post-success&job_id=$job_id");
                     exit;
                 } else {
@@ -822,6 +836,21 @@ class JobPostController
         $result = $this->jobPostModel->updateJobPost($job_id, ['job_status' => $new_status]);
 
         if ($result) {
+            // FIXED: Use model method for notifications when job is reopened
+            if ($new_status === 'open') {
+                try {
+                    $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
+
+                    if ($notificationResult) {
+                        error_log("✅ Reopened job notifications sent for job ID: $job_id");
+                    } else {
+                        error_log("⚠️ Reopened job notifications may have failed for job ID: $job_id");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Failed to send job reopened notifications: " . $e->getMessage());
+                }
+            }
+
             $action = $new_status === 'open' ? 'reopened' : $new_status;
             header('Location: ?page=view-employer-job&id=' . $job_id . '&success=' . urlencode("Job $action successfully!"));
         } else {

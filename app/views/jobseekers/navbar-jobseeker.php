@@ -41,10 +41,16 @@
         <li x-data="notificationDropdown()" class="relative">
           <button
             @click="toggleNotifications()"
-            class="relative hover:text-blue-600">
+            class="relative transition-all duration-200 rounded-full hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <!-- Notification Badge - Improved positioning and size -->
+            <span x-show="unreadCount > 0"
+              x-text="unreadCount"
+              class="absolute -top-1 -left-1 flex items-center justify-center min-w-[16px] h-[16px] text-xs font-semibold text-red-500 "
+              :class="unreadCount > 99 ? 'text-[10px] px-1' : ''">
+            </span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
               viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-              class="w-5 h-5 text-gray-500 transition-colors duration-200">
+              class="w-6 h-6 text-gray-500 transition-colors duration-200">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 
                         8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 
@@ -52,11 +58,7 @@
                         5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 
                         0m5.714 0a3 3 0 1 1-5.714 0" />
             </svg>
-            <!-- Notification Badge -->
-            <span x-show="unreadCount > 0"
-              x-text="unreadCount"
-              class="absolute flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
-            </span>
+
           </button>
 
           <!-- Notification Dropdown -->
@@ -69,44 +71,97 @@
             x-transition:leave-start="transform opacity-100 scale-100"
             x-transition:leave-end="transform opacity-0 scale-95"
             @click.away="isOpen = false"
-            class="absolute right-0 z-50 mt-2 overflow-hidden bg-white border border-gray-200 rounded-md shadow-lg w-80 max-h-96"
-            style="display: none;">
+            class="absolute right-0 z-50 mt-2 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl w-[500px] max-h-[500px]"
+            style="display: none; width: 500px !important;">
 
             <!-- Header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b">
-              <h3 class="font-semibold text-gray-900">Notifications</h3>
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+              <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
               <button @click="markAllAsRead()"
                 x-show="unreadCount > 0"
-                class="text-sm text-blue-600 hover:text-blue-800">
+                class="px-3 py-1 text-sm font-medium text-blue-600 transition-colors duration-200 rounded-md hover:text-blue-800 hover:bg-blue-100">
                 Mark all read
               </button>
             </div>
 
+            <!-- Loading State -->
+            <template x-if="loading">
+              <div class="flex items-center justify-center px-6 py-8 text-gray-500">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 mr-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                  Loading notifications...
+                </div>
+              </div>
+            </template>
+
+            <!-- Error State -->
+            <template x-if="error && !loading">
+              <div class="px-6 py-8 text-center text-red-500">
+                <p x-text="error" class="mb-3"></p>
+                <button @click="fetchNotifications()"
+                  class="px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 rounded-md hover:text-blue-800 hover:bg-blue-50">
+                  Try again
+                </button>
+              </div>
+            </template>
+
             <!-- Notifications List -->
-            <div class="overflow-y-auto max-h-64">
-              <template x-if="notifications.length === 0">
-                <div class="px-4 py-8 text-center text-gray-500">
-                  No notifications yet
+            <div class="overflow-y-auto max-h-80">
+              <!-- Empty State -->
+              <template x-if="notifications.length === 0 && !loading && !error">
+                <div class="px-6 py-12 text-center">
+                  <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM20 4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h4v-2H4V6h16v10h-2v2h2c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" />
+                  </svg>
+                  <p class="font-medium text-gray-500">No notifications yet</p>
+                  <p class="mt-1 text-sm text-gray-400">We'll notify you when there's something new!</p>
                 </div>
               </template>
 
+              <!-- Notification Items -->
               <template x-for="notification in notifications" :key="notification.notification_id">
-                <div class="border-b border-gray-100 cursor-pointer hover:bg-gray-50"
-                  :class="notification.status === 'unread' ? 'bg-blue-50' : ''"
+                <div class="transition-all duration-200 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
+                  :class="notification.status === 'unread' ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''"
                   @click="handleNotificationClick(notification)">
-                  <div class="px-4 py-3">
+                  <div class="px-6 py-4">
                     <div class="flex items-start justify-between">
-                      <div class="flex-1">
-                        <h4 class="text-sm font-medium text-gray-900"
-                          :class="notification.status === 'unread' ? 'font-bold' : ''"
-                          x-text="notification.title">
-                        </h4>
-                        <p class="mt-1 text-sm text-gray-600" x-text="notification.message"></p>
-                        <p class="mt-1 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></p>
+                      <div class="flex-1 min-w-0">
+                        <!-- Notification Icon -->
+                        <div class="flex items-start">
+                          <div class="flex-shrink-0">
+                            <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+                              <template x-if="notification.type === 'job_post'">
+<svg class="w-5 h-5 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <path d="M28,8H21V6a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2V8H4a2,2,0,0,0-2,2V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10A2,2,0,0,0,28,8ZM13,6h6V8H13Zm15,4v9H4V10ZM4,26V21H28v5Z"></path>
+  <path d="M15,18h2a1,1,0,0,0,0-2H15a1,1,0,0,0,0,2Z"></path>
+</svg>
+
+
+                              </template>
+                              <template x-if="notification.type !== 'job_post'">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </template>
+                            </div>
+                          </div>
+                          <div class="flex-1 ml-3">
+                            <h4 class="text-sm font-medium leading-5 text-gray-900"
+                              :class="notification.status === 'unread' ? 'font-semibold' : ''"
+                              x-text="notification.title">
+                            </h4>
+                            <p class="mt-1 text-sm leading-5 text-gray-600 line-clamp-2" x-text="notification.message"></p>
+                            <p class="mt-2 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></p>
+                          </div>
+                        </div>
                       </div>
-                      <div class="flex items-center ml-2">
+                      <div class="flex items-center ml-4">
                         <span x-show="notification.status === 'unread'"
-                          class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                          class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></span>
                       </div>
                     </div>
                   </div>
@@ -115,10 +170,10 @@
             </div>
 
             <!-- Footer -->
-            <div class="px-4 py-3 border-t bg-gray-50">
+            <div class="px-6 py-3 border-t bg-gray-50">
               <a href="?page=notifications"
-                class="text-sm font-medium text-blue-600 hover:text-blue-800">
-                View all notifications
+                class="block text-sm font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
+                View all notifications →
               </a>
             </div>
           </div>
@@ -196,35 +251,35 @@
             </div>
           </div>
         </li>
-      </ul>
+      </ul
+        </div>
+      <!-- Mobile Slide-in Menu -->
+      <div
+        x-show="open"
+        @click.away="open = false"
+        x-transition:enter="transition transform duration-300"
+        x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition transform duration-300"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full"
+        class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
+        style="display: none;">
+        <ul class="flex flex-col gap-4 mt-8">
+          <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
+          <li><a href="?page=jobseeker-programs" class="nav-link">Programs</a></li>
+          <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
+          <li><a href="#" class="nav-link">Community</a></li>
+          <li><a href="?page=notifications" class="nav-link">Notifications</a></li>
+          <li><a href="?page=saved-jobs" class="nav-link">Saved Jobs</a></li>
+          <li><a href="?page=my-applications" class="nav-link">Applied Jobs</a></li>
+          <li><a href="?page=settings-jobseeker" class="nav-link">Settings</a></li>
+          <li class="flex flex-col gap-2 mt-4">
+            <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
+          </li>
+        </ul>
+      </div>
     </div>
-    <!-- Mobile Slide-in Menu -->
-    <div
-      x-show="open"
-      @click.away="open = false"
-      x-transition:enter="transition transform duration-300"
-      x-transition:enter-start="translate-x-full"
-      x-transition:enter-end="translate-x-0"
-      x-transition:leave="transition transform duration-300"
-      x-transition:leave-start="translate-x-0"
-      x-transition:leave-end="translate-x-full"
-      class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
-      style="display: none;">
-      <ul class="flex flex-col gap-4 mt-8">
-        <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
-        <li><a href="?page=jobseeker-programs" class="nav-link">Programs</a></li>
-        <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
-        <li><a href="#" class="nav-link">Community</a></li>
-        <li><a href="?page=notifications" class="nav-link">Notifications</a></li>
-        <li><a href="?page=saved-jobs" class="nav-link">Saved Jobs</a></li>
-        <li><a href="?page=my-applications" class="nav-link">Applied Jobs</a></li>
-        <li><a href="?page=settings-jobseeker" class="nav-link">Settings</a></li>
-        <li class="flex flex-col gap-2 mt-4">
-          <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
-        </li>
-      </ul>
-    </div>
-  </div>
 </nav>
 
 <script>
@@ -233,6 +288,8 @@
       isOpen: false,
       notifications: [],
       unreadCount: 0,
+      loading: false,
+      error: null,
 
       async init() {
         await this.fetchNotifications();
@@ -251,20 +308,40 @@
 
       async fetchNotifications() {
         try {
+          this.loading = true;
+          this.error = null;
+
+          console.log('🔄 Fetching notifications...');
+
           const response = await fetch('/sikap/app/api/notifications.php');
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
           const data = await response.json();
+          console.log('✅ Notifications data:', data);
 
           if (data.notifications) {
             this.notifications = data.notifications;
-            this.unreadCount = data.unread_count;
+            this.unreadCount = data.unread_count || 0;
+            console.log(`📬 Loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
+          } else if (data.error) {
+            console.error('❌ API Error:', data.error);
+            this.error = data.error;
           }
         } catch (error) {
-          console.error('Error fetching notifications:', error);
+          console.error('❌ Error fetching notifications:', error);
+          this.error = 'Failed to load notifications';
+        } finally {
+          this.loading = false;
         }
       },
 
       async markAsRead(notificationId) {
         try {
+          console.log('📖 Marking notification as read:', notificationId);
+
           const response = await fetch('/sikap/app/api/notifications.php', {
             method: 'POST',
             headers: {
@@ -277,16 +354,23 @@
           });
 
           const data = await response.json();
+          console.log('Mark as read response:', data);
+
           if (data.success) {
+            console.log('✅ Successfully marked as read');
             await this.fetchNotifications();
+          } else {
+            console.error('❌ Failed to mark as read:', data);
           }
         } catch (error) {
-          console.error('Error marking notification as read:', error);
+          console.error('❌ Error marking notification as read:', error);
         }
       },
 
       async markAllAsRead() {
         try {
+          console.log('📖 Marking all notifications as read');
+
           const response = await fetch('/sikap/app/api/notifications.php', {
             method: 'POST',
             headers: {
@@ -298,15 +382,22 @@
           });
 
           const data = await response.json();
+          console.log('Mark all as read response:', data);
+
           if (data.success) {
+            console.log('✅ Successfully marked all as read');
             await this.fetchNotifications();
+          } else {
+            console.error('❌ Failed to mark all as read:', data);
           }
         } catch (error) {
-          console.error('Error marking all notifications as read:', error);
+          console.error('❌ Error marking all notifications as read:', error);
         }
       },
 
       async handleNotificationClick(notification) {
+        console.log('🔗 Clicked notification:', notification);
+
         // Mark as read if unread
         if (notification.status === 'unread') {
           await this.markAsRead(notification.notification_id);
@@ -329,11 +420,11 @@
         const days = Math.floor(hours / 24);
 
         if (minutes < 1) return 'Just now';
-      if (minutes < 60) return `${minutes}m ago`;
-      if (hours < 24) return `${hours}h ago`;
-      if (days < 7) return `${days}d ago`;
-      return date.toLocaleDateString();
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 7) return `${days}d ago`;
+        return date.toLocaleDateString();
+      }
     }
   }
-}
 </script>

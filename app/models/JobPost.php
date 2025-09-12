@@ -20,6 +20,11 @@ class JobPost
             die("Connection failed: " . $e->getMessage());
         }
     }
+    // ADD THIS METHOD - following the same pattern as your other models
+    public function getDatabase()
+    {
+        return $this->db;
+    }
 
     public function getJobCategories()
     {
@@ -1001,6 +1006,21 @@ class JobPost
         } catch (PDOException $e) {
             error_log('Error getting application settings: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    // ADD THIS METHOD - following MVC pattern like JobRecommendationService
+    public function notifyJobPosted($job_id)
+    {
+        try {
+            require_once __DIR__ . '/../services/NotificationService.php';
+
+            // Use the same database connection from this model
+            $notificationService = new NotificationService($this->db);
+            return $notificationService->notifyJobseekersAboutNewJob($job_id);
+        } catch (Exception $e) {
+            error_log("❌ Error in JobPost::notifyJobPosted: " . $e->getMessage());
+            return false;
         }
     }
 }
