@@ -249,6 +249,41 @@ class ReviewApplication
         return $stmt->execute([$application_id, $status, $changed_by_role, $remarks]);
     }
 
+    /**
+     * Get application with basic details (used for notifications)
+     */
+    public function getApplicationBasic($application_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    ja.application_id,
+                    ja.jobseeker_id,
+                    ja.job_id,
+                    ja.application_status,
+                    ja.applied_at,
+                    jp.job_title,
+                    jp.employer_id,
+                    js.user_id as jobseeker_user_id,
+                    js.first_name,
+                    js.last_name
+                FROM job_application ja
+                JOIN job_post jp ON ja.job_id = jp.job_id
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                WHERE ja.application_id = ?
+            ");
+            $stmt->execute([$application_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("🔍 DEBUG: getApplicationBasic result: " . json_encode($result));
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("❌ Error getting basic application details: " . $e->getMessage());
+            return null;
+        }
+    }
+
     // Helper methods to parse concatenated data
     private function parseEducationData($data)
     {

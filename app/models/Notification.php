@@ -271,53 +271,127 @@ class Notification
     }
 
     /**
-     * Get employer details for job application notifications - UPDATED to use employer_id
+     * Get employer details by employer_id and job_id (for job application notifications)
      */
-    public function getEmployerDetails($employerId, $jobId)
+    public function getEmployerByJobPost($employerId, $jobId)
     {
         try {
+            error_log("🔍 DEBUG: Getting employer details for employer_id: $employerId, job_id: $jobId");
+
             $stmt = $this->db->prepare("
-                SELECT u.user_id, u.email, 
-                       COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                       jp.job_title,
-                       e.employer_id,
-                       e.first_name as employer_first_name,
-                       e.last_name as employer_last_name
+                SELECT 
+                    u.user_id, 
+                    u.email, 
+                    e.employer_id,
+                    e.first_name,
+                    e.last_name,
+                    jp.job_title,
+                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name
                 FROM employer e
                 JOIN users u ON e.user_id = u.user_id
                 LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                 JOIN job_post jp ON e.employer_id = jp.employer_id
-                WHERE e.employer_id = ? AND jp.job_id = ? AND u.status = 'active'
+                WHERE e.employer_id = ? 
+                AND jp.job_id = ? 
+                AND u.status = 'active'
+                LIMIT 1
             ");
             $stmt->execute([$employerId, $jobId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("🔍 DEBUG Notification Model: Employer details query result: " . json_encode($result));
+            error_log("🔍 DEBUG: Employer lookup query result: " . json_encode($result));
 
             return $result;
         } catch (Exception $e) {
-            error_log("Error getting employer details: " . $e->getMessage());
+            error_log("❌ Error getting employer by job post: " . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Get jobseeker details for application status notifications
+     * Verify notification was inserted (for debugging)
+     */
+    public function getLatestNotification($userId, $type)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT notification_id, title, message, created_at 
+                FROM notifications 
+                WHERE user_id = ? AND type = ?
+                ORDER BY created_at DESC 
+                LIMIT 1
+            ");
+            $stmt->execute([$userId, $type]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("❌ Error getting latest notification: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Debug employer tables (for troubleshooting)
+     */
+    public function debugEmployerData($employerId, $jobId = null)
+    {
+        try {
+            $debug = [];
+
+            // Check employer table
+            $stmt = $this->db->prepare("SELECT * FROM employer WHERE employer_id = ?");
+            $stmt->execute([$employerId]);
+            $debug['employer'] = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($jobId) {
+                // Check job_post table
+                $stmt = $this->db->prepare("SELECT * FROM job_post WHERE job_id = ? AND employer_id = ?");
+                $stmt->execute([$jobId, $employerId]);
+                $debug['job_post'] = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
+
+            // Check users table
+            if ($debug['employer']) {
+                $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = ?");
+                $stmt->execute([$debug['employer']['user_id']]);
+                $debug['user'] = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
+
+            return $debug;
+        } catch (Exception $e) {
+            error_log("❌ Error debugging employer data: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get jobseeker details for application notifications
      */
     public function getJobseekerDetails($applicationId)
     {
         try {
+            error_log("🔍 DEBUG: Getting jobseeker details for application_id: $applicationId");
+
             $stmt = $this->db->prepare("
-                SELECT u.user_id, u.email, j.first_name, j.last_name
-                FROM users u
-                JOIN jobseeker j ON u.user_id = j.user_id
-                JOIN job_application ja ON j.jobseeker_id = ja.jobseeker_id
-                WHERE ja.application_id = ?
+                SELECT 
+                    js.jobseeker_id,
+                    js.user_id,
+                    js.first_name,
+                    js.last_name,
+                    u.email,
+                    u.status as user_status
+                FROM job_application ja
+                JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+                JOIN users u ON js.user_id = u.user_id
+                WHERE ja.application_id = ? AND u.status = 'active'
             ");
             $stmt->execute([$applicationId]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("🔍 DEBUG: Jobseeker details query result: " . json_encode($result));
+
+            return $result;
         } catch (Exception $e) {
-            error_log("Error getting jobseeker details: " . $e->getMessage());
+            error_log("❌ Error getting jobseeker details for application: " . $e->getMessage());
             return null;
         }
     }

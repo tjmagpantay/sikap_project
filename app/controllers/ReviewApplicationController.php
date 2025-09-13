@@ -95,6 +95,62 @@ class ReviewApplicationController
             $result = $model->updateStatus($application_id, $status, 'employer', $remarks);
 
             if ($result) {
+                error_log("✅ Application status updated successfully to: $status");
+
+                // FIXED: Send notification to jobseeker about status update
+                try {
+                    // Get application details for notification
+                    $application = $model->getApplicationBasic($application_id);
+
+                    if ($application) {
+                        require_once __DIR__ . '/../services/NotificationService.php';
+                        require_once __DIR__ . '/../../config/sikap_db.php';
+
+                        $config = require __DIR__ . '/../../config/sikap_db.php';
+                        $pdo = new PDO(
+                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            $config['db_user'],
+                            $config['db_pass']
+                        );
+                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        $notificationService = new NotificationService($pdo);
+
+                        // FIXED: Get company name using simplified approach
+                        require_once __DIR__ . '/../models/Employer.php';
+                        $employerModel = new Employer();
+                        $companyName = $employerModel->getCompanyName($employer_id);
+
+                        error_log("🔔 DEBUG: Sending status update notification");
+                        error_log("   - Application ID: $application_id");
+                        error_log("   - New Status: $status");
+                        error_log("   - Job Title: {$application['job_title']}");
+                        error_log("   - Company: $companyName");
+                        error_log("   - Remarks: " . ($remarks ?: 'None'));
+
+                        // Send notification
+                        $notificationResult = $notificationService->notifyApplicationStatusUpdate(
+                            $application_id,
+                            $status,
+                            $application['job_title'],
+                            $companyName,
+                            $remarks
+                        );
+
+                        if ($notificationResult) {
+                            error_log("✅ Status update notification sent to jobseeker for application ID: $application_id");
+                        } else {
+                            error_log("❌ Failed to send status update notification to jobseeker for application ID: $application_id");
+                        }
+                    } else {
+                        error_log("❌ Could not get application details for notification");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Error sending status update notification: " . $e->getMessage());
+                    error_log("❌ Stack trace: " . $e->getTraceAsString());
+                    // Don't fail the status update if notification fails
+                }
+
                 $statusMessages = [
                     'pending' => 'Application status updated to pending.',
                     'reviewed' => 'Application marked as reviewed.',
@@ -110,7 +166,8 @@ class ReviewApplicationController
                 header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update application status.'));
             }
         } catch (Exception $e) {
-            error_log('Error updating application status: ' . $e->getMessage());
+            error_log('❌ Error updating application status: ' . $e->getMessage());
+            error_log('❌ Stack trace: ' . $e->getTraceAsString());
             header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while updating status.'));
         }
         exit;
@@ -144,10 +201,79 @@ class ReviewApplicationController
             $result = $model->scheduleInterview($application_id, $interview_date, $interview_location, $notes, $_SESSION['user_id']);
 
             if ($result) {
-                // Also update application status to 'shortlisted' if it's still pending
-                $application = $model->getApplication($application_id);
-                if ($application && $application['application_status'] === 'pending') {
-                    $model->updateStatus($application_id, 'shortlisted', 'employer', 'Interview scheduled');
+                error_log("✅ Interview scheduled successfully");
+
+                // Get application details
+                $application = $model->getApplicationBasic($application_id);
+                error_log("🔍 DEBUG: Application details: " . json_encode($application));
+
+                // FIXED: Send interview notification regardless of status, then update status
+                try {
+                    require_once __DIR__ . '/../services/NotificationService.php';
+                    require_once __DIR__ . '/../../config/sikap_db.php';
+
+                    $config = require __DIR__ . '/../../config/sikap_db.php';
+                    $pdo = new PDO(
+                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        $config['db_user'],
+                        $config['db_pass']
+                    );
+                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    $notificationService = new NotificationService($pdo);
+
+                    // Get company name using simplified approach
+                    require_once __DIR__ . '/../models/Employer.php';
+                    $employerModel = new Employer();
+                    $companyName = $employerModel->getCompanyName($employer_id);
+
+                    error_log("🔔 DEBUG: Sending interview notification");
+                    error_log("   - Application ID: $application_id");
+                    error_log("   - Job Title: {$application['job_title']}");
+                    error_log("   - Company: $companyName");
+                    error_log("   - Date/Time: " . $dateTime->format('F j, Y \a\t g:i A'));
+                    error_log("   - Location: $interview_location");
+
+                    // FIXED: Send interview notification FIRST
+                    $interviewNotificationResult = $notificationService->notifyInterviewScheduled(
+                        $application_id,
+                        $application['job_title'],
+                        $companyName,
+                        $dateTime->format('F j, Y \a\t g:i A'),
+                        $interview_location,
+                        $notes
+                    );
+
+                    if ($interviewNotificationResult) {
+                        error_log("✅ Interview notification sent to jobseeker for application ID: $application_id");
+                    } else {
+                        error_log("❌ Failed to send interview notification for application ID: $application_id");
+                    }
+
+                    // THEN update application status to 'shortlisted' if it's pending
+                    if ($application && $application['application_status'] === 'pending') {
+                        $statusUpdateResult = $model->updateStatus($application_id, 'shortlisted', 'employer', 'Interview scheduled');
+
+                        if ($statusUpdateResult) {
+                            error_log("✅ Application status updated to shortlisted");
+
+                            // Send status update notification
+                            $statusNotificationResult = $notificationService->notifyApplicationStatusUpdate(
+                                $application_id,
+                                'shortlisted',
+                                $application['job_title'],
+                                $companyName,
+                                'Interview scheduled'
+                            );
+
+                            if ($statusNotificationResult) {
+                                error_log("✅ Status update notification sent to jobseeker for application ID: $application_id");
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Error sending interview notification: " . $e->getMessage());
+                    error_log("❌ Stack trace: " . $e->getTraceAsString());
                 }
 
                 header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Interview scheduled successfully.'));
@@ -155,7 +281,8 @@ class ReviewApplicationController
                 header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to schedule interview.'));
             }
         } catch (Exception $e) {
-            error_log('Error scheduling interview: ' . $e->getMessage());
+            error_log('❌ Error scheduling interview: ' . $e->getMessage());
+            error_log('❌ Stack trace: ' . $e->getTraceAsString());
             header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while scheduling the interview.'));
         }
         exit;

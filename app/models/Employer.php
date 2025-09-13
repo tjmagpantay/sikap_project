@@ -855,4 +855,60 @@ ORDER BY e.created_at DESC";
             return null;
         }
     }
+
+    public function getEmployerById($employerId)
+{
+    try {
+        $stmt = $this->db->prepare("
+            SELECT * FROM employer 
+            WHERE employer_id = ?
+        ");
+        $stmt->execute([$employerId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("❌ Error getting employer by ID: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Get business information for employer
+ */
+public function getBusinessInfo($employerId)
+{
+    try {
+        $stmt = $this->db->prepare("
+            SELECT * FROM employers_business 
+            WHERE employer_id = ?
+        ");
+        $stmt->execute([$employerId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("❌ Error getting business info: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Get company name (business name or personal name)
+ */
+public function getCompanyName($employerId)
+{
+    try {
+        $employer = $this->getEmployerById($employerId);
+        if (!$employer) {
+            return 'Unknown Company';
+        }
+
+        $businessInfo = $this->getBusinessInfo($employerId);
+        if ($businessInfo && !empty($businessInfo['business_name'])) {
+            return $businessInfo['business_name'];
+        }
+
+        return trim($employer['first_name'] . ' ' . $employer['last_name']);
+    } catch (Exception $e) {
+        error_log("❌ Error getting company name: " . $e->getMessage());
+        return 'Unknown Company';
+    }
+}
 }

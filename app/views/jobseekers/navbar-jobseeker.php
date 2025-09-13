@@ -3,12 +3,12 @@
 
 // Ensure we have jobseeker data - this should be passed from controller
 if (!isset($jobseeker) || empty($jobseeker)) {
-    // Fallback for pages that don't pass jobseeker data
-    $jobseeker = [
-        'profile_picture' => '',
-        'first_name' => 'Guest',
-        'last_name' => ''
-    ];
+  // Fallback for pages that don't pass jobseeker data
+  $jobseeker = [
+    'profile_picture' => '',
+    'first_name' => 'Guest',
+    'last_name' => ''
+  ];
 }
 ?>
 
@@ -161,8 +161,24 @@ if (!isset($jobseeker) || empty($jobseeker)) {
                                 </svg>
                               </template>
 
+                              <!-- Application Update Icon -->
+                              <template x-if="notification.type === 'application_update'">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </template>
+
+                              <!-- FIXED: Add Interview Notification Icon -->
+                              <template x-if="notification.type === 'interview'">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </template>
+
                               <!-- Default Icon -->
-                              <template x-if="notification.type !== 'job_post' && notification.type !== 'program'">
+                              <template x-if="notification.type !== 'job_post' && notification.type !== 'program' && notification.type !== 'application_update' && notification.type !== 'interview'">
                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>

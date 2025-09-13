@@ -138,15 +138,15 @@ class NotificationService
             error_log("   - Employer ID: $employerId");
             error_log("   - Jobseeker Name: $jobseekerName");
 
-            // Get employer details from model - FIXED to use employer_id correctly
-            error_log("🔍 DEBUG: Getting employer details");
-            $employer = $this->getEmployerDetailsByEmployerId($employerId, $jobId);
+            // FIXED: Get employer details from model (following MVC)
+            $employer = $this->notification->getEmployerByJobPost($employerId, $jobId);
 
             if (!$employer) {
                 error_log("❌ Job Application Notification: Could not find employer details for employer_id: $employerId, job_id: $jobId");
 
-                // ADDITIONAL DEBUG: Let's check what's in the database
-                $this->debugEmployerTables($employerId, $jobId);
+                // FIXED: Use model method for debugging
+                $debugData = $this->notification->debugEmployerData($employerId, $jobId);
+                error_log("🔍 DEBUG: Employer debug data: " . json_encode($debugData));
 
                 return false;
             }
@@ -170,7 +170,6 @@ class NotificationService
             error_log("   - Message: $message");
             error_log("   - Link: $link");
             error_log("   - Target user_id: {$employer['user_id']}");
-            error_log("   - Data: " . json_encode($data));
 
             // Use the notification model's create method
             $result = $this->notification->create(
@@ -183,13 +182,14 @@ class NotificationService
                 $data
             );
 
-            error_log("🔔 DEBUG: Notification create() returned: " . ($result ? 'TRUE' : 'FALSE'));
-
             if ($result) {
                 error_log("✅ Job Application notification created for employer user_id: {$employer['user_id']} (employer_id: $employerId)");
 
-                // VERIFY: Check if it was actually inserted
-                $this->verifyNotificationInserted($employer['user_id'], $applicationId);
+                // FIXED: Use model method for verification
+                $verification = $this->notification->getLatestNotification($employer['user_id'], 'job_application');
+                if ($verification) {
+                    error_log("✅ VERIFIED: Notification inserted with ID: {$verification['notification_id']}");
+                }
             } else {
                 error_log("❌ Failed to create job application notification for employer user_id: {$employer['user_id']}");
             }
@@ -203,144 +203,111 @@ class NotificationService
     }
 
     /**
-     * Debug method to check employer tables
-     */
-    private function debugEmployerTables($employerId, $jobId)
-    {
-        try {
-            error_log("🔍 DEBUG: Checking employer tables for employer_id: $employerId, job_id: $jobId");
-
-            // Check employer table
-            $stmt = $this->db->prepare("SELECT * FROM employer WHERE employer_id = ?");
-            $stmt->execute([$employerId]);
-            $employer = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("🔍 DEBUG: Employer record: " . json_encode($employer));
-
-            // Check job_post table
-            $stmt = $this->db->prepare("SELECT * FROM job_post WHERE job_id = ? AND employer_id = ?");
-            $stmt->execute([$jobId, $employerId]);
-            $job = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("🔍 DEBUG: Job post record: " . json_encode($job));
-
-            // Check users table
-            if ($employer) {
-                $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = ?");
-                $stmt->execute([$employer['user_id']]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                error_log("🔍 DEBUG: User record: " . json_encode($user));
-            }
-        } catch (Exception $e) {
-            error_log("❌ Error debugging employer tables: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Verify notification was inserted
-     */
-    private function verifyNotificationInserted($userId, $applicationId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT notification_id, title, message, created_at 
-                FROM notifications 
-                WHERE user_id = ? AND type = 'job_application'
-                ORDER BY created_at DESC 
-                LIMIT 1
-            ");
-            $stmt->execute([$userId]);
-            $notification = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($notification) {
-                error_log("✅ VERIFIED: Notification inserted with ID: {$notification['notification_id']}");
-                error_log("   - Title: {$notification['title']}");
-                error_log("   - Created: {$notification['created_at']}");
-            } else {
-                error_log("❌ VERIFICATION FAILED: No notification found in database for user_id: $userId");
-            }
-        } catch (Exception $e) {
-            error_log("❌ Error verifying notification: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Get employer details by employer_id for job application notifications
-     */
-    private function getEmployerDetailsByEmployerId($employerId, $jobId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT u.user_id, u.email, 
-                       COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                       jp.job_title,
-                       e.employer_id,
-                       e.first_name,
-                       e.last_name
-                FROM employer e
-                JOIN users u ON e.user_id = u.user_id
-                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                JOIN job_post jp ON e.employer_id = jp.employer_id
-                WHERE e.employer_id = ? AND jp.job_id = ? AND u.status = 'active'
-            ");
-            $stmt->execute([$employerId, $jobId]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            error_log("🔍 DEBUG: Employer lookup query result: " . json_encode($result));
-
-            return $result;
-        } catch (Exception $e) {
-            error_log("Error getting employer details by employer_id: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
      * Notify jobseeker about application status update
      */
-    public function notifyApplicationStatusUpdate($applicationId, $newStatus, $jobTitle, $companyName)
+    public function notifyApplicationStatusUpdate($applicationId, $newStatus, $jobTitle, $companyName, $remarks = null)
     {
         try {
+            error_log("🔍 DEBUG notifyApplicationStatusUpdate: Starting notification process");
+            error_log("   - Application ID: $applicationId");
+            error_log("   - New Status: $newStatus");
+            error_log("   - Job Title: $jobTitle");
+            error_log("   - Company: $companyName");
+            error_log("   - Remarks: " . ($remarks ?: 'None'));
+
             // Get jobseeker details from model
             $jobseeker = $this->notification->getJobseekerDetails($applicationId);
 
-            if ($jobseeker) {
-                $statusMessages = [
-                    'pending' => 'Your application is being reviewed',
-                    'reviewed' => 'Your application has been reviewed',
-                    'shortlisted' => 'Congratulations! You have been shortlisted',
-                    'rejected' => 'Your application status has been updated',
-                    'hired' => 'Congratulations! You have been hired'
-                ];
-
-                $title = "Application Status Update";
-                $message = "{$statusMessages[$newStatus]} for {$jobTitle} at {$companyName}";
-                $link = "?page=my-applications";
-
-                $data = [
-                    'application_id' => $applicationId,
-                    'status' => $newStatus,
-                    'job_title' => $jobTitle,
-                    'company_name' => $companyName
-                ];
-
-                // Use the notification model's create method
-                $result = $this->notification->create(
-                    $jobseeker['user_id'],
-                    'jobseeker',
-                    'application_update',
-                    $title,
-                    $message,
-                    $link,
-                    $data
-                );
-
-                if ($result) {
-                    error_log("✅ Status update notification created for jobseeker user_id: {$jobseeker['user_id']}");
-                }
+            if (!$jobseeker) {
+                error_log("❌ Status Update Notification: Could not find jobseeker details for application_id: $applicationId");
+                return false;
             }
 
-            return true;
+            error_log("✅ DEBUG: Found jobseeker details: " . json_encode($jobseeker));
+
+            // Create status-specific messages
+            $statusMessages = [
+                'pending' => [
+                    'title' => 'Application Under Review',
+                    'message' => "Your application for {$jobTitle} at {$companyName} is being reviewed by the employer."
+                ],
+                'reviewed' => [
+                    'title' => 'Application Reviewed',
+                    'message' => "Your application for {$jobTitle} at {$companyName} has been reviewed by the employer."
+                ],
+                'shortlisted' => [
+                    'title' => 'Congratulations! You\'ve Been Shortlisted',
+                    'message' => "Great news! You have been shortlisted for {$jobTitle} at {$companyName}. Expect to hear from them soon!"
+                ],
+                'rejected' => [
+                    'title' => 'Application Status Update',
+                    'message' => "Thank you for your interest in {$jobTitle} at {$companyName}. Unfortunately, we have decided not to move forward with your application at this time."
+                ],
+                'hired' => [
+                    'title' => 'Congratulations! You\'ve Been Hired',
+                    'message' => "Congratulations! You have been hired for {$jobTitle} at {$companyName}. Welcome to the team!"
+                ],
+                'resigned' => [
+                    'title' => 'Employment Status Updated',
+                    'message' => "Your employment status for {$jobTitle} at {$companyName} has been updated to resigned."
+                ]
+            ];
+
+            // Get the appropriate message for the status
+            $statusInfo = $statusMessages[$newStatus] ?? [
+                'title' => 'Application Status Update',
+                'message' => "Your application status for {$jobTitle} at {$companyName} has been updated."
+            ];
+
+            $title = $statusInfo['title'];
+            $message = $statusInfo['message'];
+
+            // Add remarks if provided
+            if (!empty($remarks)) {
+                $message .= " Employer notes: " . $remarks;
+            }
+
+            $link = "?page=view-application&application_id={$applicationId}";
+
+            $data = [
+                'application_id' => $applicationId,
+                'status' => $newStatus,
+                'job_title' => $jobTitle,
+                'company_name' => $companyName,
+                'remarks' => $remarks,
+                'notification_type' => 'status_update'
+            ];
+
+            error_log("🔍 DEBUG: Creating status update notification");
+            error_log("   - Title: $title");
+            error_log("   - Message: $message");
+            error_log("   - Link: $link");
+            error_log("   - Target user_id: {$jobseeker['user_id']}");
+            error_log("   - Data: " . json_encode($data));
+
+            // Use the notification model's create method
+            $result = $this->notification->create(
+                $jobseeker['user_id'],
+                'jobseeker',
+                'application_update',
+                $title,
+                $message,
+                $link,
+                $data
+            );
+
+            error_log("🔔 DEBUG: Notification create() returned: " . ($result ? 'TRUE' : 'FALSE'));
+
+            if ($result) {
+                error_log("✅ Status update notification created for jobseeker user_id: {$jobseeker['user_id']} (application_id: $applicationId)");
+            } else {
+                error_log("❌ Failed to create status update notification for jobseeker user_id: {$jobseeker['user_id']}");
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("❌ Error notifying application status update: " . $e->getMessage());
+            error_log("❌ Stack trace: " . $e->getTraceAsString());
             return false;
         }
     }
@@ -480,6 +447,91 @@ class NotificationService
             return true;
         } catch (Exception $e) {
             error_log("❌ Error notifying employers about new program: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Notify jobseeker about interview scheduled
+     */
+    public function notifyInterviewScheduled($applicationId, $jobTitle, $companyName, $interviewDateTime, $location, $notes = null)
+    {
+        try {
+            error_log("🔍 DEBUG notifyInterviewScheduled: Starting notification process");
+            error_log("   - Application ID: $applicationId");
+            error_log("   - Job Title: $jobTitle");
+            error_log("   - Company: $companyName");
+            error_log("   - Date/Time: $interviewDateTime");
+            error_log("   - Location: $location");
+
+            // Get jobseeker details from model
+            $jobseeker = $this->notification->getJobseekerDetails($applicationId);
+
+            if (!$jobseeker) {
+                error_log("❌ Interview Notification: Could not find jobseeker details for application_id: $applicationId");
+                return false;
+            }
+
+            error_log("✅ DEBUG: Found jobseeker details: " . json_encode($jobseeker));
+
+            $title = "Interview Scheduled - {$jobTitle}";
+            $message = "Your interview for {$jobTitle} at {$companyName} has been scheduled for {$interviewDateTime} at {$location}.";
+
+            if (!empty($notes)) {
+                $message .= " Additional notes: " . $notes;
+            }
+
+            $message .= " Please be prepared and arrive on time. Good luck!";
+
+            // FIXED: Use the correct parameter name that matches your view-application page
+            $link = "?page=view-application&application_id={$applicationId}";
+
+            $data = [
+                'application_id' => $applicationId,
+                'job_title' => $jobTitle,
+                'company_name' => $companyName,
+                'interview_datetime' => $interviewDateTime,
+                'interview_location' => $location,
+                'notes' => $notes,
+                'notification_type' => 'interview_scheduled'
+            ];
+
+            error_log("🔍 DEBUG: Creating interview notification");
+            error_log("   - Title: $title");
+            error_log("   - Message: $message");
+            error_log("   - Link: $link");
+            error_log("   - Target user_id: {$jobseeker['user_id']}");
+
+            // Use the notification model's create method
+            $result = $this->notification->create(
+                $jobseeker['user_id'],
+                'jobseeker',
+                'interview',
+                $title,
+                $message,
+                $link,
+                $data
+            );
+
+            if ($result) {
+                error_log("✅ Interview notification created for jobseeker user_id: {$jobseeker['user_id']} (application_id: $applicationId)");
+
+                // ADDED: Verify the notification was actually inserted
+                $verification = $this->notification->getLatestNotification($jobseeker['user_id'], 'interview');
+                if ($verification) {
+                    error_log("✅ VERIFIED: Interview notification inserted with ID: {$verification['notification_id']}");
+                    error_log("   - Title: {$verification['title']}");
+                    error_log("   - Created: {$verification['created_at']}");
+                } else {
+                    error_log("❌ VERIFICATION FAILED: Interview notification not found in database");
+                }
+            } else {
+                error_log("❌ Failed to create interview notification for jobseeker user_id: {$jobseeker['user_id']}");
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("❌ Error notifying interview scheduled: " . $e->getMessage());
             return false;
         }
     }

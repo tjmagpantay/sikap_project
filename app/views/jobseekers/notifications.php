@@ -16,13 +16,13 @@
 
     // Include authentication and navigation components like saved-jobs.php
     include_once __DIR__ . '/components/jobseeker_auth_check.php';
-    include_once __DIR__ . '/../components/navbar-top.php'; 
+    include_once __DIR__ . '/../components/navbar-top.php';
     include_once __DIR__ . '/navbar-jobseeker.php';
     ?>
 
     <div class="px-6 py-8">
         <div class="mx-auto max-w-7xl">
-            
+
             <!-- Success/Error Messages -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="p-4 mb-6 text-green-800 bg-green-100 border border-green-300 rounded-lg">
@@ -46,7 +46,7 @@
                 </div>
 
                 <?php if ($data['unreadCount'] > 0): ?>
-                    <button onclick="markAllAsRead()" 
+                    <button onclick="markAllAsRead()"
                         class="px-4 py-2 font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700">
                         Mark All as Read
                     </button>
@@ -62,7 +62,7 @@
                     </svg>
                     <h3 class="mb-2 text-lg font-medium text-gray-900">No notifications yet</h3>
                     <p class="mb-6 text-gray-500">We'll notify you when there's something new!</p>
-                    <a href="?page=jobseeker-dashboard" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-blue-600 hover:bg-blue-700">
+                    <a href="?page=jobseeker-dashboard" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
@@ -74,12 +74,14 @@
                 <div class="grid grid-cols-1 gap-6">
                     <?php foreach ($data['notifications'] as $notification): ?>
                         <div class="block overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300 <?php echo $notification['status'] === 'unread' ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''; ?>">
-                        
+
                             <!-- Header: Icon and Title -->
                             <div class="flex items-start gap-4 p-6 pb-4 <?php echo $notification['status'] === 'unread' ? 'bg-blue-50' : 'bg-gray-50'; ?>">
                                 <!-- Notification Icon -->
                                 <div class="flex-shrink-0">
-                                    <div class="flex items-center justify-center w-12 h-12 rounded-full <?php echo $notification['type'] === 'program' ? 'bg-green-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : 'bg-orange-100'); ?>">
+                                    <div class="flex items-center justify-center w-12 h-12 rounded-full <?php
+                                                                                                        echo $notification['type'] === 'program' ? 'bg-green-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : ($notification['type'] === 'application_update' ? 'bg-orange-100' : ($notification['type'] === 'interview' ? 'bg-purple-100' : 'bg-gray-100'))); ?>">
+
                                         <?php if ($notification['type'] === 'job_post'): ?>
                                             <!-- Job Post Icon -->
                                             <svg class="w-6 h-6 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
@@ -95,6 +97,12 @@
                                             <!-- Application Update Icon -->
                                             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        <?php elseif ($notification['type'] === 'interview'): ?>
+                                            <!-- FIXED: Add Interview Icon -->
+                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         <?php else: ?>
                                             <!-- Default Icon -->
@@ -132,7 +140,7 @@
 
                                 <!-- Notification Type Tag -->
                                 <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-3 py-1 text-xs bg-gray-100 rounded-full text-gray-600">
+                                    <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full">
                                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $notification['type']))); ?>
                                     </span>
                                     <?php if ($notification['status'] === 'unread'): ?>

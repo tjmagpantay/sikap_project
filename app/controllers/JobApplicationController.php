@@ -1233,4 +1233,71 @@ class JobApplicationController
 
         return ['eligible' => $eligible, 'message' => $message, 'age' => $age];
     }
+
+    // Add this method to finalize application submission:
+    private function finalizeApplication($application_id, $job, $jobseeker)
+    {
+        try {
+            // Update application as finalized
+            $updateData = [
+                'is_finalized' => 1,
+                'current_step' => 4,
+                'applied_at' => date('Y-m-d H:i:s')
+            ];
+
+            if (!$this->jobApplicationModel->updateApplication($application_id, $updateData)) {
+                throw new Exception('Failed to finalize application');
+            }
+
+            // Log status change
+            $this->jobApplicationModel->logStatusChange($application_id, 'pending', 'jobseeker', 'Application submitted');
+
+            // FIXED: Send notification to employer
+            try {
+                require_once __DIR__ . '/../services/NotificationService.php';
+                require_once __DIR__ . '/../../config/sikap_db.php';
+
+                $config = require __DIR__ . '/../../config/sikap_db.php';
+                $pdo = new PDO(
+                    "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                    $config['db_user'],
+                    $config['db_pass']
+                );
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $notificationService = new NotificationService($pdo);
+
+                // Get jobseeker's full name
+                $jobseekerName = trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']);
+
+                error_log("🔔 DEBUG: Sending job application notification");
+                error_log("   - Application ID: $application_id");
+                error_log("   - Job ID: {$job['job_id']}");
+                error_log("   - Employer ID: {$job['employer_id']}");
+                error_log("   - Jobseeker Name: $jobseekerName");
+
+                // Send notification to employer
+                $notificationResult = $notificationService->notifyJobApplication(
+                    $application_id,
+                    $job['job_id'],
+                    $job['employer_id'],
+                    $jobseekerName
+                );
+
+                if ($notificationResult) {
+                    error_log("✅ Job application notification sent to employer for application ID: $application_id");
+                } else {
+                    error_log("❌ Failed to send job application notification to employer for application ID: $application_id");
+                }
+            } catch (Exception $e) {
+                error_log("❌ Error sending job application notification: " . $e->getMessage());
+                // Don't fail the application if notification fails
+            }
+
+            return true;
+        } catch (Exception $e) {
+            error_log('❌ Error finalizing application: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
