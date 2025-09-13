@@ -68,11 +68,36 @@ class EventProgram
 
     public function createEvent($title, $description, $type, $image, $time_start, $time_end, $status)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO {$this->table} (title, description, type, image, time_start, time_end, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
-        return $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status]);
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO {$this->table} (title, description, type, image, time_start, time_end, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            $result = $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status]);
+
+            if ($result) {
+                $eventId = $this->db->lastInsertId();
+                error_log("✅ Event created with ID: $eventId");
+
+                // FIXED: Automatically send notifications if status is 'show'
+                if ($status === 'show') {
+                    error_log("🔔 Auto-sending notifications for new event ID: $eventId");
+
+                    // Send notifications to jobseekers
+                    $this->notifyJobseekersAboutNewProgram($eventId);
+
+                    // Send notifications to employers
+                    $this->notifyEmployersAboutNewProgram($eventId);
+                }
+
+                return $eventId; // Return the event ID instead of just true
+            }
+
+            return false;
+        } catch (Exception $e) {
+            error_log("❌ Error creating event: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function updateEvent($id, $title, $description, $type, $image, $time_start, $time_end, $status)

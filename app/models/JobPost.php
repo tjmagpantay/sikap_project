@@ -1015,9 +1015,36 @@ class JobPost
         try {
             require_once __DIR__ . '/../services/NotificationService.php';
 
+            // Get job details for the notification
+            $jobData = $this->getJobById($job_id);
+            if (!$jobData) {
+                error_log("❌ Job not found for notification: $job_id");
+                return false;
+            }
+
+            // Get company name for notification
+            $sql = "SELECT COALESCE(eb.business_name, e.company_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name
+                FROM job_post jp
+                JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE jp.job_id = ?";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$job_id]);
+            $company = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $companyName = $company['company_name'] ?? 'Unknown Company';
+
             // Use the same database connection from this model
             $notificationService = new NotificationService($this->db);
-            return $notificationService->notifyJobseekersAboutNewJob($job_id);
+
+            // FIXED: Use the correct method name with proper parameters
+            return $notificationService->notifyJobPosted(
+                $job_id,
+                $jobData['job_title'],
+                $companyName,
+                $jobData['location'] ?? ''
+            );
         } catch (Exception $e) {
             error_log("❌ Error in JobPost::notifyJobPosted: " . $e->getMessage());
             return false;

@@ -186,7 +186,7 @@
 
             <!-- Footer -->
             <div class="px-6 py-3 border-t bg-gray-50">
-              <a href="?page=employer-notifications"
+              <a href="?page=notifications-employer"
                 class="block text-sm font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
                 View all notifications →
               </a>
@@ -286,7 +286,7 @@
       <li><a href="?page=job-management" class="nav-link">Job Management</a></li>
       <li><a href="?page=employer-programs" class="nav-link">Programs</a></li>
       <li><a href="?page=employer-community" class="nav-link">Community</a></li>
-      <li><a href="?page=employer-notifications" class="nav-link">Notifications</a></li>
+      <li><a href="?page=notifications-employer" class="nav-link">Notifications</a></li>
       <li><a href="?page=job-applications" class="nav-link">Applications</a></li>
       <li><a href="?page=employer-messages" class="nav-link">Messages</a></li>
 
@@ -339,7 +339,8 @@
 
           console.log('🔔 Employer: Fetching notifications...');
 
-          const response = await fetch('/sikap/app/api/notifications.php');
+          // FIXED: Use MVC controller endpoint instead of API folder
+          const response = await fetch('?page=notifications-api&limit=5');
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -348,7 +349,7 @@
           const data = await response.json();
           console.log('✅ Employer notifications data:', data);
 
-          if (data.notifications) {
+          if (data.success && data.notifications) {
             this.notifications = data.notifications;
             this.unreadCount = data.unread_count || 0;
             console.log(`📬 Employer loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
@@ -368,7 +369,8 @@
         try {
           console.log('📖 Employer marking notification as read:', notificationId);
 
-          const response = await fetch('/sikap/app/api/notifications.php', {
+          // FIXED: Use MVC controller endpoint
+          const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -397,7 +399,8 @@
         try {
           console.log('📖 Employer marking all notifications as read');
 
-          const response = await fetch('/sikap/app/api/notifications.php', {
+          // FIXED: Use MVC controller endpoint
+          const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

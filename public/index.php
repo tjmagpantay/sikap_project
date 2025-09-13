@@ -75,11 +75,24 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/view-all-companies.php';
             break;
 
-        // case 'updateStatus':
-        //     require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-        //     $controller = new UserManagementController();
-        //     $controller->updateStatus();
-        //     break;
+        // NOTIFICATION ROUTES (MVC pattern)
+        case 'notifications-api':
+            require_once __DIR__ . '/../app/controllers/NotificationController.php';
+            $controller = new NotificationController();
+            $controller->apiEndpoint(); // This replaces app/api/notifications.php
+            break;
+
+        case 'notifications-jobseeker':
+            require_once __DIR__ . '/../app/controllers/NotificationController.php';
+            $controller = new NotificationController();
+            $controller->viewAllJobseekerNotifications();
+            break;
+
+        case 'notifications-employer':
+            require_once __DIR__ . '/../app/controllers/NotificationController.php';
+            $controller = new NotificationController();
+            $controller->viewAllEmployerNotifications();
+            break;
 
         case 'update-employer-status':
             require_once __DIR__ . '/../app/controllers/UserManagementController.php';

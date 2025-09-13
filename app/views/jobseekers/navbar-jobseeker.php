@@ -1,6 +1,15 @@
 <?php
-// Remove direct model access - data should come from controller
-// All jobseeker data is now passed from the controller
+// filepath: c:\xampp\htdocs\sikap\app\views\jobseekers\navbar-jobseeker.php
+
+// Ensure we have jobseeker data - this should be passed from controller
+if (!isset($jobseeker) || empty($jobseeker)) {
+    // Fallback for pages that don't pass jobseeker data
+    $jobseeker = [
+        'profile_picture' => '',
+        'first_name' => 'Guest',
+        'last_name' => ''
+    ];
+}
 ?>
 
 <nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24 ">
@@ -182,7 +191,7 @@
 
             <!-- Footer -->
             <div class="px-6 py-3 border-t bg-gray-50">
-              <a href="?page=notifications"
+              <a href="?page=notifications-jobseeker"
                 class="block text-sm font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
                 View all notifications →
               </a>
@@ -322,21 +331,22 @@
           this.loading = true;
           this.error = null;
 
-          console.log('🔄 Fetching notifications...');
+          console.log('🔔 Jobseeker: Fetching notifications...');
 
-          const response = await fetch('/sikap/app/api/notifications.php');
+          // FIXED: Use MVC controller endpoint instead of API folder
+          const response = await fetch('?page=notifications-api&limit=5');
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
 
           const data = await response.json();
-          console.log('✅ Notifications data:', data);
+          console.log('✅ Jobseeker notifications data:', data);
 
           if (data.notifications) {
             this.notifications = data.notifications;
             this.unreadCount = data.unread_count || 0;
-            console.log(`📬 Loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
+            console.log(`📬 Jobseeker loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
           } else if (data.error) {
             console.error('❌ API Error:', data.error);
             this.error = data.error;
@@ -353,7 +363,8 @@
         try {
           console.log('📖 Marking notification as read:', notificationId);
 
-          const response = await fetch('/sikap/app/api/notifications.php', {
+          // FIXED: Use MVC controller endpoint
+          const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -382,7 +393,8 @@
         try {
           console.log('📖 Marking all notifications as read');
 
-          const response = await fetch('/sikap/app/api/notifications.php', {
+          // FIXED: Use MVC controller endpoint
+          const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
