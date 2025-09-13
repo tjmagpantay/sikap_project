@@ -192,6 +192,20 @@ class EventProgram
         }
     }
 
+    public function notifyEmployersAboutNewProgram($eventId)
+    {
+        try {
+            require_once __DIR__ . '/../services/NotificationService.php';
+
+            // Use the same database connection from this model
+            $notificationService = new NotificationService($this->db);
+            return $notificationService->notifyEmployersAboutNewProgram($eventId);
+        } catch (Exception $e) {
+            error_log("❌ Error in EventProgram::notifyEmployersAboutNewProgram: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // ADD: Public getter for database connection
     public function getDatabase()
     {

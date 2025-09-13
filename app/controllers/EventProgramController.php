@@ -87,23 +87,46 @@ class EventProgramController
         );
 
         if ($success) {
-            // FIXED: Get the created event ID properly
+            // Get the created event ID
             $eventId = $this->model->getDatabase()->lastInsertId();
 
-            // Trigger notifications to jobseekers if event is visible
+            error_log("🔍 EventProgramController: Created event ID: $eventId, Status: " . $_POST['status']);
+
+            // Trigger notifications if event is visible
             if ($_POST['status'] === 'show') {
                 try {
-                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($eventId);
+                    // Notify jobseekers
+                    error_log("🔔 EventProgramController: Starting jobseeker notifications for event ID: $eventId");
+                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($eventId);
 
-                    if ($notificationResult) {
-                        error_log("✅ Program notifications sent for event ID: $eventId");
+                    if ($jobseekerNotificationResult) {
+                        error_log("✅ Jobseeker program notifications sent for event ID: $eventId");
                     } else {
-                        error_log("⚠️ Program notifications may have failed for event ID: $eventId");
+                        error_log("⚠️ Jobseeker program notifications may have failed for event ID: $eventId");
+                    }
+
+                    // Notify employers using the model method
+                    error_log("🔔 EventProgramController: Starting employer notifications for event ID: $eventId");
+
+                    // Check if the method exists first
+                    if (!method_exists($this->model, 'notifyEmployersAboutNewProgram')) {
+                        error_log("❌ EventProgramController: Method notifyEmployersAboutNewProgram does not exist in EventProgram model");
+                    } else {
+                        error_log("✅ EventProgramController: Method notifyEmployersAboutNewProgram exists, calling it...");
+                        $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($eventId);
+
+                        if ($employerNotificationResult) {
+                            error_log("✅ Employer program notifications sent for event ID: $eventId");
+                        } else {
+                            error_log("⚠️ Employer program notifications may have failed for event ID: $eventId");
+                        }
                     }
                 } catch (Exception $e) {
-                    error_log("❌ Failed to send program notifications: " . $e->getMessage());
-                    // Don't fail the event creation if notifications fail
+                    error_log("❌ EventProgramController: Failed to send program notifications: " . $e->getMessage());
+                    error_log("❌ EventProgramController: Stack trace: " . $e->getTraceAsString());
                 }
+            } else {
+                error_log("ℹ️ EventProgramController: Event status is '{$_POST['status']}', not sending notifications");
             }
 
             header('Location: index.php?page=admin-events&success=Event created successfully');
@@ -186,20 +209,28 @@ class EventProgramController
         );
 
         if ($success) {
-            // NEW: Trigger notifications if event status changed to 'show' 
-            // or if it's already 'show' and was updated
+            // Trigger notifications if event status changed to 'show' 
             if ($_POST['status'] === 'show') {
                 try {
-                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
+                    // Notify jobseekers
+                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
 
-                    if ($notificationResult) {
-                        error_log("✅ Program update notifications sent for event ID: $id");
+                    if ($jobseekerNotificationResult) {
+                        error_log("✅ Jobseeker program update notifications sent for event ID: $id");
                     } else {
-                        error_log("⚠️ Program update notifications may have failed for event ID: $id");
+                        error_log("⚠️ Jobseeker program update notifications may have failed for event ID: $id");
+                    }
+
+                    // FIXED: Also notify employers
+                    $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($id);
+
+                    if ($employerNotificationResult) {
+                        error_log("✅ Employer program update notifications sent for event ID: $id");
+                    } else {
+                        error_log("⚠️ Employer program update notifications may have failed for event ID: $id");
                     }
                 } catch (Exception $e) {
                     error_log("❌ Failed to send program update notifications: " . $e->getMessage());
-                    // Don't fail the event update if notifications fail
                 }
             }
 
@@ -280,15 +311,25 @@ class EventProgramController
         $success = $this->model->updateEventStatus($id, $newStatus);
 
         if ($success) {
-            // NEW: Trigger notifications when event status changes to 'show'
+            // Trigger notifications when event status changes to 'show'
             if ($newStatus === 'show') {
                 try {
-                    $notificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
+                    // Notify jobseekers
+                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
 
-                    if ($notificationResult) {
-                        error_log("✅ Program visibility notifications sent for event ID: $id");
+                    if ($jobseekerNotificationResult) {
+                        error_log("✅ Jobseeker program visibility notifications sent for event ID: $id");
                     } else {
-                        error_log("⚠️ Program visibility notifications may have failed for event ID: $id");
+                        error_log("⚠️ Jobseeker program visibility notifications may have failed for event ID: $id");
+                    }
+
+                    // FIXED: Also notify employers
+                    $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($id);
+
+                    if ($employerNotificationResult) {
+                        error_log("✅ Employer program visibility notifications sent for event ID: $id");
+                    } else {
+                        error_log("⚠️ Employer program visibility notifications may have failed for event ID: $id");
                     }
                 } catch (Exception $e) {
                     error_log("❌ Failed to send program visibility notifications: " . $e->getMessage());

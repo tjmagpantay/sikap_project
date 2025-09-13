@@ -15,60 +15,65 @@ class NotificationService
         $this->mailService = new MailService();
     }
 
-    // Scenario 1: Employer posts a job - notify all jobseekers
+    // FIXED: Scenario 1: Employer posts a job - notify all jobseekers
     public function notifyJobPosted($jobId, $jobTitle, $companyName)
     {
         try {
-            // Get all active jobseekers - Fixed query based on your schema
+            // Get all active jobseekers - CORRECTED query
             $stmt = $this->db->prepare("
-                SELECT u.user_id, u.email, j.first_name, j.last_name 
-                FROM users u
-                JOIN user_roles ur ON u.user_id = ur.user_id
-                JOIN roles r ON ur.role_id = r.role_id
-                JOIN jobseeker j ON u.user_id = j.user_id
-                WHERE r.role_name = 'jobseeker'
-                AND u.status = 'active'
+                SELECT j.user_id, j.first_name, j.last_name, u.email
+                FROM jobseeker j
+                INNER JOIN users u ON j.user_id = u.user_id 
+                WHERE u.status = 'active'
             ");
             $stmt->execute();
             $jobseekers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $title = "New Job Available";
-            $message = "New job posted: {$jobTitle} at {$companyName}";
-            $link = "?page=job-details&id={$jobId}";
+            error_log("🔍 Job Notification: Found " . count($jobseekers) . " jobseekers to notify about job $jobId");
 
+            if (empty($jobseekers)) {
+                error_log("ℹ️ No active jobseekers found to notify about job");
+                return true;
+            }
+
+            $title = "New Job Available: {$jobTitle}";
+            $message = "New {$jobTitle} position at {$companyName}. Apply now!";
+            $link = "?page=job-details&job_id={$jobId}";
+
+            // FIXED: Insert notifications with user_type
+            $insertStmt = $this->db->prepare("
+                INSERT INTO notifications (user_id, user_type, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'jobseeker', 'job_post', ?, ?, ?, 'unread', ?, NOW())
+            ");
+
+            $data = json_encode([
+                'job_id' => $jobId,
+                'job_title' => $jobTitle,
+                'company_name' => $companyName
+            ]);
+
+            $notificationCount = 0;
             foreach ($jobseekers as $jobseeker) {
-                // Create in-app notification
-                $this->notification->create(
+                $result = $insertStmt->execute([
                     $jobseeker['user_id'],
-                    'job_post',
                     $title,
                     $message,
                     $link,
-                    ['job_id' => $jobId, 'company_name' => $companyName]
-                );
+                    $data
+                ]);
 
-                // Send email notification (optional - can be disabled for testing)
-                if (class_exists('MailService')) {
-                    $emailSubject = "New Job Opportunity: {$jobTitle}";
-                    $emailBody = "
-                        <h2>New Job Available</h2>
-                        <p>Hi {$jobseeker['first_name']},</p>
-                        <p>A new job opportunity has been posted that might interest you:</p>
-                        <p><strong>Position:</strong> {$jobTitle}</p>
-                        <p><strong>Company:</strong> {$companyName}</p>
-                        <p><a href='http://" . $_SERVER['HTTP_HOST'] . "/sikap/?page=job-details&id={$jobId}' 
-                           style='background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
-                           View Job Details
-                        </a></p>
-                    ";
-
-                    $this->mailService->sendEmail($jobseeker['email'], $emailSubject, $emailBody);
+                if ($result) {
+                    $notificationCount++;
+                    error_log("✅ Job Notification: Inserted for user_id {$jobseeker['user_id']} ({$jobseeker['first_name']} {$jobseeker['last_name']})");
+                } else {
+                    error_log("❌ Job Notification: Failed to insert for user_id {$jobseeker['user_id']}");
                 }
             }
 
+            error_log("✅ Sent $notificationCount job notifications to jobseekers for job ID: $jobId");
             return true;
         } catch (Exception $e) {
-            error_log("Error notifying job posted: " . $e->getMessage());
+            error_log("❌ Error notifying job posted: " . $e->getMessage());
             return false;
         }
     }
@@ -275,58 +280,6 @@ class NotificationService
         }
     }
 
-    // Get notifications for a user
-    public function getUserNotifications($userId, $limit = 15, $offset = 0)
-    {
-        try {
-            $sql = "SELECT notification_id, type, title, message, link, status, data, created_at
-                    FROM notifications
-                    WHERE user_id = ?
-                    ORDER BY created_at DESC
-                    LIMIT ? OFFSET ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(1, $userId, PDO::PARAM_INT);
-            $stmt->bindValue(2, $limit, PDO::PARAM_INT);
-            $stmt->bindValue(3, $offset, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-            // DEBUG: Log the notifications we're returning
-            error_log("🔍 NotificationService: Returning " . count($notifications) . " notifications for user $userId");
-            if (!empty($notifications)) {
-                error_log("📋 First notification: " . json_encode($notifications[0]));
-            }
-
-            return $notifications;
-        } catch (Exception $e) {
-            error_log("❌ Error getting user notifications: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Get unread count
-    public function getUnreadCount($userId)
-    {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND status = 'unread'");
-        $stmt->execute([$userId]);
-        return (int)$stmt->fetchColumn();
-    }
-
-    // Mark as read
-    public function markAsRead($notificationId, $userId)
-    {
-        $stmt = $this->db->prepare("UPDATE notifications SET status = 'read' WHERE notification_id = ? AND user_id = ?");
-        return $stmt->execute([$notificationId, $userId]);
-    }
-
-    // Mark all as read
-    public function markAllAsRead($userId)
-    {
-        $stmt = $this->db->prepare("UPDATE notifications SET status = 'read' WHERE user_id = ? AND status = 'unread'");
-        return $stmt->execute([$userId]);
-    }
-
     /**
      * Notify jobseekers about new job post
      */
@@ -373,8 +326,8 @@ class NotificationService
 
             // Insert notifications for all eligible jobseekers
             $insertStmt = $this->db->prepare("
-                INSERT INTO notifications (user_id, type, title, message, link, status, data, created_at) 
-                VALUES (?, 'job_post', ?, ?, ?, 'unread', ?, NOW())
+                INSERT INTO notifications (user_id, user_type, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'jobseeker', 'job_post', ?, ?, ?, 'unread', ?, NOW())
             ");
 
             $data = json_encode([
@@ -421,7 +374,7 @@ class NotificationService
             $event = $eventStmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$event) {
-                error_log("❌ Event not found or not visible: $eventId");
+                error_log("❌ Jobseeker Notification: Event not found or not visible: $eventId");
                 return false;
             }
 
@@ -433,13 +386,11 @@ class NotificationService
             $formattedDate = $eventDate->format('F j, Y \a\t g:i A');
 
             $message = "A new {$eventType} has been posted. Join us on {$formattedDate}. Don't miss out!";
-
-            // Link to the programs page with anchor to specific event
             $link = "?page=programs-jobseeker#event-" . $eventId;
 
-            // Get all active jobseekers who want program notifications
+            // Get all active jobseekers
             $jobseekerStmt = $this->db->prepare("
-                SELECT j.user_id 
+                SELECT j.user_id, j.first_name, j.last_name
                 FROM jobseeker j
                 INNER JOIN users u ON j.user_id = u.user_id 
                 LEFT JOIN jobseeker_settings js ON j.jobseeker_id = js.jobseeker_id
@@ -449,41 +400,275 @@ class NotificationService
             $jobseekerStmt->execute();
             $jobseekers = $jobseekerStmt->fetchAll(PDO::FETCH_ASSOC);
 
+            error_log("🔍 Jobseeker Notification: Found " . count($jobseekers) . " jobseekers to notify about event $eventId");
+
             if (empty($jobseekers)) {
                 error_log("ℹ️ No active jobseekers found to notify about program");
-                return true; // No jobseekers to notify, but not an error
+                return true;
             }
 
-            // FIXED: Insert notifications for all eligible jobseekers
+            // FIXED: Insert notifications with user_type specified
             $insertStmt = $this->db->prepare("
-                INSERT INTO notifications (user_id, type, title, message, link, status, data, created_at) 
-                VALUES (?, 'program', ?, ?, ?, 'unread', ?, NOW())
+                INSERT INTO notifications (user_id, user_type, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'jobseeker', 'program', ?, ?, ?, 'unread', ?, NOW())
             ");
 
             $data = json_encode([
                 'event_id' => $eventId,
                 'event_title' => $event['title'],
                 'event_type' => $event['type'],
-                'event_date' => $event['time_start']
+                'event_date' => $event['time_start'],
+                'target_user_type' => 'jobseeker'
             ]);
 
             $notificationCount = 0;
             foreach ($jobseekers as $jobseeker) {
-                if ($insertStmt->execute([
+                $result = $insertStmt->execute([
                     $jobseeker['user_id'],
                     $title,
                     $message,
                     $link,
                     $data
-                ])) {
+                ]);
+
+                if ($result) {
                     $notificationCount++;
+                    error_log("✅ Jobseeker Notification: Inserted for user_id {$jobseeker['user_id']} ({$jobseeker['first_name']} {$jobseeker['last_name']})");
+                } else {
+                    error_log("❌ Jobseeker Notification: Failed to insert for user_id {$jobseeker['user_id']}");
                 }
             }
 
-            error_log("✅ Sent $notificationCount program notifications for event ID: $eventId");
+            error_log("✅ Sent $notificationCount program notifications to JOBSEEKERS for event ID: $eventId");
             return true;
         } catch (Exception $e) {
             error_log("❌ Error notifying jobseekers about new program: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Notify employers about new program/event posted by admin
+     */
+    public function notifyEmployersAboutNewProgram(int $eventId): bool
+    {
+        try {
+            // Get event/program details
+            $eventStmt = $this->db->prepare("
+                SELECT title, description, type, time_start, status
+                FROM events 
+                WHERE event_id = ? AND status = 'show'
+            ");
+            $eventStmt->execute([$eventId]);
+            $event = $eventStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$event) {
+                error_log("❌ Employer Notification: Event not found or not visible: $eventId");
+                return false;
+            }
+
+            // Create appropriate notification based on event type
+            $eventType = ucfirst($event['type']);
+            $title = "New {$eventType}: " . $event['title'];
+
+            $eventDate = new DateTime($event['time_start']);
+            $formattedDate = $eventDate->format('F j, Y \a\t g:i A');
+
+            $message = "A new {$eventType} has been posted. Join us on {$formattedDate}. Network with other employers!";
+            $link = "?page=employer-programs#event-" . $eventId;
+
+            // Get all active verified employers
+            $employerStmt = $this->db->prepare("
+                SELECT e.user_id, e.status as employer_status, u.status as user_status, e.first_name, e.last_name
+                FROM employer e
+                INNER JOIN users u ON e.user_id = u.user_id 
+                WHERE u.status = 'active' 
+                AND e.status = 'verified'
+            ");
+            $employerStmt->execute();
+            $employers = $employerStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("🔍 Employer Notification: Found " . count($employers) . " verified employers to notify about event $eventId");
+
+            if (empty($employers)) {
+                error_log("ℹ️ No active verified employers found to notify about program");
+                return true;
+            }
+
+            // FIXED: Insert notifications with user_type specified
+            $insertStmt = $this->db->prepare("
+                INSERT INTO notifications (user_id, user_type, type, title, message, link, status, data, created_at) 
+                VALUES (?, 'employer', 'program', ?, ?, ?, 'unread', ?, NOW())
+            ");
+
+            $data = json_encode([
+                'event_id' => $eventId,
+                'event_title' => $event['title'],
+                'event_type' => $event['type'],
+                'event_date' => $event['time_start'],
+                'target_user_type' => 'employer'
+            ]);
+
+            $notificationCount = 0;
+            foreach ($employers as $employer) {
+                $result = $insertStmt->execute([
+                    $employer['user_id'],
+                    $title,
+                    $message,
+                    $link,
+                    $data
+                ]);
+
+                if ($result) {
+                    $notificationCount++;
+                    error_log("✅ Employer Notification: Inserted for user_id {$employer['user_id']} ({$employer['first_name']} {$employer['last_name']})");
+                } else {
+                    error_log("❌ Employer Notification: Failed to insert for user_id {$employer['user_id']}");
+                }
+            }
+
+            error_log("✅ Sent $notificationCount program notifications to EMPLOYERS for event ID: $eventId");
+            return true;
+        } catch (Exception $e) {
+            error_log("❌ Error notifying employers about new program: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Update other notification methods to include user_type
+    public function getUserNotifications($userId, $limit = 15, $offset = 0)
+    {
+        try {
+            // FIXED: Get user type from session or determine from user_id
+            $userType = $this->determineUserType($userId);
+
+            $sql = "SELECT notification_id, type, title, message, link, status, data, created_at
+                    FROM notifications
+                    WHERE user_id = ? AND user_type = ?
+                    ORDER BY created_at DESC
+                    LIMIT ? OFFSET ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(1, $userId, PDO::PARAM_INT);
+            $stmt->bindValue(2, $userType, PDO::PARAM_STR);
+            $stmt->bindValue(3, $limit, PDO::PARAM_INT);
+            $stmt->bindValue(4, $offset, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            error_log("🔍 NotificationService: Returning " . count($notifications) . " notifications for user $userId (type: $userType)");
+            if (!empty($notifications)) {
+                error_log("📋 First notification: " . json_encode($notifications[0]));
+            }
+
+            return $notifications;
+        } catch (Exception $e) {
+            error_log("❌ Error getting user notifications: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getUnreadCount($userId)
+    {
+        try {
+            $userType = $this->determineUserType($userId);
+
+            $sql = "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND user_type = ? AND status = 'unread'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$userId, $userType]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)$result['count'];
+        } catch (Exception $e) {
+            error_log("❌ Error getting unread count: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    private function determineUserType($userId)
+    {
+        try {
+            // Check if user is a jobseeker
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM jobseeker WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $jobseekerCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+            if ($jobseekerCount > 0) {
+                return 'jobseeker';
+            }
+
+            // Check if user is an employer
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM employer WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $employerCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+            if ($employerCount > 0) {
+                return 'employer';
+            }
+
+            // Check if user is an admin
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM admin WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $adminCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+            if ($adminCount > 0) {
+                return 'admin';
+            }
+
+            // Default to jobseeker if none found
+            error_log("⚠️ Could not determine user type for user_id: $userId, defaulting to jobseeker");
+            return 'jobseeker';
+        } catch (Exception $e) {
+            error_log("❌ Error determining user type: " . $e->getMessage());
+            return 'jobseeker';
+        }
+    }
+
+    /**
+     * Mark a specific notification as read
+     */
+    public function markAsRead($notificationId, $userId = null)
+    {
+        try {
+            if ($userId) {
+                // Verify the notification belongs to this user and get user type
+                $userType = $this->determineUserType($userId);
+                $sql = "UPDATE notifications 
+                        SET status = 'read', updated_at = NOW() 
+                        WHERE notification_id = ? AND user_id = ? AND user_type = ?";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute([$notificationId, $userId, $userType]);
+
+                error_log("🔍 NotificationService: Marked notification $notificationId as read for user $userId (type: $userType)");
+                return $result;
+            } else {
+                // Just mark by notification ID (less secure)
+                $sql = "UPDATE notifications SET status = 'read', updated_at = NOW() WHERE notification_id = ?";
+                $stmt = $this->db->prepare($sql);
+                return $stmt->execute([$notificationId]);
+            }
+        } catch (Exception $e) {
+            error_log("❌ Error marking notification as read: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Mark all notifications as read for a user
+     */
+    public function markAllAsRead($userId)
+    {
+        try {
+            $userType = $this->determineUserType($userId);
+            $sql = "UPDATE notifications 
+                    SET status = 'read', updated_at = NOW() 
+                    WHERE user_id = ? AND user_type = ? AND status = 'unread'";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$userId, $userType]);
+
+            error_log("🔍 NotificationService: Marked all notifications as read for user $userId (type: $userType)");
+            return $result;
+        } catch (Exception $e) {
+            error_log("❌ Error marking all notifications as read: " . $e->getMessage());
             return false;
         }
     }
