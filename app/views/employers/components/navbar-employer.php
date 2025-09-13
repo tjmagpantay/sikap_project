@@ -117,69 +117,43 @@
 
               <!-- Notification Items -->
               <template x-for="notification in notifications" :key="notification.notification_id">
-                <div class="transition-all duration-200 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
-                  :class="notification.status === 'unread' ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''"
-                  @click="handleNotificationClick(notification)">
-                  <div class="px-6 py-4">
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1 min-w-0">
-                        <!-- Notification Icon -->
-                        <div class="flex items-start">
-                          <div class="flex-shrink-0">
-                            <!-- Different background colors for different notification types -->
-                            <div class="flex items-center justify-center w-8 h-8 rounded-full"
-                              :class="
-                                notification.type === 'job_application' ? 'bg-purple-100' : 
-                                notification.type === 'application_update' ? 'bg-orange-100' : 
-                                notification.type === 'program' ? 'bg-green-100' : 
-                                'bg-blue-100'
-                              ">
+                <div class="relative">
+                  <button @click="handleNotificationClick(notification)"
+                    class="flex items-start w-full px-4 py-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                    :class="notification.status === 'unread' ? 'bg-blue-50' : ''">
 
-                              <!-- Job Application Icon -->
-                              <template x-if="notification.type === 'job_application'">
-                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                              </template>
-
-                              <!-- Application Update Icon -->
-                              <template x-if="notification.type === 'application_update'">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </template>
-
-                              <!-- Program/Event Icon -->
-                              <template x-if="notification.type === 'program'">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </template>
-
-                              <!-- Default Icon -->
-                              <template x-if="notification.type !== 'job_application' && notification.type !== 'application_update' && notification.type !== 'program'">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </template>
-                            </div>
-                          </div>
-                          <div class="flex-1 ml-3">
-                            <h4 class="text-sm font-medium leading-5 text-gray-900"
-                              :class="notification.status === 'unread' ? 'font-semibold' : ''"
-                              x-text="notification.title">
-                            </h4>
-                            <p class="mt-1 text-sm leading-5 text-gray-600 line-clamp-2" x-text="notification.message"></p>
-                            <p class="mt-2 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="flex items-center ml-4">
-                        <span x-show="notification.status === 'unread'"
-                          class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></span>
+                    <!-- Notification Icon -->
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                        :class="getNotificationBadgeColor(notification.type)">
+                        <span x-html="getNotificationIcon(notification.type)"></span>
                       </div>
                     </div>
-                  </div>
+
+                    <!-- Notification Content -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                          <h4 class="text-sm font-medium text-gray-900 line-clamp-1"
+                            :class="notification.status === 'unread' ? 'font-semibold' : ''"
+                            x-text="notification.title">
+                          </h4>
+                          <p class="text-sm text-gray-600 line-clamp-2"
+                            x-text="notification.message">
+                          </p>
+                          <p class="text-xs text-gray-400"
+                            x-text="formatDate(notification.created_at)">
+                          </p>
+                        </div>
+
+                        <!-- Unread indicator -->
+                        <div x-show="notification.status === 'unread'"
+                          class="flex-shrink-0 ml-2">
+                          <span class="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
               </template>
             </div>
@@ -200,7 +174,7 @@
             @click="businessOpen = !businessOpen"
             @click.away="businessOpen = false"
             class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-gray-100 rounded-sm hover:bg-gray-200 hover:text-blue-600 focus:outline-none">
-            
+
             Business
             <svg class="w-4 h-4 ml-2 transition-transform duration-200"
               :class="{ 'rotate-180': businessOpen }"
@@ -236,7 +210,7 @@
                 class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
                 View Applications
               </a>
-              
+
               <a href="?page=setting-employer"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900">
                 Settings
@@ -339,7 +313,6 @@
 
           console.log('🔔 Employer: Fetching notifications...');
 
-          // FIXED: Use MVC controller endpoint instead of API folder
           const response = await fetch('?page=notifications-api&limit=5');
 
           if (!response.ok) {
@@ -369,7 +342,6 @@
         try {
           console.log('📖 Employer marking notification as read:', notificationId);
 
-          // FIXED: Use MVC controller endpoint
           const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
@@ -399,7 +371,6 @@
         try {
           console.log('📖 Employer marking all notifications as read');
 
-          // FIXED: Use MVC controller endpoint
           const response = await fetch('?page=notifications-api', {
             method: 'POST',
             headers: {
@@ -438,6 +409,35 @@
         }
 
         this.isOpen = false;
+      },
+
+      // ENHANCED: Better notification display for job applications
+      getNotificationIcon(type) {
+        switch (type) {
+          case 'job_application':
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>`;
+          case 'program':
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>`;
+          default:
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>`;
+        }
+      },
+
+      getNotificationBadgeColor(type) {
+        switch (type) {
+          case 'job_application':
+            return 'bg-purple-100 text-purple-600';
+          case 'program':
+            return 'bg-green-100 text-green-600';
+          default:
+            return 'bg-blue-100 text-blue-600';
+        }
       },
 
       formatDate(dateString) {

@@ -132,40 +132,164 @@ class NotificationService
     public function notifyJobApplication($applicationId, $jobId, $employerId, $jobseekerName)
     {
         try {
-            // Get employer details from model
-            $employer = $this->notification->getEmployerDetails($employerId, $jobId);
+            error_log("🔍 DEBUG notifyJobApplication: Starting notification process");
+            error_log("   - Application ID: $applicationId");
+            error_log("   - Job ID: $jobId");
+            error_log("   - Employer ID: $employerId");
+            error_log("   - Jobseeker Name: $jobseekerName");
 
-            if ($employer) {
-                $title = "New Job Application";
-                $message = "{$jobseekerName} applied for {$employer['job_title']} position";
-                $link = "?page=manage-applications&job_id={$jobId}";
+            // Get employer details from model - FIXED to use employer_id correctly
+            error_log("🔍 DEBUG: Getting employer details");
+            $employer = $this->getEmployerDetailsByEmployerId($employerId, $jobId);
 
-                $data = [
-                    'application_id' => $applicationId,
-                    'job_id' => $jobId,
-                    'applicant_name' => $jobseekerName
-                ];
+            if (!$employer) {
+                error_log("❌ Job Application Notification: Could not find employer details for employer_id: $employerId, job_id: $jobId");
 
-                // Use the notification model's create method
-                $result = $this->notification->create(
-                    $employer['user_id'],
-                    'employer',
-                    'job_application',
-                    $title,
-                    $message,
-                    $link,
-                    $data
-                );
+                // ADDITIONAL DEBUG: Let's check what's in the database
+                $this->debugEmployerTables($employerId, $jobId);
 
-                if ($result) {
-                    error_log("✅ Application notification created for employer user_id: {$employer['user_id']}");
-                }
+                return false;
             }
 
-            return true;
+            error_log("✅ DEBUG: Found employer details: " . json_encode($employer));
+
+            $title = "New Job Application";
+            $message = "{$jobseekerName} applied for {$employer['job_title']} position at your company.";
+            $link = "?page=review-application&application_id={$applicationId}";
+
+            $data = [
+                'application_id' => $applicationId,
+                'job_id' => $jobId,
+                'employer_id' => $employerId,
+                'applicant_name' => $jobseekerName,
+                'job_title' => $employer['job_title']
+            ];
+
+            error_log("🔍 DEBUG: Creating notification");
+            error_log("   - Title: $title");
+            error_log("   - Message: $message");
+            error_log("   - Link: $link");
+            error_log("   - Target user_id: {$employer['user_id']}");
+            error_log("   - Data: " . json_encode($data));
+
+            // Use the notification model's create method
+            $result = $this->notification->create(
+                $employer['user_id'],
+                'employer',
+                'job_application',
+                $title,
+                $message,
+                $link,
+                $data
+            );
+
+            error_log("🔔 DEBUG: Notification create() returned: " . ($result ? 'TRUE' : 'FALSE'));
+
+            if ($result) {
+                error_log("✅ Job Application notification created for employer user_id: {$employer['user_id']} (employer_id: $employerId)");
+
+                // VERIFY: Check if it was actually inserted
+                $this->verifyNotificationInserted($employer['user_id'], $applicationId);
+            } else {
+                error_log("❌ Failed to create job application notification for employer user_id: {$employer['user_id']}");
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("❌ Error notifying job application: " . $e->getMessage());
+            error_log("❌ Stack trace: " . $e->getTraceAsString());
             return false;
+        }
+    }
+
+    /**
+     * Debug method to check employer tables
+     */
+    private function debugEmployerTables($employerId, $jobId)
+    {
+        try {
+            error_log("🔍 DEBUG: Checking employer tables for employer_id: $employerId, job_id: $jobId");
+
+            // Check employer table
+            $stmt = $this->db->prepare("SELECT * FROM employer WHERE employer_id = ?");
+            $stmt->execute([$employerId]);
+            $employer = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("🔍 DEBUG: Employer record: " . json_encode($employer));
+
+            // Check job_post table
+            $stmt = $this->db->prepare("SELECT * FROM job_post WHERE job_id = ? AND employer_id = ?");
+            $stmt->execute([$jobId, $employerId]);
+            $job = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("🔍 DEBUG: Job post record: " . json_encode($job));
+
+            // Check users table
+            if ($employer) {
+                $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = ?");
+                $stmt->execute([$employer['user_id']]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                error_log("🔍 DEBUG: User record: " . json_encode($user));
+            }
+        } catch (Exception $e) {
+            error_log("❌ Error debugging employer tables: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Verify notification was inserted
+     */
+    private function verifyNotificationInserted($userId, $applicationId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT notification_id, title, message, created_at 
+                FROM notifications 
+                WHERE user_id = ? AND type = 'job_application'
+                ORDER BY created_at DESC 
+                LIMIT 1
+            ");
+            $stmt->execute([$userId]);
+            $notification = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($notification) {
+                error_log("✅ VERIFIED: Notification inserted with ID: {$notification['notification_id']}");
+                error_log("   - Title: {$notification['title']}");
+                error_log("   - Created: {$notification['created_at']}");
+            } else {
+                error_log("❌ VERIFICATION FAILED: No notification found in database for user_id: $userId");
+            }
+        } catch (Exception $e) {
+            error_log("❌ Error verifying notification: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get employer details by employer_id for job application notifications
+     */
+    private function getEmployerDetailsByEmployerId($employerId, $jobId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT u.user_id, u.email, 
+                       COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                       jp.job_title,
+                       e.employer_id,
+                       e.first_name,
+                       e.last_name
+                FROM employer e
+                JOIN users u ON e.user_id = u.user_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                JOIN job_post jp ON e.employer_id = jp.employer_id
+                WHERE e.employer_id = ? AND jp.job_id = ? AND u.status = 'active'
+            ");
+            $stmt->execute([$employerId, $jobId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("🔍 DEBUG: Employer lookup query result: " . json_encode($result));
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("Error getting employer details by employer_id: " . $e->getMessage());
+            return null;
         }
     }
 

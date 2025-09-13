@@ -1,5 +1,5 @@
 <?php
-// filepath: app/controllers/JobApplicationController.php
+// filepath: c:\xampp\htdocs\sikap\app\controllers\JobApplicationController.php
 require_once __DIR__ . '/../models/JobApplication.php';
 require_once __DIR__ . '/../models/JobPost.php';
 require_once __DIR__ . '/../models/Jobseeker.php';
@@ -591,10 +591,16 @@ class JobApplicationController
     private function handleStep4($job, $jobseeker, $application_id)
     {
         try {
-            // Finalize the application
+            error_log("🔍 DEBUG handleStep4: Starting final submission");
+            error_log("   - Application ID: $application_id");
+            error_log("   - Job ID: {$job['job_id']}");
+            error_log("   - Employer ID: {$job['employer_id']}");
+            error_log("   - Jobseeker: {$jobseeker['first_name']} {$jobseeker['last_name']}");
+
+            // FIXED: Finalize the application while keeping current_step for tracking
             $updateData = [
-                'is_finalized' => true,
-                'current_step' => 4,
+                'is_finalized' => 1,
+                'current_step' => 4,  // ✅ Keep this - shows they completed all steps
                 'applied_at' => date('Y-m-d H:i:s')
             ];
 
@@ -602,14 +608,68 @@ class JobApplicationController
                 throw new Exception('Failed to finalize application');
             }
 
+            error_log("✅ DEBUG: Application finalized successfully");
+
             // Log the application submission
             $this->jobApplicationModel->logStatusChange($application_id, 'pending', 'jobseeker', 'Application submitted');
+
+            error_log("🔔 DEBUG: Starting notification process");
+
+            // ADDED: Send notification to employer about new job application
+            try {
+                require_once __DIR__ . '/../services/NotificationService.php';
+                require_once __DIR__ . '/../../config/sikap_db.php';
+
+                error_log("🔍 DEBUG: Loading NotificationService");
+
+                $config = require __DIR__ . '/../../config/sikap_db.php';
+                $pdo = new PDO(
+                    "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                    $config['db_user'],
+                    $config['db_pass']
+                );
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $notificationService = new NotificationService($pdo);
+
+                // Get jobseeker's full name
+                $jobseekerName = trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']);
+
+                error_log("🔔 DEBUG: About to call notifyJobApplication");
+                error_log("   - Application ID: $application_id");
+                error_log("   - Job ID: {$job['job_id']}");
+                error_log("   - Employer ID: {$job['employer_id']}");
+                error_log("   - Jobseeker Name: $jobseekerName");
+
+                // Send notification to employer
+                $notificationResult = $notificationService->notifyJobApplication(
+                    $application_id,
+                    $job['job_id'],
+                    $job['employer_id'],
+                    $jobseekerName
+                );
+
+                error_log("🔔 DEBUG: notifyJobApplication returned: " . ($notificationResult ? 'TRUE' : 'FALSE'));
+
+                if ($notificationResult) {
+                    error_log("✅ Job application notification sent to employer for application ID: $application_id");
+                } else {
+                    error_log("❌ Failed to send job application notification to employer for application ID: $application_id");
+                }
+            } catch (Exception $e) {
+                error_log("❌ Error sending job application notification: " . $e->getMessage());
+                error_log("❌ Stack trace: " . $e->getTraceAsString());
+                // Don't fail the application submission if notification fails
+            }
+
+            error_log("✅ DEBUG: Redirecting to success page");
 
             // Redirect to success page
             header('Location: ?page=application-success&application_id=' . $application_id);
             exit;
         } catch (Exception $e) {
-            error_log('Error in handleStep4: ' . $e->getMessage());
+            error_log('❌ Error in handleStep4: ' . $e->getMessage());
+            error_log('❌ Stack trace: ' . $e->getTraceAsString());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&error=' . urlencode('Failed to submit application. Please try again.'));
             exit;
         }

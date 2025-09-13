@@ -15,15 +15,46 @@ class Notification
     public function create($userId, $userType, $type, $title, $message, $link = null, $data = null)
     {
         try {
+            error_log("🔍 DEBUG Notification::create() called:");
+            error_log("   - user_id: $userId");
+            error_log("   - user_type: $userType");
+            error_log("   - type: $type");
+            error_log("   - title: $title");
+            error_log("   - message: $message");
+            error_log("   - link: $link");
+            error_log("   - data: " . ($data ? json_encode($data) : 'null'));
+
             $stmt = $this->db->prepare("
                 INSERT INTO notifications (user_id, user_type, type, title, message, link, data, created_at) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
             ");
 
             $dataJson = $data ? json_encode($data) : null;
-            return $stmt->execute([$userId, $userType, $type, $title, $message, $link, $dataJson]);
+
+            error_log("🔍 DEBUG: About to execute SQL INSERT");
+            error_log("   - SQL: INSERT INTO notifications (user_id, user_type, type, title, message, link, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+            error_log("   - Parameters: " . json_encode([$userId, $userType, $type, $title, $message, $link, $dataJson]));
+
+            $result = $stmt->execute([$userId, $userType, $type, $title, $message, $link, $dataJson]);
+
+            if ($result) {
+                $notificationId = $this->db->lastInsertId();
+                error_log("✅ DEBUG Notification::create() SUCCESS: Inserted notification ID: $notificationId");
+            } else {
+                error_log("❌ DEBUG Notification::create() FAILED");
+                error_log("   - Error Info: " . json_encode($stmt->errorInfo()));
+            }
+
+            return $result;
         } catch (Exception $e) {
-            error_log("Error creating notification: " . $e->getMessage());
+            error_log("❌ Error creating notification: " . $e->getMessage());
+            error_log("❌ Stack trace: " . $e->getTraceAsString());
+
+            // Additional database error info
+            if (isset($stmt)) {
+                error_log("❌ SQL Error Info: " . json_encode($stmt->errorInfo()));
+            }
+
             return false;
         }
     }
@@ -240,7 +271,7 @@ class Notification
     }
 
     /**
-     * Get employer details for job application notifications
+     * Get employer details for job application notifications - UPDATED to use employer_id
      */
     public function getEmployerDetails($employerId, $jobId)
     {
@@ -248,15 +279,22 @@ class Notification
             $stmt = $this->db->prepare("
                 SELECT u.user_id, u.email, 
                        COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                       jp.job_title
-                FROM users u
-                JOIN employer e ON u.user_id = e.user_id
+                       jp.job_title,
+                       e.employer_id,
+                       e.first_name as employer_first_name,
+                       e.last_name as employer_last_name
+                FROM employer e
+                JOIN users u ON e.user_id = u.user_id
                 LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
                 JOIN job_post jp ON e.employer_id = jp.employer_id
-                WHERE e.employer_id = ? AND jp.job_id = ?
+                WHERE e.employer_id = ? AND jp.job_id = ? AND u.status = 'active'
             ");
             $stmt->execute([$employerId, $jobId]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("🔍 DEBUG Notification Model: Employer details query result: " . json_encode($result));
+
+            return $result;
         } catch (Exception $e) {
             error_log("Error getting employer details: " . $e->getMessage());
             return null;
