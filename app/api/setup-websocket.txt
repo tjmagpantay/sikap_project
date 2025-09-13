@@ -1,0 +1,530 @@
+==================================================
+WEBSOCKET NOTIFICATION SYSTEM SETUP GUIDE
+==================================================
+
+This document outlines how to implement WebSocket real-time notifications
+for the SIKAP job portal when migrating from shared hosting to VPS/Cloud.
+
+==================================================
+CURRENT ARCHITECTURE (Shared Hosting - Hostinger)
+==================================================
+
+1. POLLING-BASED SYSTEM:
+   - Frontend polls every 15 seconds: ?page=notifications-api
+   - NotificationService writes to database
+   - No real-time updates (acceptable for shared hosting)
+
+2. FILES INVOLVED:
+   - /app/services/NotificationService.php
+   - /app/controllers/NotificationController.php  
+   - /app/api/NotificationApiController.php (NEW)
+   - Frontend: navbar-jobseeker.php, navbar-employer.php
+
+==================================================
+FUTURE ARCHITECTURE (VPS/Cloud with WebSocket)
+==================================================
+
+1. HYBRID SYSTEM:
+   - Database notifications (for persistence)
+   - WebSocket real-time push (for instant updates)
+   - Polling as fallback (if WebSocket fails)
+
+2. TECHNOLOGY STACK OPTIONS:
+
+   OPTION A - Node.js WebSocket Server:
+   - Socket.IO server on port 3001
+   - PHP sends HTTP requests to Node.js
+   - Node.js broadcasts to connected clients
+   
+   OPTION B - PHP Ratchet WebSocket:
+   - Pure PHP WebSocket server
+   - Integrated with existing codebase
+   - ReactPHP/Ratchet library
+
+3. RECOMMENDED: Node.js Socket.IO
+   - More stable for production
+   - Better browser compatibility
+   - Easier to scale
+
+==================================================
+IMPLEMENTATION PLAN
+==================================================
+
+PHASE 1 - PREPARE CODEBASE (Current - Shared Hosting):
+✅ Extend NotificationService with WebSocket stubs
+✅ Create API controllers in /app/api/
+✅ Ensure all notifications go through NotificationService
+✅ Keep polling system working
+
+PHASE 2 - WEBSOCKET SERVER SETUP (VPS Migration):
+1. Install Node.js on VPS
+2. Create Socket.IO server
+3. Configure nginx proxy
+4. Test WebSocket connections
+
+PHASE 3 - FRONTEND INTEGRATION:
+1. Add Socket.IO client library
+2. Implement WebSocket listeners
+3. Keep polling as fallback
+4. Test across browsers
+
+PHASE 4 - PRODUCTION DEPLOYMENT:
+1. PM2 process manager for Node.js
+2. SSL certificates for WebSocket
+3. Load balancing (if needed)
+4. Monitoring and logging
+
+==================================================
+WEBSOCKET SERVER CODE (Node.js + Socket.IO)
+==================================================
+
+// websocket-server/server.js
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const cors = require('cors');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "https://yourdomain.com",
+    methods: ["GET", "POST"]
+  }
+});
+
+app.use(cors());
+app.use(express.json());
+
+// Store connected users
+const connectedUsers = new Map();
+
+// WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  
+  // User authentication and room joining
+  socket.on('join', (data) => {
+    const { userId, userType } = data;
+    socket.join(`${userType}-${userId}`);
+    connectedUsers.set(socket.id, { userId, userType });
+    console.log(`${userType} ${userId} joined room`);
+  });
+  
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    connectedUsers.delete(socket.id);
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// HTTP endpoint for PHP to push notifications
+app.post('/push-notification', (req, res) => {
+  const { userId, userType, notification } = req.body;
+  
+  // Send to specific user room
+  io.to(`${userType}-${userId}`).emit('notification', notification);
+  
+  res.json({ success: true, message: 'Notification sent' });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'WebSocket server running', timestamp: new Date() });
+});
+
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`WebSocket server running on port ${PORT}`);
+});
+
+==================================================
+PHP WEBSOCKET CLIENT CODE
+==================================================
+
+// In NotificationService.php - pushToSocket() method
+private function pushToSocket($userId, $userType, $notificationData) {
+  if (!$this->isWebSocketEnabled()) {
+    return false; // Skip if WebSocket not available
+  }
+  
+  try {
+    $payload = [
+      'userId' => $userId,
+      'userType' => $userType,
+      'notification' => $notificationData
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'http://localhost:3001/push-notification');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+      error_log("✅ WebSocket notification pushed for {$userType} {$userId}");
+      return true;
+    } else {
+      error_log("❌ WebSocket push failed: HTTP {$httpCode}");
+      return false;
+    }
+  } catch (Exception $e) {
+    error_log("❌ WebSocket push error: " . $e->getMessage());
+    return false;
+  }
+}
+
+==================================================
+FRONTEND WEBSOCKET CLIENT
+==================================================
+
+// Add to navbar JavaScript
+class NotificationManager {
+  constructor() {
+    this.socket = null;
+    this.pollingInterval = null;
+    this.userId = null;
+    this.userType = null;
+  }
+  
+  init(userId, userType) {
+    this.userId = userId;
+    this.userType = userType;
+    
+    // Try WebSocket first, fallback to polling
+    if (this.initWebSocket()) {
+      console.log('✅ Using WebSocket notifications');
+    } else {
+      console.log('📡 Falling back to polling notifications');
+      this.startPolling();
+    }
+  }
+  
+  initWebSocket() {
+    try {
+      // Only try WebSocket in production/VPS environment
+      if (!window.location.hostname.includes('localhost') && 
+          !window.location.hostname.includes('127.0.0.1')) {
+        
+        this.socket = io('wss://yourdomain.com:3001');
+        
+        this.socket.on('connect', () => {
+          console.log('🔌 WebSocket connected');
+          this.socket.emit('join', {
+            userId: this.userId,
+            userType: this.userType
+          });
+          this.stopPolling(); // Stop polling when WebSocket works
+        });
+        
+        this.socket.on('notification', (notification) => {
+          console.log('🔔 Real-time notification received:', notification);
+          this.handleNewNotification(notification);
+        });
+        
+        this.socket.on('disconnect', () => {
+          console.log('🔌 WebSocket disconnected, starting polling fallback');
+          this.startPolling();
+        });
+        
+        return true;
+      }
+    } catch (error) {
+      console.log('❌ WebSocket failed, using polling:', error);
+      return false;
+    }
+    return false;
+  }
+  
+  startPolling() {
+    this.pollingInterval = setInterval(() => {
+      this.fetchNotifications();
+    }, 15000);
+  }
+  
+  stopPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+  }
+  
+  handleNewNotification(notification) {
+    // Update UI immediately
+    this.notifications.unshift(notification);
+    this.unreadCount++;
+    
+    // Show toast notification
+    this.showToast(notification.title, notification.message);
+  }
+}
+
+==================================================
+DEPLOYMENT CHECKLIST (VPS Migration)
+==================================================
+
+SERVER REQUIREMENTS:
+□ Node.js v16+ installed
+□ PM2 process manager
+□ Nginx configured for WebSocket proxy
+□ SSL certificate for WSS
+□ Firewall: Allow port 3001
+
+NGINX WEBSOCKET PROXY:
+location /socket.io/ {
+  proxy_pass http://localhost:3001;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+PM2 COMMANDS:
+pm2 start websocket-server/server.js --name "sikap-websocket"
+pm2 startup
+pm2 save
+
+TESTING:
+1. Test WebSocket connection from browser console
+2. Send test notifications via PHP
+3. Verify fallback to polling works
+4. Test across different browsers
+5. Load testing with multiple users
+
+==================================================
+MONITORING AND TROUBLESHOOTING
+==================================================
+
+LOGS TO MONITOR:
+- Node.js WebSocket server logs
+- PHP curl errors to WebSocket
+- Browser console WebSocket errors
+- Database notification logs
+
+COMMON ISSUES:
+- CORS policy blocking WebSocket
+- SSL certificate issues with WSS
+- Firewall blocking WebSocket port
+- PM2 process crashes
+
+PERFORMANCE CONSIDERATIONS:
+- Max concurrent WebSocket connections
+- Message queue for high-volume notifications
+- Database indexing for notification queries
+- Redis for session storage (if scaling)
+
+==================================================
+COST COMPARISON
+==================================================
+
+SHARED HOSTING (Current):
+- PHP polling only
+- Database queries every 15 seconds
+- No real-time updates
+- Cost: ~$10-20/month
+
+VPS WITH WEBSOCKET (Future):
+- Real-time notifications
+- Better user experience
+- Scalable architecture
+- Cost: ~$40-80/month
+
+BENEFITS OF WEBSOCKET:
+✅ Instant notifications
+✅ Reduced server load
+✅ Better user engagement
+✅ Professional appearance
+✅ Scalable for mobile apps
+
+==================================================
+END OF WEBSOCKET SETUP GUIDE
+==================================================
+
+==================================================
+CODE FOR NOTIFICATION services
+==================================================
+
+/**
+ * Check if WebSocket is enabled/available
+ */
+private function isWebSocketEnabled()
+{
+    // For now, always return false (polling mode)
+    // Later, check environment variable or config
+    return false;
+    
+    // Future implementation:
+    // return $_ENV['WEBSOCKET_ENABLED'] === 'true' && $_ENV['APP_ENV'] !== 'shared-hosting';
+}
+
+/**
+ * Push notification to WebSocket server (STUB - for future implementation)
+ * This is where we'll integrate with Node.js Socket.IO server
+ */
+private function pushToSocket($userId, $userType, $notificationData)
+{
+    // STUB: Return false for now (no WebSocket)
+    if (!$this->isWebSocketEnabled()) {
+        return false;
+    }
+    
+    // Future WebSocket implementation:
+    /*
+    try {
+        $payload = [
+            'userId' => $userId,
+            'userType' => $userType,
+            'notification' => $notificationData
+        ];
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'http://localhost:3001/push-notification');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200) {
+            error_log("✅ WebSocket notification pushed for {$userType} {$userId}");
+            return true;
+        } else {
+            error_log("❌ WebSocket push failed: HTTP {$httpCode}");
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("❌ WebSocket push error: " . $e->getMessage());
+        return false;
+    }
+    */
+    
+    return false;
+}
+
+/**
+ * Enhanced notification creation with WebSocket support
+ * This method ensures all notifications go through a single integration point
+ */
+private function createAndPushNotification($userId, $userType, $type, $title, $message, $link = null, $data = null)
+{
+    try {
+        error_log("🔔 Creating notification for {$userType} {$userId}: {$title}");
+        
+        // 1. Always save to database (for persistence and polling)
+        $databaseResult = $this->notification->create($userId, $userType, $type, $title, $message, $link, $data);
+        
+        if (!$databaseResult) {
+            error_log("❌ Failed to save notification to database");
+            return false;
+        }
+        
+        // 2. Try to push via WebSocket (if available)
+        $notificationData = [
+            'notification_id' => $this->notification->getLastInsertId(),
+            'user_id' => $userId,
+            'user_type' => $userType,
+            'type' => $type,
+            'title' => $title,
+            'message' => $message,
+            'link' => $link,
+            'data' => $data,
+            'status' => 'unread',
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+        
+        $websocketResult = $this->pushToSocket($userId, $userType, $notificationData);
+        
+        if ($websocketResult) {
+            error_log("✅ Notification sent via WebSocket and database");
+        } else {
+            error_log("📡 Notification saved to database (WebSocket not available - using polling)");
+        }
+        
+        return $databaseResult;
+        
+    } catch (Exception $e) {
+        error_log("❌ Error creating notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Update your existing notification methods to use createAndPushNotification:
+
+public function notifyJobApplication($applicationId, $jobId, $employerId, $jobseekerName)
+{
+    try {
+        // ... existing code to get employer details ...
+        
+        // Use the new unified method
+        return $this->createAndPushNotification(
+            $employer['user_id'],
+            'employer',
+            'job_application',
+            $title,
+            $message,
+            $link,
+            $data
+        );
+        
+    } catch (Exception $e) {
+        error_log("❌ Error notifying job application: " . $e->getMessage());
+        return false;
+    }
+}
+
+public function notifyApplicationStatusUpdate($applicationId, $newStatus, $jobTitle, $companyName, $remarks = null)
+{
+    try {
+        // ... existing code to get jobseeker details ...
+        
+        // Use the new unified method
+        return $this->createAndPushNotification(
+            $jobseeker['user_id'],
+            'jobseeker',
+            'application_update',
+            $title,
+            $message,
+            $link,
+            $data
+        );
+        
+    } catch (Exception $e) {
+        error_log("❌ Error notifying application status update: " . $e->getMessage());
+        return false;
+    }
+}
+
+public function notifyInterviewScheduled($applicationId, $jobTitle, $companyName, $interviewDateTime, $location, $notes = null)
+{
+    try {
+        // ... existing code to get jobseeker details ...
+        
+        // Use the new unified method
+        return $this->createAndPushNotification(
+            $jobseeker['user_id'],
+            'jobseeker',
+            'interview',
+            $title,
+            $message,
+            $link,
+            $data
+        );
+        
+    } catch (Exception $e) {
+        error_log("❌ Error notifying interview scheduled: " . $e->getMessage());
+        return false;
+    }
+}

@@ -27,7 +27,6 @@ if (!isset($jobseeker) || empty($jobseeker)) {
         <li><a href="?page=browse-jobs" class="nav-link">Job Search</a></li>
         <li><a href="?page=programs-jobseeker" class="nav-link">Programs</a></li>
         <li><a href="?page=explore-companies" class="nav-link">Explore Companies</a></li>
-        <li><a href="?page=recommended-jobs" class="nav-link">Recommended Jobs</a></li>
       </ul>
     </div>
 

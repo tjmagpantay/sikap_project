@@ -1,0 +1,60 @@
+🔹 How to Keep Server Always Running
+
+On a VPS, you never want to “manually run python app.py”.
+Instead:
+
+Option 1: Gunicorn + Nginx for Flask
+
+# Install gunicorn
+pip install gunicorn
+
+# Run Flask app (production WSGI server)
+gunicorn -w 4 app:app
+
+
+-w 4 = 4 worker processes
+
+app:app = app.py file with app = Flask(...) inside
+
+Then use Nginx as reverse proxy to expose it on port 80/443.
+
+Option 2: Keep Alive with systemd
+Create /etc/systemd/system/flask.service:
+
+[Unit]
+Description=Flask App
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/flaskapp
+ExecStart=/usr/bin/gunicorn -w 4 app:app -b 0.0.0.0:5000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+Then:
+
+sudo systemctl daemon-reload
+sudo systemctl start flask
+sudo systemctl enable flask   # starts on boot
+
+
+Option 3: Use pm2 (if Node.js + Flask together)
+
+npm install -g pm2
+pm2 start "gunicorn -w 4 app:app -b 0.0.0.0:5000" --name flask
+pm2 save
+pm2 startup
+
+🔹 Combined Setup
+
+PHP (your job portal) runs via Apache/Nginx.
+
+Flask runs as Gunicorn service.
+
+WebSocket server (Node.js or Ratchet) runs as pm2/systemd service.
+
+Nginx sits in front, routing requests to PHP, Flask API, and WebSocket.
