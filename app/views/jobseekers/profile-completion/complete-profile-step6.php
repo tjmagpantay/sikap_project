@@ -109,7 +109,24 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     </h3>
                     <ul class="space-y-1 list-disc list-inside">
                         <?php foreach ($parsedCertificates as $cert): ?>
-                            <li class="text-sm text-green-800"><?php echo htmlspecialchars($cert['certificate_title']); ?></li>
+                            <li class="text-sm text-green-800">
+                                <?php
+                                // FIXED: Handle different possible key structures
+                                $certTitle = '';
+                                if (isset($cert['certificate_title'])) {
+                                    $certTitle = $cert['certificate_title'];
+                                } elseif (isset($cert['certificate_name'])) {
+                                    $certTitle = $cert['certificate_name'];
+                                } elseif (isset($cert['name'])) {
+                                    $certTitle = $cert['name'];
+                                } elseif (is_string($cert)) {
+                                    $certTitle = $cert;
+                                } else {
+                                    $certTitle = 'Certificate'; // Fallback
+                                }
+                                echo htmlspecialchars($certTitle);
+                                ?>
+                            </li>
                         <?php endforeach; ?>
                     </ul>
                     <p class="mt-2 text-xs text-green-600">These certificates have been automatically added below. You can edit or add more.</p>
@@ -133,7 +150,44 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                             // Only use parsed certificates if no database certificates exist
                             if (!empty($parsedCertificates)) {
                                 foreach ($parsedCertificates as $cert) {
-                                    $allCertificates[] = $cert;
+                                    // FIXED: Normalize the certificate data structure
+                                    $normalizedCert = [
+                                        'certificate_title' => '',
+                                        'issuing_organization' => '',
+                                        'date_issued' => ''
+                                    ];
+
+                                    // Handle different possible structures
+                                    if (is_array($cert)) {
+                                        if (isset($cert['certificate_title'])) {
+                                            $normalizedCert['certificate_title'] = $cert['certificate_title'];
+                                        } elseif (isset($cert['certificate_name'])) {
+                                            $normalizedCert['certificate_title'] = $cert['certificate_name'];
+                                        } elseif (isset($cert['name'])) {
+                                            $normalizedCert['certificate_title'] = $cert['name'];
+                                        }
+
+                                        if (isset($cert['issuing_organization'])) {
+                                            $normalizedCert['issuing_organization'] = $cert['issuing_organization'];
+                                        } elseif (isset($cert['organization'])) {
+                                            $normalizedCert['issuing_organization'] = $cert['organization'];
+                                        } elseif (isset($cert['issuer'])) {
+                                            $normalizedCert['issuing_organization'] = $cert['issuer'];
+                                        }
+
+                                        if (isset($cert['date_issued'])) {
+                                            $normalizedCert['date_issued'] = $cert['date_issued'];
+                                        } elseif (isset($cert['issue_date'])) {
+                                            $normalizedCert['date_issued'] = $cert['issue_date'];
+                                        } elseif (isset($cert['date'])) {
+                                            $normalizedCert['date_issued'] = $cert['date'];
+                                        }
+                                    } elseif (is_string($cert)) {
+                                        // If it's just a string, use it as the certificate title
+                                        $normalizedCert['certificate_title'] = $cert;
+                                    }
+
+                                    $allCertificates[] = $normalizedCert;
                                 }
                             }
                         }
