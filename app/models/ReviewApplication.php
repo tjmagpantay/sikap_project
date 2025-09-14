@@ -23,7 +23,7 @@ class ReviewApplication
 
         $this->jobseekerModel = new Jobseeker();
     }
-
+ 
     public function getApplication($application_id)
     {
         $stmt = $this->db->prepare("
@@ -381,5 +381,39 @@ class ReviewApplication
         }
 
         return $certificates;
+    }
+
+
+     /**
+     * Get all applications where interview date passed 7+ days ago
+     * and the application status is still 'shortlisted' (no decision made after interview).
+     */
+    public function getPendingApplicationsWithExpiredInterview()
+    {
+        $stmt = $this->db->prepare("
+            SELECT 
+                ja.application_id,
+                ja.application_status,
+                jam.interview_date,
+                e.employer_id,
+                e.company_name AS employer_name,
+                u.email AS employer_email,
+                CONCAT(js.first_name, ' ', js.last_name) AS jobseeker_name
+            FROM job_application ja
+            INNER JOIN job_application_management jam 
+                ON ja.application_id = jam.application_id
+            INNER JOIN job_post jp 
+                ON ja.job_id = jp.job_id
+            INNER JOIN employer e 
+                ON jp.employer_id = e.employer_id
+            INNER JOIN users u 
+                ON e.user_id = u.user_id
+            INNER JOIN jobseeker js 
+                ON ja.jobseeker_id = js.jobseeker_id
+            WHERE ja.application_status = 'shortlisted'
+              AND DATE(jam.interview_date) <= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

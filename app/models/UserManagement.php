@@ -37,15 +37,10 @@ class UserManagement {
                     j.date_of_birth, 
                     j.sex, 
                     j.address, 
-                    j.contact_no, 
-                    j.profile_completion, 
-                    j.created_at, 
-                    j.updated_at, 
-                    j.profile_completed,
-                    GROUP_CONCAT(DISTINCT ja.application_status) as application_statuses
+                    j.contact_no,
+                    j.acc_status,
+                    j.created_at
                 FROM jobseeker j
-                LEFT JOIN job_application ja ON j.jobseeker_id = ja.jobseeker_id
-                GROUP BY j.jobseeker_id
             ");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -107,8 +102,24 @@ class UserManagement {
      */
     public function updateJobseekerStatus($user_id, $status) {
         try {
-            $stmt = $this->db->prepare("UPDATE jobseeker SET status = ? WHERE user_id = ?");
-            return $stmt->execute([$status, $user_id]);
+            // Debug logging
+            error_log("Updating jobseeker status in database: user_id={$user_id}, status={$status}");
+            
+            // Verify the user exists first
+            $check = $this->db->prepare("SELECT jobseeker_id FROM jobseeker WHERE user_id = ?");
+            $check->execute([$user_id]);
+            if (!$check->fetch()) {
+                error_log("No jobseeker found with user_id: {$user_id}");
+                return false;
+            }
+
+            $stmt = $this->db->prepare("UPDATE jobseeker SET acc_status = ? WHERE user_id = ?");
+            $result = $stmt->execute([$status, $user_id]);
+            
+            // Log the result
+            error_log("Update result: " . ($result ? "success" : "failed") . ", rows affected: " . $stmt->rowCount());
+            
+            return $result;
         } catch (Exception $e) {
             error_log("Error updating jobseeker status: " . $e->getMessage());
             return false;

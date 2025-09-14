@@ -23,466 +23,591 @@ include_once __DIR__ . '/components/admin_auth_check.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        /* Ensure proper height and overflow for layout */
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .main-content {
-            height: calc(100vh - 4rem);
-            /* Subtract topbar height */
-            overflow-y: auto;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-50">
-    <!-- Topbar (Sticky) -->
+    <!-- Topbar -->
     <?php include __DIR__ . '/components/topbar.php'; ?>
 
     <div class="flex h-screen">
-        <!-- Sidebar (Fixed/Sticky) -->
+        <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
 
-        <!-- Main Content Area (Scrollable) -->
-        <div class="flex-1 lg:ml-80 main-content">
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto lg:ml-80">
             <div class="p-6">
-                <!-- Improved Stats Cards -->
+                <!-- Stats Cards -->
                 <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-4">
                     <!-- Card 1: Total Jobseekers -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="">
+                        <div>
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Total Jobseekers</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="totalCount"><?php echo count($users); ?></span>
-                                <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M17.5 18H18.7687C19.2035 18 19.4209 18 19.5817 17.9473C20.1489 17.7612 20.5308 17.1231 20.498 16.4163C20.4887 16.216 20.42 15.9676 20.2825 15.4708C20.168 15.0574 20.1108 14.8507 20.0324 14.6767C19.761 14.0746 19.2766 13.6542 18.7165 13.5346C18.5546 13.5 18.3737 13.5 18.0118 13.5L15.5 13.5346M14.6899 11.6996C15.0858 11.892 15.5303 12 16 12C17.6569 12 19 10.6569 19 9C19 7.34315 17.6569 6 16 6C15.7295 6 15.4674 6.0358 15.2181 6.10291M13.5 8C13.5 10.2091 11.7091 12 9.5 12C7.29086 12 5.5 10.2091 5.5 8C5.5 5.79086 7.29086 4 9.5 4C11.7091 4 13.5 5.79086 13.5 8ZM6.81765 14H12.1824C12.6649 14 12.9061 14 13.1219 14.0461C13.8688 14.2056 14.5147 14.7661 14.8765 15.569C14.9811 15.8009 15.0574 16.0765 15.21 16.6278C15.3933 17.2901 15.485 17.6213 15.4974 17.8884C15.5411 18.8308 15.0318 19.6817 14.2756 19.9297C14.0613 20 13.7714 20 13.1916 20H5.80844C5.22864 20 4.93875 20 4.72441 19.9297C3.96818 19.6817 3.45888 18.8308 3.50261 17.8884C3.51501 17.6213 3.60668 17.2901 3.79003 16.6278C3.94262 16.0765 4.01891 15.8009 4.12346 15.569C4.4853 14.7661 5.13116 14.2056 5.87806 14.0461C6.09387 14 6.33513 14 6.81765 14Z" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </g>
-                                </svg>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">
-                                All registered jobseekers in the system
-                            </p>
+                            <p class="mt-2 text-xs text-gray-500">All registered jobseekers in the system</p>
                         </div>
                     </div>
 
                     <!-- Card 2: Active Jobseekers -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="">
+                        <div>
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Active</h3>
                             <div class="flex items-baseline">
                                 <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="activeCount">
                                     <?php echo count(array_filter($users, function ($user) {
-                                        return ($user['status'] ?? 'active') === 'active';
+                                        return ($user['acc_status'] ?? 'enabled') === 'enabled';
                                     })); ?>
                                 </span>
-                                <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#059669" stroke-width="1.5" />
-                                        <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="#059669" stroke-width="1.5" />
-                                        <path d="M17 12L19 14L23 10" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </g>
-                                </svg>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">
-                                Currently active jobseekers
-                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Currently active jobseekers</p>
                         </div>
                     </div>
 
                     <!-- Card 3: From Rosario -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="">
+                        <div>
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">From Rosario</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="rosarioCount">
                                     <?php echo count(array_filter($users, function ($user) {
-                                        return stripos($user['address'], 'rosario') !== false;
+                                        return stripos($user['address'] ?? '', 'rosario') !== false;
                                     })); ?>
                                 </span>
-                                <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M12 2C16.8706 2 21 6.03298 21 10.9258C21 15.8965 16.8033 19.3847 12.927 21.7567C12.6445 21.9162 12.325 22 12 22C11.675 22 11.3555 21.9162 11.073 21.7567C7.2039 19.3616 3 15.9137 3 10.9258C3 6.03298 7.12944 2 12 2Z" stroke="#EA580C" stroke-width="1.5" />
-                                        <path d="M15 11C15 12.6569 13.6569 14 12 14C10.3431 14 9 12.6569 9 11C9 9.34315 10.3431 8 12 8C13.6569 8 15 9.34315 15 11Z" stroke="#EA580C" stroke-width="1.5" />
-                                    </g>
-                                </svg>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">
-                                Jobseekers from Rosario area
-                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Jobseekers from Rosario area</p>
                         </div>
                     </div>
 
                     <!-- Card 4: Other Areas -->
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6">
-                        <div class="">
+                        <div>
                             <h3 class="mb-3 text-sm font-medium text-gray-700 sm:mb-4">Other Areas</h3>
                             <div class="flex items-baseline">
-                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                                <span class="text-2xl font-bold text-gray-900 sm:text-3xl" id="otherAreasCount">
                                     <?php echo count(array_filter($users, function ($user) {
-                                        return stripos($user['address'], 'rosario') === false;
+                                        return stripos($user['address'] ?? '', 'rosario') === false;
                                     })); ?>
                                 </span>
-                                <svg class="ml-1 sm:ml-2" width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" stroke="#6B7280" stroke-width="1.5" />
-                                        <path d="M7.5 8C7.77614 7.67386 8.12386 7.32614 8.5 7.5M12 7V12H16.5M8.5 16.5C8.12386 16.6739 7.77614 16.3261 7.5 16M16.5 8C16.2239 7.67386 15.8761 7.32614 15.5 7.5M16.5 16C16.2239 16.3261 15.8761 16.6739 15.5 16.5" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#6B7280" stroke-width="1.5" />
-                                    </g>
-                                </svg>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">
-                                Jobseekers from outside Rosario
-                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Jobseekers from outside Rosario</p>
                         </div>
                     </div>
                 </div>
-                <!-- End Stats Cards -->
 
-                <!-- Search and Filter Section -->
-                <div class="relative py-4 rounded-xl">
+                <!-- Search and Filter Controls -->
+                <div class="relative py-4 mb-6 rounded-xl">
                     <div class="flex flex-col w-full gap-6 mx-auto">
                         <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
-
-                            <!-- Search Jobseekers (Much Wider) -->
-                            <div class="flex-1 min-w-[200px] max-w-xs">
+                            <!-- Search Input -->
+                            <div class="flex-1 min-w-[200px] max-w-xl">
                                 <div class="relative">
-                                    <input type="text" id="searchInput"
-                                        class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                        placeholder="Search .">
-
+                                    <input type="text" id="searchInput" 
+                                           class="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" 
+                                           placeholder="Search jobseekers...">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <i class="text-gray-400 fas fa-search"></i>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Location Filter -->
-                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Location' }">
-                                <button @click="open = !open"
-                                    @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <div class="relative" x-data="{ open: false, selected: 'All Locations' }">
+                                <button @click="open = !open" class="px-4 py-2 text-sm bg-white border rounded-md shadow-sm">
                                     <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
+                                    <i class="ml-2 fas fa-chevron-down"></i>
                                 </button>
-
-                                <!-- Dropdown Menu -->
-                                <div x-show="open"
-                                    x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                    x-cloak>
+                                <div x-show="open" @click.away="open = false" 
+                                     class="absolute z-50 w-48 mt-1 bg-white rounded-md shadow-lg">
                                     <div class="py-1">
-                                        <button @click="selected = 'All Locations'; open = false; filterByLocation('')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            All Locations
-                                        </button>
-                                        <button @click="selected = 'Rosario'; open = false; filterByLocation('rosario')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Rosario
-                                        </button>
-                                        <button @click="selected = 'Other Areas'; open = false; filterByLocation('other')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Other Areas
-                                        </button>
+                                        <a href="#" @click.prevent="selected = 'All Locations'; filterByLocation('all'); open = false" 
+                                           class="block px-4 py-2 hover:bg-gray-100">All Locations</a>
+                                        <a href="#" @click.prevent="selected = 'Rosario'; filterByLocation('rosario'); open = false" 
+                                           class="block px-4 py-2 hover:bg-gray-100">Rosario</a>
+                                        <a href="#" @click.prevent="selected = 'Others'; filterByLocation('others'); open = false" 
+                                           class="block px-4 py-2 hover:bg-gray-100">Others</a>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Status Filter -->
-                            <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Status' }">
-                                <button @click="open = !open"
-                                    @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                    <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
+                            <!-- Action Buttons -->
+                            <div class="flex space-x-2">
+                                <button onclick="clearAllFilters()" 
+                                        class="px-4 py-2 text-sm text-white rounded-lg bg-primary hover:bg-primary/90">
+                                    Clear Filters
                                 </button>
-
-                                <!-- Dropdown Menu -->
-                                <div x-show="open"
-                                    x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                    x-cloak>
-                                    <div class="py-1">
-                                        <button @click="selected = 'All Status'; open = false; filterByStatus('')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            All Status
-                                        </button>
-                                        <button @click="selected = 'Active'; open = false; filterByStatus('active')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Active
-                                        </button>
-                                        <button @click="selected = 'Inactive'; open = false; filterByStatus('inactive')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Inactive
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Date Filter -->
-                            <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
-                                <button @click="open = !open"
-                                    @click.away="open = false"
-                                    class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                    <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-
-                                <!-- Dropdown Menu -->
-                                <div x-show="open"
-                                    x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                    x-cloak>
-                                    <div class="py-1">
-                                        <button @click="selected = 'All Time'; open = false; filterByDate('')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            All Time
-                                        </button>
-                                        <button @click="selected = 'Today'; open = false; filterByDate('today')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Today
-                                        </button>
-                                        <button @click="selected = 'This Week'; open = false; filterByDate('week')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            This Week
-                                        </button>
-                                        <button @click="selected = 'This Month'; open = false; filterByDate('month')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            This Month
-                                        </button>
-                                        <button @click="selected = 'This Year'; open = false; filterByDate('year')"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            This Year
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Filter/Clear Buttons -->
-                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
-                                <button onclick="clearAllFilters()"
-                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                    Clear
-                                </button>
-                                <button onclick="exportResults('csv')"
-                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Export
+                                <button onclick="exportToPDF()" 
+                                        class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
+                                    <i class="mr-1 fas fa-file-pdf"></i> Export PDF
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- All Jobseekers -->
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold text-gray-900">All Jobseekers</h2>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-3 py-1 text-sm bg-blue-100 rounded-sm text-primary" id="visibleCount">
-                                <?php echo count($users); ?> visible
-                            </span>
+                <!-- Status Filters -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between space-x-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="relative" x-data="{ open: false, selected: 'All' }">
+                                <button @click="open = !open" class="w-32 px-4 py-2 bg-white border rounded-md shadow-sm">
+                                    <span x-text="selected"></span>
+                                    <i class="ml-2 fas fa-chevron-down"></i>
+                                </button>
+                            <div x-show="open" @click.away="open = false" 
+                                 class="absolute z-50 w-32 mt-1 bg-white rounded-md shadow-lg">
+                                <div class="py-1">
+                                    <a href="#" @click.prevent="selected = 'All'; filterByStatus(''); open = false" 
+                                       class="block px-4 py-2 hover:bg-gray-100">All</a>
+                                    <a href="#" @click.prevent="selected = 'Enabled'; filterByStatus('enabled'); open = false" 
+                                       class="block px-4 py-2 hover:bg-gray-100">Enabled</a>
+                                    <a href="#" @click.prevent="selected = 'Disabled'; filterByStatus('disabled'); open = false" 
+                                       class="block px-4 py-2 hover:bg-gray-100">Disabled</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <?php if (empty($users)): ?>
-                        <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noUsersMessage">
-                            <i class="mb-4 text-4xl text-gray-400 fas fa-inbox"></i>
-                            <p class="text-gray-500">No jobseekers found</p>
-                        </div>
-                    <?php else: ?>
-                        <!-- No Results Message (Hidden by default) -->
-                        <div class="hidden p-8 text-center bg-white border border-gray-200 rounded-lg" id="noResultsMessage">
-                            <i class="mb-4 text-4xl text-gray-400 fas fa-search"></i>
-                            <p class="text-gray-500">No jobseekers match your search criteria</p>
-                        </div>
-
-                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="jobseekersTable">
-                            <table class="w-full divide-y divide-gray-200 table-auto">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
-                                            Name <i class="ml-1 text-gray-400 fas fa-sort"></i>
-                                        </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Sex</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Address</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Applications</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(5)">
-                                            Registered <i class="ml-1 text-gray-400 fas fa-sort"></i>
-                                        </th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
-                                    <?php foreach ($users as $user): ?>
-                                        <tr class="hover:bg-gray-50"
-                                            data-name="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'])); ?>"
-                                            data-address="<?php echo htmlspecialchars(strtolower($user['address'])); ?>"
-                                            data-date="<?php echo $user['created_at']; ?>">
-                                            <!-- Name column -->
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
-                                                        <span class="text-xs font-medium text-gray-600">
-                                                            <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
-                                                        </span>
-                                                    </div>
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                        <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix']); ?>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <!-- Contact column -->
-                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <?php echo htmlspecialchars($user['contact_no']); ?>
-                                                </div>
-                                            </td>
-
-                                            <!-- Sex column -->
-                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                <?php
-                                                $sex = strtolower($user['sex'] ?? '');
-                                                if ($sex === 'male'): ?>
-                                                    <span class="inline-flex items-center px-4 py-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-sm">
-                                                        <i class="mr-1 fas fa-mars"></i>
-                                                        Male
-                                                    </span>
-                                                <?php elseif ($sex === 'female'): ?>
-                                                    <span class="inline-flex items-center px-2.5 py-2 rounded-sm text-xs font-medium bg-red-100 text-red-800">
-                                                        <i class="mr-1 fas fa-venus"></i>
-                                                        Female
-                                                    </span>
-                                                <?php else: ?>
-                                                    <span class="inline-flex items-center px-2.5 py-2 rounded-sm text-xs font-medium bg-gray-100 text-gray-600">
-                                                        N/A
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <!-- Address column -->
-                                            <td class="max-w-xs px-6 py-4 text-xs text-gray-500 truncate whitespace-nowrap" title="<?php echo htmlspecialchars($user['address']); ?>">
-                                                <div class="flex items-center">
-
-                                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full <?php echo stripos($user['address'], 'rosario') !== false ? ' text-gray-500' : ' text-gray-200'; ?>">
-                                                        <?php echo htmlspecialchars($user['address']); ?>
-                                                    </span>
-                                                </div>
-                                            </td>
-
-                                            <!-- Applications column -->
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <?php if (isset($user['job_applications'])): ?>
-                                                    <div class="flex flex-wrap gap-1">
-                                                        <?php foreach ($user['job_applications'] as $application): ?>
-                                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full 
-                                                                    <?php
-                                                                    $statusClass = match ($application['application_status']) {
-                                                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                                                        'shortlisted' => 'bg-blue-100 text-blue-800',
-                                                                        'interviewed' => 'bg-purple-100 text-purple-800',
-                                                                        'hired' => 'bg-green-100 text-green-800',
-                                                                        'rejected' => 'bg-red-100 text-red-800',
-                                                                        default => 'bg-gray-100 text-gray-800'
-                                                                    };
-                                                                    echo $statusClass;
-                                                                    ?>">
-                                                                <?php echo ucfirst($application['application_status']); ?>
-                                                            </span>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                <?php else: ?>
-                                                    <span class="text-xs text-gray-500">No applications</span>
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <!-- Registered column -->
-                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                <div class="flex items-center">
-
-                                                    <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
-                                                </div>
-                                            </td>
-
-                                            <!-- Actions column -->
-                                            <td class="px-6 py-4 text-xs font-medium whitespace-nowrap">
-                                                <button class="px-2 py-2 text-gray-600 bg-gray-100 hover:text-gray-900" disabled title="Block User">
-                                                    <i class="mr-1 fas fa-ban"></i>Disable
-                                                </button>
-                        </div>
-                        </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
+                <!-- Jobseekers Table -->
+                <div class="overflow-hidden bg-white rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Name
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Birth Date
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Sex
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Address
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Contact
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Status
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
+                            <?php foreach ($users as $user): ?>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            <?php 
+                                            echo htmlspecialchars(
+                                                $user['first_name'] . ' ' . 
+                                                ($user['middle_name'] ? $user['middle_name'] . ' ' : '') . 
+                                                $user['last_name'] . 
+                                                ($user['suffix'] ? ' ' . $user['suffix'] : '')
+                                            ); 
+                                            ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo $user['date_of_birth'] ? date('M d, Y', strtotime($user['date_of_birth'])) : '-'; ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo htmlspecialchars($user['sex'] ?? '-'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo htmlspecialchars($user['address'] ?? '-'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo htmlspecialchars($user['contact_no'] ?? '-'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full <?php 
+                                            echo $user['acc_status'] === 'enabled' ? 
+                                                'text-green-800 bg-green-100' : 
+                                                'text-red-800 bg-red-100'; 
+                                            ?>">
+                                            <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                        <?php if ($user['acc_status'] !== 'disabled'): ?>
+                                            <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')" 
+                                                    class="text-red-600 hover:text-red-900">
+                                                <i class="mr-1 fas fa-ban"></i> Disable
+                                            </button>
+                                        <?php else: ?>
+                                            <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')" 
+                                                    class="text-green-600 hover:text-green-900">
+                                                <i class="mr-1 fas fa-check"></i> Enable
+                                            </button>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination -->
-                <div class="py-4 border-t border-gray-200 " id="paginationContainer">
-                    <div class="flex items-center justify-between">
-                        <!-- Left side: Results info -->
-                        <div class="text-sm text-gray-700" id="paginationInfo">
-                            Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($users); ?></span> jobseekers
-                        </div>
-
-                        <!-- Right side: Pagination controls -->
-                        <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
-                            <!-- Previous button -->
-                            <button id="prevBtn" onclick="changePage('prev')"
-                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Previous
-                            </button>
-
-                            <!-- Page numbers will be inserted here by JavaScript -->
-                            <div id="pageNumbers" class="flex space-x-1"></div>
-
-                            <!-- Next button -->
-                            <button id="nextBtn" onclick="changePage('next')"
-                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Next
-                            </button>
-                        </nav>
-                    </div>
-                </div>
-            <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <!-- Your existing scripts -->
-    <!-- ... (keeping all your existing script code) ... -->
+    <script>
+        // Apply all filters
+        function applyFilters() {
+            console.log('Running search...');
+            const rows = document.querySelectorAll('#jobseekersTableBody tr');
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput?.value.toLowerCase() || '';
+            
+            console.log('Search term:', searchTerm);
+            console.log('Number of rows:', rows.length);
+            
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowText = Array.from(cells)
+                    .slice(0, -1) // Exclude the last cell (actions)
+                    .map(cell => cell.textContent.toLowerCase())
+                    .join(' ');
+                
+                const showRow = searchTerm === '' || rowText.includes(searchTerm);
+                row.style.display = showRow ? '' : 'none';
+                
+                if (showRow) visibleCount++;
+                
+                console.log('Row text:', rowText);
+                console.log('Show row:', showRow);
+            });
+            
+            console.log('Visible count:', visibleCount);
+            
+            // Update counts
+            updateCounts(visibleCount);
+        }
+        
+        // Update all count displays
+        function updateCounts(visibleCount) {
+            const totalCount = document.getElementById('totalCount');
+            const activeCount = document.getElementById('activeCount');
+            const rosarioCount = document.getElementById('rosarioCount');
+            const otherAreasCount = document.getElementById('otherAreasCount');
+            
+            if (totalCount) totalCount.textContent = visibleCount;
+            
+            if (!activeCount || !rosarioCount || !otherAreasCount) return;
+            
+            const visibleRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'))
+                .filter(row => row.style.display !== 'none');
+            
+            const activeRows = visibleRows.filter(row => {
+                const statusCell = row.querySelector('td:nth-child(6)');
+                return statusCell && statusCell.textContent.trim().toLowerCase() === 'enabled';
+            });
+            
+            const rosarioRows = visibleRows.filter(row => {
+                const addressCell = row.querySelector('td:nth-child(4)');
+                return addressCell && addressCell.textContent.toLowerCase().includes('rosario');
+            });
+            
+            activeCount.textContent = activeRows.length;
+            rosarioCount.textContent = rosarioRows.length;
+            otherAreasCount.textContent = visibleRows.length - rosarioRows.length;
+        }
+
+        // Export table to PDF
+        function exportToPDF() {
+            // Create a window object for printing
+            const printWindow = window.open('', '', 'height=600,width=800');
+            
+            // Build the HTML content for the print window
+            printWindow.document.write('<html><head><title>Jobseekers Report</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write(`
+                table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f8f9fa; }
+                .header { margin-bottom: 20px; text-align: center; }
+                .header h1 { margin: 0; color: #092C4C; }
+                .status-enabled { color: #059669; }
+                .status-disabled { color: #DC2626; }
+                .date { color: #666; font-size: 12px; }
+            `);
+            printWindow.document.write('</style></head><body>');
+            
+            // Add header
+            printWindow.document.write(`
+                <div class="header">
+                    <h1>SIKAP - Jobseekers Report</h1>
+                    <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+                </div>
+            `);
+            
+            // Get visible rows from the table
+            const visibleRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'))
+                                   .filter(row => row.style.display !== 'none');
+            
+            // Create table
+            printWindow.document.write('<table>');
+            
+            // Add headers
+            printWindow.document.write(`
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Birth Date</th>
+                        <th>Sex</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+            `);
+            
+            // Add rows
+            printWindow.document.write('<tbody>');
+            visibleRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                printWindow.document.write('<tr>');
+                // Only include the first 6 cells (excluding the actions column)
+                for (let i = 0; i < 6; i++) {
+                    const cell = cells[i];
+                    if (i === 5) { // Status column
+                        const status = cell.textContent.trim().toLowerCase();
+                        printWindow.document.write(`
+                            <td class="status-${status}">
+                                ${cell.textContent}
+                            </td>
+                        `);
+                    } else {
+                        printWindow.document.write(`<td>${cell.textContent}</td>`);
+                    }
+                }
+                printWindow.document.write('</tr>');
+            });
+            printWindow.document.write('</tbody></table>');
+            
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            
+            // Wait for the content to load then print
+            printWindow.onload = function() {
+                printWindow.focus();
+                printWindow.print();
+            };
+        }
+
+        // Filter by status
+        function filterByStatus(status) {
+            const rows = document.querySelectorAll('#jobseekersTableBody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const statusCell = row.querySelector('td:nth-child(6)');
+                const currentStatus = statusCell.textContent.trim().toLowerCase();
+                
+                if (!status || currentStatus.includes(status.toLowerCase())) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+        }
+
+        // Filter by location
+        function filterByLocation(location) {
+            const rows = document.querySelectorAll('#jobseekersTableBody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const addressCell = row.querySelector('td:nth-child(4)');
+                const address = addressCell.textContent.toLowerCase();
+                let show = false;
+                
+                if (location === 'all') {
+                    show = true;
+                } else if (location === 'rosario') {
+                    show = address.includes('rosario');
+                } else if (location === 'others') {
+                    show = !address.includes('rosario');
+                }
+                
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            
+            document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+        }
+
+        // Update jobseeker status
+        function updateJobseekerStatus(userId, action) {
+            console.log('updateJobseekerStatus called with:', { userId, action });
+            
+            if (!confirm('Are you sure you want to ' + action + ' this jobseeker\'s account?')) {
+                console.log('User cancelled the operation');
+                return;
+            }
+
+            // Create the form data
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            formData.append('action', action);
+            formData.append('user_type', 'jobseeker');
+            
+            console.log('Sending request with data:', {
+                user_id: userId,
+                action: action,
+                user_type: 'jobseeker'
+            });
+
+            // Build the full URL using the current location
+            const baseUrl = window.location.pathname.split('index.php')[0];
+            const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
+            console.log('Sending request to:', url);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const text = await response.text();
+                console.log('Raw response:', text);
+                
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                    successMessage.innerHTML = `Successfully ${action}d jobseeker account`;
+                    document.body.appendChild(successMessage);
+
+                    // Find all buttons with onclick containing the userId
+                    const buttons = document.querySelectorAll('button[onclick*="' + userId + '"]');
+                    // Find the button's parent row
+                    const row = buttons[0]?.closest('tr');
+                    
+                    if (row) {
+                        // Update status cell
+                        const statusCell = row.querySelector('td:nth-child(6) span');
+                        const newStatus = action === 'disable' ? 'disabled' : 'enabled';
+                        if (statusCell) {
+                            statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                            statusCell.className = `inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
+                                newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
+                            }`;
+                        }
+
+                        // Update action button
+                        const actionButton = buttons[0];
+                        if (actionButton) {
+                            if (newStatus === 'disabled') {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-check"></i> Enable';
+                                actionButton.className = 'text-green-600 hover:text-green-900';
+                                actionButton.setAttribute('onclick', `updateJobseekerStatus('${userId}', 'enable')`);
+                            } else {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-ban"></i> Disable';
+                                actionButton.className = 'text-red-600 hover:text-red-900';
+                                actionButton.setAttribute('onclick', `updateJobseekerStatus('${userId}', 'disable')`);
+                            }
+                        }
+                    }
+
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to update status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorMessage.innerHTML = error.message;
+                document.body.appendChild(errorMessage);
+                
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 3000);
+            });
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            // Reset search
+            document.getElementById('searchInput').value = '';
+            
+            // Reset location dropdown
+            const locationDropdown = document.querySelector('[x-data]').__x.$data;
+            if (locationDropdown) {
+                locationDropdown.selected = 'All Locations';
+            }
+            
+            // Show all rows
+            const rows = document.querySelectorAll('#jobseekersTableBody tr');
+            rows.forEach(row => row.style.display = '');
+            
+            // Update count
+            document.getElementById('visibleCount').textContent = `${rows.length} visible`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Content Loaded');
+            
+            // Set up search input
+            const searchInput = document.getElementById('searchInput');
+            console.log('Search input found:', !!searchInput);
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    console.log('Search input changed:', searchInput.value);
+                    applyFilters();
+                });
+                
+                // Trigger search on Enter key
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        console.log('Enter key pressed');
+                        applyFilters();
+                    }
+                });
+            }
+            
+            // Initial count update
+            updateCounts(document.querySelectorAll('#jobseekersTableBody tr').length);
+        });
+    </script>
 
 </body>
-
 </html>

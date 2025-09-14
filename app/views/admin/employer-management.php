@@ -13,7 +13,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
+                    colors: { 
                         primary: '#092C4C',
                         secondary: '#F3AF0E'
                     }
@@ -350,14 +350,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
-                                <button onclick="clearAllFilters()"
-                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                    Clear
+                           <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
+                                <button onclick="clearAllFilters()" class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="mr-1 fas fa-times"></i>Clear Filters
                                 </button>
-                                <button onclick="exportResults('csv')"
-                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Export
+                                <button onclick="exportResults('pdf')" class="px-3 py-2 text-sm text-white border rounded-lg bg-primary border-primary hover:bg-primary/90">
+                                    <i class="mr-1 fas fa-file-pdf"></i>Export PDF
                                 </button>
                             </div>
                         </div>
@@ -500,6 +498,96 @@ include_once __DIR__ . '/components/admin_auth_check.php';
     <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
     <script>
+        // Function to handle employer status updates
+        function updateEmployerStatus(userId, action) {
+            if (!confirm('Are you sure you want to ' + action + ' this employer\'s account?')) {
+                return;
+            }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            formData.append('action', action);
+            formData.append('user_type', 'employer');
+
+            // Get the base URL from the current path
+            const baseUrl = window.location.pathname.split('index.php')[0];
+            const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                const text = await response.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Find all buttons with onclick containing the userId
+                    const buttons = document.querySelectorAll(`button[onclick*="${userId}"]`);
+                    const row = buttons[0]?.closest('tr');
+                    
+                    if (row) {
+                        // Update status cell
+                        const statusCell = row.querySelector('td:nth-child(6) span');
+                        const newStatus = action === 'disable' ? 'disabled' : 'enabled';
+                        if (statusCell) {
+                            statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                            statusCell.className = `inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
+                                newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
+                            }`;
+                        }
+
+                        // Update action button
+                        const actionButton = buttons[0];
+                        if (actionButton) {
+                            if (newStatus === 'disabled') {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-check"></i> Enable';
+                                actionButton.className = 'text-green-600 hover:text-green-900';
+                                actionButton.setAttribute('onclick', `updateEmployerStatus('${userId}', 'enable')`);
+                            } else {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-ban"></i> Disable';
+                                actionButton.className = 'text-red-600 hover:text-red-900';
+                                actionButton.setAttribute('onclick', `updateEmployerStatus('${userId}', 'disable')`);
+                            }
+                        }
+                    }
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                    successMessage.innerHTML = `Successfully ${action}d employer account`;
+                    document.body.appendChild(successMessage);
+
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to update status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorMessage.innerHTML = error.message;
+                document.body.appendChild(errorMessage);
+                
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 3000);
+            });
+        }
+
         let allRows = [];
         let filteredRows = [];
         let currentFilters = {
@@ -791,63 +879,81 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
         // Export functionality
         function exportResults(format) {
-            // Export all filtered results, not just current page
-            const visibleData = filteredRows.map(row => {
-                const cells = row.querySelectorAll('td');
-                return {
-                    company: cells[0].textContent.trim(),
-                    contact: cells[1].textContent.trim(),
-                    representative: cells[2].textContent.trim(),
-                    status: cells[3].textContent.trim(),
-                    registered: cells[4].textContent.trim()
-                };
-            });
-
-            if (format === 'csv') {
-                exportToCSV(visibleData);
-            } else if (format === 'pdf') {
-                // PDF export would require a library like jsPDF
-                alert('PDF export functionality would require additional implementation');
+            if (format !== 'pdf') {
+                alert('Only PDF export is supported');
+                return;
             }
-        }
 
-        function exportToCSV(data) {
-            const headers = ['Company', 'Contact', 'Representative', 'Status', 'Registered'];
-            const csvContent = [
-                headers.join(','),
-                ...data.map(row => [
-                    `"${row.company}"`,
-                    `"${row.contact}"`,
-                    `"${row.representative}"`,
-                    `"${row.status}"`,
-                    `"${row.registered}"`
-                ].join(','))
-            ].join('\n');
+            // Show loading state
+            const loadingMessage = document.createElement('div');
+            loadingMessage.className = 'fixed top-4 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded z-50';
+            loadingMessage.innerHTML = '<i class="mr-2 fas fa-spinner fa-spin"></i>Generating PDF...';
+            document.body.appendChild(loadingMessage);
 
-            const blob = new Blob([csvContent], {
-                type: 'text/csv'
-            });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `employers_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            try {
+                // Collect the data for export
+                const data = [];
+                filteredRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 5) {
+                        data.push({
+                            company: cells[0].textContent.trim(),
+                            contact: cells[1].textContent.trim(),
+                            representative: cells[2].textContent.trim(),
+                            status: cells[3].textContent.trim(),
+                            registered: cells[4].textContent.trim()
+                        });
+                    }
+                });
+
+                if (data.length === 0) {
+                    throw new Error('No data to export');
+                }
+
+                // Create the form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'index.php?page=admin-export-pdf';
+                form.target = '_blank'; // This will open in a new tab
+                
+                // Add the data as a hidden field
+                const dataInput = document.createElement('input');
+                dataInput.type = 'hidden';
+                dataInput.name = 'data';
+                dataInput.value = JSON.stringify(data);
+                form.appendChild(dataInput);
+
+                // Add to document and submit
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+
+                // Show success message
+                loadingMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                loadingMessage.innerHTML = '<i class="mr-2 fas fa-check"></i>PDF generation started';
+            } catch (error) {
+                console.error('Export error:', error);
+                loadingMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                loadingMessage.innerHTML = `<i class="mr-2 fas fa-exclamation-circle"></i>${error.message || 'Failed to generate PDF'}`;
+            }
+
+            // Remove message after delay
+            setTimeout(() => loadingMessage.remove(), 3000);
         }
 
         // Enhanced suspend/unsuspend functionality with proper API endpoint
         function handleStatusChange(action, userId, button) {
+            // Already confirmed through native confirm dialog
             // Disable button and show loading state
             button.disabled = true;
             const originalText = button.innerHTML;
             button.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i>Processing...';
 
-            // Create form data
+            // Create form data 
             const formData = new FormData();
-            formData.append('action', action);
             formData.append('user_id', userId);
+            formData.append('action', action);
+            formData.append('user_type', 'employer');
 
             fetch('index.php?page=update-employer-status', {
                     method: 'POST',
@@ -970,7 +1076,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             if (e.key === 'Escape') {
                 clearAllFilters();
             }
-        });
+        }); 
     </script>
 </body>
 

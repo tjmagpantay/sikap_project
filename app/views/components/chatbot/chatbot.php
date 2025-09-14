@@ -17,7 +17,7 @@
             --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             --sikap-online: #22c55e;
         }
-
+ 
         @media (prefers-color-scheme: dark) {
             :root {
                 --sikap-bg: #0f172a;
@@ -287,6 +287,17 @@
             border-bottom-left-radius: 0.5rem;
         }
 
+        .message-bubble.bot a {
+            color: var(--sikap-primary);
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .message-bubble.bot a:hover {
+            color: var(--sikap-primary-dark);
+        }
+
         .sikap-faq-button {
             display: block;
             width: 100%;
@@ -481,14 +492,31 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const bubbleClass = sender === 'user' ? 'user' : 'bot';
             
+            const messageContent = text;
+            
             messageDiv.innerHTML = `
                 <div class="message-bubble ${bubbleClass}">
-                    ${text}
+                    ${messageContent}
                 </div>
             `;
             
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Make links clickable in bot messages
+            if (sender === 'bot') {
+                const links = messageDiv.getElementsByTagName('a');
+                Array.from(links).forEach(link => {
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        if (link.href.startsWith('mailto:')) {
+                            window.location.href = link.href;
+                        } else {
+                            window.open(link.href, '_blank');
+                        }
+                    };
+                });
+            }
         }, sender === 'bot' ? 1000 : 0);
     }
 
@@ -569,18 +597,29 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showAnswer = function(type, question) {
         const faq = SIKAP_FAQS[type].find(f => f.q === question);
         if (faq) {
+            // Show user's question
             addMessage('user', faq.q);
             
+            // Get answer messages
             const messages = formatBulletPoints(faq.a);
+            const totalMessages = messages.length;
+            
+            // Show each message with delay
             messages.forEach((msg, index) => {
                 setTimeout(() => {
                     addMessage('bot', msg);
                     
-                    // Show FAQ menu after last message
-                    if (index === messages.length - 1) {
-                        setTimeout(showFAQMenu, 2000);
+                    // After showing all answer messages
+                    if (index === totalMessages - 1) {
+                        // Add contact info
+                        setTimeout(() => {
+                            addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
+                            
+                            // Show menu after contact info
+                            setTimeout(showFAQMenu, 2000);
+                        }, 2000);
                     }
-                }, (index + 1) * 2000); // 2 second delay between each message
+                }, (index + 1) * 2000);
             });
         }
     };
@@ -596,13 +635,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     normalizedInput.includes(faq.q.toLowerCase())) {
                     
                     const messages = formatBulletPoints(faq.a);
+                    const totalMessages = messages.length;
+
                     messages.forEach((msg, index) => {
                         setTimeout(() => {
                             addMessage('bot', msg);
-                            if (index === messages.length - 1) {
-                                setTimeout(showFAQMenu, 2000);
+                            if (index === totalMessages - 1) {
+                                setTimeout(() => {
+                                    addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
+                                    setTimeout(showFAQMenu, 2000);
+                                }, 2000);
                             }
-                        }, index * 2000); // 2 second delay between each message
+                        }, (index + 1) * 2000);
                     });
                     
                     foundAnswer = true;
