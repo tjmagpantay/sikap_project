@@ -17,7 +17,7 @@ try {
         WHERE application_id = ?
     ");
 
-    $applicationId = 25; // The ID from your test case
+    $applicationId = 27; // The ID from your test case
     $stmt->execute([$applicationId]);
 
     if ($stmt->rowCount() > 0) {

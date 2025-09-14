@@ -2,7 +2,7 @@
 
 class UserManagement {
     private $db;
-
+ 
     public function __construct() {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {

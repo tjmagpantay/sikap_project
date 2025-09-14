@@ -9,7 +9,7 @@ class UserManagementController {
         $this->model = new UserManagement();
     }
 
-    public function index($userType) {
+    public function index($userType) { 
         // Map user type to view file name
         $viewFile = match ($userType) {
             'jobseekers' => 'jobseeker-management.php',
