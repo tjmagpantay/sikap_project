@@ -176,9 +176,24 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             Birthdate <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
-                            <input id="date_of_birth" name="date_of_birth" type="date" required
-                                value="<?php echo htmlspecialchars($jobseeker['date_of_birth'] ?? $_POST['date_of_birth'] ?? ''); ?>"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            <input id="date_of_birth" name="date_of_birth" type="text" required
+                                value="<?php
+                                        // Convert database format (YYYY-MM-DD) to display format (MM/DD/YYYY)
+                                        $birthdate = $jobseeker['date_of_birth'] ?? $_POST['date_of_birth'] ?? '';
+                                        if (!empty($birthdate) && preg_match('/(\d{4})-(\d{2})-(\d{2})/', $birthdate, $match)) {
+                                            echo htmlspecialchars($match[2] . '/' . $match[3] . '/' . $match[1]);
+                                        } else {
+                                            echo htmlspecialchars($birthdate);
+                                        }
+                                        ?>"
+                                placeholder="MM/DD/YYYY"
+                                maxlength="10"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="formatDateInput(this)"
+                                onblur="validateDateInput(this)">
+                        </div>
+                        <div class="mt-1 text-xs text-gray-500">
+                            Format: MM/DD/YYYY
                         </div>
                     </div>
 
@@ -258,3 +273,70 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
         </div>
     </div>
 </div>
+
+<script>
+    function formatDateInput(input) {
+        let value = input.value.replace(/\D/g, ''); // Remove non-digits
+
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2);
+        }
+        if (value.length >= 5) {
+            value = value.substring(0, 5) + '/' + value.substring(5, 9);
+        }
+
+        input.value = value;
+    }
+
+    function validateDateInput(input) {
+        const dateValue = input.value;
+        const dateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        const match = dateValue.match(dateRegex);
+
+        if (!match) {
+            if (dateValue) {
+                input.setCustomValidity('Please enter date in MM/DD/YYYY format');
+                input.classList.add('border-red-500');
+            } else {
+                input.setCustomValidity('Birthdate is required');
+                input.classList.add('border-red-500');
+            }
+            return false;
+        }
+
+        const month = parseInt(match[1]);
+        const day = parseInt(match[2]);
+        const year = parseInt(match[3]);
+
+        // Validate ranges
+        if (month < 1 || month > 12) {
+            input.setCustomValidity('Month must be between 1 and 12');
+            input.classList.add('border-red-500');
+            return false;
+        }
+
+        if (day < 1 || day > 31) {
+            input.setCustomValidity('Day must be between 1 and 31');
+            input.classList.add('border-red-500');
+            return false;
+        }
+
+        const currentYear = new Date().getFullYear();
+        if (year < 1940 || year > (currentYear - 16)) {
+            input.setCustomValidity(`Year must be between 1940 and ${currentYear - 16}`);
+            input.classList.add('border-red-500');
+            return false;
+        }
+
+        // If we get here, date is valid
+        input.setCustomValidity('');
+        input.classList.remove('border-red-500');
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    // Add event listener for real-time validation
+    document.getElementById('date_of_birth').addEventListener('input', function() {
+        this.classList.remove('border-red-500', 'border-green-500');
+    });
+</script>

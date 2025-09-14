@@ -220,13 +220,15 @@ class Jobseeker
     public function saveWorkExperience($jobseeker_id, $data)
     {
         try {
-            $stmt = $this->db->prepare("
-                INSERT INTO jobseeker_work_experience 
-                (jobseeker_id, job_title, company_name, employment_type, start_date, end_date, currently_working, experience_type, responsibilities) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
+            error_log("DEBUG: saveWorkExperience called with: " . json_encode($data));
 
-            return $stmt->execute([
+            $stmt = $this->db->prepare("
+            INSERT INTO jobseeker_work_experience 
+            (jobseeker_id, job_title, company_name, employment_type, start_date, end_date, currently_working, experience_type, responsibilities) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+            $result = $stmt->execute([
                 $jobseeker_id,
                 $data['job_title'],
                 $data['company_name'],
@@ -235,13 +237,22 @@ class Jobseeker
                 $data['end_date'],
                 $data['currently_working'],
                 $data['experience_type'] ?? 'previous',
-                $data['responsibilities']
+                $data['responsibilities'] ?? ''
             ]);
+
+            error_log("DEBUG: saveWorkExperience result: " . ($result ? 'success' : 'failed'));
+            if (!$result) {
+                error_log("DEBUG: saveWorkExperience error: " . print_r($stmt->errorInfo(), true));
+            }
+
+            return $result;
         } catch (PDOException $e) {
             error_log("Error saving work experience: " . $e->getMessage());
             return false;
         }
     }
+
+
 
     public function deleteWorkExperience($jobseeker_id, $experience_id)
     {
@@ -272,6 +283,7 @@ class Jobseeker
         }
     }
 
+
     public function hasCurrentJob($jobseeker_id)
     {
         try {
@@ -292,10 +304,10 @@ class Jobseeker
     {
         try {
             $stmt = $this->db->prepare("
-                SELECT * FROM jobseeker_work_experience 
-                WHERE jobseeker_id = ? AND currently_working = 'Yes' 
-                LIMIT 1
-            ");
+            SELECT * FROM jobseeker_work_experience 
+            WHERE jobseeker_id = ? AND currently_working = 'Yes' 
+            LIMIT 1
+        ");
             $stmt->execute([$jobseeker_id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -304,18 +316,21 @@ class Jobseeker
         }
     }
 
+
     public function updateWorkExperience($jobseeker_id, $data, $experience_id)
     {
         try {
-            $stmt = $this->db->prepare("
-                UPDATE jobseeker_work_experience 
-                SET job_title = ?, company_name = ?, employment_type = ?, 
-                    start_date = ?, end_date = ?, currently_working = ?, 
-                    experience_type = ?, responsibilities = ?
-                WHERE experience_id = ? AND jobseeker_id = ?
-            ");
+            error_log("DEBUG: updateWorkExperience called with: " . json_encode($data));
 
-            return $stmt->execute([
+            $stmt = $this->db->prepare("
+            UPDATE jobseeker_work_experience 
+            SET job_title = ?, company_name = ?, employment_type = ?, 
+                start_date = ?, end_date = ?, currently_working = ?, 
+                experience_type = ?, responsibilities = ?
+            WHERE experience_id = ? AND jobseeker_id = ?
+        ");
+
+            $result = $stmt->execute([
                 $data['job_title'],
                 $data['company_name'],
                 $data['employment_type'],
@@ -323,15 +338,19 @@ class Jobseeker
                 $data['end_date'],
                 $data['currently_working'],
                 $data['experience_type'] ?? 'previous',
-                $data['responsibilities'],
+                $data['responsibilities'] ?? '',
                 $experience_id,
                 $jobseeker_id
             ]);
+
+            error_log("DEBUG: updateWorkExperience result: " . ($result ? 'success' : 'failed'));
+            return $result;
         } catch (PDOException $e) {
             error_log("Error updating work experience: " . $e->getMessage());
             return false;
         }
     }
+
 
     public function deleteDocumentByType($jobseeker_id, $type)
     {
@@ -837,7 +856,7 @@ class Jobseeker
         }
     }
 
-/**
+    /**
      * Get all jobseeker data for ML recommendation system
      */
     public function getRecommendationData($jobseeker_id)
@@ -851,10 +870,10 @@ class Jobseeker
 
             // Get skills
             $skills = $this->getJobseekerSkills($jobseeker_id);
-            
+
             // Get work experience
             $workExperience = $this->getJobseekerWorkExperience($jobseeker_id);
-            
+
             // Get education
             $education = $this->getJobseekerEducation($jobseeker_id);
 
@@ -952,5 +971,4 @@ class Jobseeker
             return [];
         }
     }
-
 }

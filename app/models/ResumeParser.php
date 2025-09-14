@@ -308,37 +308,54 @@ class ResumeParser
         $lastName = '';
         $suffix = '';
 
-        // Method 1: Look for "Full Name:" pattern
+        // Method 1: Look for "Full Name:" pattern with better filtering
         if (preg_match('/(?:full\s*name|name)[\s:]+([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)/i', $text, $nameMatch)) {
-            $fullName = trim($nameMatch[1]);
+            $candidateName = trim($nameMatch[1]);
+            // Validate it's actually a name, not job title or other text
+            if ($this->isValidPersonName($candidateName)) {
+                $fullName = $candidateName;
+            }
         }
 
-        // Method 2: Look for name patterns in first few lines (improved pattern)
+        // Method 2: Look for name patterns in first few lines with better validation
         if (!$fullName && !empty($cleanLines)) {
             foreach (array_slice($cleanLines, 0, 5) as $line) {
-                // Skip common resume headers
-                if (preg_match('/^(resume|curriculum|cv|contact|profile|objective|summary|email|phone|address|linkedin|github)/i', $line)) {
+                // Skip common resume headers and non-name content
+                if (preg_match('/^(resume|curriculum|cv|contact|profile|objective|summary|email|phone|address|linkedin|github|experience|education|skills|work|employment|position|title|developer|engineer|manager|analyst|specialist|coordinator|director|supervisor|assistant|consultant)/i', $line)) {
                     continue;
                 }
 
-                // Improved pattern to catch names with middle initials
+                // Skip lines with numbers, email patterns, or URLs
+                if (preg_match('/\d{3}|\@|\.com|\.net|\.org|http|www/i', $line)) {
+                    continue;
+                }
+
+                // Enhanced pattern to catch names with better validation
                 if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', $line, $match)) {
-                    $fullName = trim($match[1]);
-                    break;
+                    $candidateName = trim($match[1]);
+                    if ($this->isValidPersonName($candidateName) && strlen($candidateName) >= 4 && strlen($candidateName) <= 50) {
+                        $fullName = $candidateName;
+                        break;
+                    }
                 }
             }
         }
 
-        // Method 3: Extract from first line if it looks like a name
+        // Method 3: Extract from first line with enhanced validation
         if (!$fullName && !empty($cleanLines)) {
             $firstLine = $cleanLines[0];
             $cleanFirstLine = preg_replace('/^(full\s*name[\s:]*|name[\s:]*)/i', '', $firstLine);
-            if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', trim($cleanFirstLine), $match)) {
-                $fullName = trim($match[1]);
+            $cleanFirstLine = trim($cleanFirstLine);
+
+            if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', $cleanFirstLine, $match)) {
+                $candidateName = trim($match[1]);
+                if ($this->isValidPersonName($candidateName) && strlen($candidateName) >= 4 && strlen($candidateName) <= 50) {
+                    $fullName = $candidateName;
+                }
             }
         }
 
-        // Parse name components (IMPROVED LOGIC)
+        // Parse name components if we found a valid name
         if ($fullName) {
             $nameParts = explode(' ', $fullName);
             $nameParts = array_filter($nameParts); // Remove empty elements
@@ -376,18 +393,6 @@ class ResumeParser
 
                     $middleName = implode(' ', $processedMiddle);
                 }
-                // Special case: 3 parts could be "FirstName M. LastName"
-                else if ($nameCount == 3) {
-                    $middlePart = $nameParts[1];
-                    // Check if middle part is an initial
-                    if (preg_match('/^[A-Z]\.?$/', $middlePart)) {
-                        $middleName = $middlePart;
-                        $lastName = $nameParts[2];
-                    } else {
-                        // Treat middle part as part of last name or first name
-                        $lastName = $nameParts[1] . ' ' . $nameParts[2];
-                    }
-                }
             } elseif ($nameCount == 1) {
                 $firstName = $nameParts[0];
             }
@@ -400,6 +405,111 @@ class ResumeParser
             'last_name' => $lastName,
             'suffix' => $suffix
         ];
+    }
+
+    // Add this new validation method
+    private function isValidPersonName($name)
+    {
+        // List of common non-name words that might appear at the beginning of resumes
+        $invalidNames = [
+            'resume',
+            'curriculum',
+            'cv',
+            'vitae',
+            'profile',
+            'contact',
+            'information',
+            'personal',
+            'objective',
+            'summary',
+            'experience',
+            'education',
+            'skills',
+            'work',
+            'employment',
+            'position',
+            'title',
+            'developer',
+            'engineer',
+            'manager',
+            'analyst',
+            'specialist',
+            'coordinator',
+            'director',
+            'supervisor',
+            'assistant',
+            'consultant',
+            'senior',
+            'junior',
+            'lead',
+            'principal',
+            'software',
+            'web',
+            'mobile',
+            'frontend',
+            'backend',
+            'fullstack',
+            'full stack',
+            'data',
+            'system',
+            'network',
+            'security',
+            'database',
+            'project',
+            'product',
+            'business',
+            'marketing',
+            'sales',
+            'customer',
+            'human',
+            'resources',
+            'financial',
+            'email',
+            'phone',
+            'address',
+            'linkedin',
+            'github',
+            'portfolio',
+            'website',
+            'location',
+            'residence'
+        ];
+
+        $nameLower = strtolower(trim($name));
+
+        // Check if it exactly matches any invalid name
+        if (in_array($nameLower, $invalidNames)) {
+            return false;
+        }
+
+        // Check if it starts with common job titles or resume keywords
+        foreach ($invalidNames as $invalid) {
+            if (strpos($nameLower, $invalid) === 0) {
+                return false;
+            }
+        }
+
+        // Must contain only letters, spaces, dots, and common name characters
+        if (!preg_match('/^[A-Za-z.\s\']+$/', $name)) {
+            return false;
+        }
+
+        // Should not contain too many consecutive uppercase letters (like "HTML", "CSS", etc.)
+        if (preg_match('/[A-Z]{3,}/', $name)) {
+            return false;
+        }
+
+        // Should not be too short or too long
+        if (strlen($name) < 2 || strlen($name) > 50) {
+            return false;
+        }
+
+        // Must have at least one vowel (basic name validation)
+        if (!preg_match('/[aeiouAEIOU]/', $name)) {
+            return false;
+        }
+
+        return true;
     }
 
     private function extractEmail($text)
@@ -420,13 +530,88 @@ class ResumeParser
 
     private function extractAddress($text)
     {
-        // Pattern 1: Look for explicit address labels
-        if (preg_match('/(?:address|location|residence|home)[\s:]*([^\n]+(?:street|avenue|road|blvd|boulevard|drive|lane|way|city|state|province|country|philippines|usa|america)[^\n]*)/i', $text, $match)) {
+        // List of Rosario, Batangas barangays for better matching
+        $rosarioBarangays = [
+            'Alupay',
+            'Antipolo',
+            'Bagong Pook',
+            'Balibago',
+            'Barangay A',
+            'Barangay B',
+            'Barangay C',
+            'Barangay D',
+            'Barangay E',
+            'Bayawang',
+            'Baybayin',
+            'Bulihan',
+            'Cahigam',
+            'Calantas',
+            'Colongan',
+            'Itlugan',
+            'Leviste',
+            'Lumbangan',
+            'Maalas-as',
+            'Mabato',
+            'Mabunga',
+            'Macalamcam A',
+            'Macalamcam B',
+            'Malaya',
+            'Maligaya',
+            'Marilag',
+            'Masaya',
+            'Matamis',
+            'Mavalor',
+            'Mayuro',
+            'Namuco',
+            'Namunga',
+            'Nasi',
+            'Natu',
+            'Palakpak',
+            'Pinagsibaan',
+            'Putingkahoy',
+            'Quilib',
+            'Salao',
+            'San Carlos',
+            'San Ignacio',
+            'San Isidro',
+            'San Jose',
+            'San Roque',
+            'Santa Cruz',
+            'Timbugan',
+            'Tiquiwan',
+            'Tulos'
+        ];
+
+        // Pattern 1: Look for Rosario, Batangas barangays specifically
+        foreach ($rosarioBarangays as $barangay) {
+            $pattern = '/\b' . preg_quote($barangay, '/') . '\b[,\s]*(?:Rosario)?[,\s]*(?:Batangas)?/i';
+            if (preg_match($pattern, $text, $match)) {
+                $fullAddress = $barangay . ', Rosario, Batangas';
+                error_log("🔍 DEBUG: Found Rosario barangay address: " . $fullAddress);
+                return $fullAddress;
+            }
+        }
+
+        // Pattern 2: Look for "Rosario" with any barangay
+        if (preg_match('/([A-Z][a-zA-Z\s]+),?\s*Rosario[,\s]*Batangas/i', $text, $match)) {
+            return trim($match[0]);
+        }
+
+        // Pattern 3: Look for explicit address labels
+        if (preg_match('/(?:address|location|residence|home)[\s:]*([^\n]+(?:street|avenue|road|blvd|boulevard|drive|lane|way|city|state|province|barangay|rosario|batangas|philippines)[^\n]*)/i', $text, $match)) {
+            $address = trim($match[1]);
+            // Clean up the address
+            $address = preg_replace('/^[•\-\*\+\s]+/', '', $address);
+            return $address;
+        }
+
+        // Pattern 4: Look for City, State pattern (general)
+        if (preg_match('/\b([A-Z][a-zA-Z\s,]+(?:City|Municipality|Province|Batangas|Philippines))\b/i', $text, $match)) {
             return trim($match[1]);
         }
 
-        // Pattern 2: Look for City, State pattern
-        if (preg_match('/([A-Z][a-z]+,\s*[A-Z]{2}(?:,?\s*[A-Z]{3})?)/i', $text, $match)) {
+        // Pattern 5: Look for any location with Batangas
+        if (preg_match('/([A-Z][a-zA-Z\s,]+Batangas[^.\n]*)/i', $text, $match)) {
             return trim($match[1]);
         }
 
@@ -460,33 +645,150 @@ class ResumeParser
         return '';
     }
 
-    // Update the extractWorkExperience method
-
+    // Replace the extractWorkExperience method with this improved version:
     private function extractWorkExperience($text)
     {
         $experiences = [];
 
-        // Enhanced experience pattern with better section detection
-        if (preg_match('/(?:experience|employment|work\s+history|professional\s+experience)[\s:]*([^\n]+(?:\n[^\n]*)*?)(?=\n\s*(?:education|skills|projects?|certificates?|languages?|references?|$))/is', $text, $match)) {
-            $expText = $match[1];
+        error_log("🔍 DEBUG: Starting work experience extraction");
+        error_log("🔍 DEBUG: Text length: " . strlen($text));
 
-            // Split by common separators for multiple experiences
-            $expSections = preg_split('/\n\s*\n|\n(?=\S)/', $expText);
+        // Enhanced patterns to find work experience sections
+        $sectionPatterns = [
+            '/(?:work\s+experience|professional\s+experience|employment\s+history|career\s+history|employment|experience)[\s:]*\n?(.*?)(?=\n\s*(?:education|academic|skills|projects?|certificates?|certifications?|languages?|references?|hobbies|interests|awards?|$))/is',
+            '/(?:career\s+summary|professional\s+summary)[\s:]*\n?(.*?)(?=\n\s*(?:education|academic|skills|projects?|certificates?|certifications?|languages?|references?|hobbies|interests|awards?|$))/is'
+        ];
 
-            foreach ($expSections as $section) {
-                $section = trim($section);
-                if (empty($section) || strlen($section) < 10) continue;
+        $experienceText = '';
+        foreach ($sectionPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                $experienceText = trim($match[1]);
+                error_log("🔍 DEBUG: Found experience section with pattern: " . substr($pattern, 0, 50) . "...");
+                break;
+            }
+        }
 
-                $experience = $this->parseExperienceEntry($section);
-                if (!empty($experience['job_title']) && strlen($experience['job_title']) > 2) {
-                    $experiences[] = $experience;
+        if (empty($experienceText)) {
+            error_log("❌ DEBUG: No work experience section found");
+            // Try to find individual job entries without a section header
+            $experienceText = $this->extractJobEntriesWithoutHeader($text);
+            if (empty($experienceText)) {
+                error_log("❌ DEBUG: No individual job entries found either");
+                return [];
+            }
+        }
+
+        error_log("✅ DEBUG: Found experience text: " . substr($experienceText, 0, 200) . "...");
+
+        // Split by common separators for multiple experiences
+        $experienceSections = $this->splitExperienceEntries($experienceText);
+        error_log("🔍 DEBUG: Split into " . count($experienceSections) . " sections");
+
+        foreach ($experienceSections as $index => $section) {
+            $section = trim($section);
+            if (empty($section) || strlen($section) < 15) {
+                error_log("⚠️ DEBUG: Skipping short section $index: " . substr($section, 0, 50));
+                continue;
+            }
+
+            error_log("🔍 DEBUG: Processing section $index: " . substr($section, 0, 100) . "...");
+
+            $experience = $this->parseExperienceEntry($section);
+
+            // Only add if we have both job title and company
+            if (
+                !empty($experience['job_title']) && !empty($experience['company_name']) &&
+                strlen($experience['job_title']) > 2 && strlen($experience['company_name']) > 2
+            ) {
+                $experiences[] = $experience;
+                error_log("✅ DEBUG: Successfully parsed experience: " . $experience['job_title'] . " at " . $experience['company_name']);
+            } else {
+                error_log("❌ DEBUG: Rejected experience - missing data: " . json_encode($experience));
+            }
+        }
+
+        error_log("🔍 DEBUG: Total experiences found: " . count($experiences));
+        return array_slice($experiences, 0, 5); // Limit to 5 experiences
+    }
+
+    // Add this helper method to find job entries without a clear section header
+    private function extractJobEntriesWithoutHeader($text)
+    {
+        $lines = explode("\n", $text);
+        $jobEntries = '';
+        $foundJobPattern = false;
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // Look for lines that might be job titles
+            if (preg_match('/\b(?:software|web|mobile|frontend|backend|full[\-\s]?stack|data|system|network|security|database|devops|project|product|business|marketing|sales|customer|human|financial)?\s*(?:engineer|developer|programmer|analyst|manager|coordinator|specialist|consultant|director|supervisor|designer|architect|representative|associate|assistant|intern|trainee)\b/i', $line)) {
+                $foundJobPattern = true;
+                $jobEntries .= $line . "\n";
+            } elseif ($foundJobPattern) {
+                // Continue collecting lines after we found a job pattern
+                $jobEntries .= $line . "\n";
+
+                // Stop if we hit an education or skills section
+                if (preg_match('/^(?:education|academic|skills|projects?|certificates?)/i', $line)) {
+                    break;
                 }
             }
         }
 
-        return array_slice($experiences, 0, 5); // Limit to 5 experiences
+        return $foundJobPattern ? $jobEntries : '';
     }
 
+    // Add this new method to better split experience entries
+    private function splitExperienceEntries($text)
+    {
+        $entries = [];
+
+        // Method 1: Split by job title patterns (most reliable)
+        $jobTitlePattern = '/(?=(?:^|\n)\s*(?:(?:senior|junior|lead|principal|assistant|associate)\s+)?(?:software|web|mobile|frontend|backend|full[\-\s]?stack|devops|project|product|business|marketing|sales|customer|human|financial)?\s*(?:engineer|developer|programmer)(?:\s+[IVX]+)?(?:\s|$))/im';
+
+        $parts = preg_split($jobTitlePattern, $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (count($parts) > 1) {
+            error_log("🔍 DEBUG: Split by job titles into " . count($parts) . " parts");
+            return $parts;
+        }
+
+        // Method 2: Split by company patterns
+        $companyPattern = '/(?=(?:^|\n)\s*(?:at\s+)?[A-Z][a-zA-Z\s&\-\']+(?:Inc|Corp|Ltd|LLC|Company|Corporation|Technologies|Systems|Solutions|Group|Consulting)\b)/im';
+        $parts = preg_split($companyPattern, $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (count($parts) > 1) {
+            error_log("🔍 DEBUG: Split by companies into " . count($parts) . " parts");
+            return $parts;
+        }
+
+        // Method 3: Split by date ranges
+        $datePattern = '/(?=(?:^|\n)\s*(?:\d{1,2}\/\d{4}|\w+\s+\d{4}|\d{4})\s*[-–]\s*(?:\d{1,2}\/\d{4}|\w+\s+\d{4}|\d{4}|present|current))/im';
+        $parts = preg_split($datePattern, $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (count($parts) > 1) {
+            error_log("🔍 DEBUG: Split by dates into " . count($parts) . " parts");
+            return $parts;
+        }
+
+        // Method 4: Split by double line breaks
+        $parts = preg_split('/\n\s*\n/', $text);
+        $filteredParts = array_filter($parts, function ($part) {
+            return strlen(trim($part)) > 20;
+        });
+
+        if (count($filteredParts) > 1) {
+            error_log("🔍 DEBUG: Split by line breaks into " . count($filteredParts) . " parts");
+            return array_values($filteredParts);
+        }
+
+        // Fallback: return the whole text as one entry
+        error_log("🔍 DEBUG: No split patterns worked, returning as single entry");
+        return [$text];
+    }
+
+    // Enhanced parseExperienceEntry method
     private function parseExperienceEntry($text)
     {
         $experience = [
@@ -496,340 +798,277 @@ class ResumeParser
             'start_date' => null,
             'end_date' => null,
             'currently_working' => 'No',
-            'responsibilities' => ''
+            'experience_type' => 'previous',
+            'responsibilities' => '',
+            'achievements' => ''
         ];
 
         $lines = explode("\n", trim($text));
         $lines = array_filter(array_map('trim', $lines));
 
-        // Enhanced job title extraction with common patterns
-        $jobTitlePatterns = [
-            // Common job title patterns - more specific
-            '/^(?:senior\s+|junior\s+|lead\s+|principal\s+)?(?:software\s+)?(?:engineer|developer|programmer|analyst|manager|coordinator|specialist|consultant|director|supervisor|associate|assistant)(?:\s+[IVX]+)?$/i',
-            '/^(?:senior\s+|junior\s+|lead\s+)?(?:frontend|backend|full[\-\s]?stack|web|mobile|data|system|network|security|database|devops)\s+(?:engineer|developer|programmer|analyst)$/i',
-            '/^(?:project\s+manager|product\s+manager|business\s+analyst|data\s+scientist|ui\/ux\s+designer|graphic\s+designer)$/i',
-            '/^(?:marketing\s+specialist|sales\s+representative|customer\s+service|human\s+resources|financial\s+analyst)$/i',
-            '/^(?:software|hardware|systems?|network|security|database|web|mobile|frontend|backend|fullstack|full[\-\s]stack)\s+(?:engineer|developer|programmer|analyst|architect)$/i'
-        ];
+        error_log("🔍 DEBUG: Parsing entry with " . count($lines) . " lines");
 
-        // Try to find job title in first few lines
-        foreach (array_slice($lines, 0, 3) as $line) {
-            $cleanLine = preg_replace('/^[•\-\*\+\d\.\s]+/', '', $line);
-            $cleanLine = trim($cleanLine);
-
-            // Skip if it's a date line or company name line
-            if (preg_match('/\d{4}/', $cleanLine) || preg_match('/(?:inc|corp|ltd|llc|company)/i', $cleanLine)) {
-                continue;
-            }
-
-            // Check against job title patterns
-            foreach ($jobTitlePatterns as $pattern) {
-                if (preg_match($pattern, $cleanLine)) {
-                    $experience['job_title'] = $cleanLine;
-                    break 2;
-                }
-            }
-
-            // Fallback: if line contains common job keywords and is reasonable length
-            if (
-                empty($experience['job_title']) &&
-                preg_match('/\b(?:engineer|developer|manager|analyst|specialist|coordinator|director|supervisor|associate|assistant|consultant|designer|architect)\b/i', $cleanLine) &&
-                strlen($cleanLine) >= 5 && strlen($cleanLine) <= 50 &&
-                !preg_match('/\b(?:years?|experience|expertise|responsible|developed|managed|worked)\b/i', $cleanLine)
-            ) {
-
-                $experience['job_title'] = $cleanLine;
-                break;
-            }
+        // Enhanced job title extraction
+        $jobTitle = $this->extractJobTitle($lines, $text);
+        if ($jobTitle) {
+            $experience['job_title'] = $jobTitle;
+            error_log("✅ DEBUG: Found job title: " . $jobTitle);
         }
 
-        // Enhanced company name extraction
-        $companyPatterns = [
-            '/(?:at|@)\s+([A-Z][^\n,]+?)(?:\s*[-–]\s*|\s*,|\s*$)/i',
-            '/([A-Z][^\n]*(?:Inc|Corp|Ltd|LLC|Company|Corporation|Technologies|Systems|Solutions|Group|Consulting)[^\n]*)/i',
-            '/\b([A-Z][a-zA-Z\s&]+(?:Inc|Corp|Ltd|LLC|Company)\.?)\b/i'
-        ];
-
-        foreach ($companyPatterns as $pattern) {
-            if (preg_match($pattern, $text, $match)) {
-                $company = trim($match[1]);
-                $company = preg_replace('/^[•\-\*\+\s]+/', '', $company);
-                if (strlen($company) > 2 && strlen($company) < 100) {
-                    $experience['company_name'] = $company;
-                    break;
-                }
-            }
+        // Enhanced company extraction
+        $companyName = $this->extractCompanyName($lines, $text);
+        if ($companyName) {
+            $experience['company_name'] = $companyName;
+            error_log("✅ DEBUG: Found company: " . $companyName);
         }
 
         // Enhanced date extraction
+        $dateInfo = $this->extractWorkDates($text);
+        if ($dateInfo) {
+            $experience = array_merge($experience, $dateInfo);
+            error_log("✅ DEBUG: Found dates - Start: " . ($dateInfo['start_date'] ?: 'N/A') . ", End: " . ($dateInfo['end_date'] ?: 'Current'));
+        }
+
+        // Extract employment type
+        $employmentType = $this->extractEmploymentType($text);
+        if ($employmentType) {
+            $experience['employment_type'] = $employmentType;
+            error_log("✅ DEBUG: Found employment type: " . $employmentType);
+        }
+
+        // Extract responsibilities
+        $responsibilities = $this->extractResponsibilities($text);
+        if ($responsibilities) {
+            $experience['responsibilities'] = $responsibilities;
+        }
+
+        return $experience;
+    }
+
+    // Add these helper methods for better extraction
+
+    private function extractJobTitle($lines, $fullText)
+    {
+        // Common job title patterns - ordered by specificity
+        $jobTitlePatterns = [
+            // Specific technical roles
+            '/^(?:senior\s+|junior\s+|lead\s+|principal\s+|staff\s+)?(?:software\s+|web\s+|mobile\s+|frontend\s+|backend\s+|full[\-\s]?stack\s+|devops\s+)?(?:engineer|developer|programmer)(?:\s+[IVX]+)?$/i',
+            '/^(?:senior\s+|junior\s+|lead\s+)?(?:data\s+scientist|data\s+analyst|business\s+analyst|system\s+analyst|security\s+analyst)$/i',
+            '/^(?:project\s+manager|product\s+manager|program\s+manager|technical\s+manager|engineering\s+manager)$/i',
+            '/^(?:ui\/ux\s+designer|graphic\s+designer|web\s+designer|product\s+designer)$/i',
+
+            // Business roles
+            '/^(?:marketing\s+specialist|marketing\s+manager|digital\s+marketing\s+specialist)$/i',
+            '/^(?:sales\s+representative|sales\s+manager|account\s+manager|business\s+development)$/i',
+            '/^(?:customer\s+service\s+representative|customer\s+success\s+manager|support\s+specialist)$/i',
+            '/^(?:human\s+resources\s+specialist|hr\s+manager|recruiter|talent\s+acquisition)$/i',
+            '/^(?:financial\s+analyst|accountant|finance\s+manager|controller)$/i',
+
+            // General patterns
+            '/^(?:senior\s+|junior\s+|assistant\s+|associate\s+)?[\w\s]+(?:manager|director|supervisor|coordinator|specialist|analyst|consultant|officer|executive|associate|assistant)$/i',
+            '/^(?:intern|trainee|apprentice)\s+[\w\s]*$/i'
+        ];
+
+        // Try first few lines for job title
+        foreach (array_slice($lines, 0, 4) as $line) {
+            $cleanLine = preg_replace('/^[•\-\*\+\d\.\s]+/', '', $line);
+            $cleanLine = trim($cleanLine);
+
+            // Skip obvious non-titles
+            if (
+                empty($cleanLine) || strlen($cleanLine) > 60 ||
+                preg_match('/\d{4}|@|\.com|phone|email|address/i', $cleanLine) ||
+                preg_match('/^(?:summary|objective|profile|experience|education|skills)/i', $cleanLine)
+            ) {
+                continue;
+            }
+
+            // Check against patterns
+            foreach ($jobTitlePatterns as $pattern) {
+                if (preg_match($pattern, $cleanLine)) {
+                    return $cleanLine;
+                }
+            }
+
+            // Fallback: if contains job keywords and reasonable length
+            if (
+                preg_match('/\b(?:engineer|developer|manager|analyst|specialist|coordinator|director|supervisor|associate|assistant|consultant|designer|architect|representative|intern|trainee)\b/i', $cleanLine) &&
+                strlen($cleanLine) >= 5 && strlen($cleanLine) <= 50 &&
+                !preg_match('/\b(?:years?|experience|responsible|developed|managed|worked|company|inc|corp|ltd)\b/i', $cleanLine)
+            ) {
+                return $cleanLine;
+            }
+        }
+
+        return '';
+    }
+
+    private function extractCompanyName($lines, $fullText)
+    {
+        $companyPatterns = [
+            // "at Company Name" pattern
+            '/(?:at|@)\s+([A-Z][^\n,]+?)(?:\s*[-–]\s*|\s*,|\s*\(|\s*$)/i',
+
+            // Company with legal entity
+            '/\b([A-Z][a-zA-Z\s&\-\'\.]+(?:Inc|Corp|Ltd|LLC|Company|Corporation|Technologies|Systems|Solutions|Group|Consulting)\.?)\b/i',
+
+            // University or school
+            '/\b([A-Z][a-zA-Z\s&\-\']+(?:University|College|Institute|School|Academy|Hospital|Medical\s+Center|Clinic))\b/i',
+
+            // Government or organization
+            '/\b([A-Z][a-zA-Z\s&\-\']+(?:Department|Ministry|Agency|Commission|Bureau|Office|Government|Municipality|City|County))\b/i'
+        ];
+
+        foreach ($companyPatterns as $pattern) {
+            if (preg_match($pattern, $fullText, $match)) {
+                $company = trim($match[1]);
+                $company = preg_replace('/^[•\-\*\+\s]+/', '', $company);
+                $company = preg_replace('/\s*[-–]\s*\d{4}.*$/', '', $company); // Remove dates
+
+                if (
+                    strlen($company) > 2 && strlen($company) < 100 &&
+                    !preg_match('/^(?:january|february|march|april|may|june|july|august|september|october|november|december|\d)/i', $company)
+                ) {
+                    return $company;
+                }
+            }
+        }
+
+        // Fallback: look in lines for company-like strings
+        foreach ($lines as $line) {
+            $cleanLine = trim($line);
+
+            // Skip if it looks like a job title or date
+            if (
+                preg_match('/(?:engineer|developer|manager|analyst|specialist)\b/i', $cleanLine) ||
+                preg_match('/\d{4}/', $cleanLine) ||
+                strlen($cleanLine) < 3 || strlen($cleanLine) > 80
+            ) {
+                continue;
+            }
+
+            // Look for capitalized words that could be company names
+            if (
+                preg_match('/^[A-Z][a-zA-Z\s&\-\']+$/', $cleanLine) &&
+                str_word_count($cleanLine) >= 1 && str_word_count($cleanLine) <= 5
+            ) {
+                return $cleanLine;
+            }
+        }
+
+        return '';
+    }
+
+    private function extractWorkDates($text)
+    {
+        $dateInfo = [
+            'start_date' => null,
+            'end_date' => null,
+            'currently_working' => 'No',
+            'experience_type' => 'previous'
+        ];
+
+        // Enhanced date patterns
         $datePatterns = [
-            '/(\w+\s+\d{4})\s*[-–]\s*(\w+\s+\d{4}|present|current)/i', // "January 2020 - December 2022"
-            '/(\d{1,2}\/\d{4})\s*[-–]\s*(\d{1,2}\/\d{4}|present|current)/i', // "01/2020 - 12/2022"
-            '/(\d{4})\s*[-–]\s*(\d{4}|present|current)/i' // "2020 - 2022"
+            // "January 2020 - December 2022" or "Jan 2020 - Dec 2022"
+            '/(\w+\s+\d{4})\s*[-–]\s*(\w+\s+\d{4}|present|current)/i',
+
+            // "01/2020 - 12/2022" or "1/2020 - 12/2022"
+            '/(\d{1,2}\/\d{4})\s*[-–]\s*(\d{1,2}\/\d{4}|present|current)/i',
+
+            // "2020 - 2022" or "2020 - present"
+            '/(\d{4})\s*[-–]\s*(\d{4}|present|current)/i',
+
+            // "March 2020 to December 2022"
+            '/(\w+\s+\d{4})\s+to\s+(\w+\s+\d{4}|present|current)/i',
+
+            // Single date patterns for ongoing jobs
+            '/(?:since|from)\s+(\w+\s+\d{4}|\d{1,2}\/\d{4}|\d{4})(?:\s+[-–]\s+(?:present|current))?/i'
         ];
 
         foreach ($datePatterns as $pattern) {
             if (preg_match($pattern, $text, $match)) {
                 $startDate = $match[1];
-                $endDate = $match[2];
+                $endDate = $match[2] ?? null;
 
-                // Convert dates to standard format
-                $experience['start_date'] = $this->standardizeDateFormat($startDate);
+                // Convert start date
+                $dateInfo['start_date'] = $this->standardizeDateFormat($startDate);
 
-                if (strtolower($endDate) === 'present' || strtolower($endDate) === 'current') {
-                    $experience['currently_working'] = 'Yes';
-                    $experience['end_date'] = null;
+                // Handle end date
+                if ($endDate && (strtolower($endDate) === 'present' || strtolower($endDate) === 'current')) {
+                    $dateInfo['currently_working'] = 'Yes';
+                    $dateInfo['experience_type'] = 'current';
+                    $dateInfo['end_date'] = null;
+                } elseif ($endDate) {
+                    $dateInfo['end_date'] = $this->standardizeDateFormat($endDate);
                 } else {
-                    $experience['end_date'] = $this->standardizeDateFormat($endDate);
+                    // If only start date found with "since/from", assume current
+                    $dateInfo['currently_working'] = 'Yes';
+                    $dateInfo['experience_type'] = 'current';
+                    $dateInfo['end_date'] = null;
                 }
-                break;
+
+                error_log("✅ DEBUG: Extracted dates - Start: {$dateInfo['start_date']}, End: {$dateInfo['end_date']}, Current: {$dateInfo['currently_working']}");
+                return $dateInfo;
             }
         }
 
-        // Extract responsibilities (clean up)
-        $responsibility = trim($text);
-        $responsibility = preg_replace('/^.*?(?:responsibilities|duties|achievements|accomplishments)[\s:]*\n?/is', '', $responsibility);
-        $responsibility = preg_replace('/^\s*[•\-\*\+]\s*/m', '• ', $responsibility);
-        $experience['responsibilities'] = strlen($responsibility) > 10 ? $responsibility : 'N/A';
+        // Look for "current" or "present" keywords alone
+        if (preg_match('/\b(?:current|present|ongoing|active)\b/i', $text)) {
+            $dateInfo['currently_working'] = 'Yes';
+            $dateInfo['experience_type'] = 'current';
+        }
 
-        return $experience;
+        return $dateInfo;
     }
 
-    // Enhanced date standardization
-    private function standardizeDateFormat($dateString)
+    private function extractEmploymentType($text)
     {
-        $dateString = trim($dateString);
-
-        // Handle different date formats
-        $formats = [
-            'Y-m-d',
-            'm/d/Y',
-            'd/m/Y',
-            'Y',
-            'm/Y',
-            'M Y',
-            'F Y',
-            'M d, Y',
-            'F d, Y'
+        $employmentPatterns = [
+            '/\b(full[\-\s]time)\b/i' => 'full-time',
+            '/\b(part[\-\s]time)\b/i' => 'part-time',
+            '/\b(contract|contractor)\b/i' => 'contract',
+            '/\b(freelance|freelancer)\b/i' => 'freelance',
+            '/\b(intern|internship)\b/i' => 'internship',
+            '/\b(temporary|temp)\b/i' => 'contract',
+            '/\b(consultant|consulting)\b/i' => 'contract'
         ];
 
-        foreach ($formats as $format) {
-            $date = DateTime::createFromFormat($format, $dateString);
-            if ($date !== false) {
-                // If only year is provided, assume January 1st
-                if ($format === 'Y') {
-                    return $date->format('Y') . '-01-01';
-                }
-                // If month/year, assume first day of month
-                if (in_array($format, ['m/Y', 'M Y', 'F Y'])) {
-                    return $date->format('Y-m') . '-01';
-                }
-                return $date->format('Y-m-d');
+        foreach ($employmentPatterns as $pattern => $type) {
+            if (preg_match($pattern, $text)) {
+                return $type;
             }
         }
 
-        // If no format matches, try to extract just the year
-        if (preg_match('/(\d{4})/', $dateString, $match)) {
-            return $match[1] . '-01-01';
-        }
-
-        return null;
+        return 'full-time'; // Default
     }
 
-    // private function parseExperienceEntry($text)
-    // {
-    //     $experience = [
-    //         'job_title' => '',
-    //         'company_name' => '',
-    //         'employment_type' => 'full-time',
-    //         'start_date' => null,
-    //         'end_date' => null,
-    //         'currently_working' => 'No',
-    //         'responsibilities' => ''
-    //     ];
-
-    //     // Extract job title (usually first line)
-    //     $lines = explode("\n", trim($text));
-    //     if (!empty($lines[0])) {
-    //         $experience['job_title'] = trim($lines[0]);
-    //     }
-
-    //     // Extract company name
-    //     if (preg_match('/(?:at|@)\s+([^\n,]+)/i', $text, $match)) {
-    //         $experience['company_name'] = trim($match[1]);
-    //     }
-
-    //     // Extract dates
-    //     if (preg_match('/(\d{4})\s*[-–]\s*(\d{4}|present|current)/i', $text, $match)) {
-    //         $experience['start_date'] = $match[1] . '-01-01';
-    //         if (strtolower($match[2]) === 'present' || strtolower($match[2]) === 'current') {
-    //             $experience['currently_working'] = 'Yes';
-    //         } else {
-    //             $experience['end_date'] = $match[2] . '-12-31';
-    //         }
-    //     }
-
-    //     $experience['responsibilities'] = trim($text);
-
-    //     return $experience;
-    // }
-
-    private function extractEducation($text)
+    private function extractResponsibilities($text)
     {
-        $education = [
-            'school_name' => '',
-            'education_level' => '',
-            'field_of_study' => '',
-            'start_date' => null,
-            'end_date' => null
+        // Look for responsibility sections
+        $responsibilityPatterns = [
+            '/(?:responsibilities|duties|role|tasks|job\s+description)[\s:]*\n?(.*?)(?=\n\s*(?:[A-Z][A-Z\s]+:|$))/is',
+            '/(?:achievements|accomplishments|key\s+achievements)[\s:]*\n?(.*?)(?=\n\s*(?:[A-Z][A-Z\s]+:|$))/is'
         ];
 
-        // Enhanced education pattern - stops at other major sections
-        if (preg_match('/(?:education|academic|qualification|educational\s+background)[\s:]*([^\n]+(?:\n[^\n]*)*?)(?=\n\s*(?:experience|work|employment|skills|projects?|certificates?|languages?|references?|objective|summary|$))/is', $text, $match)) {
-            $eduText = $match[1];
+        foreach ($responsibilityPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                $responsibilities = trim($match[1]);
+                $responsibilities = preg_replace('/^\s*[•\-\*\+]\s*/m', '• ', $responsibilities);
 
-            // Use advanced school name extraction
-            $education['school_name'] = $this->extractSchoolNameAdvanced($eduText);
-
-            // If advanced method didn't work, fall back to basic patterns
-            if (empty($education['school_name'])) {
-                $schoolPatterns = [
-                    '/([^\n]*(?:university|college|institute|school|academy)[^\n]*)/i',
-                    '/([A-Z][^\n]*(?:University|College|Institute|School|Academy)[^\n]*)/i',
-                ];
-
-                foreach ($schoolPatterns as $pattern) {
-                    if (preg_match($pattern, $eduText, $schoolMatch)) {
-                        $schoolName = $this->cleanSchoolName(trim($schoolMatch[1]));
-
-                        if (strlen($schoolName) > 3 && $this->isValidSchoolName($schoolName)) {
-                            $education['school_name'] = $schoolName;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Rest of the extraction logic remains the same...
-            // (degree level, field of study, dates)
-
-            // Extract degree level
-            $degreePatterns = [
-                '/\b(bachelor(?:\'s)?(?:\s+(?:of\s+)?(?:science|arts|engineering|business|fine\s+arts))?)/i' => 'Bachelor',
-                '/\b(master(?:\'s)?(?:\s+(?:of\s+)?(?:science|arts|engineering|business|fine\s+arts))?)/i' => 'Master',
-                '/\b(phd|doctorate|doctoral)/i' => 'Doctorate',
-                '/\b(associate(?:\s+degree)?)/i' => 'Associate',
-                '/\b(diploma|certificate)/i' => 'Vocational',
-                '/\b(high\s+school|secondary)/i' => 'High School'
-            ];
-
-            foreach ($degreePatterns as $pattern => $level) {
-                if (preg_match($pattern, $eduText, $degreeMatch)) {
-                    $education['education_level'] = $level;
-                    break;
-                }
-            }
-
-            // Extract field of study
-            $fieldPatterns = [
-                '/(?:bachelor(?:\'s)?|master(?:\'s)?|degree)\s+(?:of\s+)?(?:science\s+)?(?:in\s+)?([^,\n\d]+)/i',
-                '/(?:major(?:ing)?|field|study(?:ing)?|specialization)(?:\s+in)?\s*:?\s*([^,\n\d]+)/i',
-                '/\b(computer\s+science|information\s+technology|engineering|business\s+administration|marketing|psychology|education|nursing|medicine)\b/i'
-            ];
-
-            foreach ($fieldPatterns as $pattern) {
-                if (preg_match($pattern, $eduText, $fieldMatch)) {
-                    $field = trim($fieldMatch[1] ?? $fieldMatch[0]);
-                    $field = preg_replace('/^[•\-\*\+\s]+/', '', $field);
-                    $field = preg_replace('/\s*\d{4}.*$/', '', $field); // Remove years
-                    if (strlen($field) > 2) {
-                        $education['field_of_study'] = $field;
-                        break;
-                    }
-                }
-            }
-
-            // Extract years with validation
-            $yearPatterns = [
-                '/(?:graduated|graduation|completed).*?(\d{4})/i',
-                '/(\d{4})\s*[-–]\s*(\d{4})/i',
-                '/(?:class\s+of|year).*?(\d{4})/i',
-                '/\b(\d{4})\b(?=\s*$|\s*[,\n])/m'
-            ];
-
-            foreach ($yearPatterns as $pattern) {
-                if (preg_match($pattern, $eduText, $yearMatch)) {
-                    if (isset($yearMatch[2])) {
-                        $startYear = (int)$yearMatch[1];
-                        $endYear = (int)$yearMatch[2];
-
-                        if ($this->isValidEducationYear($startYear) && $this->isValidEducationYear($endYear) && $startYear <= $endYear) {
-                            $education['start_date'] = $startYear . '-01-01';
-                            $education['end_date'] = $endYear . '-12-31';
-                            break;
-                        }
-                    } else {
-                        $gradYear = (int)$yearMatch[1];
-
-                        if ($this->isValidEducationYear($gradYear)) {
-                            $education['end_date'] = $gradYear . '-12-31';
-                            $education['start_date'] = ($gradYear - 4) . '-01-01';
-                            break;
-                        }
-                    }
+                if (strlen($responsibilities) > 20) {
+                    return $responsibilities;
                 }
             }
         }
 
-        return $education;
+        // Fallback: clean up the entire text as responsibilities
+        $cleaned = trim($text);
+        $cleaned = preg_replace('/^.*?(?:responsibilities|duties|role|tasks)[\s:]*\n?/is', '', $cleaned);
+        $cleaned = preg_replace('/^\s*[•\-\*\+]\s*/m', '• ', $cleaned);
+
+        return strlen($cleaned) > 20 && strlen($cleaned) < 1000 ? $cleaned : '';
     }
-
-    // Add helper method to validate education years
-    private function isValidEducationYear($year)
-    {
-        $currentYear = (int)date('Y');
-        return ($year >= 1900 && $year <= ($currentYear + 10)); // Allow future years for ongoing programs
-    }
-
-    private function extractCertificates($text)
-    {
-        $certificates = [];
-
-        if (preg_match('/(?:certificate|certification|license)[\s:]*([^\n]+(?:\n[^\n]*)*?)(?=\n\s*(?:[A-Z][A-Z\s]+|$))/i', $text, $match)) {
-            $certText = $match[1];
-            $certLines = explode("\n", $certText);
-
-            foreach ($certLines as $line) {
-                $line = trim($line);
-                if (!empty($line) && strlen($line) > 5) {
-                    $certificates[] = [
-                        'certificate_title' => $line,
-                        'issuing_organization' => 'Unknown',
-                        'date_issued' => date('Y-m-d')
-                    ];
-                }
-            }
-        }
-
-        return array_slice($certificates, 0, 5);
-    }
-
-    // private function standardizeDateFormat($dateString)
-    // {
-    //     $dateString = trim($dateString);
-
-    //     // Try different date formats
-    //     $formats = ['Y-m-d', 'm/d/Y', 'd/m/Y', 'M d, Y', 'F d, Y'];
-
-    //     foreach ($formats as $format) {
-    //         $date = DateTime::createFromFormat($format, $dateString);
-    //         if ($date !== false) {
-    //             return $date->format('Y-m-d');
-    //         }
-    //     }
-
-    //     return null;
-    // }
 
     public function updateJobseekerProfileFromParsedData($userId, $parsedData)
     {
@@ -840,7 +1079,6 @@ class ResumeParser
             // Get or create jobseeker record
             $jobseeker = $jobseekerModel->findByUserId($userId);
             if (!$jobseeker) {
-                // Create basic jobseeker record
                 $jobseekerModel->create(
                     $userId,
                     $parsedData['name_data']['first_name'] ?: 'N/A',
@@ -864,59 +1102,91 @@ class ResumeParser
                 'contact_no' => $parsedData['phone'] ?: $jobseeker['contact_no']
             ];
 
-            $jobseekerModel->updateProfile($userId, $profileData);
+            $updateResult = $jobseekerModel->updateProfile($userId, $profileData);
+            if (!$updateResult) {
+                error_log("❌ Failed to update basic profile");
+            }
 
-            // Update skills (delete existing and add new ones)
+            // ENHANCED: Better work experience handling
+            if (!empty($parsedData['experience']) && is_array($parsedData['experience'])) {
+                error_log("🔍 DEBUG: Processing " . count($parsedData['experience']) . " work experiences");
+
+                // Don't delete existing experience, just add new parsed ones
+                // This allows users to keep manually entered experience
+                foreach ($parsedData['experience'] as $index => $exp) {
+                    if (empty($exp['job_title']) || empty($exp['company_name'])) {
+                        error_log("⚠️ DEBUG: Skipping experience $index - missing required fields");
+                        continue;
+                    }
+
+                    // Check if this experience already exists to avoid duplicates
+                    $existingExp = $this->checkDuplicateExperience($jobseekerId, $exp, $jobseekerModel);
+                    if ($existingExp) {
+                        error_log("⚠️ DEBUG: Similar experience already exists, skipping: " . $exp['job_title']);
+                        continue;
+                    }
+
+                    $result = $jobseekerModel->saveWorkExperience($jobseekerId, $exp);
+                    if ($result) {
+                        error_log("✅ DEBUG: Saved work experience: " . $exp['job_title'] . " at " . $exp['company_name']);
+                    } else {
+                        error_log("❌ DEBUG: Failed to save work experience: " . $exp['job_title']);
+                    }
+                }
+            }
+
+            // Update skills (existing logic)
             if (!empty($parsedData['skills'])) {
-                $jobseekerModel->deleteSkills($jobseekerId);
-                foreach ($parsedData['skills'] as $skill) {
-                    $jobseekerModel->saveSkill($jobseekerId, $skill);
-                }
-            }
-
-            // Update work experience (delete existing and add new ones to avoid duplicates)
-            if (!empty($parsedData['experience'])) {
-                // Delete existing work experience from parsing
-                $existingExperience = $jobseekerModel->getWorkExperience($userId);
-                if (!empty($existingExperience)) {
-                    foreach ($existingExperience as $exp) {
-                        $jobseekerModel->deleteWorkExperience($jobseekerId, $exp['experience_id']);
+                // Only delete skills if we have new ones to replace them
+                $existingSkills = $jobseekerModel->getSkills($userId);
+                if (empty($existingSkills) || count($parsedData['skills']) > count($existingSkills)) {
+                    $jobseekerModel->deleteSkills($jobseekerId);
+                    foreach ($parsedData['skills'] as $skill) {
+                        $jobseekerModel->saveSkill($jobseekerId, $skill);
                     }
-                }
-
-                // Add new parsed work experience
-                foreach ($parsedData['experience'] as $exp) {
-                    $jobseekerModel->saveWorkExperience($jobseekerId, $exp);
+                    error_log("✅ Updated " . count($parsedData['skills']) . " skills");
                 }
             }
 
-            // Update education (replace existing with parsed data)
+            // Update education (existing logic)
             if (!empty($parsedData['education']) && !empty($parsedData['education']['school_name'])) {
-                // Delete existing education first
                 $existingEducation = $jobseekerModel->getEducation($userId);
-                if (!empty($existingEducation)) {
-                    foreach ($existingEducation as $edu) {
-                        $stmt = $jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_education WHERE education_id = ?");
-                        $stmt->execute([$edu['education_id']]);
+                if (empty($existingEducation) || empty($existingEducation[0]['school_name'])) {
+                    if (!empty($existingEducation)) {
+                        foreach ($existingEducation as $edu) {
+                            $stmt = $jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_education WHERE education_id = ?");
+                            $stmt->execute([$edu['education_id']]);
+                        }
                     }
+                    $jobseekerModel->saveEducation($jobseekerId, $parsedData['education']);
+                    error_log("✅ Updated education data");
                 }
-
-                // Add new parsed education
-                $jobseekerModel->saveEducation($jobseekerId, $parsedData['education']);
             }
 
-            // Update certificates (delete existing and add new ones)
+            // Update certificates (existing logic)
             if (!empty($parsedData['certificates'])) {
-                $existingCertificates = $jobseekerModel->getCertificates($jobseekerId);
-                if (!empty($existingCertificates)) {
-                    foreach ($existingCertificates as $cert) {
-                        $stmt = $jobseekerModel->getPdo()->prepare("DELETE FROM jobseeker_certificates WHERE certificate_id = ?");
-                        $stmt->execute([$cert['certificate_id']]);
-                    }
-                }
+                error_log("🔍 DEBUG: Processing " . count($parsedData['certificates']) . " certificates");
 
-                foreach ($parsedData['certificates'] as $cert) {
-                    $jobseekerModel->saveCertificate($jobseekerId, $cert);
+                // Don't delete existing certificates, just add new ones if they don't exist
+                foreach ($parsedData['certificates'] as $index => $cert) {
+                    if (empty($cert['certificate_title'])) {
+                        error_log("⚠️ DEBUG: Skipping certificate $index - missing title");
+                        continue;
+                    }
+
+                    // Check if certificate already exists
+                    $existingCert = $this->checkDuplicateCertificate($jobseekerId, $cert, $jobseekerModel);
+                    if ($existingCert) {
+                        error_log("⚠️ DEBUG: Similar certificate already exists, skipping: " . $cert['certificate_title']);
+                        continue;
+                    }
+
+                    $result = $jobseekerModel->saveCertificate($jobseekerId, $cert);
+                    if ($result) {
+                        error_log("✅ DEBUG: Saved certificate: " . $cert['certificate_title']);
+                    } else {
+                        error_log("❌ DEBUG: Failed to save certificate: " . $cert['certificate_title']);
+                    }
                 }
             }
 
@@ -926,7 +1196,7 @@ class ResumeParser
                 'data' => $parsedData
             ];
         } catch (Exception $e) {
-            error_log("Error updating jobseeker profile from parsed data: " . $e->getMessage());
+            error_log("❌ Error updating jobseeker profile from parsed data: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Failed to update profile: ' . $e->getMessage()
@@ -934,84 +1204,363 @@ class ResumeParser
         }
     }
 
-    // Add this method to better extract school names from common formats:
-
-    private function extractSchoolNameAdvanced($eduText)
+    // Add this helper method to check for duplicate experiences
+    private function checkDuplicateExperience($jobseekerId, $newExp, $jobseekerModel)
     {
-        $schoolName = '';
+        try {
+            // Get existing work experience
+            $stmt = $jobseekerModel->getPdo()->prepare("
+                SELECT * FROM jobseeker_work_experience 
+                WHERE jobseeker_id = ? 
+                AND LOWER(job_title) = LOWER(?) 
+                AND LOWER(company_name) = LOWER(?)
+            ");
+            $stmt->execute([$jobseekerId, $newExp['job_title'], $newExp['company_name']]);
 
-        // Common patterns for school names
-        $patterns = [
-            // Pattern 1: "University of [Location]" or "[Name] University"
-            '/\b([A-Z][a-zA-Z\s&\-\']+(?:University|College|Institute|School|Academy)(?:\s+of\s+[A-Z][a-zA-Z\s]+)?)\b/',
-            // Pattern 2: "[State] [Type] University"
-            '/\b([A-Z][a-zA-Z]+\s+(?:State\s+)?(?:University|College|Institute))\b/',
-            // Pattern 3: Full institution names
-            '/\b([A-Z][a-zA-Z\s&\-\']+(?:Community\s+College|Technical\s+Institute|Polytechnic|Seminary))\b/',
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error checking duplicate experience: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Add this helper method for certificate duplicates
+    private function checkDuplicateCertificate($jobseekerId, $newCert, $jobseekerModel)
+    {
+        try {
+            $stmt = $jobseekerModel->getPdo()->prepare("
+                SELECT * FROM jobseeker_certificates 
+                WHERE jobseeker_id = ? 
+                AND LOWER(certificate_title) = LOWER(?)
+            ");
+            $stmt->execute([$jobseekerId, $newCert['certificate_title']]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error checking duplicate certificate: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function standardizeDateFormat($dateString)
+    {
+        // Try parsing various date formats
+        $formats = [
+            'Y-m-d', // 2023-01-31
+            'Y/m/d', // 2023/01/31
+            'Y.m.d', // 2023.01.31
+            'd-m-Y', // 31-01-2023
+            'd/m/Y', // 31/01/2023
+            'd.m.Y', // 31.01.2023
+            'M j, Y', // Jan 31, 2023
+            'F j, Y', // January 31, 2023
+            'Y' // Just the year, e.g., 2023
         ];
 
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $eduText, $match)) {
-                $candidate = trim($match[1]);
+        foreach ($formats as $format) {
+            $dateTime = DateTime::createFromFormat($format, $dateString);
+            if ($dateTime) {
+                return $dateTime->format('Y-m-d');
+            }
+        }
 
-                // Clean the candidate
-                $candidate = $this->cleanSchoolName($candidate);
+        // If no formats matched, return the original string or handle as needed
+        return $dateString;
+    }
 
-                // Validate it's a real school name (not just keywords)
-                if (strlen($candidate) > 5 && $this->isValidSchoolName($candidate)) {
-                    $schoolName = $candidate;
-                    break;
+    private function extractEducation($text)
+    {
+        $education = [
+            'school_name' => '',
+            'education_level' => '',
+            'field_of_study' => '',
+            'start_year' => null,
+            'end_year' => null,
+            'graduation_status' => 'Graduated'
+        ];
+
+        // Enhanced patterns to find education sections
+        $sectionPatterns = [
+            '/(?:education|academic\s+background|educational\s+background)[\s:]*\n?(.*?)(?=\n\s*(?:experience|work|employment|skills|projects?|certificates?|certifications?|languages?|references?|hobbies|interests|$))/is',
+            '/(?:academic|educational)[\s:]*\n?(.*?)(?=\n\s*(?:experience|work|employment|skills|projects?|certificates?|certifications?|languages?|references?|hobbies|interests|$))/is'
+        ];
+
+        $educationText = '';
+        foreach ($sectionPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                $educationText = trim($match[1]);
+                break;
+            }
+        }
+
+        if (empty($educationText)) {
+            error_log("🔍 DEBUG: No education section found");
+            return $education;
+        }
+
+        error_log("🔍 DEBUG: Found education text: " . substr($educationText, 0, 200) . "...");
+
+        // Extract school name using advanced method
+        $schoolName = $this->extractSchoolNameAdvanced($educationText);
+        if ($schoolName) {
+            $education['school_name'] = $schoolName;
+            error_log("✅ DEBUG: Found school name: " . $schoolName);
+        }
+
+        // Extract education level
+        $educationLevel = $this->extractEducationLevel($educationText);
+        if ($educationLevel) {
+            $education['education_level'] = $educationLevel;
+            error_log("✅ DEBUG: Found education level: " . $educationLevel);
+        }
+
+        // Extract field of study
+        $fieldOfStudy = $this->extractFieldOfStudy($educationText);
+        if ($fieldOfStudy) {
+            $education['field_of_study'] = $fieldOfStudy;
+            error_log("✅ DEBUG: Found field of study: " . $fieldOfStudy);
+        }
+
+        // Extract years
+        $years = $this->extractEducationYears($educationText);
+        if ($years) {
+            $education = array_merge($education, $years);
+            error_log("✅ DEBUG: Found years - Start: " . ($years['start_year'] ?: 'N/A') . ", End: " . ($years['end_year'] ?: 'N/A'));
+        }
+
+        return $education;
+    }
+
+    private function extractEducationLevel($text)
+    {
+        $levelPatterns = [
+            // PhD patterns
+            '/\b(?:phd|ph\.d\.|doctor\s+of\s+philosophy|doctoral|doctorate)\b/i' => 'Doctoral Degree',
+
+            // Master's patterns
+            '/\b(?:master|masters|ms|ma|mba|m\.s\.|m\.a\.|m\.b\.a\.|master\s+of\s+science|master\s+of\s+arts|master\s+of\s+business)\b/i' => 'Master\'s Degree',
+
+            // Bachelor's patterns
+            '/\b(?:bachelor|bachelors|bs|ba|bsc|b\.s\.|b\.a\.|b\.sc\.|bachelor\s+of\s+science|bachelor\s+of\s+arts)\b/i' => 'Bachelor\'s Degree',
+
+            // Associate patterns
+            '/\b(?:associate|associates|aa|as|a\.a\.|a\.s\.|associate\s+degree)\b/i' => 'Associate Degree',
+
+            // High school patterns
+            '/\b(?:high\s+school|secondary|senior\s+high|grade\s+12|k-12|k12)\b/i' => 'High School',
+
+            // Certificate patterns
+            '/\b(?:certificate|certification|diploma|cert\.)\b/i' => 'Certificate',
+
+            // College patterns (generic)
+            '/\b(?:college|university|undergraduate)\b/i' => 'Bachelor\'s Degree'
+        ];
+
+        foreach ($levelPatterns as $pattern => $level) {
+            if (preg_match($pattern, $text)) {
+                return $level;
+            }
+        }
+
+        return 'Bachelor\'s Degree'; // Default
+    }
+
+    private function extractFieldOfStudy($text)
+    {
+        // Common field of study patterns
+        $fieldPatterns = [
+            // Computer Science & IT
+            '/\b(?:computer\s+science|information\s+technology|software\s+engineering|information\s+systems|cybersecurity|data\s+science)\b/i',
+
+            // Engineering
+            '/\b(?:electrical\s+engineering|mechanical\s+engineering|civil\s+engineering|chemical\s+engineering|industrial\s+engineering)\b/i',
+
+            // Business
+            '/\b(?:business\s+administration|management|marketing|finance|accounting|economics|human\s+resources)\b/i',
+
+            // Healthcare
+            '/\b(?:nursing|medicine|pharmacy|psychology|biology|chemistry|physics)\b/i',
+
+            // Liberal Arts
+            '/\b(?:english|history|political\s+science|sociology|anthropology|philosophy|communications)\b/i',
+
+            // Education
+            '/\b(?:education|teaching|elementary\s+education|secondary\s+education)\b/i'
+        ];
+
+        foreach ($fieldPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                return ucwords(strtolower(trim($match[0])));
+            }
+        }
+
+        // Try to find "in [field]" or "of [field]" patterns
+        if (preg_match('/\b(?:in|of|major)\s+([a-zA-Z\s]+?)(?:\s|$|,|\.|;)/i', $text, $match)) {
+            $field = trim($match[1]);
+            if (strlen($field) > 3 && strlen($field) < 50) {
+                return ucwords(strtolower($field));
+            }
+        }
+
+        return '';
+    }
+
+    private function extractEducationYears($text)
+    {
+        $years = [
+            'start_year' => null,
+            'end_year' => null,
+            'graduation_status' => 'Graduated'
+        ];
+
+        // Enhanced year patterns for education
+        $yearPatterns = [
+            // "2018 - 2022" or "2018 - present"
+            '/(\d{4})\s*[-–]\s*(\d{4}|present|current)/i',
+
+            // "September 2018 - May 2022"
+            '/(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})\s*[-–]\s*(?:january|february|march|april|may|june|july|august|september|october|november|december)?\s*(\d{4}|present|current)/i',
+
+            // "Class of 2022"
+            '/class\s+of\s+(\d{4})/i',
+
+            // "Graduated 2022"
+            '/graduated?\s+(\d{4})/i',
+
+            // Single year patterns
+            '/\b(\d{4})\b/'
+        ];
+
+        foreach ($yearPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                if (isset($match[2])) {
+                    // Range pattern
+                    $years['start_year'] = (int)$match[1];
+                    if (strtolower($match[2]) === 'present' || strtolower($match[2]) === 'current') {
+                        $years['graduation_status'] = 'Currently Enrolled';
+                    } else {
+                        $years['end_year'] = (int)$match[2];
+                    }
+                } else {
+                    // Single year - assume it's graduation year
+                    $years['end_year'] = (int)$match[1];
+                    $years['start_year'] = $years['end_year'] - 4; // Assume 4-year program
                 }
+                break;
             }
         }
 
-        return $schoolName;
+        // Validate years
+        $currentYear = (int)date('Y');
+        if ($years['start_year'] && ($years['start_year'] < 1950 || $years['start_year'] > $currentYear)) {
+            $years['start_year'] = null;
+        }
+        if ($years['end_year'] && ($years['end_year'] < 1950 || $years['end_year'] > ($currentYear + 6))) {
+            $years['end_year'] = null;
+        }
+
+        return $years;
     }
 
-    private function cleanSchoolName($name)
+    private function extractCertificates($text)
     {
-        // Remove years and dates
-        $name = preg_replace('/\s*[\|\-–]\s*\d{4}.*$/', '', $name);
-        $name = preg_replace('/\s*\(\s*\d{4}.*?\)/', '', $name);
-        $name = preg_replace('/\s*,?\s*\d{4}\s*[-–]\s*\d{4}/', '', $name);
-        $name = preg_replace('/\s*,?\s*\d{4}\s*[-–]\s*(?:present|current)/i', '', $name);
-        $name = preg_replace('/\s*\d{4}\s*$/', '', $name);
+        $certificates = [];
 
-        // Remove degree abbreviations
-        $name = preg_replace('/\s*[-–]\s*(BS|BA|MS|MA|PhD|Dr\.|BSc|MSc|Bachelor|Master).*$/i', '', $name);
+        // Enhanced patterns to find certificate sections
+        $sectionPatterns = [
+            '/(?:certificates?|certifications?|professional\s+certifications?|licenses?)[\s:]*\n?(.*?)(?=\n\s*(?:education|experience|work|employment|skills|projects?|languages?|references?|hobbies|interests|$))/is',
+            '/(?:awards?|achievements?|honors?)[\s:]*\n?(.*?)(?=\n\s*(?:education|experience|work|employment|skills|projects?|languages?|references?|hobbies|interests|$))/is'
+        ];
 
-        // Remove bullets and numbering
-        $name = preg_replace('/^[•\-\*\+\s\d\.]+/', '', $name);
-
-        // Final cleanup
-        $name = trim($name);
-        $name = rtrim($name, ',-|–');
-
-        return $name;
-    }
-
-    private function isValidSchoolName($name)
-    {
-        // Check if it's not just common words or abbreviations
-        $invalidNames = ['university', 'college', 'school', 'institute', 'academy', 'education', 'degree', 'bachelor', 'master'];
-
-        $nameLower = strtolower($name);
-        foreach ($invalidNames as $invalid) {
-            if ($nameLower === $invalid) {
-                return false;
+        $certificateText = '';
+        foreach ($sectionPatterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                $certificateText = trim($match[1]);
+                break;
             }
         }
 
-        // Must contain at least one letter
-        if (!preg_match('/[a-zA-Z]/', $name)) {
-            return false;
+        if (empty($certificateText)) {
+            error_log("🔍 DEBUG: No certificate section found");
+            return [];
         }
 
-        // Should not be mostly numbers
-        if (preg_match('/^\d+/', $name)) {
-            return false;
+        error_log("🔍 DEBUG: Found certificate text: " . substr($certificateText, 0, 200) . "...");
+
+        // Split certificates by common separators
+        $certificateEntries = $this->splitCertificateEntries($certificateText);
+
+        foreach ($certificateEntries as $index => $entry) {
+            $entry = trim($entry);
+            if (empty($entry) || strlen($entry) < 5) {
+                continue;
+            }
+
+            $certificate = $this->parseCertificateEntry($entry);
+            if (!empty($certificate['certificate_name'])) {
+                $certificates[] = $certificate;
+                error_log("✅ DEBUG: Found certificate: " . $certificate['certificate_name']);
+            }
         }
 
-        return true;
+        return array_slice($certificates, 0, 10); // Limit to 10 certificates
+    }
+
+    private function splitCertificateEntries($text)
+    {
+        // Split by bullet points, line breaks, or numbering
+        $entries = preg_split('/(?:\n\s*[•\-\*\+\d\.]\s*|\n\s*\n)/', $text);
+
+        // Filter out empty entries
+        $entries = array_filter(array_map('trim', $entries), function ($entry) {
+            return strlen($entry) > 5;
+        });
+
+        return array_values($entries);
+    }
+
+    private function parseCertificateEntry($text)
+    {
+        $certificate = [
+            'certificate_title' => '', // Make sure this key is always used
+            'issuing_organization' => '',
+            'issue_date' => null,
+            'expiration_date' => null,
+            'credential_id' => ''
+        ];
+
+        // Clean the text
+        $cleanText = preg_replace('/^[•\-\*\+\d\.\s]+/', '', $text);
+        $cleanText = trim($cleanText);
+
+        // Extract certificate name (usually the first line or before " - ")
+        if (preg_match('/^([^-\n]+?)(?:\s*-\s*|\s*\|\s*|\s*by\s+|\s*from\s+|$)/i', $cleanText, $match)) {
+            $certificate['certificate_title'] = trim($match[1]);
+        }
+
+        // If no title extracted, use the cleaned text as title
+        if (empty($certificate['certificate_title']) && !empty($cleanText)) {
+            $lines = explode("\n", $cleanText);
+            $certificate['certificate_title'] = trim($lines[0]);
+        }
+
+        // Extract issuing organization
+        if (preg_match('/(?:from|by|issued\s+by)\s+([^-\n,]+?)(?:\s*[-,]|\s*$)/i', $text, $match)) {
+            $certificate['issuing_organization'] = trim($match[1]);
+        } elseif (preg_match('/\b([A-Z][a-zA-Z\s&]+(?:Inc|Corp|Ltd|LLC|Company|Corporation|Institute|Academy|University|College|Organization|Association|Society))\b/i', $text, $match)) {
+            $certificate['issuing_organization'] = trim($match[1]);
+        }
+
+        // Extract dates
+        if (preg_match('/(\d{4}|\w+\s+\d{4})/i', $text, $match)) {
+            $certificate['issue_date'] = $this->standardizeDateFormat($match[1]);
+        }
+
+        // Extract credential ID if present
+        if (preg_match('/(?:id|credential|certificate)[\s#:]*([A-Z0-9\-]+)/i', $text, $match)) {
+            $certificate['credential_id'] = trim($match[1]);
+        }
+
+        return $certificate;
     }
 }
