@@ -308,54 +308,37 @@ class ResumeParser
         $lastName = '';
         $suffix = '';
 
-        // Method 1: Look for "Full Name:" pattern with better filtering
+        // Method 1: Look for "Full Name:" pattern
         if (preg_match('/(?:full\s*name|name)[\s:]+([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)/i', $text, $nameMatch)) {
-            $candidateName = trim($nameMatch[1]);
-            // Validate it's actually a name, not job title or other text
-            if ($this->isValidPersonName($candidateName)) {
-                $fullName = $candidateName;
-            }
+            $fullName = trim($nameMatch[1]);
         }
 
-        // Method 2: Look for name patterns in first few lines with better validation
+        // Method 2: Look for name patterns in first few lines (improved pattern)
         if (!$fullName && !empty($cleanLines)) {
             foreach (array_slice($cleanLines, 0, 5) as $line) {
-                // Skip common resume headers and non-name content
-                if (preg_match('/^(resume|curriculum|cv|contact|profile|objective|summary|email|phone|address|linkedin|github|experience|education|skills|work|employment|position|title|developer|engineer|manager|analyst|specialist|coordinator|director|supervisor|assistant|consultant)/i', $line)) {
+                // Skip common resume headers
+                if (preg_match('/^(resume|curriculum|cv|contact|profile|objective|summary|email|phone|address|linkedin|github)/i', $line)) {
                     continue;
                 }
 
-                // Skip lines with numbers, email patterns, or URLs
-                if (preg_match('/\d{3}|\@|\.com|\.net|\.org|http|www/i', $line)) {
-                    continue;
-                }
-
-                // Enhanced pattern to catch names with better validation
+                // Improved pattern to catch names with middle initials
                 if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', $line, $match)) {
-                    $candidateName = trim($match[1]);
-                    if ($this->isValidPersonName($candidateName) && strlen($candidateName) >= 4 && strlen($candidateName) <= 50) {
-                        $fullName = $candidateName;
-                        break;
-                    }
+                    $fullName = trim($match[1]);
+                    break;
                 }
             }
         }
 
-        // Method 3: Extract from first line with enhanced validation
+        // Method 3: Extract from first line if it looks like a name
         if (!$fullName && !empty($cleanLines)) {
             $firstLine = $cleanLines[0];
             $cleanFirstLine = preg_replace('/^(full\s*name[\s:]*|name[\s:]*)/i', '', $firstLine);
-            $cleanFirstLine = trim($cleanFirstLine);
-
-            if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', $cleanFirstLine, $match)) {
-                $candidateName = trim($match[1]);
-                if ($this->isValidPersonName($candidateName) && strlen($candidateName) >= 4 && strlen($candidateName) <= 50) {
-                    $fullName = $candidateName;
-                }
+            if (preg_match('/^([A-Z][a-z]+(?:\s+[A-Z]\.?(?:\s+[A-Z][a-z]*)*|\s+[A-Z][a-z]*)*(?:\s+(?:Jr|Sr|III?|IV)\.?)?)$/i', trim($cleanFirstLine), $match)) {
+                $fullName = trim($match[1]);
             }
         }
 
-        // Parse name components if we found a valid name
+        // Parse name components (IMPROVED LOGIC)
         if ($fullName) {
             $nameParts = explode(' ', $fullName);
             $nameParts = array_filter($nameParts); // Remove empty elements
@@ -393,6 +376,18 @@ class ResumeParser
 
                     $middleName = implode(' ', $processedMiddle);
                 }
+                // Special case: 3 parts could be "FirstName M. LastName"
+                else if ($nameCount == 3) {
+                    $middlePart = $nameParts[1];
+                    // Check if middle part is an initial
+                    if (preg_match('/^[A-Z]\.?$/', $middlePart)) {
+                        $middleName = $middlePart;
+                        $lastName = $nameParts[2];
+                    } else {
+                        // Treat middle part as part of last name or first name
+                        $lastName = $nameParts[1] . ' ' . $nameParts[2];
+                    }
+                }
             } elseif ($nameCount == 1) {
                 $firstName = $nameParts[0];
             }
@@ -405,111 +400,6 @@ class ResumeParser
             'last_name' => $lastName,
             'suffix' => $suffix
         ];
-    }
-
-    // Add this new validation method
-    private function isValidPersonName($name)
-    {
-        // List of common non-name words that might appear at the beginning of resumes
-        $invalidNames = [
-            'resume',
-            'curriculum',
-            'cv',
-            'vitae',
-            'profile',
-            'contact',
-            'information',
-            'personal',
-            'objective',
-            'summary',
-            'experience',
-            'education',
-            'skills',
-            'work',
-            'employment',
-            'position',
-            'title',
-            'developer',
-            'engineer',
-            'manager',
-            'analyst',
-            'specialist',
-            'coordinator',
-            'director',
-            'supervisor',
-            'assistant',
-            'consultant',
-            'senior',
-            'junior',
-            'lead',
-            'principal',
-            'software',
-            'web',
-            'mobile',
-            'frontend',
-            'backend',
-            'fullstack',
-            'full stack',
-            'data',
-            'system',
-            'network',
-            'security',
-            'database',
-            'project',
-            'product',
-            'business',
-            'marketing',
-            'sales',
-            'customer',
-            'human',
-            'resources',
-            'financial',
-            'email',
-            'phone',
-            'address',
-            'linkedin',
-            'github',
-            'portfolio',
-            'website',
-            'location',
-            'residence'
-        ];
-
-        $nameLower = strtolower(trim($name));
-
-        // Check if it exactly matches any invalid name
-        if (in_array($nameLower, $invalidNames)) {
-            return false;
-        }
-
-        // Check if it starts with common job titles or resume keywords
-        foreach ($invalidNames as $invalid) {
-            if (strpos($nameLower, $invalid) === 0) {
-                return false;
-            }
-        }
-
-        // Must contain only letters, spaces, dots, and common name characters
-        if (!preg_match('/^[A-Za-z.\s\']+$/', $name)) {
-            return false;
-        }
-
-        // Should not contain too many consecutive uppercase letters (like "HTML", "CSS", etc.)
-        if (preg_match('/[A-Z]{3,}/', $name)) {
-            return false;
-        }
-
-        // Should not be too short or too long
-        if (strlen($name) < 2 || strlen($name) > 50) {
-            return false;
-        }
-
-        // Must have at least one vowel (basic name validation)
-        if (!preg_match('/[aeiouAEIOU]/', $name)) {
-            return false;
-        }
-
-        return true;
     }
 
     private function extractEmail($text)
@@ -530,88 +420,13 @@ class ResumeParser
 
     private function extractAddress($text)
     {
-        // List of Rosario, Batangas barangays for better matching
-        $rosarioBarangays = [
-            'Alupay',
-            'Antipolo',
-            'Bagong Pook',
-            'Balibago',
-            'Barangay A',
-            'Barangay B',
-            'Barangay C',
-            'Barangay D',
-            'Barangay E',
-            'Bayawang',
-            'Baybayin',
-            'Bulihan',
-            'Cahigam',
-            'Calantas',
-            'Colongan',
-            'Itlugan',
-            'Leviste',
-            'Lumbangan',
-            'Maalas-as',
-            'Mabato',
-            'Mabunga',
-            'Macalamcam A',
-            'Macalamcam B',
-            'Malaya',
-            'Maligaya',
-            'Marilag',
-            'Masaya',
-            'Matamis',
-            'Mavalor',
-            'Mayuro',
-            'Namuco',
-            'Namunga',
-            'Nasi',
-            'Natu',
-            'Palakpak',
-            'Pinagsibaan',
-            'Putingkahoy',
-            'Quilib',
-            'Salao',
-            'San Carlos',
-            'San Ignacio',
-            'San Isidro',
-            'San Jose',
-            'San Roque',
-            'Santa Cruz',
-            'Timbugan',
-            'Tiquiwan',
-            'Tulos'
-        ];
-
-        // Pattern 1: Look for Rosario, Batangas barangays specifically
-        foreach ($rosarioBarangays as $barangay) {
-            $pattern = '/\b' . preg_quote($barangay, '/') . '\b[,\s]*(?:Rosario)?[,\s]*(?:Batangas)?/i';
-            if (preg_match($pattern, $text, $match)) {
-                $fullAddress = $barangay . ', Rosario, Batangas';
-                error_log("🔍 DEBUG: Found Rosario barangay address: " . $fullAddress);
-                return $fullAddress;
-            }
-        }
-
-        // Pattern 2: Look for "Rosario" with any barangay
-        if (preg_match('/([A-Z][a-zA-Z\s]+),?\s*Rosario[,\s]*Batangas/i', $text, $match)) {
-            return trim($match[0]);
-        }
-
-        // Pattern 3: Look for explicit address labels
-        if (preg_match('/(?:address|location|residence|home)[\s:]*([^\n]+(?:street|avenue|road|blvd|boulevard|drive|lane|way|city|state|province|barangay|rosario|batangas|philippines)[^\n]*)/i', $text, $match)) {
-            $address = trim($match[1]);
-            // Clean up the address
-            $address = preg_replace('/^[•\-\*\+\s]+/', '', $address);
-            return $address;
-        }
-
-        // Pattern 4: Look for City, State pattern (general)
-        if (preg_match('/\b([A-Z][a-zA-Z\s,]+(?:City|Municipality|Province|Batangas|Philippines))\b/i', $text, $match)) {
+        // Pattern 1: Look for explicit address labels
+        if (preg_match('/(?:address|location|residence|home)[\s:]*([^\n]+(?:street|avenue|road|blvd|boulevard|drive|lane|way|city|state|province|country|philippines|usa|america)[^\n]*)/i', $text, $match)) {
             return trim($match[1]);
         }
 
-        // Pattern 5: Look for any location with Batangas
-        if (preg_match('/([A-Z][a-zA-Z\s,]+Batangas[^.\n]*)/i', $text, $match)) {
+        // Pattern 2: Look for City, State pattern
+        if (preg_match('/([A-Z][a-z]+,\s*[A-Z]{2}(?:,?\s*[A-Z]{3})?)/i', $text, $match)) {
             return trim($match[1]);
         }
 

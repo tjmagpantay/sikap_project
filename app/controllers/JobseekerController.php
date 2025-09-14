@@ -468,7 +468,25 @@ class JobseekerController
             }
         }
 
-        // Create or update jobseeker profile - saving all fields including sex, municipal, barangay
+        // FIXED: Properly handle address field
+        $address = isset($data['address']) ? trim($data['address']) : '';
+
+        // Debug logging for address
+        error_log("🔍 DEBUG Step 2: Address value: '" . $address . "'");
+
+        // FIXED: Convert MM/DD/YYYY to YYYY-MM-DD for database
+        $dateOfBirth = $data['date_of_birth'] ?? '';
+        if (!empty($dateOfBirth)) {
+            // Check if it's in MM/DD/YYYY format
+            if (preg_match('/(\d{1,2})\/(\d{1,2})\/(\d{4})/', $dateOfBirth, $match)) {
+                $month = str_pad($match[1], 2, '0', STR_PAD_LEFT);
+                $day = str_pad($match[2], 2, '0', STR_PAD_LEFT);
+                $year = $match[3];
+                $dateOfBirth = $year . '-' . $month . '-' . $day;
+            }
+        }
+
+        // Create or update jobseeker profile - saving all fields including sex, address
         $result = $this->jobseekerModel->createOrUpdateProfile($_SESSION['user_id'], [
             'first_name' => $data['first_name'],
             'middle_name' => $data['middle_name'] ?? '',
@@ -476,7 +494,7 @@ class JobseekerController
             'suffix' => $data['suffix'] ?? '',
             'date_of_birth' => $data['date_of_birth'],
             'sex' => $data['sex'],
-            'address' => ($data['municipal'] ?? '') . ' ' . ($data['barangay'] ?? ''),
+            'address' => $address, // FIXED: Use the actual address field
             'contact_no' => $data['contact_no']
         ]);
 
