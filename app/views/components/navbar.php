@@ -25,7 +25,7 @@
 <body class="antialiased">
   <!-- Your existing HTML content -->
 
-  <nav x-data="{ open: false }" class="block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
+  <nav x-data="{ open: false }" class="relative block w-full px-4 py-4 bg-white shadow-md font-inter sm:px-6 md:px-16 lg:px-24">
     <div class="flex flex-wrap items-center justify-between mx-auto max-w-7xl">
       <div class="flex items-center gap-3">
         <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
@@ -49,8 +49,13 @@
         class="relative ml-auto h-6 max-h-[40px] w-6 max-w-[40px] select-none rounded-lg text-center align-middle text-xs font-medium uppercase text-inherit transition-all hover:bg-transparent focus:bg-transparent active:bg-transparent disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none lg:hidden"
         type="button">
         <span class="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- Hamburger Icon -->
+          <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <!-- Close Icon -->
+          <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </span>
       </button>
@@ -66,28 +71,47 @@
       </div>
     </div>
 
-    <!-- Mobile Slide-in Menu -->
+    <!-- Mobile Dropdown Menu - Updated with better styling -->
     <div
       x-show="open"
       @click.away="open = false"
-      x-transition:enter="transition transform duration-300"
-      x-transition:enter-start="translate-x-full"
-      x-transition:enter-end="translate-x-0"
-      x-transition:leave="transition transform duration-300"
-      x-transition:leave-start="translate-x-0"
-      x-transition:leave-end="translate-x-full"
-      class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition ease-in duration-150"
+      x-transition:leave-start="opacity-100 scale-100"
+      x-transition:leave-end="opacity-0 scale-95"
+      class="absolute left-0 right-0 z-50 mt-4 bg-white border border-gray-200 rounded-lg shadow-lg lg:hidden"
       style="display: none;">
-      <ul class="flex flex-col gap-4 mt-8">
-        <li><a href="#popular-jobs" class="nav-link">Job Search</a></li>
-        <li><a href="#" class="nav-link">Programs</a></li>
-        <li><a href="#" class="nav-link">Explore Companies</a></li>
-        <li><a href="#" class="nav-link">Community</a></li>
-        <li class="flex flex-col gap-2 mt-4">
-          <a href="?page=login-jobseeker" class="w-full text-center btn-outline">Sign In</a>
-          <a href="?page=login-employer" class="w-full text-center btn-primary">Post A Job</a>
-        </li>
-      </ul>
+      <div class="p-4">
+        <ul class="flex flex-col gap-3">
+          <li><a href="#popular-jobs" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Job Search</a></li>
+          <li><a href="?page=program-events" class="block px-3 py-2 text-base text-gray-700 rounded-md m hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Programs</a></li>
+          <li><a href="#top-companies" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Explore Companies</a></li>
+          <li><a href="?page=about-us" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">About Us</a></li>
+
+          <!-- Mobile Action Buttons -->
+          <li class="pt-3 mt-2 border-t border-gray-200 mborder-t">
+            <div class="flex flex-col gap-2 mt-4">
+              <button
+                type="button" 
+                class="w-full px-4 py-2 text-sm font-semibold text-center border border-gray-300 rounded-md hover:bg-gray-100"
+                onclick="window.location.href='?page=login-jobseeker';"
+                @click="open = false">
+                Sign In
+              </button>
+              <button
+                type="button"
+                class="w-full px-4 py-2 text-sm text-center text-white rounded-md bg-primary hover:bg-primary/90font-semibold"
+                onclick="window.location.href='?page=login-employer';"
+                @click="open = false">
+                Post A Job
+              </button>
+            </div>
+          </li>
+
+        </ul>
+      </div>
     </div>
   </nav>
 
@@ -116,15 +140,6 @@
               top: targetPosition,
               behavior: 'smooth'
             });
-
-            // Close mobile menu if open (for Alpine.js)
-            if (window.Alpine && window.Alpine.store) {
-              // Close mobile menu
-              const mobileMenu = document.querySelector('[x-data]');
-              if (mobileMenu && mobileMenu._x_dataStack) {
-                mobileMenu._x_dataStack[0].open = false;
-              }
-            }
           }
         });
       });

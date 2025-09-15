@@ -76,20 +76,11 @@
                     </div>
                 </div>
 
-                <!-- CTA Button -->
-                <div class="flex justify-center md:justify-start">
-                    <a href="?page=signup-jobseeker" class="relative inline-flex items-center px-8 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-xl group bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 hover:shadow-2xl hover:-translate-y-1 hover:scale-105">
-                        <span class="relative z-10 mr-3">Get Started Today</span>
-                        <svg class="relative z-10 w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                        </svg>
-                        <div class="absolute inset-0 transition-opacity duration-300 opacity-0 rounded-xl bg-gradient-to-r from-blue-400 to-blue-600 group-hover:opacity-20"></div>
-                    </a>
-                </div>
+                
             </div>
 
             <!-- Right Image Section - Hidden below 640px -->
-            <div class="relative flex items-center justify-center hidden p-4 sm:block">
+            <div class="relative items-center justify-center hidden p-4 sm:block">
                 <!-- Background gradient overlay -->
                 <div class="absolute inset-0 transition-transform duration-300 transform rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 hover:scale-105"></div>
 
