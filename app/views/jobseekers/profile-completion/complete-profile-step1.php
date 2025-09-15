@@ -6,14 +6,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                </div>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
+
+            <h2 class="mt-2 text-3xl font-extrabold text-center text-gray-900">
                 Upload Your Documents
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
@@ -133,46 +127,50 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Upload your professional resume in PDF format. Max file size 5 MB.
                     </p>
 
-                    <div class="grid grid-cols-2 gap-4 mt-2 mb-6 bg-gray-100 rounded-md">
-                        <!-- Left Column - Current Resume Display -->
-                        <div class="flex items-center justify-center">
+                    <div class="grid grid-cols-2 gap-6 p-4 py-6 mt-2 mb-6 rounded-md bg-gray-50 text-primary"
+                        style="border-width:2px; border-style:dashed !important; border-color:currentColor !important;">
+
+                        <!-- Right Column - Current Resume Display -->
+                        <div class="flex flex-col items-center justify-center text-center">
                             <?php if (!empty($resumeDoc)): ?>
-                                <div class="text-center">
-                                    <a href="view-document.php?doc_id=<?php echo $resumeDoc['document_id']; ?>" target="_blank" class="block transition-transform hover:scale-105">
-                                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md hover:bg-red-200">
-                                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                        <p class="mt-1 text-xs text-blue-600 underline hover:text-blue-800">View Resume</p>
-                                    </a>
-                                </div>
+                                <!-- FIXED: Use the correct document viewing URL -->
+                                <a href="?page=view-document&doc_id=<?php echo htmlspecialchars($resumeDoc['document_id']); ?>" target="_blank" class="transition-transform hover:scale-105">
+                                    <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-md hover:bg-red-200">
+                                        <img
+                                    src="../public/assets/icons/pdf-icon.png"
+                                    alt="Icon"
+                                    class="object-cover w-8 h-8" />
+                                    </div>
+                                    <p class="mt-2 text-xs font-medium text-red-400">
+                                        <?php echo htmlspecialchars($resumeDoc['original_filename'] ?? $resumeDoc['file_name'] ?? 'Resume.pdf'); ?>
+                                    </p>
+                                </a>
                             <?php else: ?>
-                                <div class="flex items-center justify-center w-16 h-16 border-2 border-gray-300 border-dashed rounded-md">
-                                    <svg class="w-6 h-6 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                </div>
+                                <p class="text-sm text-gray-500">No resume uploaded yet.</p>
                             <?php endif; ?>
+
+                            <p class="mt-3 text-xs text-gray-500">
+                                Ensure your resume is updated and professional.
+                            </p>
                         </div>
 
-                        <!-- Right Column - Upload/Edit Function -->
-                        <div class="flex flex-col justify-center">
-                            <div class="flex justify-center px-4 py-3 transition-colors border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400">
-                                <div class="text-center">
-                                    <svg class="w-6 h-6 mx-auto mb-2 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                    <div class="flex text-sm text-gray-600">
-                                        <label for="resume" class="relative font-medium bg-white rounded-md cursor-pointer text-primary hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                                            <span><?php echo !empty($resumeDoc) ? 'Replace resume' : 'Upload resume'; ?></span>
-                                            <input id="resume" name="resume" type="file" class="sr-only" accept=".pdf">
-                                        </label>
-                                    </div>
-                                    <p class="mt-1 text-xs text-gray-500">PDF up to 5MB</p>
-                                </div>
-                            </div>
+                        <!-- Left Column - Upload/Edit Function -->
+                        <div class="flex flex-col justify-center text-center">
+                            <svg viewBox="0 0 1024 1024" class="w-12 h-12 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M736.68 435.86a173.773 173.773 0 0 1 172.042 172.038c0.578 44.907-18.093 87.822-48.461 119.698-32.761 34.387-76.991 51.744-123.581 52.343-68.202 0.876-68.284 106.718 0 105.841 152.654-1.964 275.918-125.229 277.883-277.883 1.964-152.664-128.188-275.956-277.883-277.879-68.284-0.878-68.202 104.965 0 105.842zM285.262 779.307A173.773 173.773 0 0 1 113.22 607.266c-0.577-44.909 18.09-87.823 48.461-119.705 32.759-34.386 76.988-51.737 123.58-52.337 68.2-0.877 68.284-106.721 0-105.842C132.605 331.344 9.341 454.607 7.379 607.266 5.417 759.929 135.565 883.225 285.262 885.148c68.284 0.876 68.2-104.965 0-105.841z" fill="#092c4c"></path>
+                                <path d="M339.68 384.204a173.762 173.762 0 0 1 172.037-172.038c44.908-0.577 87.822 18.092 119.698 48.462 34.388 32.759 51.743 76.985 52.343 123.576 0.877 68.199 106.72 68.284 105.843 0-1.964-152.653-125.231-275.917-277.884-277.879-152.664-1.962-275.954 128.182-277.878 277.879-0.88 68.284 104.964 68.199 105.841 0z" fill="#092c4c"></path>
+                                <path d="M545.039 473.078c16.542 16.542 16.542 43.356 0 59.896l-122.89 122.895c-16.542 16.538-43.357 16.538-59.896 0-16.542-16.546-16.542-43.362 0-59.899l122.892-122.892c16.537-16.542 43.355-16.542 59.894 0z" fill="#F39A2B"></path>
+                                <path d="M485.17 473.078c16.537-16.539 43.354-16.539 59.892 0l122.896 122.896c16.538 16.533 16.538 43.354 0 59.896-16.541 16.538-43.361 16.538-59.898 0L485.17 532.979c-16.547-16.543-16.547-43.359 0-59.901z" fill="#F39A2B"></path>
+                                <path d="M514.045 634.097c23.972 0 43.402 19.433 43.402 43.399v178.086c0 23.968-19.432 43.398-43.402 43.398-23.964 0-43.396-19.432-43.396-43.398V677.496c0.001-23.968 19.433-43.399 43.396-43.399z" fill="#F39A2B"></path>
+                            </svg>
+
+                            <label for="resume" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/80">
+                                <?php echo !empty($resumeDoc) ? 'Replace Resume' : 'Upload Resume'; ?>
+                                <input id="resume" name="resume" type="file" class="sr-only" accept=".pdf">
+                            </label>
+                            <p class="mt-2 text-xs text-gray-500">PDF format only, max 5MB</p>
                         </div>
+
                     </div>
                 </div>
 
@@ -185,48 +183,52 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Upload your CV in PDF format if different from your resume. Max file size 5 MB.
                     </p>
 
-                    <div class="grid grid-cols-2 gap-4 mt-2 mb-6 bg-gray-100 rounded-md">
+                    <div class="grid grid-cols-2 gap-6 p-4 py-6 mt-2 mb-6 rounded-md bg-gray-50 text-primary"
+                        style="border-width:2px; border-style:dashed !important; border-color:currentColor !important;">
+
                         <!-- Left Column - Current CV Display -->
-                        <div class="flex items-center justify-center">
+                        <div class="flex flex-col items-center justify-center text-center">
                             <?php if (!empty($cvDoc)): ?>
-                                <div class="text-center">
-                                    <a href="view-document.php?doc_id=<?php echo $cvDoc['document_id']; ?>" target="_blank" class="block transition-transform hover:scale-105">
-                                        <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-md hover:bg-red-200">
-                                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                        <p class="mt-1 text-xs text-blue-600 underline hover:text-blue-800">View CV</p>
-                                    </a>
-                                </div>
+                                <!-- FIXED: Use the correct document viewing URL -->
+                                <a href="?page=view-document&doc_id=<?php echo htmlspecialchars($cvDoc['document_id']); ?>" target="_blank" class="transition-transform hover:scale-105">
+                                    <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-md hover:bg-red-200">
+                                        <img
+                                    src="../public/assets/icons/pdf-icon.png"
+                                    alt="Icon"
+                                    class="object-cover w-8 h-8" />
+                                    </div>
+                                    <p class="mt-2 text-xs font-medium text-red-400">
+                                        <?php echo htmlspecialchars($cvDoc['original_filename'] ?? $cvDoc['file_name'] ?? 'CV.pdf'); ?>
+                                    </p>
+                                </a>
                             <?php else: ?>
-                                <div class="flex items-center justify-center w-16 h-16 border-2 border-gray-300 border-dashed rounded-md">
-                                    <svg class="w-6 h-6 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                </div>
+                                <p class="text-sm text-gray-500">No CV uploaded yet.</p>
                             <?php endif; ?>
+
+                            <p class="mt-3 text-xs text-gray-500">
+                                Ensure your CV is updated and professional.
+                            </p>
                         </div>
 
                         <!-- Right Column - Upload/Edit Function -->
-                        <div class="flex flex-col justify-center">
-                            <div class="flex justify-center px-4 py-3 transition-colors border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400">
-                                <div class="text-center">
-                                    <svg class="w-6 h-6 mx-auto mb-2 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                    <div class="flex text-sm text-gray-600">
-                                        <label for="cv" class="relative font-medium bg-white rounded-md cursor-pointer text-primary hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                                            <span><?php echo !empty($cvDoc) ? 'Replace CV' : 'Upload CV'; ?></span>
-                                            <input id="cv" name="cv" type="file" class="sr-only" accept=".pdf">
-                                        </label>
-                                    </div>
-                                    <p class="mt-1 text-xs text-gray-500">PDF up to 5MB</p>
-                                </div>
-                            </div>
+                        <div class="flex flex-col justify-center text-center">
+                            <svg viewBox="0 0 1024 1024" class="w-12 h-12 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M736.68 435.86a173.773 173.773 0 0 1 172.042 172.038c0.578 44.907-18.093 87.822-48.461 119.698-32.761 34.387-76.991 51.744-123.581 52.343-68.202 0.876-68.284 106.718 0 105.841 152.654-1.964 275.918-125.229 277.883-277.883 1.964-152.664-128.188-275.956-277.883-277.879-68.284-0.878-68.202 104.965 0 105.842zM285.262 779.307A173.773 173.773 0 0 1 113.22 607.266c-0.577-44.909 18.09-87.823 48.461-119.705 32.759-34.386 76.988-51.737 123.58-52.337 68.2-0.877 68.284-106.721 0-105.842C132.605 331.344 9.341 454.607 7.379 607.266 5.417 759.929 135.565 883.225 285.262 885.148c68.284 0.876 68.2-104.965 0-105.841z" fill="#092c4c"></path>
+                                <path d="M339.68 384.204a173.762 173.762 0 0 1 172.037-172.038c44.908-0.577 87.822 18.092 119.698 48.462 34.388 32.759 51.743 76.985 52.343 123.576 0.877 68.199 106.72 68.284 105.843 0-1.964-152.653-125.231-275.917-277.884-277.879-152.664-1.962-275.954 128.182-277.878 277.879-0.88 68.284 104.964 68.199 105.841 0z" fill="#092c4c"></path>
+                                <path d="M545.039 473.078c16.542 16.542 16.542 43.356 0 59.896l-122.89 122.895c-16.542 16.538-43.357 16.538-59.896 0-16.542-16.546-16.542-43.362 0-59.899l122.892-122.892c16.537-16.542 43.355-16.542 59.894 0z" fill="#F39A2B"></path>
+                                <path d="M485.17 473.078c16.537-16.539 43.354-16.539 59.892 0l122.896 122.896c16.538 16.533 16.538 43.354 0 59.896-16.541 16.538-43.361 16.538-59.898 0L485.17 532.979c-16.547-16.543-16.547-43.359 0-59.901z" fill="#F39A2B"></path>
+                                <path d="M514.045 634.097c23.972 0 43.402 19.433 43.402 43.399v178.086c0 23.968-19.432 43.398-43.402 43.398-23.964 0-43.396-19.432-43.396-43.398V677.496c0.001-23.968 19.433-43.399 43.396-43.399z" fill="#F39A2B"></path>
+                            </svg>
+
+                            <label for="cv" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/80">
+                                <?php echo !empty($cvDoc) ? 'Replace CV' : 'Upload CV'; ?>
+                                <input id="cv" name="cv" type="file" class="sr-only" accept=".pdf">
+                            </label>
+                            <p class="mt-2 text-xs text-gray-500">PDF format only, max 5MB</p>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="flex justify-between">
                     <a href="?page=dashboard" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
