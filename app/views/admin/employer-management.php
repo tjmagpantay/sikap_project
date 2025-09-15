@@ -110,7 +110,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                 <div class="flex items-baseline">
                                     <span class="text-lg font-bold text-orange-600 sm:text-xl" data-stat="pending">
                                         <?php echo count(array_filter($users, function ($user) {
-                                            return $user['status'] === 'pending verification';
+                                            return $user['status'] === 'pending_verification';
                                         })); ?>
                                     </span>
                                     <svg class="ml-1" width="12px" height="12px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -284,7 +284,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Incomplete
                                         </button>
-                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending verification')"
+                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending_verification')"
                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Pending
                                         </button>
@@ -354,7 +354,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                 <button onclick="clearAllFilters()" class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                     <i class="mr-1 fas fa-times"></i>Clear Filters
                                 </button>
-                                <button onclick="exportResults('pdf')" class="px-3 py-2 text-sm text-white border rounded-lg bg-primary border-primary hover:bg-primary/90">
+                                <button onclick="exportToPDF()" class="px-3 py-2 text-sm text-white border rounded-lg bg-primary border-primary hover:bg-primary/90">
                                     <i class="mr-1 fas fa-file-pdf"></i>Export PDF
                                 </button>
                             </div>
@@ -878,67 +878,74 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         }
 
         // Export functionality
-        function exportResults(format) {
-            if (format !== 'pdf') {
-                alert('Only PDF export is supported');
-                return;
-            }
-
-            // Show loading state
-            const loadingMessage = document.createElement('div');
-            loadingMessage.className = 'fixed top-4 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded z-50';
-            loadingMessage.innerHTML = '<i class="mr-2 fas fa-spinner fa-spin"></i>Generating PDF...';
-            document.body.appendChild(loadingMessage);
-
-            try {
-                // Collect the data for export
-                const data = [];
-                filteredRows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 5) {
-                        data.push({
-                            company: cells[0].textContent.trim(),
-                            contact: cells[1].textContent.trim(),
-                            representative: cells[2].textContent.trim(),
-                            status: cells[3].textContent.trim(),
-                            registered: cells[4].textContent.trim()
-                        });
+        function exportToPDF() {
+            // Get visible rows
+            const visibleRows = Array.from(document.querySelectorAll('#employersTableBody tr'))
+                .filter(row => row.style.display !== 'none');
+            
+            // Create print window
+            const printWindow = window.open('', '', 'height=600,width=800');
+            
+            // Build HTML content
+            printWindow.document.write('<html><head><title>Employers Report</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write(`
+                table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f8f9fa; }
+                .header { margin-bottom: 20px; text-align: center; }
+                .header h1 { margin: 0; color: #092C4C; }
+                .status-enabled { color: #059669; }
+                .status-disabled { color: #DC2626; }
+                .date { color: #666; font-size: 12px; }
+            `);
+            printWindow.document.write('</style></head><body>');
+            
+            // Add header
+            printWindow.document.write(`
+                <div class="header">
+                    <h1>SIKAP - Employers Report</h1>
+                    <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+                </div>
+            `);
+            
+            // Create table
+            printWindow.document.write('<table><thead><tr>');
+            const headers = ['Company Name', 'Contact', 'Representative', 'Status', 'Registration Date'];
+            headers.forEach(header => {
+                printWindow.document.write(`<th>${header}</th>`);
+            });
+            printWindow.document.write('</tr></thead><tbody>');
+            
+            // Add rows
+            visibleRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                printWindow.document.write('<tr>');
+                // Only include the first 6 cells (excluding the actions column)
+                for (let i = 0; i < 5; i++) {
+                    if (i === 4) { // Status column
+                        const status = cells[i].textContent.trim();
+                        printWindow.document.write(`
+                            <td class="status-${status.toLowerCase()}">
+                                ${status}
+                            </td>
+                        `);
+                    } else {
+                        printWindow.document.write(`<td>${cells[i].textContent.trim()}</td>`);
                     }
-                });
-
-                if (data.length === 0) {
-                    throw new Error('No data to export');
                 }
-
-                // Create the form
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'index.php?page=admin-export-pdf';
-                form.target = '_blank'; // This will open in a new tab
-                
-                // Add the data as a hidden field
-                const dataInput = document.createElement('input');
-                dataInput.type = 'hidden';
-                dataInput.name = 'data';
-                dataInput.value = JSON.stringify(data);
-                form.appendChild(dataInput);
-
-                // Add to document and submit
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-
-                // Show success message
-                loadingMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
-                loadingMessage.innerHTML = '<i class="mr-2 fas fa-check"></i>PDF generation started';
-            } catch (error) {
-                console.error('Export error:', error);
-                loadingMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
-                loadingMessage.innerHTML = `<i class="mr-2 fas fa-exclamation-circle"></i>${error.message || 'Failed to generate PDF'}`;
-            }
-
-            // Remove message after delay
-            setTimeout(() => loadingMessage.remove(), 3000);
+                printWindow.document.write('</tr>');
+            });
+            
+            printWindow.document.write('</tbody></table>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.focus();
+                printWindow.print();
+            };
         }
 
         // Enhanced suspend/unsuspend functionality with proper API endpoint
@@ -1028,7 +1035,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             rows.forEach(row => {
                 const status = row.getAttribute('data-status');
                 if (status === 'incomplete') counts.incomplete++;
-                if (status === 'pending verification') counts.pending++;
+                if (status === 'pending_verification') counts.pending++;
                 if (status === 'verified') counts.verified++;
                 if (status === 'rejected') counts.rejected++;
                 if (status === 'suspended') counts.suspended++;

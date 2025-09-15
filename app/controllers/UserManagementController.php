@@ -140,129 +140,18 @@ class UserManagementController {
     }
 
     public function exportEmployersPDF() {
+        // This is just a response endpoint, actual export happens in JavaScript
         try {
-            // Clear any existing output
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-            
-            error_log("Starting PDF export...");
-            
-            if (!isset($_POST['data'])) {
-                error_log("No data received in POST");
-                die("Error: No data provided for PDF generation");
-            }
-
-            // Get the JSON data from POST
-            $jsonData = $_POST['data'] ?? '';
-            $data = json_decode($jsonData, true);
-            
-            if (empty($data)) {
-                die("No data provided for PDF generation");
-            }
-
-        require_once __DIR__ . '/../../vendor/autoload.php';
-        require_once __DIR__ . '/../../vendor/mpdf/mpdf/mpdf.php';
-
-        // Create new PDF instance (using mPDF 6.1 syntax)
-        $mpdf = new \mPDF(
-            '',    // mode - default ''
-            'A4',    // format - A4, for example, default ''
-            0,     // font size - default 0
-            '',    // default font family
-            20,    // margin_left
-            20,    // margin right
-            20,    // margin top
-            20,    // margin bottom
-            15,    // margin header
-            15     // margin footer
-        );
-
-        // Add title
-        $mpdf->WriteHTML('
-            <style>
-                h1 { color: #092C4C; font-size: 24px; text-align: center; margin-bottom: 20px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th { background-color: #092C4C; color: white; padding: 10px; text-align: left; }
-                td { padding: 8px; border-bottom: 1px solid #ddd; }
-                tr:nth-child(even) { background-color: #f9f9f9; }
-                .status-badge {
-                    padding: 4px 8px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    display: inline-block;
-                }
-                .status-verified { background-color: #dcfce7; color: #166534; }
-                .status-pending { background-color: #fff7ed; color: #9a3412; }
-                .status-rejected { background-color: #fee2e2; color: #991b1b; }
-                .status-suspended { background-color: #fef9c3; color: #854d0e; }
-                .status-incomplete { background-color: #f3f4f6; color: #4b5563; }
-            </style>
-            <h1>Employers List</h1>
-        ');
-
-        // Start table
-        $html = '
-        <table>
-            <thead>
-                <tr>
-                    <th>Company</th>
-                    <th>Contact</th>
-                    <th>Representative</th>
-                    <th>Status</th>
-                    <th>Registration Date</th>
-                </tr>
-            </thead>
-            <tbody>';
-
-        // Add data rows
-        foreach ($data as $row) {
-            // Determine status style
-            $statusClass = match(strtolower($row['status'])) {
-                'verified' => 'status-verified',
-                'pending verification' => 'status-pending',
-                'rejected' => 'status-rejected',
-                'suspended' => 'status-suspended',
-                'incomplete' => 'status-incomplete',
-                default => ''
-            };
-
-            $html .= sprintf('
-                <tr>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td><span class="status-badge %s">%s</span></td>
-                    <td>%s</td>
-                </tr>',
-                htmlspecialchars($row['company']),
-                htmlspecialchars($row['contact']),
-                htmlspecialchars($row['representative']),
-                $statusClass,
-                htmlspecialchars($row['status']),
-                htmlspecialchars($row['registered'])
-            );
-        }
-
-        // Close table
-        $html .= '</tbody></table>';
-
-        // Add page footer with generation date
-        $mpdf->SetFooter('Generated on ' . date('Y-m-d H:i:s') . '|Page {PAGENO}|SIKAP Employers List');
-
-        // Write HTML content
-        $mpdf->WriteHTML($html);
-
-        // Set headers for download
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="employers_list_' . date('Y-m-d') . '.pdf"');
-
-            // Output the PDF
-            $mpdf->Output('employers_list.pdf', 'I');
-            exit;
+            $employers = $this->model->getUsersByType('employer');
+            $this->sendJson([
+                'success' => true,
+                'data' => $employers
+            ]);
         } catch (Exception $e) {
-            error_log("PDF generation error: " . $e->getMessage());
-            die("Error generating PDF: " . $e->getMessage());
+            $this->sendJson([
+                'success' => false,
+                'error' => 'Error fetching employers: ' . $e->getMessage()
+            ]);
         }
     }
 }
