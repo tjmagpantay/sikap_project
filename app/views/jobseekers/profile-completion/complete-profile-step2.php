@@ -107,7 +107,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=2">
+            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=2" id="profileForm">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <!-- First Name -->
                     <div>
@@ -118,7 +118,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <input id="first_name" name="first_name" type="text" required
                                 value="<?php echo htmlspecialchars($jobseeker['first_name'] ?? $_POST['first_name'] ?? $user['first_name'] ?? ''); ?>"
                                 placeholder="First Name"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                maxlength="50"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="validateName(this, 'first_name')">
+                            <div id="first_name_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
 
@@ -131,7 +134,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <input id="last_name" name="last_name" type="text" required
                                 value="<?php echo htmlspecialchars($jobseeker['last_name'] ?? $_POST['last_name'] ?? $user['last_name'] ?? ''); ?>"
                                 placeholder="Last Name"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                maxlength="50"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="validateName(this, 'last_name')">
+                            <div id="last_name_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
                 </div>
@@ -146,83 +152,184 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <input id="middle_name" name="middle_name" type="text"
                                 value="<?php echo htmlspecialchars($jobseeker['middle_name'] ?? $_POST['middle_name'] ?? $user['middle_name'] ?? ''); ?>"
                                 placeholder="Middle Name"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                maxlength="50"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="validateMiddleName(this)">
+                            <div id="middle_name_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
 
-                    <!-- Suffix -->
+                    <!-- Suffix - IMPROVED DROPDOWN -->
                     <div>
                         <label for="suffix" class="block mb-1 text-xs font-medium text-gray-500">
                             Suffix
                         </label>
-                        <div class="mt-1">
-                            <select id="suffix" name="suffix"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                <option value="">Suffix</option>
-                                <option value="Jr." <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'Jr.' ? 'selected' : ''; ?>>Jr.</option>
-                                <option value="Sr." <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'Sr.' ? 'selected' : ''; ?>>Sr.</option>
-                                <option value="II" <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'II' ? 'selected' : ''; ?>>II</option>
-                                <option value="III" <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'III' ? 'selected' : ''; ?>>III</option>
-                                <option value="IV" <?php echo ($jobseeker['suffix'] ?? $_POST['suffix'] ?? '') === 'IV' ? 'selected' : ''; ?>>IV</option>
-                            </select>
+                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($jobseeker['suffix'] ?? $_POST['suffix'] ?? ''); ?>' || 'Select Suffix' }">
+                            <button type="button" @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                                <span x-text="selected === 'Select Suffix' ? 'Select Suffix' : selected"
+                                    :class="selected === 'Select Suffix' ? 'text-gray-400' : 'text-gray-700'"></span>
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" name="suffix" x-model="selected === 'Select Suffix' ? '' : selected">
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button type="button"
+                                        @click="selected = 'Select Suffix'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Select Suffix
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'Jr.'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Jr.
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'Sr.'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Sr.
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'II'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        II
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'III'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        III
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'IV'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        IV
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'V'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        V
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- Birthdate -->
+                    <!-- Birthdate - FIXED CALENDAR INPUT -->
                     <div>
                         <label for="date_of_birth" class="block mb-1 text-xs font-medium text-gray-500">
                             Birthdate <span class="text-red-500">*</span>
                         </label>
-                        <div class="mt-1">
-                            <input id="date_of_birth" name="date_of_birth" type="text" required
+                        <div class="relative mt-1">
+                            <input id="date_of_birth" name="date_of_birth" type="date" required
                                 value="<?php
-                                        // Convert database format (YYYY-MM-DD) to display format (MM/DD/YYYY)
+                                        // Convert display format (MM/DD/YYYY) to HTML date format (YYYY-MM-DD)
                                         $birthdate = $jobseeker['date_of_birth'] ?? $_POST['date_of_birth'] ?? '';
-                                        if (!empty($birthdate) && preg_match('/(\d{4})-(\d{2})-(\d{2})/', $birthdate, $match)) {
-                                            echo htmlspecialchars($match[2] . '/' . $match[3] . '/' . $match[1]);
-                                        } else {
-                                            echo htmlspecialchars($birthdate);
+                                        if (!empty($birthdate)) {
+                                            // If it's already in YYYY-MM-DD format, use it
+                                            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthdate)) {
+                                                echo htmlspecialchars($birthdate);
+                                            }
+                                            // If it's in MM/DD/YYYY format, convert it
+                                            elseif (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $birthdate, $match)) {
+                                                echo htmlspecialchars(sprintf('%04d-%02d-%02d', $match[3], $match[1], $match[2]));
+                                            }
                                         }
                                         ?>"
-                                placeholder="MM/DD/YYYY"
-                                maxlength="10"
+                                max="<?php echo date('Y-m-d', strtotime('-16 years')); ?>"
+                                min="1940-01-01"
                                 class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
-                                oninput="formatDateInput(this)"
-                                onblur="validateDateInput(this)">
+                                onchange="validateBirthdate(this)">
+                            <div id="date_of_birth_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                         <div class="mt-1 text-xs text-gray-500">
-                            Format: MM/DD/YYYY
+                            Must be at least 16 years old
                         </div>
                     </div>
 
-                    <!-- Gender -->
+                    <!-- Gender - IMPROVED DROPDOWN -->
                     <div>
                         <label for="sex" class="block mb-1 text-xs font-medium text-gray-500">
                             Gender <span class="text-red-500">*</span>
                         </label>
-                        <div class="mt-1">
-                            <select id="sex" name="sex" required
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                <option value="">Gender</option>
-                                <option value="Male" <?php echo ($jobseeker['sex'] ?? $_POST['sex'] ?? '') === 'Male' ? 'selected' : ''; ?>>Male</option>
-                                <option value="Female" <?php echo ($jobseeker['sex'] ?? $_POST['sex'] ?? '') === 'Female' ? 'selected' : ''; ?>>Female</option>
-                                <option value="Other" <?php echo ($jobseeker['sex'] ?? $_POST['sex'] ?? '') === 'Other' ? 'selected' : ''; ?>>Other</option>
-                            </select>
+                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($jobseeker['sex'] ?? $_POST['sex'] ?? ''); ?>' || 'Select Gender' }">
+                            <button type="button" @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                                <span x-text="selected === 'Select Gender' ? 'Select Gender' : selected"
+                                    :class="selected === 'Select Gender' ? 'text-gray-400' : 'text-gray-700'"></span>
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" name="sex" x-model="selected === 'Select Gender' ? '' : selected" required>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button type="button"
+                                        @click="selected = 'Male'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Male
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'Female'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Female
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'Prefer not to say'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Prefer not to say
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <div id="sex_error" class="hidden mt-1 text-xs text-red-600"></div>
                     </div>
                 </div>
 
                 <!-- Address -->
                 <div>
                     <label for="address" class="block mb-1 text-xs font-medium text-gray-500">
-                        Complete Address
+                        Complete Address <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
-                        <textarea id="address" name="address" rows="3"
+                        <textarea id="address" name="address" rows="3" required
                             placeholder="Complete Address"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"><?php echo htmlspecialchars($jobseeker['address'] ?? $_POST['address'] ?? ''); ?></textarea>
+                            maxlength="200"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                            oninput="validateAddress(this)"><?php echo htmlspecialchars($jobseeker['address'] ?? $_POST['address'] ?? ''); ?></textarea>
+                        <div id="address_error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="address_count">0</span>/200 characters
+                        </div>
                     </div>
                 </div>
 
@@ -235,8 +342,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         <div class="mt-1">
                             <input id="contact_no" name="contact_no" type="tel" required
                                 value="<?php echo htmlspecialchars($jobseeker['contact_no'] ?? $_POST['contact_no'] ?? ''); ?>"
-                                placeholder="Phone Number"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                placeholder="09123456789 or +639123456789"
+                                maxlength="13"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="validatePhoneNumber(this)">
+                            <div id="contact_no_error" class="hidden mt-1 text-xs text-red-600"></div>
+                            <div class="mt-1 text-xs text-gray-500">
+                                Format: 09123456789 or +639123456789
+                            </div>
                         </div>
                     </div>
 
@@ -262,7 +375,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                         Previous Step
                     </a>
                     <button type="submit" name="submit_step2"
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700"
+                        id="submitBtn">
                         <?php echo ($jobseeker && (!empty($jobseeker['first_name']) || !empty($jobseeker['last_name'])) ? 'Update & Continue' : 'Next Step'); ?>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -275,68 +389,223 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 </div>
 
 <script>
-    function formatDateInput(input) {
-        let value = input.value.replace(/\D/g, ''); // Remove non-digits
+    // Validation functions
+    function validateName(input, fieldName) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById(fieldName + '_error');
+        const nameRegex = /^[a-zA-Z\s]+$/;
 
-        if (value.length >= 2) {
-            value = value.substring(0, 2) + '/' + value.substring(2);
-        }
-        if (value.length >= 5) {
-            value = value.substring(0, 5) + '/' + value.substring(5, 9);
-        }
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
 
-        input.value = value;
-    }
-
-    function validateDateInput(input) {
-        const dateValue = input.value;
-        const dateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-        const match = dateValue.match(dateRegex);
-
-        if (!match) {
-            if (dateValue) {
-                input.setCustomValidity('Please enter date in MM/DD/YYYY format');
-                input.classList.add('border-red-500');
-            } else {
-                input.setCustomValidity('Birthdate is required');
-                input.classList.add('border-red-500');
+        if (value === '') {
+            if (fieldName !== 'middle_name') {
+                showError(input, errorDiv, 'This field is required');
+                return false;
             }
+            return true;
+        }
+
+        if (value.length < 2) {
+            showError(input, errorDiv, 'Must be at least 2 characters');
             return false;
         }
 
-        const month = parseInt(match[1]);
-        const day = parseInt(match[2]);
-        const year = parseInt(match[3]);
-
-        // Validate ranges
-        if (month < 1 || month > 12) {
-            input.setCustomValidity('Month must be between 1 and 12');
-            input.classList.add('border-red-500');
+        if (value.length > 50) {
+            showError(input, errorDiv, 'Must be less than 50 characters');
             return false;
         }
 
-        if (day < 1 || day > 31) {
-            input.setCustomValidity('Day must be between 1 and 31');
-            input.classList.add('border-red-500');
+        if (!nameRegex.test(value)) {
+            showError(input, errorDiv, 'Only letters and spaces are allowed');
             return false;
         }
 
-        const currentYear = new Date().getFullYear();
-        if (year < 1940 || year > (currentYear - 16)) {
-            input.setCustomValidity(`Year must be between 1940 and ${currentYear - 16}`);
-            input.classList.add('border-red-500');
-            return false;
-        }
-
-        // If we get here, date is valid
-        input.setCustomValidity('');
-        input.classList.remove('border-red-500');
+        // Valid
         input.classList.add('border-green-500');
         return true;
     }
 
-    // Add event listener for real-time validation
-    document.getElementById('date_of_birth').addEventListener('input', function() {
-        this.classList.remove('border-red-500', 'border-green-500');
+    function validateMiddleName(input) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById('middle_name_error');
+        const nameRegex = /^[a-zA-Z\s]*$/; // Allow empty for middle name
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (value === '') {
+            return true; // Middle name is optional
+        }
+
+        if (value.length > 50) {
+            showError(input, errorDiv, 'Must be less than 50 characters');
+            return false;
+        }
+
+        if (!nameRegex.test(value)) {
+            showError(input, errorDiv, 'Only letters and spaces are allowed');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateBirthdate(input) {
+        const value = input.value;
+        const errorDiv = document.getElementById('date_of_birth_error');
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (!value) {
+            showError(input, errorDiv, 'Birthdate is required');
+            return false;
+        }
+
+        const birthDate = new Date(value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 16) {
+            showError(input, errorDiv, 'You must be at least 16 years old');
+            return false;
+        }
+
+        if (birthDate.getFullYear() < 1940) {
+            showError(input, errorDiv, 'Year must be 1940 or later');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateAddress(input) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById('address_error');
+        const countSpan = document.getElementById('address_count');
+        const addressRegex = /^[a-zA-Z0-9\s,.#-]*$/;
+
+        // Update character count
+        countSpan.textContent = value.length;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (value === '') {
+            showError(input, errorDiv, 'Address is required');
+            return false;
+        }
+
+        if (value.length > 200) {
+            showError(input, errorDiv, 'Address must be less than 200 characters');
+            return false;
+        }
+
+        if (!addressRegex.test(value)) {
+            showError(input, errorDiv, 'Address contains invalid characters');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validatePhoneNumber(input) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById('contact_no_error');
+
+        // Allow only digits, +, and remove spaces
+        let cleanValue = value.replace(/[^\d+]/g, '');
+        input.value = cleanValue;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (cleanValue === '') {
+            showError(input, errorDiv, 'Phone number is required');
+            return false;
+        }
+
+        // Philippine number patterns
+        const patterns = [
+            /^09\d{9}$/, // 09123456789
+            /^\+639\d{9}$/, // +639123456789
+            /^639\d{9}$/ // 639123456789
+        ];
+
+        const isValid = patterns.some(pattern => pattern.test(cleanValue));
+
+        if (!isValid) {
+            showError(input, errorDiv, 'Please enter a valid Philippine phone number');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function showError(input, errorDiv, message) {
+        input.classList.add('border-red-500');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    // Form submission validation
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        let isValid = true;
+
+        // Validate all fields
+        const firstName = document.getElementById('first_name');
+        const lastName = document.getElementById('last_name');
+        const middleName = document.getElementById('middle_name');
+        const birthdate = document.getElementById('date_of_birth');
+        const address = document.getElementById('address');
+        const phone = document.getElementById('contact_no');
+
+        if (!validateName(firstName, 'first_name')) isValid = false;
+        if (!validateName(lastName, 'last_name')) isValid = false;
+        if (!validateMiddleName(middleName)) isValid = false;
+        if (!validateBirthdate(birthdate)) isValid = false;
+        if (!validateAddress(address)) isValid = false;
+        if (!validatePhoneNumber(phone)) isValid = false;
+
+        // Check dropdowns
+        const genderInput = document.querySelector('input[name="sex"]');
+        if (!genderInput.value || genderInput.value === 'Select Gender') {
+            document.getElementById('sex_error').textContent = 'Please select a gender';
+            document.getElementById('sex_error').classList.remove('hidden');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the errors before continuing.');
+        }
+    });
+
+    // Initialize character count for address
+    document.addEventListener('DOMContentLoaded', function() {
+        const addressField = document.getElementById('address');
+        const countSpan = document.getElementById('address_count');
+        if (addressField && countSpan) {
+            countSpan.textContent = addressField.value.length;
+        }
     });
 </script>
