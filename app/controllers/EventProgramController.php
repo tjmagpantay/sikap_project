@@ -76,7 +76,7 @@ class EventProgramController
         // Only allow valid types
         $valid_types = ['program', 'jobfair', 'local recruitment'];
         $type = in_array($_POST['type'], $valid_types) ? $_POST['type'] : 'program';
-        $success = $this->model->createEvent(
+        $eventId = $this->model->createEvent(
             $_POST['title'],
             $_POST['description'],
             $type,
@@ -86,9 +86,9 @@ class EventProgramController
             $_POST['status']
         );
 
-        if ($success) {
-            // Get the created event ID
-            $eventId = $this->model->getDatabase()->lastInsertId();
+        if ($eventId) {
+            // Event was created successfully
+            error_log("✅ Event created successfully with ID: " . $eventId);
 
             error_log("🔍 EventProgramController: Created event ID: $eventId, Status: " . $_POST['status']);
 
