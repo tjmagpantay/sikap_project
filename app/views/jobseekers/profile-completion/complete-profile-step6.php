@@ -3,6 +3,16 @@ include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 
+// Display success/error messages from session
+if (isset($_SESSION['success_message'])) {
+    $success = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
 // Check if we have parsed data in session
 $parsedCertificates = [];
 if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['parsed_resume_data']['certificates'])) {
@@ -13,14 +23,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
+            <h2 class="mt-2 text-3xl font-extrabold text-center text-grayMain">
                 Certificates & Licenses
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
@@ -98,6 +101,53 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 </div>
             </div>
 
+            <!-- Success/Error Messages -->
+            <?php if (!empty($success)): ?>
+                <div class="p-4 mb-4 border border-blue-400 rounded-md bg-blue-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-primary"><?php echo htmlspecialchars($success); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($error)): ?>
+                <div class="p-4 mb-4 border border-red-200 rounded-md bg-red-50">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-600"><?php echo htmlspecialchars($error); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Display existing certificates if available -->
+            <?php if (!empty($certificates) && is_array($certificates) && count($certificates) > 0): ?>
+                <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <h3 class="mb-4 font-medium text-grayMain text-md">Your Current Certificates</h3>
+                    <div class="space-y-2">
+                        <?php foreach ($certificates as $cert): ?>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                <div>
+                                    <h4 class="text-sm font-medium text-primary"><?php echo htmlspecialchars($cert['certificate_title']); ?></h4>
+                                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($cert['issuing_organization']); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo date('M Y', strtotime($cert['date_issued'])); ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Display parsed certificates if available -->
             <?php if (!empty($parsedCertificates)): ?>
                 <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
@@ -111,7 +161,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         <?php foreach ($parsedCertificates as $cert): ?>
                             <li class="text-sm text-green-800">
                                 <?php
-                                // FIXED: Handle different possible key structures
+                                // Handle different possible key structures
                                 $certTitle = '';
                                 if (isset($cert['certificate_title'])) {
                                     $certTitle = $cert['certificate_title'];
@@ -133,14 +183,14 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 </div>
             <?php endif; ?>
 
-            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=6">
+            <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=6" id="certificatesForm">
                 <div>
-                    <label class="block mb-4 text-sm font-medium text-gray-700">Certificates & Licenses</label>
+
                     <div id="certificates-container">
                         <?php
                         $allCertificates = [];
 
-                        // FIXED: Prioritize existing database certificates over parsed ones to avoid duplication
+                        // Prioritize existing database certificates over parsed ones to avoid duplication
                         if (!empty($certificates) && $certificates !== false) {
                             // Use existing database certificates (user has already been through this step)
                             foreach ($certificates as $cert) {
@@ -150,7 +200,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                             // Only use parsed certificates if no database certificates exist
                             if (!empty($parsedCertificates)) {
                                 foreach ($parsedCertificates as $cert) {
-                                    // FIXED: Normalize the certificate data structure
+                                    // Normalize the certificate data structure
                                     $normalizedCert = [
                                         'certificate_title' => '',
                                         'issuing_organization' => '',
@@ -202,7 +252,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         }
 
                         foreach ($allCertificates as $index => $cert): ?>
-                            <div class="p-4 mb-4 space-y-4 border border-gray-200 rounded-lg certificate-row" data-index="<?php echo $index; ?>">
+                            <div class="mb-4 space-y-4 certificate-row" data-index="<?php echo $index; ?>">
 
                                 <!-- Add hidden field for existing certificate ID -->
                                 <?php if (isset($cert['certificate_id'])): ?>
@@ -213,55 +263,42 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 <input type="hidden" name="certificates[<?php echo $index; ?>][delete]" value="0" class="delete-flag">
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
+                                    <label class="block text-xs font-medium text-gray-500">Certificate/License Name</label>
                                     <input type="text"
                                         name="certificates[<?php echo $index; ?>][certificate_title]"
                                         value="<?php echo htmlspecialchars($cert['certificate_title'] ?? ''); ?>"
                                         placeholder="e.g., AWS Certified Solutions Architect"
-                                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                                    <label class="block text-xs font-medium text-gray-500">Issuing Organization</label>
                                     <input type="text"
                                         name="certificates[<?php echo $index; ?>][issuing_organization]"
                                         value="<?php echo htmlspecialchars($cert['issuing_organization'] ?? ''); ?>"
                                         placeholder="e.g., Amazon Web Services"
-                                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                                 </div>
 
                                 <div class="flex gap-4">
                                     <div class="flex-1">
-                                        <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                                        <label class="block text-xs font-medium text-gray-500">Date Issued</label>
                                         <input type="date"
                                             name="certificates[<?php echo $index; ?>][date_issued]"
                                             value="<?php echo htmlspecialchars($cert['date_issued'] ?? ''); ?>"
-                                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                            class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                                     </div>
 
                                     <div class="flex items-end">
-                                        <!-- Replace the complex delete button with this simple one: -->
-                                        <?php if (isset($cert['certificate_id']) && !empty($cert['certificate_id'])): ?>
-                                            <!-- Simple delete form for existing certificates -->
-                                            <form method="POST" action="?page=delete-certificate-simple" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this certificate?')">
-                                                <input type="hidden" name="certificate_id" value="<?php echo $cert['certificate_id']; ?>">
-                                                <button type="submit" class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        <?php else: ?>
-                                            <!-- JavaScript remove for new certificates -->
-                                            <button type="button"
-                                                class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                                onclick="removeNewCertificate(this)"
-                                                title="Remove this certificate">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                            </button>
-                                        <?php endif; ?>
+                                        <!-- Fixed Delete Button for ALL certificates -->
+                                        <button type="button"
+                                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                            onclick="deleteCertificate(this, <?php echo isset($cert['certificate_id']) ? $cert['certificate_id'] : 'null'; ?>)"
+                                            title="Remove this certificate">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -276,16 +313,41 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     </button>
                 </div>
 
-                <div class="flex justify-between">
-                    <a href="?page=complete-jobseeker-profile&step=5"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Previous
-                    </a>
-                    <button type="submit"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Next
-                    </button>
+                <!-- Multiple Button Layout - Fixed to 1 Row -->
+                <div class="flex items-center justify-between">
+                    <!-- Left Side - Previous Button -->
+                    <div>
+                        <a href="?page=complete-jobseeker-profile&step=5"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Previous Step
+                        </a>
+                    </div>
+
+                    <!-- Right Side - Action Buttons -->
+                    <div class="flex gap-2">
+                        <!-- Save Certificates Button -->
+                        <button type="submit" name="save_certificates"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            Save Certificates
+                        </button>
+
+                        <!-- Skip & Continue Button -->
+                        <button type="submit" name="submit_step6"
+                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <span>Skip & Continue</span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+
             </form>
         </div>
     </div>
@@ -327,7 +389,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 <input type="text" 
                        name="certificates[${certificateCount}][certificate_title]" 
                        placeholder="e.g., AWS Certified Solutions Architect" 
-                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                       class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
             </div>
             
             <div>
@@ -335,7 +397,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 <input type="text" 
                        name="certificates[${certificateCount}][issuing_organization]" 
                        placeholder="e.g., Amazon Web Services" 
-                       class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                       class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
             </div>
             
             <div class="flex gap-4">
@@ -343,13 +405,13 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     <label class="block text-sm font-medium text-gray-700">Date Issued</label>
                     <input type="date" 
                            name="certificates[${certificateCount}][date_issued]" 
-                           class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                           class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
                 
                 <div class="flex items-end">
                     <button type="button" 
-                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md remove-certificate hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" 
-                            onclick="removeCertificate(this)"
+                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" 
+                            onclick="deleteCertificate(this, null)"
                             title="Remove this certificate">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -363,12 +425,16 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
             certificateCount++;
         }
 
-        addCertificateBtn.addEventListener('click', function() {
-            addEmptyCertificateRow();
-        });
+        // Add certificate button event listener
+        if (addCertificateBtn) {
+            addCertificateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                addEmptyCertificateRow();
+            });
+        }
 
-        // Enhanced remove certificate function with better debugging
-        window.removeCertificate = function(button) {
+        // Global delete certificate function
+        window.deleteCertificate = function(button, certificateId) {
             const currentRow = button.closest('.certificate-row');
             const visibleRows = document.querySelectorAll('.certificate-row:not(.deleted)');
 
@@ -381,74 +447,51 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 return;
             }
 
-            // Check if this is an existing certificate (has certificate_id)
-            const certificateIdInput = currentRow.querySelector('input[name*="[certificate_id]"]');
+            if (certificateId && certificateId !== 'null') {
+                // This is an existing certificate - use simple delete form approach
+                if (confirm('Are you sure you want to delete this certificate permanently?')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '?page=delete-certificate-simple';
+                    form.style.display = 'none';
 
-            console.log('DEBUG: Certificate ID input:', certificateIdInput);
-            console.log('DEBUG: Certificate ID value:', certificateIdInput ? certificateIdInput.value : 'none');
+                    const certificateIdInput = document.createElement('input');
+                    certificateIdInput.type = 'hidden';
+                    certificateIdInput.name = 'certificate_id';
+                    certificateIdInput.value = certificateId;
 
-            if (certificateIdInput && certificateIdInput.value) {
-                // This is an existing certificate - mark for deletion
-                const deleteFlag = currentRow.querySelector('.delete-flag');
-                console.log('DEBUG: Delete flag input:', deleteFlag);
-
-                if (deleteFlag) {
-                    deleteFlag.value = '1';
-                    console.log('DEBUG: Set delete flag to 1 for certificate ID:', certificateIdInput.value);
+                    form.appendChild(certificateIdInput);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
-
-                // Hide the row visually but keep it in DOM for form submission
-                currentRow.style.display = 'none';
-                currentRow.classList.add('deleted');
-
-                console.log('DEBUG: Hidden row for existing certificate');
             } else {
                 // This is a new certificate - remove from DOM completely
                 if (visibleRows.length > 1) {
                     currentRow.remove();
                     updateIndices();
-                    console.log('DEBUG: Removed new certificate row from DOM');
                 } else {
                     // If it's the last row, just clear the inputs
                     textInputs.forEach(input => input.value = '');
-                    console.log('DEBUG: Cleared inputs of last remaining row');
                 }
             }
         };
 
-        // Add this function to handle new certificate removal
-        window.removeNewCertificate = function(button) {
-            const currentRow = button.closest('.certificate-row');
-            const visibleRows = document.querySelectorAll('.certificate-row:not(.deleted)');
+        // Form validation before submission
+        const form = document.getElementById('certificatesForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (e.submitter && e.submitter.name === 'save_certificates') {
+                    // Check if at least one certificate has a title
+                    const certificateTitles = form.querySelectorAll('input[name*="[certificate_title]"]');
+                    const hasValidCertificate = Array.from(certificateTitles).some(input => input.value.trim() !== '');
 
-            // Check if the row has any data
-            const textInputs = currentRow.querySelectorAll('input[type="text"], input[type="date"]');
-            const hasData = Array.from(textInputs).some(input => input.value.trim() !== '');
-
-            // Confirm deletion if there's data
-            if (hasData && !confirm('Are you sure you want to remove this certificate?')) {
-                return;
-            }
-
-            // This is a new certificate - remove from DOM completely
-            if (visibleRows.length > 1) {
-                currentRow.remove();
-                updateIndices();
-            } else {
-                // If it's the last row, just clear the inputs
-                textInputs.forEach(input => input.value = '');
-            }
-        };
-
-        // Debug form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            console.log('DEBUG: Form submitting...');
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                if (key.includes('certificates')) {
-                    console.log('DEBUG Form data:', key, '=', value);
+                    if (!hasValidCertificate) {
+                        e.preventDefault();
+                        alert('Please fill in at least one certificate title to save.');
+                        return false;
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>

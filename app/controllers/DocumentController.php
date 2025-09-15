@@ -15,8 +15,102 @@ class DocumentController
         $this->jobPostModel = new JobPost();
     }
 
+    public function viewDocument()
+    {
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            die('Access denied - Please login');
+        }
+
+        $documentId = $_GET['doc_id'] ?? null;
+
+        if (!$documentId) {
+            http_response_code(400);
+            die('Document ID required');
+        }
+
+        try {
+            // Get document info from database
+            $document = $this->getDocumentById($documentId);
+
+            // Debug output
+            error_log("DEBUG: Document ID: " . $documentId);
+            error_log("DEBUG: Document data: " . json_encode($document));
+
+            if (!$document) {
+                http_response_code(404);
+                die('Document not found in database');
+            }
+
+            // Security check: Only allow access to own documents or if user is employer/admin
+            $canAccess = false;
+
+            if ($_SESSION['role'] == User::ROLE_JOBSEEKER) {
+                // Jobseekers can only access their own documents
+                $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+                error_log("DEBUG: Current jobseeker: " . json_encode($jobseeker));
+                error_log("DEBUG: Document jobseeker_id: " . $document['jobseeker_id']);
+
+                $canAccess = ($jobseeker && $jobseeker['jobseeker_id'] == $document['jobseeker_id']);
+            } elseif ($_SESSION['role'] == User::ROLE_EMPLOYER || $_SESSION['role'] == User::ROLE_ADMIN) {
+                // Employers and admins can access documents
+                $canAccess = true;
+            }
+
+            if (!$canAccess) {
+                http_response_code(403);
+                die('Access denied - You can only view your own documents');
+            }
+
+            // Build file path - try multiple possible locations
+            $filePath = $this->findDocumentPath($document['file_path']);
+
+            // Debug file path search
+            error_log("DEBUG: Original file_path: " . $document['file_path']);
+            error_log("DEBUG: Found file_path: " . ($filePath ?: 'NOT FOUND'));
+
+            if (!$filePath || !file_exists($filePath)) {
+                http_response_code(404);
+                die('File not found on server: ' . htmlspecialchars($document['file_path']));
+            }
+
+            // Get file extension for content type
+            $fileExtension = strtolower(pathinfo($document['file_name'], PATHINFO_EXTENSION));
+            $contentType = $this->getContentType($fileExtension);
+
+            // Only allow viewing of certain file types
+            $viewableTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'txt'];
+            if (!in_array($fileExtension, $viewableTypes)) {
+                // Force download for non-viewable files
+                header('Location: ?page=download-document&doc_id=' . urlencode($documentId) . '&download=1');
+                exit;
+            }
+
+            // Clear any previous output
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            // Serve the file for viewing
+            header('Content-Type: ' . $contentType);
+            header('Content-Disposition: inline; filename="' . basename($document['file_name']) . '"');
+            header('Content-Length: ' . filesize($filePath));
+            header('Cache-Control: private, max-age=3600');
+            header('Pragma: public');
+
+            readfile($filePath);
+            exit;
+        } catch (Exception $e) {
+            error_log('Document view error: ' . $e->getMessage());
+            http_response_code(500);
+            die('Error viewing document: ' . htmlspecialchars($e->getMessage()));
+        }
+    }
+
     public function downloadDocument()
     {
+        // Same logic as viewDocument but with download headers
         // Check if user is logged in
         if (!isset($_SESSION['user_id'])) {
             http_response_code(403);
@@ -31,59 +125,136 @@ class DocumentController
             die('Document ID required');
         }
 
-        // Get document info from database
-        $document = $this->jobseekerModel->getDocumentById($documentId);
-        if (!$document) {
-            http_response_code(404);
-            die('Document not found');
+        try {
+            // Get document info from database
+            $document = $this->getDocumentById($documentId);
+            if (!$document) {
+                http_response_code(404);
+                die('Document not found');
+            }
+
+            // Security check: Only allow access to own documents or if user is employer/admin
+            $canAccess = false;
+
+            if ($_SESSION['role'] == User::ROLE_JOBSEEKER) {
+                // Jobseekers can only access their own documents
+                $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+                $canAccess = ($jobseeker && $jobseeker['jobseeker_id'] == $document['jobseeker_id']);
+            } elseif ($_SESSION['role'] == User::ROLE_EMPLOYER || $_SESSION['role'] == User::ROLE_ADMIN) {
+                // Employers and admins can access documents
+                $canAccess = true;
+            }
+
+            if (!$canAccess) {
+                http_response_code(403);
+                die('Access denied');
+            }
+
+            // Build file path
+            $filePath = $this->findDocumentPath($document['file_path']);
+
+            if (!$filePath || !file_exists($filePath)) {
+                http_response_code(404);
+                die('File not found');
+            }
+
+            // Get file extension for content type
+            $fileExtension = strtolower(pathinfo($document['file_name'], PATHINFO_EXTENSION));
+            $contentType = $this->getContentType($fileExtension);
+
+            // Clear any previous output
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            // Serve the file
+            header('Content-Type: ' . $contentType);
+
+            if ($isDownload) {
+                // Force download
+                header('Content-Disposition: attachment; filename="' . basename($document['file_name']) . '"');
+            } else {
+                // View in browser
+                header('Content-Disposition: inline; filename="' . basename($document['file_name']) . '"');
+            }
+
+            header('Content-Length: ' . filesize($filePath));
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+
+            readfile($filePath);
+            exit;
+        } catch (Exception $e) {
+            error_log('Document download error: ' . $e->getMessage());
+            http_response_code(500);
+            die('Error downloading document');
+        }
+    }
+
+    private function getDocumentById($documentId)
+    {
+        try {
+            $config = require __DIR__ . '/../../config/sikap_db.php';
+            $db = new PDO(
+                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                $config['db_user'],
+                $config['db_pass']
+            );
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // FIXED: Use correct table name 'jobseeker' instead of 'jobseekers'
+            $sql = "SELECT d.*, j.user_id 
+                    FROM jobseeker_documents d 
+                    JOIN jobseeker j ON d.jobseeker_id = j.jobseeker_id 
+                    WHERE d.document_id = ?";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$documentId]);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("DEBUG: SQL Query result: " . json_encode($result));
+
+            return $result;
+        } catch (Exception $e) {
+            error_log('Database error in getDocumentById: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function findDocumentPath($filePath)
+    {
+        // Clean the file path
+        $filePath = ltrim($filePath, '/\\');
+
+        // Debug the original file path
+        error_log("DEBUG: Searching for file: " . $filePath);
+
+        // Try multiple possible paths based on your upload structure
+        $possiblePaths = [
+            // Direct path from root
+            __DIR__ . '/../../' . $filePath,
+            // From uploads folder (your actual structure)
+            __DIR__ . '/../../uploads/documents/' . basename($filePath),
+            // Public folder paths
+            __DIR__ . '/../../public/' . $filePath,
+            __DIR__ . '/../../public/uploads/' . basename($filePath),
+            __DIR__ . '/../../public/uploads/documents/' . basename($filePath),
+            __DIR__ . '/../../public/uploads/jobseeker_documents/' . basename($filePath),
+            // Other possible locations
+            __DIR__ . '/../../uploads/' . basename($filePath),
+            __DIR__ . '/../../uploads/jobseeker_documents/' . basename($filePath)
+        ];
+
+        foreach ($possiblePaths as $path) {
+            error_log("DEBUG: Checking path: " . $path);
+            if (file_exists($path)) {
+                error_log("DEBUG: Found file at: " . $path);
+                return $path;
+            }
         }
 
-        // Security check: Only allow access to own documents or if user is employer/admin
-        $canAccess = false;
-
-        if ($_SESSION['role'] == User::ROLE_JOBSEEKER) {
-            // Jobseekers can only access their own documents
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-            $canAccess = ($jobseeker && $jobseeker['jobseeker_id'] == $document['jobseeker_id']);
-        } elseif ($_SESSION['role'] == User::ROLE_EMPLOYER || $_SESSION['role'] == User::ROLE_ADMIN) {
-            // Employers and admins can access documents (add more specific checks if needed)
-            $canAccess = true;
-        }
-
-        if (!$canAccess) {
-            http_response_code(403);
-            die('Access denied');
-        }
-
-        // Build file path
-        $filePath = __DIR__ . '/../../' . $document['file_path'];
-
-        if (!file_exists($filePath)) {
-            http_response_code(404);
-            die('File not found');
-        }
-
-        // Get file extension for content type
-        $fileExtension = strtolower(pathinfo($document['file_name'], PATHINFO_EXTENSION));
-        $contentType = $this->getContentType($fileExtension);
-
-        // Serve the file
-        header('Content-Type: ' . $contentType);
-
-        if ($isDownload) {
-            // Force download
-            header('Content-Disposition: attachment; filename="' . basename($document['file_name']) . '"');
-        } else {
-            // View in browser
-            header('Content-Disposition: inline; filename="' . basename($document['file_name']) . '"');
-        }
-
-        header('Content-Length: ' . filesize($filePath));
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-
-        readfile($filePath);
-        exit;
+        error_log("DEBUG: File not found in any of the expected locations");
+        return false;
     }
 
     public function downloadJobAttachment()

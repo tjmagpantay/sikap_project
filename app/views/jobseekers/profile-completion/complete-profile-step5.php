@@ -23,14 +23,8 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                    </svg>
-                </div>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
+
+            <h2 class="mt-2 text-3xl font-extrabold text-center text-grayMain">
                 Skills & Expertise
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
@@ -108,16 +102,16 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                 </div>
             </div>
 
-            <!-- Success/Error Messages (like Step 4) -->
+            <!-- Success/Error Messages -->
             <?php if (!empty($success)): ?>
-                <div class="p-4 mb-4 border border-green-200 rounded-md bg-green-50">
+                <div class="p-4 mb-4 border border-blue-400 rounded-md bg-blue-50">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-green-600"><?php echo htmlspecialchars($success); ?></p>
+                            <p class="text-sm text-primary"><?php echo htmlspecialchars($success); ?></p>
                         </div>
                     </div>
                 </div>
@@ -140,12 +134,12 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
             <!-- Display existing skills if available -->
             <?php if (!empty($skills) && is_array($skills) && count($skills) > 0): ?>
                 <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-                    <h3 class="mb-4 text-lg font-medium text-gray-900">Your Current Skills</h3>
+                    <h3 class="mb-4 font-medium text-gray-900 text-md">Your Current Skills</h3>
                     <div class="flex flex-wrap gap-2">
                         <?php foreach ($skills as $skill): ?>
-                            <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                            <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-primary">
                                 <?php echo htmlspecialchars($skill['skill_name']); ?>
-                                <span class="ml-2 text-xs text-blue-600">
+                                <span class="ml-2 text-xs font-medium text-blue-600">
                                     (<?php echo htmlspecialchars($skill['proficiency_level']); ?>)
                                 </span>
                             </div>
@@ -179,7 +173,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=5" id="skillsForm">
                 <div>
-                    <label class="block mb-4 text-sm font-medium text-gray-700">Skills</label>
+                    <label class="block mb-3 text-xs font-medium text-gray-500">Skills</label>
                     <div id="skills-container">
                         <?php
                         $allSkills = [];
@@ -205,40 +199,95 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
 
                         foreach ($allSkills as $index => $skill): ?>
                             <div class="flex gap-4 mb-4 skill-row" data-index="<?php echo $index; ?>">
-
                                 <!-- Hidden field for skill ID if it exists -->
                                 <?php if (isset($skill['skill_id'])): ?>
                                     <input type="hidden" name="skills[<?php echo $index; ?>][skill_id]" value="<?php echo $skill['skill_id']; ?>">
                                 <?php endif; ?>
 
-                                <div class="flex-1">
+                                <!-- Skill Name Input -->
+                                <div class="flex-1 min-w-0">
                                     <input type="text"
                                         name="skills[<?php echo $index; ?>][skill_name]"
                                         value="<?php echo htmlspecialchars($skill['skill_name'] ?? ''); ?>"
                                         placeholder="Enter skill name"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                                </div>
-                                <div class="w-32">
-                                    <select name="skills[<?php echo $index; ?>][proficiency_level]"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                                        <option value="Beginner" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Beginner') ? 'selected' : ''; ?>>Beginner</option>
-                                        <option value="Intermediate" <?php echo (!isset($skill['proficiency_level']) || $skill['proficiency_level'] === 'Intermediate') ? 'selected' : ''; ?>>Intermediate</option>
-                                        <option value="Advanced" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Advanced') ? 'selected' : ''; ?>>Advanced</option>
-                                        <option value="Expert" <?php echo (isset($skill['proficiency_level']) && $skill['proficiency_level'] === 'Expert') ? 'selected' : ''; ?>>Expert</option>
-                                    </select>
+                                        maxlength="50"
+                                        class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                        oninput="validateSkillName(this)"
+                                        data-skill-index="<?php echo $index; ?>">
+                                    <div id="skill_name_error_<?php echo $index; ?>" class="hidden mt-1 text-xs text-red-600"></div>
                                 </div>
 
-                                <!-- FIXED: Delete button for existing skills -->
+                                <!-- Proficiency Level Dropdown - FIXED WIDTH -->
+                                <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: '<?php echo htmlspecialchars($skill['proficiency_level'] ?? 'Intermediate'); ?>' }">
+                                    <button type="button" @click="open = !open"
+                                        @click.away="open = false"
+                                        class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                                        <span x-text="selected" class="pr-1 truncate"></span>
+                                        <svg class="flex-shrink-0 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Hidden input for form submission -->
+                                    <input type="hidden" name="skills[<?php echo $index; ?>][proficiency_level]" x-model="selected">
+
+                                    <!-- Dropdown Menu -->
+                                    <div x-show="open"
+                                        x-transition:enter="transition ease-out duration-100"
+                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-75"
+                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                        class="absolute left-0 z-50 w-32 mt-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                        x-cloak>
+                                        <div class="py-1">
+                                            <button type="button"
+                                                @click="selected = 'Beginner'; open = false"
+                                                class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-400 rounded-full"></div>
+                                                    <span class="truncate">Beginner</span>
+                                                </div>
+                                            </button>
+                                            <button type="button"
+                                                @click="selected = 'Intermediate'; open = false"
+                                                class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-yellow-400 rounded-full"></div>
+                                                    <span class="truncate">Intermediate</span>
+                                                </div>
+                                            </button>
+                                            <button type="button"
+                                                @click="selected = 'Advanced'; open = false"
+                                                class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-blue-400 rounded-full"></div>
+                                                    <span class="truncate">Advanced</span>
+                                                </div>
+                                            </button>
+                                            <button type="button"
+                                                @click="selected = 'Expert'; open = false"
+                                                class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-400 rounded-full"></div>
+                                                    <span class="truncate">Expert</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Button -->
                                 <?php if (isset($skill['skill_id']) && !empty($skill['skill_id'])): ?>
-                                    <button type="button" class="px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600"
+                                    <button type="button" class="flex-shrink-0 px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600"
                                         onclick="deleteExistingSkill(<?php echo $skill['skill_id']; ?>)">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
                                     </button>
                                 <?php else: ?>
-                                    <!-- JavaScript remove for new skills -->
-                                    <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeNewSkill(this)">
+                                    <button type="button" class="flex-shrink-0 px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 remove-skill" onclick="removeNewSkill(this)">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
@@ -248,7 +297,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                         <?php endforeach; ?>
                     </div>
 
-                    <button type="button" id="add-skill" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <button type="button" id="add-skill" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium transition-colors duration-200 border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -256,7 +305,6 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                     </button>
                 </div>
 
-                <!-- FIXED: Updated buttons to match Step 4 pattern exactly -->
                 <div class="flex justify-between">
                     <a href="?page=complete-jobseeker-profile&step=4"
                         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
@@ -266,124 +314,233 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                         Previous Step
                     </a>
 
-                    <div class="flex space-x-3">
-
-
-                        <!-- FIXED: Continue Button - matches Step 4 "Next Step" button exactly -->
-                        <button type="submit" name="submit_step5"
-                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <span>
-                                <?php if (!empty($skills)): ?>
-                                    Continue
-                                <?php else: ?>
-                                    Skip & Continue
-                                <?php endif; ?>
-                            </span>
-                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </button>
-                    </div>
+                    <button type="submit" name="submit_step5"
+                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                        <span>
+                            <?php if (!empty($skills)): ?>
+                                Continue
+                            <?php else: ?>
+                                Skip & Continue
+                            <?php endif; ?>
+                        </span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- FIXED: Updated JavaScript -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let skillCount = <?php echo count($allSkills); ?>;
-        const addSkillBtn = document.getElementById('add-skill');
-        const skillsContainer = document.getElementById('skills-container');
+let skillCount = <?php echo count($allSkills); ?>;
 
-        // FIXED: Add new skill row function
-        function addEmptySkillRow() {
-            const skillRow = document.createElement('div');
-            skillRow.className = 'skill-row flex gap-4 mb-4';
-            skillRow.setAttribute('data-index', skillCount);
+// Skill name validation function
+function validateSkillName(input) {
+    const value = input.value.trim();
+    const skillIndex = input.getAttribute('data-skill-index') || input.closest('.skill-row').getAttribute('data-index');
+    const errorDiv = document.getElementById('skill_name_error_' + skillIndex);
+    const skillRegex = /^[a-zA-Z\s]+$/;
+    
+    // Reset styles
+    input.classList.remove('border-red-500', 'border-green-500');
+    if (errorDiv) {
+        errorDiv.classList.add('hidden');
+    }
+    
+    if (value === '') {
+        return true; // Optional field
+    }
+    
+    if (value.length > 50) {
+        showError(input, errorDiv, 'Must be less than 50 characters');
+        return false;
+    }
+    
+    if (!skillRegex.test(value)) {
+        showError(input, errorDiv, 'Only letters and spaces are allowed');
+        return false;
+    }
+    
+    // Valid
+    input.classList.add('border-green-500');
+    return true;
+}
 
-            skillRow.innerHTML = `
-        <div class="flex-1">
+function showError(input, errorDiv, message) {
+    input.classList.add('border-red-500');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+// Add new skill row function
+function addEmptySkillRow() {
+    const skillsContainer = document.getElementById('skills-container');
+    const skillRow = document.createElement('div');
+    skillRow.className = 'skill-row flex gap-4 mb-4';
+    skillRow.setAttribute('data-index', skillCount);
+
+    skillRow.innerHTML = `
+        <!-- Skill Name Input -->
+        <div class="flex-1 min-w-0">
             <input type="text" 
                    name="skills[${skillCount}][skill_name]" 
-                   placeholder="Enter skill name" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                   placeholder="Enter skill name"
+                   maxlength="50"
+                   class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                   oninput="validateSkillName(this)"
+                   data-skill-index="${skillCount}">
+            <div id="skill_name_error_${skillCount}" class="hidden mt-1 text-xs text-red-600"></div>
         </div>
-        <div class="w-32">
-            <select name="skills[${skillCount}][proficiency_level]" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate" selected>Intermediate</option>
-                <option value="Advanced">Advanced</option>
-                <option value="Expert">Expert</option>
-            </select>
+
+        <!-- Proficiency Level Dropdown - FIXED WIDTH -->
+        <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: 'Intermediate' }">
+            <button type="button" @click="open = !open"
+                @click.away="open = false"
+                class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                <span x-text="selected" class="pr-1 truncate"></span>
+                <svg class="flex-shrink-0 w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Hidden input for form submission -->
+            <input type="hidden" name="skills[${skillCount}][proficiency_level]" x-model="selected">
+
+            <!-- Dropdown Menu -->
+            <div x-show="open"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="absolute left-0 z-50 w-32 mt-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                x-cloak>
+                <div class="py-1">
+                    <button type="button"
+                        @click="selected = 'Beginner'; open = false"
+                        class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-400 rounded-full"></div>
+                            <span class="truncate">Beginner</span>
+                        </div>
+                    </button>
+                    <button type="button"
+                        @click="selected = 'Intermediate'; open = false"
+                        class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-yellow-400 rounded-full"></div>
+                            <span class="truncate">Intermediate</span>
+                        </div>
+                    </button>
+                    <button type="button"
+                        @click="selected = 'Advanced'; open = false"
+                        class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-blue-400 rounded-full"></div>
+                            <span class="truncate">Advanced</span>
+                        </div>
+                    </button>
+                    <button type="button"
+                        @click="selected = 'Expert'; open = false"
+                        class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-400 rounded-full"></div>
+                            <span class="truncate">Expert</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
         </div>
-        <button type="button" class="px-3 py-2 text-red-600 remove-skill hover:text-red-800" onclick="removeNewSkill(this)">
+
+        <!-- Delete Button -->
+        <button type="button" class="flex-shrink-0 px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600" onclick="removeNewSkill(this)">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
         </button>
     `;
 
-            skillsContainer.appendChild(skillRow);
-            skillCount++;
-        }
+    skillsContainer.appendChild(skillRow);
+    skillCount++;
+}
 
-        // FIXED: Event listener for add button
-        if (addSkillBtn) {
-            addSkillBtn.addEventListener('click', function(e) {
+// Remove skill function
+function removeNewSkill(button) {
+    const skillRows = document.querySelectorAll('.skill-row');
+    if (skillRows.length > 1) {
+        button.closest('.skill-row').remove();
+    } else {
+        // Don't allow removing the last skill row, just clear it
+        const skillRow = button.closest('.skill-row');
+        const input = skillRow.querySelector('input[name*="[skill_name]"]');
+        
+        if (input) {
+            input.value = '';
+            validateSkillName(input);
+        }
+        
+        // Reset Alpine.js dropdown to Intermediate
+        const dropdown = skillRow.querySelector('[x-data]');
+        if (dropdown && dropdown._x_dataStack && dropdown._x_dataStack[0]) {
+            dropdown._x_dataStack[0].selected = 'Intermediate';
+        }
+    }
+}
+
+// Delete existing skill function
+function deleteExistingSkill(skillId) {
+    if (confirm('Are you sure you want to delete this skill?')) {
+        // Create and submit a hidden form for deletion
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '?page=delete-skill-simple';
+        form.style.display = 'none';
+
+        const skillIdInput = document.createElement('input');
+        skillIdInput.type = 'hidden';
+        skillIdInput.name = 'skill_id';
+        skillIdInput.value = skillId;
+
+        form.appendChild(skillIdInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addSkillBtn = document.getElementById('add-skill');
+    const form = document.getElementById('skillsForm');
+
+    // Event listener for add button
+    if (addSkillBtn) {
+        addSkillBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            addEmptySkillRow();
+        });
+    }
+
+    // Form submission handling with validation
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate all skill name inputs
+            document.querySelectorAll('input[name*="[skill_name]"]').forEach(function(input) {
+                if (!validateSkillName(input)) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
                 e.preventDefault();
-                addEmptySkillRow();
-            });
-        }
-
-        // FIXED: Remove new skill function
-        window.removeNewSkill = function(button) {
-            const skillRows = document.querySelectorAll('.skill-row');
-            if (skillRows.length > 1) {
-                button.closest('.skill-row').remove();
-            } else {
-                // Don't allow removing the last skill row, just clear it
-                const inputs = button.closest('.skill-row').querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    if (input.tagName === 'INPUT') {
-                        input.value = '';
-                    } else if (input.tagName === 'SELECT') {
-                        input.selectedIndex = 1; // Set to Intermediate
-                    }
-                });
+                alert('Please fix the skill validation errors before continuing.');
             }
-        };
-
-        // FIXED: Delete existing skill function
-        window.deleteExistingSkill = function(skillId) {
-            if (confirm('Are you sure you want to delete this skill?')) {
-                // Create and submit a hidden form for deletion
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '?page=delete-skill-simple';
-                form.style.display = 'none';
-
-                const skillIdInput = document.createElement('input');
-                skillIdInput.type = 'hidden';
-                skillIdInput.name = 'skill_id';
-                skillIdInput.value = skillId;
-
-                form.appendChild(skillIdInput);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        };
-
-        // FIXED: Form submission handling - remove all validation
-        const form = document.getElementById('skillsForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                // Let all form submissions go through without validation
-                console.log('Form submitted');
-                return true;
-            });
-        }
-    });
+        });
+    }
+});
 </script>

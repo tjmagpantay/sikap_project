@@ -153,32 +153,21 @@
     </div>
     <?php if (!empty($skills) && is_array($skills)): ?>
         <div class="flex flex-wrap gap-2">
-            <?php foreach ($skills as $skill): ?>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                <?php
-                switch ($skill['proficiency_level'] ?? '') {
-                    case 'Expert':
-                        echo 'bg-green-100 text-green-800';
-                        break;
-                    case 'Advanced':
-                        echo 'bg-blue-100 text-blue-800';
-                        break;
-                    case 'Intermediate':
-                        echo 'bg-yellow-100 text-yellow-800';
-                        break;
-                    default:
-                        echo 'bg-gray-100 text-gray-800';
-                }
-                ?>">
-                    <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
-                    <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
-                </span>
-            <?php endforeach; ?>
+            <div class="flex flex-wrap gap-2 p-4 border border-gray-200 rounded-lg">
+                <?php foreach ($skills as $skill): ?>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 text-primary">
+                        <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
+                        <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
+                    </span>
+                <?php endforeach; ?>
+            </div>
         </div>
     <?php else: ?>
         <p class="text-sm text-gray-500">No skills added yet.</p>
     <?php endif; ?>
 </div>
+
+
 
 <!-- Certificates Card -->
 <?php if (!empty($certificates) && is_array($certificates)): ?>
