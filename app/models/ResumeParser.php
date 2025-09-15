@@ -1405,6 +1405,129 @@ class ResumeParser
         return '';
     }
 
+    private function extractSchoolNameAdvanced($text)
+    {
+        error_log("🔍 DEBUG: Starting advanced school name extraction");
+
+        // List of Rosario, Batangas schools for specific matching
+        $rosarioSchools = [
+            'Rosario Institute',
+            'St. John Institute',
+            'Holy Child Institute',
+            'Dagatan National High School',
+            'Rosario National High School',
+            'Rosario State College',
+            'St. John Colleges',
+            'St. John Academy',
+            'Holy Child Academy'
+        ];
+
+        // Try specific school matches first
+        foreach ($rosarioSchools as $school) {
+            if (stripos($text, $school) !== false) {
+                error_log("✅ DEBUG: Found local school: " . $school);
+                return $school;
+            }
+        }
+
+        // Common school keywords and patterns
+        $patterns = [
+            // University patterns
+            '/([A-Z][A-Za-z\s&\.\',]+(?:University|College|Institute|Academy))/i',
+            
+            // School patterns
+            '/([A-Z][A-Za-z\s&\.\',]+(?:School|Seminary|Polytechnic))/i',
+            
+            // Education center patterns
+            '/([A-Z][A-Za-z\s&\.\',]+(?:Education\s+Center|Training\s+Center|Technical\s+Institute))/i'
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text, $match)) {
+                $schoolName = trim($match[1]);
+                
+                // Validate the school name
+                if ($this->isValidSchoolName($schoolName)) {
+                    error_log("✅ DEBUG: Found school name via pattern: " . $schoolName);
+                    return $schoolName;
+                }
+            }
+        }
+
+        // Look for lines that might be school names
+        $lines = explode("\n", $text);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            
+            // Skip obvious non-school lines
+            if (empty($line) || strlen($line) < 5 || strlen($line) > 100) {
+                continue;
+            }
+
+            // Skip lines that look like degrees or dates
+            if (preg_match('/^(?:bachelor|master|phd|doctor|associate|certificate|diploma|degree|\d{4})/i', $line)) {
+                continue;
+            }
+
+            // Look for capitalized words that could be school names
+            if (preg_match('/^[A-Z][a-zA-Z\s&\.\',]+$/', $line) && 
+                !preg_match('/\b(?:experience|work|skills|projects|certificates|languages|references)\b/i', $line)) {
+                
+                if ($this->isValidSchoolName($line)) {
+                    error_log("✅ DEBUG: Found school name via line analysis: " . $line);
+                    return $line;
+                }
+            }
+        }
+
+        error_log("⚠️ DEBUG: No valid school name found");
+        return '';
+    }
+
+    private function isValidSchoolName($name)
+    {
+        // Common words that indicate it's not a school name
+        $invalidWords = [
+            'resume',
+            'curriculum',
+            'vitae',
+            'profile',
+            'objective',
+            'summary',
+            'experience',
+            'employment',
+            'skills',
+            'projects',
+            'certificates',
+            'languages',
+            'references',
+            'hobbies',
+            'interests',
+            'work',
+            'job',
+            'position',
+            'career'
+        ];
+
+        // Check length
+        if (strlen($name) < 5 || strlen($name) > 100) {
+            return false;
+        }
+
+        // Check for invalid words
+        foreach ($invalidWords as $word) {
+            if (stripos($name, $word) !== false) {
+                return false;
+            }
+        }
+
+        // Should have some educational keywords or proper capitalization
+        $hasEducationalTerms = preg_match('/\b(?:University|College|Institute|Academy|School|Seminary|Polytechnic)\b/i', $name);
+        $hasProperCapitalization = preg_match('/^[A-Z][a-zA-Z\s&\.\',]+$/', $name);
+
+        return $hasEducationalTerms || $hasProperCapitalization;
+    }
+
     private function extractEducationYears($text)
     {
         $years = [
