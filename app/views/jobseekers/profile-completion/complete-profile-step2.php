@@ -6,14 +6,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
+            <h2 class="mt-2 text-3xl font-extrabold text-center text-gray-900">
                 Personal Information
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
@@ -258,7 +251,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 onchange="validateBirthdate(this)">
                             <div id="date_of_birth_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
-                        <div class="mt-1 text-xs text-gray-500">
+                        <div class="mt-1 text-xs text-gray-400">
                             Must be at least 16 years old
                         </div>
                     </div>
