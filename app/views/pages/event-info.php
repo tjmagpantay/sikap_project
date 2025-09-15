@@ -80,10 +80,10 @@ include_once __DIR__ . '/../components/navbar.php';
                     </div>
                 </div>
                 <!-- Sidebar (Right Section) -->
-                <div class="w-full lg:w-1/3">
+                <div class="w-full lg:w-1/3 ">
                     <div class="sticky top-8">
                         <!-- Event Information Card -->
-                        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+                        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
                             <h3 class="mb-6 text-lg font-semibold text-gray-900">Event Information</h3>
 
                             <div class="space-y-4">

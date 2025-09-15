@@ -14,23 +14,28 @@ $companies = $landingController->getTopCompanies(4);
         </h2>
 
         <p class="text-sm leading-relaxed text-gray-600">
-          Discover the top employers and businesses that are making waves <br> in their industries.
+          Discover the top employers and businesses that are making waves in their industries.
         </p>
       </div>
 
-        <a href="?page=view-all-companies"
-          class="flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
-          View All
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+      <a href="?page=view-all-companies"
+        class="hidden md:flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
+        View All
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
 
     </div>
     <?php if (!empty($companies)): ?>
-      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
-        <?php foreach ($companies as $company): ?>
-          <div class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-lg hover:scale-[1.02] h-[480px] flex flex-col transform"
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+        <?php
+        $displayCount = 0;
+        foreach ($companies as $company):
+          $displayCount++;
+          $hideClass = $displayCount > 3 ? 'hidden' : '';
+        ?>
+          <div class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-lg hover:scale-[1.02] h-[480px] flex flex-col transform <?php echo $hideClass; ?>"
             onclick="viewCompany(<?php echo $company['employer_id']; ?>)">
 
             <!-- Company Header -->

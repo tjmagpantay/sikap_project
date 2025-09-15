@@ -6,13 +6,13 @@
           Top Jobs for You to Explore
         </h2>
 
-        <p class="text-sm leading-relaxed text-gray-600">
-          Check out the most popular and in-demand job opportunities that <br> could be the perfect fit your career.
+        <p class="w-10 text-sm leading-relaxed text-gray-600">
+          Check out the most popular and in-demand job opportunities that could be the perfect fit your career.
         </p>
       </div>
 
       <a href="?page=view-all-companies"
-        class="flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
+        class="hidden md:flex items-center gap-1 px-6 py-2 font-medium bg-transparent border *:border-primary text-primary text-sm mt-6">
         View All
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -151,23 +151,7 @@
               Posted <?php echo date('M j, Y', strtotime($job['posted_date'])); ?>
             </span>
 
-            <span class="flex items-center gap-1 text-primary">
-              Best Match:
-
-              <!-- Smaller Circle with check -->
-              <span class="flex items-center justify-center w-4 h-4 rounded-full bg-primary">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class="w-2.5 h-2.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="white"
-                  stroke-width="">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </span>
-
-              <span class="text-sm font-medium text-primary">95%</span>
-            </span>
+            
 
 
           </div>
