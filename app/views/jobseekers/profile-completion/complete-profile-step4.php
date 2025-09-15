@@ -36,14 +36,7 @@ if (!empty($workExperience)) {
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </div>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
+            <h2 class="mt-6 text-3xl font-extrabold text-center text-grayMain">
                 Work Experience
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
@@ -319,7 +312,13 @@ if (!empty($workExperience)) {
                         <input id="job_title" name="job_title" type="text"
                             value="<?php echo htmlspecialchars($_POST['job_title'] ?? ''); ?>"
                             placeholder="e.g., Software Developer, Marketing Manager"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            maxlength="100"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                            oninput="validateJobTitle(this)">
+                        <div id="job_title_error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="job_title_count">0</span>/100 characters
+                        </div>
                     </div>
                 </div>
 
@@ -332,26 +331,89 @@ if (!empty($workExperience)) {
                         <input id="company_name" name="company_name" type="text"
                             value="<?php echo htmlspecialchars($_POST['company_name'] ?? ''); ?>"
                             placeholder="Company/Organization Name"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                            maxlength="100"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                            oninput="validateCompanyName(this)">
+                        <div id="company_name_error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="company_name_count">0</span>/100 characters
+                        </div>
                     </div>
                 </div>
 
-                <!-- Employment Type -->
+                <!-- Employment Type - IMPROVED DROPDOWN -->
                 <div>
                     <label for="employment_type" class="block mb-1 text-xs font-medium text-gray-500">
-                        Employment Type
+                        Employment Type <span class="text-red-500" id="employment_type_required" style="display: none;">*</span>
                     </label>
-                    <div class="mt-1">
-                        <select id="employment_type" name="employment_type"
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                            <option value="">Select Employment Type</option>
-                            <option value="full-time" <?php echo ($_POST['employment_type'] ?? '') === 'full-time' ? 'selected' : ''; ?>>Full-time</option>
-                            <option value="part-time" <?php echo ($_POST['employment_type'] ?? '') === 'part-time' ? 'selected' : ''; ?>>Part-time</option>
-                            <option value="contract" <?php echo ($_POST['employment_type'] ?? '') === 'contract' ? 'selected' : ''; ?>>Contract</option>
-                            <option value="freelance" <?php echo ($_POST['employment_type'] ?? '') === 'freelance' ? 'selected' : ''; ?>>Freelance</option>
-                            <option value="internship" <?php echo ($_POST['employment_type'] ?? '') === 'internship' ? 'selected' : ''; ?>>Internship</option>
-                            <option value="other" <?php echo ($_POST['employment_type'] ?? '') === 'other' ? 'selected' : ''; ?>>Other</option>
-                        </select>
+                    <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($_POST['employment_type'] ?? ''); ?>' || 'Select Employment Type' }">
+                        <button type="button" @click="open = !open"
+                            @click.away="open = false"
+                            class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                            <span x-text="selected === 'Select Employment Type' ? 'Select Employment Type' : selected"
+                                :class="selected === 'Select Employment Type' ? 'text-gray-400' : 'text-gray-700'"></span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Hidden input for form submission -->
+                        <input type="hidden" name="employment_type" x-model="selected === 'Select Employment Type' ? '' : selected">
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1">
+                                <button type="button"
+                                    @click="selected = 'Full-time'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Full-time
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Part-time'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Part-time
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Contract'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Contract
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Freelance'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Freelance
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Internship'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Internship
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Temporary'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Temporary
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Volunteer'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Volunteer
+                                </button>
+                                <button type="button"
+                                    @click="selected = 'Other'; open = false"
+                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                    Other
+                                </button>
+                            </div>
+                        </div>
+                        <div id="employment_type_error" class="hidden mt-1 text-xs text-red-600"></div>
                     </div>
                 </div>
 
@@ -359,12 +421,15 @@ if (!empty($workExperience)) {
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="start_date" class="block mb-1 text-xs font-medium text-gray-500">
-                            Start Date
+                            Start Date <span class="text-red-500" id="start_date_required" style="display: none;">*</span>
                         </label>
                         <div class="mt-1">
                             <input id="start_date" name="start_date" type="date"
                                 value="<?php echo htmlspecialchars($_POST['start_date'] ?? ''); ?>"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                max="<?php echo date('Y-m-d'); ?>"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                onchange="validateStartDate(this)">
+                            <div id="start_date_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
 
@@ -375,7 +440,10 @@ if (!empty($workExperience)) {
                         <div class="mt-1">
                             <input id="end_date" name="end_date" type="date"
                                 value="<?php echo htmlspecialchars($_POST['end_date'] ?? ''); ?>"
-                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                max="<?php echo date('Y-m-d'); ?>"
+                                class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                onchange="validateEndDate(this)">
+                            <div id="end_date_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
                 </div>
@@ -398,7 +466,13 @@ if (!empty($workExperience)) {
                     <div class="mt-1">
                         <textarea id="responsibilities" name="responsibilities" rows="4"
                             placeholder="Describe your key responsibilities and achievements..."
-                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"><?php echo htmlspecialchars($_POST['responsibilities'] ?? ''); ?></textarea>
+                            maxlength="500"
+                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                            oninput="validateResponsibilities(this)"><?php echo htmlspecialchars($_POST['responsibilities'] ?? ''); ?></textarea>
+                        <div id="responsibilities_error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="responsibilities_count">0</span>/500 characters
+                        </div>
                     </div>
                 </div>
 
@@ -410,7 +484,7 @@ if (!empty($workExperience)) {
                         Previous Step
                     </a>
 
-                    <div class="flex space-x-3">
+                    <div class="flex gap-2">
                         <button type="submit" name="add_another" id="addAnotherBtn"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
                             <span id="addAnotherText">Add Experience</span>
@@ -449,12 +523,231 @@ if (!empty($workExperience)) {
 </div>
 
 <script>
+    // Global validation state
+    let hasJobTitle = false;
+
+    // Validation functions
+    function validateJobTitle(input) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById('job_title_error');
+        const countSpan = document.getElementById('job_title_count');
+        const jobTitleRegex = /^[a-zA-Z0-9\s\-,./&]*$/;
+
+        // Update character count
+        countSpan.textContent = value.length;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        // Update global state
+        hasJobTitle = value.length > 0;
+        updateRequiredFields();
+
+        if (value === '') {
+            return true; // Optional field
+        }
+
+        if (value.length > 100) {
+            showError(input, errorDiv, 'Must be less than 100 characters');
+            return false;
+        }
+
+        if (!jobTitleRegex.test(value)) {
+            showError(input, errorDiv, 'Only letters, numbers, spaces, and basic symbols (- , . / &) are allowed');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateCompanyName(input) {
+        const value = input.value.trim();
+        const errorDiv = document.getElementById('company_name_error');
+        const countSpan = document.getElementById('company_name_count');
+        const companyRegex = /^[a-zA-Z0-9\s\-,.&']*$/;
+
+        // Update character count
+        countSpan.textContent = value.length;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (value === '') {
+            return true; // Optional field
+        }
+
+        if (value.length > 100) {
+            showError(input, errorDiv, 'Must be less than 100 characters');
+            return false;
+        }
+
+        if (!companyRegex.test(value)) {
+            showError(input, errorDiv, 'Only letters, numbers, spaces, and symbols (- , . & \') are allowed');
+            return false;
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateStartDate(input) {
+        const value = input.value;
+        const errorDiv = document.getElementById('start_date_error');
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (!value) {
+            if (hasJobTitle) {
+                showError(input, errorDiv, 'Start date is required when job title is provided');
+                return false;
+            }
+            return true;
+        }
+
+        const startDate = new Date(value);
+        const today = new Date();
+
+        if (startDate > today) {
+            showError(input, errorDiv, 'Start date cannot be in the future');
+            return false;
+        }
+
+        // Validate end date if it exists
+        const endDateInput = document.getElementById('end_date');
+        if (endDateInput.value) {
+            validateEndDate(endDateInput);
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateEndDate(input) {
+        const value = input.value;
+        const errorDiv = document.getElementById('end_date_error');
+        const startDateValue = document.getElementById('start_date').value;
+        const currentlyWorking = document.getElementById('currently_working').checked;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (!value || currentlyWorking) {
+            return true; // Optional if not currently working
+        }
+
+        const endDate = new Date(value);
+        const today = new Date();
+
+        if (endDate > today) {
+            showError(input, errorDiv, 'End date cannot be in the future');
+            return false;
+        }
+
+        if (startDateValue) {
+            const startDate = new Date(startDateValue);
+            if (endDate < startDate) {
+                showError(input, errorDiv, 'End date must be greater than or equal to start date');
+                return false;
+            }
+        }
+
+        // Valid
+        input.classList.add('border-green-500');
+        return true;
+    }
+
+    function validateResponsibilities(input) {
+        const value = input.value;
+        const errorDiv = document.getElementById('responsibilities_error');
+        const countSpan = document.getElementById('responsibilities_count');
+
+        // Update character count
+        countSpan.textContent = value.length;
+
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        errorDiv.classList.add('hidden');
+
+        if (value.length > 500) {
+            showError(input, errorDiv, 'Must be less than 500 characters');
+            return false;
+        }
+
+        // Valid
+        if (value.length > 0) {
+            input.classList.add('border-green-500');
+        }
+        return true;
+    }
+
+    function updateRequiredFields() {
+        const employmentTypeRequired = document.getElementById('employment_type_required');
+        const startDateRequired = document.getElementById('start_date_required');
+
+        if (hasJobTitle) {
+            employmentTypeRequired.style.display = 'inline';
+            startDateRequired.style.display = 'inline';
+        } else {
+            employmentTypeRequired.style.display = 'none';
+            startDateRequired.style.display = 'none';
+        }
+    }
+
+    function validateEmploymentType() {
+        const employmentTypeInput = document.querySelector('input[name="employment_type"]');
+        const errorDiv = document.getElementById('employment_type_error');
+
+        errorDiv.classList.add('hidden');
+
+        if (hasJobTitle && (!employmentTypeInput.value || employmentTypeInput.value === 'Select Employment Type')) {
+            showError(null, errorDiv, 'Employment type is required when job title is provided');
+            return false;
+        }
+
+        return true;
+    }
+
+    function showError(input, errorDiv, message) {
+        if (input) {
+            input.classList.add('border-red-500');
+        }
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const experienceTypeRadios = document.querySelectorAll('input[name="experience_type"]');
         const currentlyWorkingContainer = document.getElementById('currently-working-container');
         const currentlyWorkingCheckbox = document.getElementById('currently_working');
         const endDateContainer = document.getElementById('end-date-container');
         const endDateInput = document.getElementById('end_date');
+
+        // Initialize character counts
+        const jobTitleField = document.getElementById('job_title');
+        const companyField = document.getElementById('company_name');
+        const responsibilitiesField = document.getElementById('responsibilities');
+
+        if (jobTitleField) {
+            document.getElementById('job_title_count').textContent = jobTitleField.value.length;
+            hasJobTitle = jobTitleField.value.trim().length > 0;
+        }
+        if (companyField) {
+            document.getElementById('company_name_count').textContent = companyField.value.length;
+        }
+        if (responsibilitiesField) {
+            document.getElementById('responsibilities_count').textContent = responsibilitiesField.value.length;
+        }
+
+        updateRequiredFields();
 
         // Handle radio button selection visual feedback
         experienceTypeRadios.forEach(radio => {
@@ -510,11 +803,30 @@ if (!empty($workExperience)) {
             const jobTitle = document.getElementById('job_title').value.trim();
             const companyName = document.getElementById('company_name').value.trim();
 
-            // If "Add Experience" button and fields are empty, prevent submission
-            if (submitBtn && submitBtn.name === 'add_another' && (!jobTitle || !companyName)) {
-                e.preventDefault();
-                alert('Please fill in Job Title and Company Name to add experience.');
-                return;
+            // If "Add Experience" button and fields are filled, validate
+            if (submitBtn && submitBtn.name === 'add_another') {
+                if (!jobTitle && !companyName) {
+                    // No experience to add, prevent submission
+                    e.preventDefault();
+                    alert('Please fill in at least Job Title to add experience.');
+                    return;
+                }
+
+                // Validate all fields if job title is provided
+                let isValid = true;
+
+                if (!validateJobTitle(document.getElementById('job_title'))) isValid = false;
+                if (!validateCompanyName(document.getElementById('company_name'))) isValid = false;
+                if (!validateEmploymentType()) isValid = false;
+                if (!validateStartDate(document.getElementById('start_date'))) isValid = false;
+                if (!validateEndDate(document.getElementById('end_date'))) isValid = false;
+                if (!validateResponsibilities(document.getElementById('responsibilities'))) isValid = false;
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fix the errors before adding experience.');
+                    return;
+                }
             }
 
             // For "Skip & Continue" button, always allow submission
@@ -538,10 +850,25 @@ if (!empty($workExperience)) {
                     document.getElementById('form_mode').value = 'update';
                     document.getElementById('job_title').value = exp.job_title;
                     document.getElementById('company_name').value = exp.company_name;
-                    document.getElementById('employment_type').value = exp.employment_type;
+
+                    // Update Alpine.js dropdown for employment type
+                    const employmentTypeContainer = document.querySelector('[x-data*="employment_type"]');
+                    if (employmentTypeContainer) {
+                        employmentTypeContainer._x_dataStack[0].selected = exp.employment_type;
+                    }
+
                     document.getElementById('start_date').value = exp.start_date;
                     document.getElementById('end_date').value = exp.end_date || '';
                     document.getElementById('responsibilities').value = exp.responsibilities || '';
+
+                    // Update character counts
+                    document.getElementById('job_title_count').textContent = exp.job_title.length;
+                    document.getElementById('company_name_count').textContent = exp.company_name.length;
+                    document.getElementById('responsibilities_count').textContent = (exp.responsibilities || '').length;
+
+                    // Update global state
+                    hasJobTitle = exp.job_title.trim().length > 0;
+                    updateRequiredFields();
 
                     // Set experience type radio
                     const experienceType = exp.currently_working === 'Yes' ? 'current' : 'previous';
@@ -577,6 +904,15 @@ if (!empty($workExperience)) {
         document.getElementById('form_mode').value = 'add';
         document.getElementById('experience_id').value = '';
 
+        // Reset character counts
+        document.getElementById('job_title_count').textContent = '0';
+        document.getElementById('company_name_count').textContent = '0';
+        document.getElementById('responsibilities_count').textContent = '0';
+
+        // Reset global state
+        hasJobTitle = false;
+        updateRequiredFields();
+
         // Show normal buttons, hide update container
         document.querySelector('.flex.justify-between').style.display = 'flex';
         document.getElementById('updateButtonContainer').style.display = 'none';
@@ -587,6 +923,12 @@ if (!empty($workExperience)) {
         if (defaultRadioElement) {
             defaultRadioElement.checked = true;
             defaultRadioElement.dispatchEvent(new Event('change'));
+        }
+
+        // Reset Alpine.js dropdown
+        const employmentTypeContainer = document.querySelector('[x-data*="employment_type"]');
+        if (employmentTypeContainer) {
+            employmentTypeContainer._x_dataStack[0].selected = 'Select Employment Type';
         }
     }
 </script>
