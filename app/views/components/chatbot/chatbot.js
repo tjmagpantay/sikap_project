@@ -11,8 +11,8 @@ const SIKAP_FAQS = {
         {
             q: "How does the job recommendation system work?",
             a: "Sikap uses machine learning algorithms that analyze your profile, skills, and preferences to match you with the most suitable job postings. It uses techniques like content-based filtering to ensure personalized results based on your qualifications."
-        },
-        {
+        }, 
+        { 
             q: "Is Sikap free to use?",
             a: "Yes. Sikap is completely free for job seekers, employers, and PESO Rosario staff. It is a public service platform developed under the goals of the PESO Act of 1999 (RA 8759)."
         },
@@ -53,9 +53,14 @@ const SIKAP_FAQS = {
     ]
 };
 
+const contactInfo = `\n\nIf you have any inquiries, please feel free to contact us via <a href="mailto:pesorosariobats@gmail.com" style="color: #3b82f6; text-decoration: underline;">email</a> or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.`;
+
 function formatBulletPoints(text) {
     const parts = text.split('\n•');
-    if (parts.length <= 1) return [text]; // Return as single message if no bullet points
+    if (parts.length <= 1) {
+        // For single messages, append contact info
+        return [text + contactInfo];
+    }
 
     let messages = [];
     // Add the introduction (text before first bullet point)
@@ -71,6 +76,11 @@ function formatBulletPoints(text) {
     if (lastPart.includes('\n\n')) {
         const conclusion = lastPart.split('\n\n')[1];
         messages.push(conclusion);
+    }
+
+    // Add contact info to the last message
+    if (messages.length > 0) {
+        messages[messages.length - 1] += contactInfo;
     }
 
     return messages;

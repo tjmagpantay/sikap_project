@@ -100,6 +100,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->updateStatus();
             break;
 
+        case 'admin-jobseeker-update-status':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->updateStatus();
+            break;
+
         // Google login Jobseeker & Employer
 
         case 'google-login':

@@ -11,7 +11,7 @@ if os.name == 'nt':  # Windows
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
 
-import json
+import json 
 from flask import Flask, request, jsonify
 from recommend import JobRecommendationEngine, test_database_connection, get_sample_jobseeker_ids
 

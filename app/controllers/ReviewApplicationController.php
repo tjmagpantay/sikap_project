@@ -16,7 +16,7 @@ class ReviewApplicationController
             header('Location: ?page=browse-candidates&error=Application not found');
             exit;
         }
-
+ 
         $interview = $model->getInterview($application_id);
 
         // Get resignation request data
@@ -400,5 +400,75 @@ class ReviewApplicationController
             header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while updating status.'));
         }
         exit;
+    }
+
+     // --- EMAIL NOTIFICATION METHOD ---
+    public function sendStatusReminderEmails()
+    {
+        try {
+            // Load mailer configuration
+            $mailerConfig = require __DIR__ . '/../../config/mailer.php';
+            
+            $model = new ReviewApplication();
+
+            // Fetch all pending applications where interview passed 7+ days
+            $applications = $model->getPendingApplicationsWithExpiredInterview();
+
+            if (empty($applications)) {
+                error_log('No shortlisted applications found requiring status update notifications.');
+                return;
+            }
+
+            foreach ($applications as $app) {
+                try {
+                    $subject = "Reminder: Update Application Status for {$app['jobseeker_name']}";
+                    $body = "
+                        <p>Dear {$app['employer_name']},</p>
+                        <p>The interview for <b>{$app['jobseeker_name']}</b> held on 
+                        <b>{$app['interview_date']}</b> has not been updated.</p>
+                        <p>Please <a href='http://localhost/sikap/index.php?page=review-application&application_id={$app['application_id']}'>
+                        update the application status here</a>.</p>
+                        <br>
+                        <p>Thank you,<br>SIKAP Team</p>
+                    ";
+
+                    // Initialize PHPMailer
+                    $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
+                    
+                    try {
+                        $mailer->isSMTP();
+                        $mailer->Host = $mailerConfig['host'];
+                        $mailer->SMTPAuth = true;
+                        $mailer->Username = $mailerConfig['username'];
+                        $mailer->Password = $mailerConfig['password'];
+                        $mailer->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                        $mailer->Port = $mailerConfig['port'];
+                        
+                        // Set sender
+                        $mailer->setFrom($mailerConfig['from_email'], $mailerConfig['from_name']);
+                        $mailer->addAddress($app['employer_email']);
+                        
+                        // Content
+                        $mailer->isHTML(true);
+                        $mailer->Subject = $subject;
+                        $mailer->Body = $body;
+                        
+                        $mailer->send();
+                        echo "Reminder email sent to {$app['employer_email']} for jobseeker {$app['jobseeker_name']}\n";
+                        
+                    } catch (Exception $e) {
+                        error_log("Mailer Error for {$app['employer_email']}: " . $e->getMessage());
+                        echo "Failed to send email to {$app['employer_email']}: " . $e->getMessage() . "\n";
+                    }
+                } catch (Exception $e) {
+                    error_log("Error processing application {$app['application_id']}: " . $e->getMessage());
+                    echo "Error processing application {$app['application_id']}: " . $e->getMessage() . "\n";
+                    continue;
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Error in sendStatusReminderEmails: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

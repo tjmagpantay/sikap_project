@@ -3,13 +3,13 @@
 require_once __DIR__ . '/../models/UserManagement.php';
 
 class UserManagementController {
-    private $model;
+    private $model; 
 
     public function __construct() {
         $this->model = new UserManagement();
     }
 
-    public function index($userType) {
+    public function index($userType) { 
         // Map user type to view file name
         $viewFile = match ($userType) {
             'jobseekers' => 'jobseeker-management.php',
@@ -36,49 +36,110 @@ class UserManagementController {
      * Handle AJAX suspend/unsuspend requests
      */
     public function updateStatus() {
+        // Clear any existing output
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Set content type to JSON
         header('Content-Type: application/json');
         
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->sendJson(['success' => false, 'error' => 'Invalid request method']);
-        }
-
-        $user_id = $_POST['user_id'] ?? null;
-        $action = $_POST['action'] ?? null;
-
-        if (!$user_id || !$action) {
-            $this->sendJson(['success' => false, 'error' => 'Missing required parameters']);
-        }
-        
         try {
-            // Fix: Pass user_id first, then action
-            $success = $this->model->updateEmployerStatus($user_id, $action);
-            
-            if ($success) {
-                $this->sendJson([
-                    'success' => true,
-                    'message' => ucfirst($action) . ' successful',
-                    'new_status' => $action === 'suspend' ? 'suspended' : 'verified'
-                ]);
-            } else {
-                $this->sendJson([
-                    'success' => false,
-                    'error' => 'Failed to update status'
-                ]);
+            // Validate request method
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
             }
+
+            // Get and validate parameters
+            $user_id = $_POST['user_id'] ?? null;
+            $action = $_POST['action'] ?? null;
+            $user_type = $_POST['user_type'] ?? null;
+            
+            error_log("Status Update Request - Parameters: " . json_encode([
+                'user_id' => $user_id,
+                'action' => $action,
+                'user_type' => $user_type
+            ]));
+
+            if (!$user_id || !$action || !$user_type) {
+                throw new Exception('Missing required parameters');
+            }
+
+            // Determine new status
+            $new_status = $action === 'disable' ? 'disabled' : 'enabled';
+            
+            // Update status based on user type
+            $success = false;
+            if ($user_type === 'jobseeker') {
+                error_log("Updating jobseeker status - ID: $user_id, New Status: $new_status");
+                $success = $this->model->updateJobseekerStatus($user_id, $new_status);
+            } else {
+                error_log("Updating employer status - ID: $user_id, Action: $action");
+                $success = $this->model->updateEmployerStatus($user_id, $action);
+            }
+            
+            if (!$success) {
+                throw new Exception('Failed to update status');
+            }
+
+            // Send success response
+            echo json_encode([
+                'success' => true,
+                'message' => ucfirst($action) . ' successful',
+                'new_status' => $new_status
+            ]);
+            
         } catch (Exception $e) {
-            $this->sendJson([
+            error_log("Status Update Error: " . $e->getMessage());
+            http_response_code(400);
+            echo json_encode([
                 'success' => false,
-                'error' => 'An error occurred: ' . $e->getMessage()
+                'error' => $e->getMessage()
             ]);
         }
+        exit;
     }
 
     /**
      * Utility function to send JSON responses and exit
      */
     private function sendJson($data) {
+        // Clear all previous output
+        ob_end_clean();
+        
+        // Start fresh output buffer
+        ob_start();
+        
+        // Set headers
         header('Content-Type: application/json');
-        echo json_encode($data);
+        
+        // Encode response
+        $json = json_encode($data);
+        if ($json === false) {
+            $json = json_encode(['success' => false, 'error' => 'Internal server error']);
+        }
+        
+        // Output json
+        echo $json;
+        
+        // Send the response and end script
+        ob_end_flush();
         exit;
+    }
+
+    public function exportEmployersPDF() {
+        // This is just a response endpoint, actual export happens in JavaScript
+        try {
+            $employers = $this->model->getUsersByType('employer');
+            $this->sendJson([
+                'success' => true,
+                'data' => $employers
+            ]);
+        } catch (Exception $e) {
+            $this->sendJson([
+                'success' => false,
+                'error' => 'Error fetching employers: ' . $e->getMessage()
+            ]);
+        }
     }
 }

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,26 +12,23 @@
             --sikap-border: #e2e8f0;
             --sikap-text: #334155;
             --sikap-text-light: #64748b;
-            --sikap-primary: #092c4c;
+            --sikap-primary: #3b82f6;
             --sikap-primary-dark: #2563eb;
             --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             --sikap-online: #22c55e;
-            --sikap-chat-bg: #f1f5f9;
-            /* New gray background for chat area */
         }
-
+ 
         @media (prefers-color-scheme: dark) {
             :root {
-                --sikap-bg: #ffffff;
-                --sikap-surface: #f8fafc;
-                --sikap-border: #e2e8f0;
-                --sikap-text: #334155;
-                --sikap-text-light: #64748b;
-                --sikap-primary: #092c4c;
-                --sikap-primary-dark: #2563eb;
-                --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-                --sikap-online: #22c55e;
-                --sikap-chat-bg: #f1f5f9;
+                --sikap-bg: #0f172a;
+                --sikap-surface: #1e293b;
+                --sikap-border: #334155;
+                --sikap-text: #f1f5f9;
+                --sikap-text-light: #94a3b8;
+                --sikap-primary: #60a5fa;
+                --sikap-primary-dark: #3b82f6;
+                --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+                --sikap-online: #4ade80;
             }
         }
 
@@ -142,8 +138,6 @@
             color: var(--sikap-text-light);
             transition: all 0.2s ease;
             border: 1px solid transparent;
-            background: transparent;
-            cursor: pointer;
         }
 
         .sikap-close-btn:hover {
@@ -157,8 +151,7 @@
             padding: 1.25rem;
             overflow-y: auto;
             scroll-behavior: smooth;
-            background: var(--sikap-chat-bg);
-            /* Gray background for messages area */
+            background: var(--sikap-bg);
         }
 
         .sikap-input-area {
@@ -187,7 +180,7 @@
         .sikap-input:focus {
             outline: none;
             border-color: var(--sikap-primary);
-            box-shadow: 0 0 0 3px rgba(9, 44, 76, 0.1);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .sikap-input::placeholder {
@@ -209,7 +202,7 @@
         }
 
         .sikap-send-btn:hover {
-            background: var(--sikap-primary-dark);
+            background: #1d4ed8;
         }
 
         .sikap-send-btn:disabled {
@@ -249,8 +242,7 @@
             display: flex;
             gap: 4px;
             padding: 0.75rem 1rem;
-            background: var(--sikap-bg);
-            /* White background for typing indicator */
+            background: var(--sikap-surface);
             border: 1px solid var(--sikap-border);
             border-radius: 1rem;
             width: fit-content;
@@ -265,13 +257,8 @@
             opacity: 0.7;
         }
 
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
         .message-bubble {
             opacity: 0;
@@ -294,11 +281,21 @@
         }
 
         .message-bubble.bot {
-            background: var(--sikap-bg);
-            /* White background for bot messages */
+            background: var(--sikap-surface);
             color: var(--sikap-text);
             border: 1px solid var(--sikap-border);
             border-bottom-left-radius: 0.5rem;
+        }
+
+        .message-bubble.bot a {
+            color: var(--sikap-primary);
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .message-bubble.bot a:hover {
+            color: var(--sikap-primary-dark);
         }
 
         .sikap-faq-button {
@@ -306,33 +303,24 @@
             width: 100%;
             padding: 1rem 1.25rem;
             text-align: left;
-            background: var(--sikap-bg);
-            /* White background for FAQ buttons */
+            background: var(--sikap-surface);
             border: 1px solid var(--sikap-border);
             border-radius: 1rem;
             margin-bottom: 0.75rem;
             transition: all 0.2s ease;
             color: var(--sikap-text);
             font-size: 0.9375rem;
-            cursor: pointer;
         }
 
         .sikap-faq-button:hover {
-            background: var(--sikap-surface);
+            background: var(--sikap-bg);
             border-color: var(--sikap-primary);
             transform: translateY(-1px);
         }
 
         @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-3px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         @keyframes fadeIn {
@@ -340,7 +328,6 @@
                 opacity: 0;
                 transform: translateY(10px) scale(0.98);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -348,14 +335,11 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% { 
                 transform: scale(1);
                 opacity: 0.3;
             }
-
-            50% {
+            50% { 
                 transform: scale(1.5);
                 opacity: 0;
             }
@@ -379,151 +363,175 @@
         }
     </style>
 </head>
-
 <body>
 
-    <?php
-    // Remove any output before this point
-    ?>
-    <div class="sikap-chatbot-wrapper">
-        <div id="chatbot" class="sikap-chatbot">
-            <!-- Header -->
-            <div class="sikap-chatbot-header">
-                <div class="sikap-header-content">
-                    <div class="sikap-header-title">
-                        <div class="sikap-avatar">
-                            <i class="text-xl fas fa-robot"></i>
-                        </div>
-                        <div>
-                            <h3 style="font-size: 1.125rem; font-weight: bold;">Sikap Assistant</h3>
-                            <div class="sikap-status">
-                                <span class="sikap-status-dot"></span>
-                                <span>Online</span>
-                            </div>
+
+<?php
+// Remove any output before this point
+?>
+<div class="sikap-chatbot-wrapper">
+    <div id="chatbot" class="sikap-chatbot">
+        <!-- Header -->
+        <div class="sikap-chatbot-header">
+            <div class="sikap-header-content">
+                <div class="sikap-header-title">
+                    <div class="sikap-avatar">
+                        <i class="text-xl fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.125rem; font-weight: bold;">Sikap Assistant</h3>
+                        <div class="sikap-status">
+                            <span class="sikap-status-dot"></span>
+                            <span>Online</span>
                         </div>
                     </div>
-                    <button id="close-chat" class="sikap-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
-            </div>
-
-            <!-- Messages Area -->
-            <div id="chat-messages" class="sikap-messages"></div>
-
-            <!-- Input Area -->
-            <div class="sikap-input-area">
-                <div class="sikap-input-group">
-                    <input type="text"
-                        id="chat-input"
-                        class="sikap-input"
-                        placeholder="Type your question...">
-                    <button id="send-message" class="sikap-send-btn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
+                <button id="close-chat" class="sikap-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Toggle Button -->
-        <button id="chatbot-toggle" class="sikap-toggle-btn">
-            <i class="text-xl fas fa-comments"></i>
-        </button>
+        <!-- Messages Area -->
+        <div id="chat-messages" class="sikap-messages"></div>
+
+        <!-- Input Area -->
+        <div class="sikap-input-area">
+            <div class="sikap-input-group">
+                <input type="text" 
+                    id="chat-input"
+                    class="sikap-input"
+                    placeholder="Type your question...">
+                <button id="send-message" class="sikap-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Chatbot Scripts -->
-    <script src="/sikap/app/views/components/chatbot/chatbot.js"></script>
-    <script>
-        function formatBulletPoints(text) {
-            // Split by newline and bullet points
-            const parts = text.split('\n');
-            let messages = [];
-            let currentMessage = '';
+    <!-- Toggle Button -->
+    <button id="chatbot-toggle" class="sikap-toggle-btn">
+        <i class="text-xl fas fa-comments"></i>
+    </button>
+</div>
 
-            parts.forEach(part => {
-                if (part.trim() === '') {
-                    if (currentMessage) {
-                        messages.push(currentMessage);
-                        currentMessage = '';
-                    }
-                } else if (part.startsWith('•')) {
-                    if (currentMessage) {
-                        messages.push(currentMessage);
-                    }
-                    currentMessage = part;
-                } else if (part.startsWith('🔒')) {
-                    if (currentMessage) {
-                        messages.push(currentMessage);
-                    }
-                    currentMessage = part;
-                } else if (currentMessage) {
-                    currentMessage += ' ' + part;
-                } else {
-                    currentMessage = part;
-                }
-            });
+<!-- Chatbot Scripts -->
+<script src="/sikap/app/views/components/chatbot/chatbot.js"></script>
+<script>
+function formatBulletPoints(text) {
+    // Split by newline and bullet points
+    const parts = text.split('\n');
+    let messages = [];
+    let currentMessage = '';
 
+    parts.forEach(part => {
+        if (part.trim() === '') {
+            if (currentMessage) {
+                messages.push(currentMessage);
+                currentMessage = '';
+            }
+        } else if (part.startsWith('•')) {
             if (currentMessage) {
                 messages.push(currentMessage);
             }
-
-            return messages.filter(msg => msg.trim() !== '');
+            currentMessage = part;
+        } else if (part.startsWith('🔒')) {
+            if (currentMessage) {
+                messages.push(currentMessage);
+            }
+            currentMessage = part;
+        } else if (currentMessage) {
+            currentMessage += ' ' + part;
+        } else {
+            currentMessage = part;
         }
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatbot = document.getElementById('chatbot');
-            const chatbotToggle = document.getElementById('chatbot-toggle');
-            const closeChat = document.getElementById('close-chat');
-            const chatMessages = document.getElementById('chat-messages');
-            const chatInput = document.getElementById('chat-input');
-            const sendMessage = document.getElementById('send-message');
+    if (currentMessage) {
+        messages.push(currentMessage);
+    }
 
-            function addMessage(sender, text) {
-                // Add typing indicator for bot messages
-                let typingIndicator;
-                if (sender === 'bot') {
-                    typingIndicator = document.createElement('div');
-                    typingIndicator.style.display = 'flex';
-                    typingIndicator.style.justifyContent = 'flex-start';
-                    typingIndicator.innerHTML = `
+    return messages.filter(msg => msg.trim() !== '');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const chatbot = document.getElementById('chatbot');
+    const chatbotToggle = document.getElementById('chatbot-toggle');
+    const closeChat = document.getElementById('close-chat');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendMessage = document.getElementById('send-message');
+
+    function addMessage(sender, text) {
+        // Add typing indicator for bot messages
+        let typingIndicator;
+        if (sender === 'bot') {
+            typingIndicator = document.createElement('div');
+            typingIndicator.style.display = 'flex';
+            typingIndicator.style.justifyContent = 'flex-start';
+            typingIndicator.innerHTML = `
                 <div class="typing-indicator">
                     <span></span>
                     <span></span>
                     <span></span>
                 </div>
             `;
-                    chatMessages.appendChild(typingIndicator);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-                // Delay actual message for bot responses
-                setTimeout(() => {
-                    if (typingIndicator) {
-                        typingIndicator.remove();
-                    }
-
-                    const messageDiv = document.createElement('div');
-                    messageDiv.style.display = 'flex';
-                    messageDiv.style.justifyContent = sender === 'user' ? 'flex-end' : 'flex-start';
-
-                    const bubbleClass = sender === 'user' ? 'user' : 'bot';
-
-                    messageDiv.innerHTML = `
-                <div class="message-bubble ${bubbleClass}">
-                    ${text}
-                </div>
-            `;
-
-                    chatMessages.appendChild(messageDiv);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, sender === 'bot' ? 1000 : 0);
+        // Delay actual message for bot responses
+        setTimeout(() => {
+            if (typingIndicator) {
+                typingIndicator.remove();
             }
 
-            window.showFAQMenu = function() {
-                addMessage('bot', `
+            const messageDiv = document.createElement('div');
+            messageDiv.style.display = 'flex';
+            messageDiv.style.justifyContent = sender === 'user' ? 'flex-end' : 'flex-start';
+            
+            const bubbleClass = sender === 'user' ? 'user' : 'bot';
+            
+            const messageContent = text;
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble ${bubbleClass}">
+                    ${messageContent}
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Make links clickable in bot messages
+            if (sender === 'bot') {
+                const links = messageDiv.getElementsByTagName('a');
+                Array.from(links).forEach(link => {
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        if (link.href.startsWith('mailto:')) {
+                            window.location.href = link.href;
+                        } else {
+                            window.open(link.href, '_blank');
+                        }
+                    };
+                });
+            }
+        }, sender === 'bot' ? 1000 : 0);
+    }
+
+    window.showFAQMenu = function() {
+        addMessage('bot', `
             <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <p style="font-weight: 600; color: var(--sikap-text); margin-bottom: 0.5rem;">
+                    <i class="fas fa-list-ul" style="color: var(--sikap-primary); margin-right: 0.5rem;"></i>
+                    How can I help you?
+                </p>
                 <button onclick="showFAQsByType('jobseeker')" 
                     class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user-tie" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
+                    </div>
                     <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
                         <span style="font-weight: 500;">Job Seeker Help Center</span>
                         <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
@@ -534,6 +542,9 @@
                 </button>
                 <button onclick="showFAQsByType('employer')" 
                     class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-building-circle-check" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
+                    </div>
                     <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
                         <span style="font-weight: 500;">Employer Help Center</span>
                         <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
@@ -544,11 +555,11 @@
                 </button>
             </div>
         `);
-            }
+    }
 
-            window.showFAQsByType = function(type) {
-                const faqs = SIKAP_FAQS[type];
-                let faqButtons = faqs.map(faq => `
+    window.showFAQsByType = function(type) {
+        const faqs = SIKAP_FAQS[type];
+        let faqButtons = faqs.map(faq => `
             <button onclick="showAnswer('${type}', '${faq.q.replace(/'/g, "\\'")}')"
                 class="sikap-faq-button">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -558,7 +569,7 @@
             </button>
         `).join('');
 
-                addMessage('bot', `
+        addMessage('bot', `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
                     <i class="fas ${type === 'jobseeker' ? 'fa-user-tie' : 'fa-building'}" 
@@ -581,91 +592,108 @@
                 </button>
             </div>
         `);
-            };
+    };
 
-            window.showAnswer = function(type, question) {
-                const faq = SIKAP_FAQS[type].find(f => f.q === question);
-                if (faq) {
-                    addMessage('user', faq.q);
+    window.showAnswer = function(type, question) {
+        const faq = SIKAP_FAQS[type].find(f => f.q === question);
+        if (faq) {
+            // Show user's question
+            addMessage('user', faq.q);
+            
+            // Get answer messages
+            const messages = formatBulletPoints(faq.a);
+            const totalMessages = messages.length;
+            
+            // Show each message with delay
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    addMessage('bot', msg);
+                    
+                    // After showing all answer messages
+                    if (index === totalMessages - 1) {
+                        // Add contact info
+                        setTimeout(() => {
+                            addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
+                            
+                            // Show menu after contact info
+                            setTimeout(showFAQMenu, 2000);
+                        }, 2000);
+                    }
+                }, (index + 1) * 2000);
+            });
+        }
+    };
 
+    // Update handleUserInput function as well
+    function handleUserInput(message) {
+        const normalizedInput = message.toLowerCase();
+        let foundAnswer = false;
+
+        for (const type in SIKAP_FAQS) {
+            for (const faq of SIKAP_FAQS[type]) {
+                if (faq.q.toLowerCase().includes(normalizedInput) || 
+                    normalizedInput.includes(faq.q.toLowerCase())) {
+                    
                     const messages = formatBulletPoints(faq.a);
+                    const totalMessages = messages.length;
+
                     messages.forEach((msg, index) => {
                         setTimeout(() => {
                             addMessage('bot', msg);
-
-                            // Show FAQ menu after last message
-                            if (index === messages.length - 1) {
-                                setTimeout(showFAQMenu, 2000);
-                            }
-                        }, (index + 1) * 2000); // 2 second delay between each message
-                    });
-                }
-            };
-
-            // Update handleUserInput function as well
-            function handleUserInput(message) {
-                const normalizedInput = message.toLowerCase();
-                let foundAnswer = false;
-
-                for (const type in SIKAP_FAQS) {
-                    for (const faq of SIKAP_FAQS[type]) {
-                        if (faq.q.toLowerCase().includes(normalizedInput) ||
-                            normalizedInput.includes(faq.q.toLowerCase())) {
-
-                            const messages = formatBulletPoints(faq.a);
-                            messages.forEach((msg, index) => {
+                            if (index === totalMessages - 1) {
                                 setTimeout(() => {
-                                    addMessage('bot', msg);
-                                    if (index === messages.length - 1) {
-                                        setTimeout(showFAQMenu, 2000);
-                                    }
-                                }, index * 2000); // 2 second delay between each message
-                            });
-
-                            foundAnswer = true;
-                            break;
-                        }
-                    }
-                    if (foundAnswer) break;
-                }
-
-                if (!foundAnswer) {
-                    addMessage('bot', "I couldn't find a specific answer. Here are some frequently asked questions:");
-                    setTimeout(showFAQMenu, 1000);
+                                    addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
+                                    setTimeout(showFAQMenu, 2000);
+                                }, 2000);
+                            }
+                        }, (index + 1) * 2000);
+                    });
+                    
+                    foundAnswer = true;
+                    break;
                 }
             }
+            if (foundAnswer) break;
+        }
 
-            chatbotToggle.addEventListener('click', () => {
-                chatbot.classList.add('active');
-                chatbotToggle.classList.add('hidden');
-                addMessage('bot', 'Hello! How can I help you today?');
-                showFAQMenu();
-            });
+        if (!foundAnswer) {
+            addMessage('bot', "I couldn't find a specific answer. Here are some frequently asked questions:");
+            setTimeout(showFAQMenu, 1000);
+        }
+    }
 
-            closeChat.addEventListener('click', () => {
-                chatbot.classList.remove('active');
-                chatbotToggle.classList.remove('hidden');
-                chatMessages.innerHTML = '';
-            });
+    chatbotToggle.addEventListener('click', () => {
+        chatbot.classList.add('active');
+        chatbotToggle.classList.add('hidden');
+        addMessage('bot', 'Hello! How can I help you today?');
+        showFAQMenu();
+    });
 
-            sendMessage.addEventListener('click', () => {
-                const message = chatInput.value.trim();
-                if (message) {
-                    addMessage('user', message);
-                    handleUserInput(message);
-                    chatInput.value = '';
-                }
-            });
+    closeChat.addEventListener('click', () => {
+        chatbot.classList.remove('active');
+        chatbotToggle.classList.remove('hidden');
+        chatMessages.innerHTML = '';
+    });
 
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage.click();
-                }
-            });
-        });
-    </script>
+    sendMessage.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        if (message) {
+            addMessage('user', message);
+            handleUserInput(message);
+            chatInput.value = '';
+        }
+    });
+
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage.click();
+        }
+    });
+});
+</script>
+
 
 </body>
-
 </html>
+

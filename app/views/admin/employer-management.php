@@ -13,7 +13,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
+                    colors: { 
                         primary: '#092C4C',
                         secondary: '#F3AF0E'
                     }
@@ -58,9 +58,9 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                 <!-- Improved Employer Stats Cards -->
                 <div class="mb-6">
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-6 ">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                         <!-- Card 1: Total Employers -->
-                        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-5">
+                        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
                             <div class="mb-3 sm:mb-4">
                                 <h3 class="mb-2 text-xs font-medium text-gray-700 sm:mb-3">Total Employers</h3>
                                 <div class="flex items-baseline">
@@ -110,7 +110,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                 <div class="flex items-baseline">
                                     <span class="text-lg font-bold text-orange-600 sm:text-xl" data-stat="pending">
                                         <?php echo count(array_filter($users, function ($user) {
-                                            return $user['status'] === 'pending verification';
+                                            return $user['status'] === 'pending_verification';
                                         })); ?>
                                     </span>
                                     <svg class="ml-1" width="12px" height="12px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -203,8 +203,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                 <!-- Search and Filter Section -->
                 <div class="relative py-4 rounded-xl">
-                    <div class="flex flex-col w-full gap-6 mx-auto">
-                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
+                    <div class="flex flex-col w-full mx-auto space-y-4 sm:space-y-6">
+                        <div class="grid items-center w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:flex xl:flex-wrap sm:gap-4">
 
                             <!-- Search Employers (Much Wider) -->
                             <div class="flex-1 min-w-[200px] max-w-xs">
@@ -284,7 +284,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Incomplete
                                         </button>
-                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending verification')"
+                                        <button @click="selected = 'Pending'; open = false; filterByStatus('pending_verification')"
                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Pending
                                         </button>
@@ -350,14 +350,12 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
-                                <button onclick="clearAllFilters()"
-                                    class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                    Clear
+                           <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
+                                <button onclick="clearAllFilters()" class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="mr-1 fas fa-times"></i>Clear Filters
                                 </button>
-                                <button onclick="exportResults('csv')"
-                                    class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Export
+                                <button onclick="exportToPDF()" class="px-3 py-2 text-sm text-white border rounded-lg bg-primary border-primary hover:bg-primary/90">
+                                    <i class="mr-1 fas fa-file-pdf"></i>Export PDF
                                 </button>
                             </div>
                         </div>
@@ -387,11 +385,13 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             <p class="text-gray-500">No employers match your search criteria</p>
                         </div>
 
-                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
-                            <table class="w-full divide-y divide-gray-200 table-auto">
+                        <div class="relative overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 table-auto">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Company</th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Business Address</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Representative</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
@@ -409,6 +409,11 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     <?php echo htmlspecialchars($user['company_name']); ?>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">
+                                                    <?php echo htmlspecialchars($user['business_address'] ?? '-'); ?>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
@@ -461,18 +466,19 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
 
                         <!-- Pagination -->
-                        <div class="px-6 py-4 border-t border-gray-200" id="paginationContainer">
-                            <div class="flex items-center justify-between">
+                        <div class="px-4 py-3 border-t border-gray-200 sm:px-6" id="paginationContainer">
+                            <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
                                 <!-- Left side: Results info -->
-                                <div class="text-sm text-gray-700" id="paginationInfo">
+                                <div class="w-full text-sm text-center text-gray-700 sm:w-auto sm:text-left" id="paginationInfo">
                                     Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($users); ?></span> employers
                                 </div>
 
                                 <!-- Right side: Pagination controls -->
-                                <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
+                                <nav class="inline-flex justify-center w-full space-x-2 sm:w-auto" aria-label="Pagination" id="paginationControls">
                                     <!-- Previous button -->
                                     <button id="prevBtn" onclick="changePage('prev')"
                                         class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -500,6 +506,96 @@ include_once __DIR__ . '/components/admin_auth_check.php';
     <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
     <script>
+        // Function to handle employer status updates
+        function updateEmployerStatus(userId, action) {
+            if (!confirm('Are you sure you want to ' + action + ' this employer\'s account?')) {
+                return;
+            }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            formData.append('action', action);
+            formData.append('user_type', 'employer');
+
+            // Get the base URL from the current path
+            const baseUrl = window.location.pathname.split('index.php')[0];
+            const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                const text = await response.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Find all buttons with onclick containing the userId
+                    const buttons = document.querySelectorAll(`button[onclick*="${userId}"]`);
+                    const row = buttons[0]?.closest('tr');
+                    
+                    if (row) {
+                        // Update status cell
+                        const statusCell = row.querySelector('td:nth-child(6) span');
+                        const newStatus = action === 'disable' ? 'disabled' : 'enabled';
+                        if (statusCell) {
+                            statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                            statusCell.className = `inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
+                                newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
+                            }`;
+                        }
+
+                        // Update action button
+                        const actionButton = buttons[0];
+                        if (actionButton) {
+                            if (newStatus === 'disabled') {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-check"></i> Enable';
+                                actionButton.className = 'text-green-600 hover:text-green-900';
+                                actionButton.setAttribute('onclick', `updateEmployerStatus('${userId}', 'enable')`);
+                            } else {
+                                actionButton.innerHTML = '<i class="mr-1 fas fa-ban"></i> Disable';
+                                actionButton.className = 'text-red-600 hover:text-red-900';
+                                actionButton.setAttribute('onclick', `updateEmployerStatus('${userId}', 'disable')`);
+                            }
+                        }
+                    }
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                    successMessage.innerHTML = `Successfully ${action}d employer account`;
+                    document.body.appendChild(successMessage);
+
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to update status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorMessage.innerHTML = error.message;
+                document.body.appendChild(errorMessage);
+                
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 3000);
+            });
+        }
+
         let allRows = [];
         let filteredRows = [];
         let currentFilters = {
@@ -790,64 +886,89 @@ include_once __DIR__ . '/components/admin_auth_check.php';
         }
 
         // Export functionality
-        function exportResults(format) {
-            // Export all filtered results, not just current page
-            const visibleData = filteredRows.map(row => {
+        function exportToPDF() {
+            // Get visible rows
+            const visibleRows = Array.from(document.querySelectorAll('#employersTableBody tr'))
+                .filter(row => row.style.display !== 'none');
+            
+            // Create print window
+            const printWindow = window.open('', '', 'height=600,width=800');
+            
+            // Build HTML content
+            printWindow.document.write('<html><head><title>Employers Report</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write(`
+                table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f8f9fa; }
+                .header { margin-bottom: 20px; text-align: center; }
+                .header h1 { margin: 0; color: #092C4C; }
+                .status-enabled { color: #059669; }
+                .status-disabled { color: #DC2626; }
+                .date { color: #666; font-size: 12px; }
+            `);
+            printWindow.document.write('</style></head><body>');
+            
+            // Add header
+            printWindow.document.write(`
+                <div class="header">
+                    <h1>SIKAP - Employers Report</h1>
+                    <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+                </div>
+            `);
+            
+            // Create table
+            printWindow.document.write('<table><thead><tr>');
+            const headers = ['Company Name', 'Business Address', 'Contact', 'Representative', 'Status', 'Registration Date'];
+            headers.forEach(header => {
+                printWindow.document.write(`<th>${header}</th>`);
+            });
+            printWindow.document.write('</tr></thead><tbody>');
+            
+            // Add rows
+            visibleRows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                return {
-                    company: cells[0].textContent.trim(),
-                    contact: cells[1].textContent.trim(),
-                    representative: cells[2].textContent.trim(),
-                    status: cells[3].textContent.trim(),
-                    registered: cells[4].textContent.trim()
-                };
+                printWindow.document.write('<tr>');
+                // Only include the first 6 cells (excluding the actions column)
+                for (let i = 0; i < 6; i++) {
+                    if (i === 4) { // Status column
+                        const status = cells[i].textContent.trim();
+                        printWindow.document.write(`
+                            <td class="status-${status.toLowerCase()}">
+                                ${status}
+                            </td>
+                        `);
+                    } else {
+                        printWindow.document.write(`<td>${cells[i].textContent.trim()}</td>`);
+                    }
+                }
+                printWindow.document.write('</tr>');
             });
-
-            if (format === 'csv') {
-                exportToCSV(visibleData);
-            } else if (format === 'pdf') {
-                // PDF export would require a library like jsPDF
-                alert('PDF export functionality would require additional implementation');
-            }
-        }
-
-        function exportToCSV(data) {
-            const headers = ['Company', 'Contact', 'Representative', 'Status', 'Registered'];
-            const csvContent = [
-                headers.join(','),
-                ...data.map(row => [
-                    `"${row.company}"`,
-                    `"${row.contact}"`,
-                    `"${row.representative}"`,
-                    `"${row.status}"`,
-                    `"${row.registered}"`
-                ].join(','))
-            ].join('\n');
-
-            const blob = new Blob([csvContent], {
-                type: 'text/csv'
-            });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `employers_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            
+            printWindow.document.write('</tbody></table>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.focus();
+                printWindow.print();
+            };
         }
 
         // Enhanced suspend/unsuspend functionality with proper API endpoint
         function handleStatusChange(action, userId, button) {
+            // Already confirmed through native confirm dialog
             // Disable button and show loading state
             button.disabled = true;
             const originalText = button.innerHTML;
             button.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i>Processing...';
 
-            // Create form data
+            // Create form data 
             const formData = new FormData();
-            formData.append('action', action);
             formData.append('user_id', userId);
+            formData.append('action', action);
+            formData.append('user_type', 'employer');
 
             fetch('index.php?page=update-employer-status', {
                     method: 'POST',
@@ -922,7 +1043,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             rows.forEach(row => {
                 const status = row.getAttribute('data-status');
                 if (status === 'incomplete') counts.incomplete++;
-                if (status === 'pending verification') counts.pending++;
+                if (status === 'pending_verification') counts.pending++;
                 if (status === 'verified') counts.verified++;
                 if (status === 'rejected') counts.rejected++;
                 if (status === 'suspended') counts.suspended++;
@@ -970,7 +1091,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             if (e.key === 'Escape') {
                 clearAllFilters();
             }
-        });
+        }); 
     </script>
 </body>
 
