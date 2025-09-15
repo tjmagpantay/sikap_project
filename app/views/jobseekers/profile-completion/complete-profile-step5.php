@@ -134,7 +134,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
             <!-- Display existing skills if available -->
             <?php if (!empty($skills) && is_array($skills) && count($skills) > 0): ?>
                 <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-                    <h3 class="mb-4 text-lg font-medium text-gray-900">Your Current Skills</h3>
+                    <h3 class="mb-4 font-medium text-gray-900 text-md">Your Current Skills</h3>
                     <div class="flex flex-wrap gap-2">
                         <?php foreach ($skills as $skill): ?>
                             <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-primary">
