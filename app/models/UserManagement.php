@@ -20,8 +20,12 @@ class UserManagement {
     public function getUsersByType($type) {
         if ($type === 'employer') {
             $stmt = $this->db->prepare("
-                SELECT employer_id, user_id, first_name, middle_name, last_name, position, contact_no, company_name, about_us, created_at, updated_at, profile_completed, status
-                FROM employer
+                SELECT e.employer_id, e.user_id, e.first_name, e.middle_name, e.last_name, 
+                       e.position, e.contact_no, e.company_name, e.about_us, e.created_at, 
+                       e.updated_at, e.profile_completed, e.status,
+                       eb.business_address
+                FROM employer e
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
             ");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

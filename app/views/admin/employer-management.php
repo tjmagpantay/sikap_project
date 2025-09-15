@@ -58,9 +58,9 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                 <!-- Improved Employer Stats Cards -->
                 <div class="mb-6">
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-6 ">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                         <!-- Card 1: Total Employers -->
-                        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-5">
+                        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
                             <div class="mb-3 sm:mb-4">
                                 <h3 class="mb-2 text-xs font-medium text-gray-700 sm:mb-3">Total Employers</h3>
                                 <div class="flex items-baseline">
@@ -203,8 +203,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
 
                 <!-- Search and Filter Section -->
                 <div class="relative py-4 rounded-xl">
-                    <div class="flex flex-col w-full gap-6 mx-auto">
-                        <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
+                    <div class="flex flex-col w-full mx-auto space-y-4 sm:space-y-6">
+                        <div class="grid items-center w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:flex xl:flex-wrap sm:gap-4">
 
                             <!-- Search Employers (Much Wider) -->
                             <div class="flex-1 min-w-[200px] max-w-xs">
@@ -385,11 +385,13 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             <p class="text-gray-500">No employers match your search criteria</p>
                         </div>
 
-                        <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
-                            <table class="w-full divide-y divide-gray-200 table-auto">
+                        <div class="relative overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 table-auto">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Company</th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Business Address</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Representative</th>
                                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
@@ -407,6 +409,11 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     <?php echo htmlspecialchars($user['company_name']); ?>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">
+                                                    <?php echo htmlspecialchars($user['business_address'] ?? '-'); ?>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
@@ -459,18 +466,19 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
 
                         <!-- Pagination -->
-                        <div class="px-6 py-4 border-t border-gray-200" id="paginationContainer">
-                            <div class="flex items-center justify-between">
+                        <div class="px-4 py-3 border-t border-gray-200 sm:px-6" id="paginationContainer">
+                            <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
                                 <!-- Left side: Results info -->
-                                <div class="text-sm text-gray-700" id="paginationInfo">
+                                <div class="w-full text-sm text-center text-gray-700 sm:w-auto sm:text-left" id="paginationInfo">
                                     Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($users); ?></span> employers
                                 </div>
 
                                 <!-- Right side: Pagination controls -->
-                                <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
+                                <nav class="inline-flex justify-center w-full space-x-2 sm:w-auto" aria-label="Pagination" id="paginationControls">
                                     <!-- Previous button -->
                                     <button id="prevBtn" onclick="changePage('prev')"
                                         class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -911,7 +919,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             
             // Create table
             printWindow.document.write('<table><thead><tr>');
-            const headers = ['Company Name', 'Contact', 'Representative', 'Status', 'Registration Date'];
+            const headers = ['Company Name', 'Business Address', 'Contact', 'Representative', 'Status', 'Registration Date'];
             headers.forEach(header => {
                 printWindow.document.write(`<th>${header}</th>`);
             });
@@ -922,7 +930,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 const cells = row.querySelectorAll('td');
                 printWindow.document.write('<tr>');
                 // Only include the first 6 cells (excluding the actions column)
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 6; i++) {
                     if (i === 4) { // Status column
                         const status = cells[i].textContent.trim();
                         printWindow.document.write(`
