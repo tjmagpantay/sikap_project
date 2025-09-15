@@ -81,14 +81,10 @@ $localRecruitment = array_filter($allEvents, function ($event) {
               <p class="mb-2 text-xs opacity-70">
                 <?php echo date('j F Y', strtotime($event['time_start'])); ?>
               </p>
-              <h3 class="mb-3 text-base font-medium leading-tight sm:text-lg">
+              <h3 class="mb-3 text-base font-medium leading-tight line-clamp-2 sm:text-lg" title="<?php echo htmlspecialchars($event['title']); ?>">
                 <?php echo htmlspecialchars($event['title']); ?>
               </h3>
-              <?php if (!empty($event['description'])): ?>
-                <p class="mb-3 text-xs opacity-80 sm:text-sm line-clamp-2">
-                  <?php echo htmlspecialchars(substr($event['description'], 0, 80)) . (strlen($event['description']) > 80 ? '...' : ''); ?>
-                </p>
-              <?php endif; ?>
+              
               <div class="flex items-center justify-between">
                 <span class="text-xs opacity-60">
                   <?php echo date('g:i A', strtotime($event['time_start'])); ?>

@@ -10,7 +10,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <div class="relative px-6 py-4 overflow-hidden rounded-lg sm:px-8 sm:py-12 lg:px-12 lg:py-16">
             <!-- Background Image and Gradient Overlay (below content) -->
             <div class="absolute inset-0 z-0 rounded-t-xl">
-                <img src="assets/images/header-bg.png"
+                <img src="assets/images/new-header.svg"
                     alt="Hero Background"
                     class="object-cover w-full h-full opacity-20 rounded-t-xl"
                     onerror="this.style.display='none'">
@@ -21,12 +21,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             <!-- Hero Content Only -->
             <div class="relative z-10 flex flex-col max-w-5xl gap-6 mx-auto rounded-t-xl" style="min-height:80px;">
-                <div class="flex flex-col items-start justify-start flex-1 h-full md:items-start md:justify-start">
+                <div class="flex flex-col items-start justify-center flex-1 h-full md:items-start md:justify-center">
                     <p class="max-w-2xl mt-2 text-xs leading-relaxed text-center text-white md:text-left sm:mt-3 sm:text-xs">
                         LEARN HOW TO GET STARTED
                     </p>
-                    <h1 class="w-full mb-1 text-xl font-bold text-white text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
-                        Sikap 101 will guide you through the <br> basics of the platform
+                    <h1 class="w-full mb-1 text-3xl font-bold text-white text-start sm:text-3xl lg:text-4xl md:w-auto md:text-left">
+                        Find your dream jobs with us
                     </h1>
 
                 </div>
@@ -239,13 +239,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     </div>
                     <!-- Filter Buttons -->
                     <div class="flex items-start w-full mb-2 border-b border-gray-200">
-                        <button class="flex-1 py-4 text-sm font-medium transition-colors border-b-2 text-grayMain border-primary active-filter"
-                            data-filter="all" onclick="filterJobs('all', this)">
-                            <div class="flex flex-col items-start">
-                                <span>All Jobs
-                                    <span class="text-xs font-normal text-gray-400 whitespace-nowrap">(2 jobs)</span> </span>
-                            </div>
-                        </button>
 
                         <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
                             data-filter="recent" onclick="filterJobs('recent', this)">
@@ -263,13 +256,20 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                     </div>
                     <!-- Job Post Card -->
-                    <div class="overflow-y-auto " style="max-height: 600px; ">
+                    <div class="overflow-y-auto" style="max-height: 600px;">
                         <?php if (!empty($jobs)): ?>
                             <div class="space-y-6">
-                                <?php foreach ($jobs as $job): ?>
+                                <?php
+                                $displayedJobs = array_slice($jobs, 0, 5); // Limit to 5 jobs
+                                $totalJobs = count($jobs);
+                                ?>
+
+                                <?php foreach ($displayedJobs as $job): ?>
                                     <div class="relative p-6 transition-all duration-300 ease-in-out transform border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] left-job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-gray-50'); ?>"
                                         onclick="loadJobDetails(<?php echo $job['job_id']; ?>, this)"
                                         data-job-id="<?php echo $job['job_id']; ?>"
+                                        data-posted-date="<?php echo strtotime($job['created_at']); ?>"
+                                        data-match-percentage="<?php echo $job['match_percentage'] ?? 0; ?>"
                                         style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
                                         <!-- Row 1: Business Profile + Job Title + Business Name + Urgent Tag -->
@@ -344,7 +344,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             </span>
 
                                             <span class="flex items-center gap-1 transition-all duration-300 text-primary hover:text-primary/80">
-                                                Best Matches: 
+                                                Best Matches:
 
                                                 <?php
                                                 $matchPercentage = $job['match_percentage'] ?? 50;
@@ -387,6 +387,28 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     </div>
                                 <?php endforeach; ?>
                             </div>
+
+                            <!-- View More Jobs Button/Text - Only show if there are more than 5 jobs -->
+                            <?php if ($totalJobs > 5): ?>
+                                <div class="mt-6 text-center">
+                                    <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg hover:border-primary hover:shadow-md">
+                                        <p class="mb-2 text-sm text-gray-600">
+                                            Showing 5 of <?php echo $totalJobs; ?> jobs available
+                                        </p>
+                                        <a href="?page=job-search"
+                                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-md text-primary hover:bg-primary hover:text-white hover:shadow-lg hover:scale-105">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                            View more jobs on job search page
+                                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
                         <?php else: ?>
                             <div class="p-8 text-center">
                                 <i class="mx-auto text-4xl text-gray-300 fas fa-briefcase"></i>
@@ -411,13 +433,124 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         </div>
     </div>
 
+
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
-        // Auto-load latest job when page loads
+        // Updated job filtering function - Only Most Recent and Best Matches
+        function filterJobs(filterType, buttonElement) {
+            // Update active filter button
+            document.querySelectorAll('[data-filter]').forEach(btn => {
+                btn.classList.remove('border-primary', 'text-primary', 'active-filter');
+                btn.classList.add('border-transparent', 'text-grayMain');
+            });
+
+            buttonElement.classList.remove('border-transparent', 'text-grayMain');
+            buttonElement.classList.add('border-primary', 'text-primary', 'active-filter');
+
+            // Get all job cards
+            const jobCards = document.querySelectorAll('.left-job-card');
+            let sortedCards = Array.from(jobCards);
+
+            if (filterType === 'recent') {
+                // Sort by most recent (posted date)
+                sortedCards.sort((a, b) => {
+                    const dateA = parseInt(a.dataset.postedDate || 0);
+                    const dateB = parseInt(b.dataset.postedDate || 0);
+                    return dateB - dateA; // Most recent first
+                });
+            } else if (filterType === 'matches') {
+                // Sort by best matches (match percentage)
+                sortedCards.sort((a, b) => {
+                    const matchA = parseFloat(a.dataset.matchPercentage || 0);
+                    const matchB = parseFloat(b.dataset.matchPercentage || 0);
+                    return matchB - matchA; // Highest match first
+                });
+            }
+
+            // Show only top 5 jobs
+            const visibleCards = sortedCards.slice(0, 5);
+
+            // Hide all cards first
+            jobCards.forEach(card => {
+                card.style.display = 'none';
+                card.style.order = 'unset';
+            });
+
+            // Show and reorder filtered cards
+            visibleCards.forEach((card, index) => {
+                card.style.display = 'block';
+                card.style.order = index;
+                // Add slight animation
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.3s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 50);
+            });
+
+            // Update job count
+            updateJobCount(visibleCards.length);
+
+            // Auto-select first visible job
+            if (visibleCards.length > 0) {
+                const firstJobId = visibleCards[0].getAttribute('data-job-id');
+                loadJobDetails(firstJobId, visibleCards[0], true);
+            }
+        }
+
+        // Initialize with "Most Recent" as default
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if there are any jobs available
+            // Auto-load first job
+            const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
+            if (firstJobCard) {
+                const latestJobId = firstJobCard.getAttribute('data-job-id');
+                loadJobDetails(latestJobId, firstJobCard, true);
+            }
+
+            // Set "Most Recent" as default active
+            const recentButton = document.querySelector('[data-filter="recent"]');
+            if (recentButton) {
+                filterJobs('recent', recentButton);
+            }
+        });
+
+        // Update job count display
+        function updateJobCount(count) {
+            const totalJobs = <?php echo count($jobs); ?>;
+
+            document.querySelectorAll('[data-filter] span .text-gray-400').forEach(element => {
+                const filterType = element.closest('[data-filter]').dataset.filter;
+                element.textContent = `(${count} jobs)`;
+            });
+        }
+
+        // Update job count display - Updated to handle the limit
+        function updateJobCount(count) {
+            const totalJobs = <?php echo count($jobs); ?>;
+            const displayLimit = 5;
+            const actualDisplayCount = Math.min(count, displayLimit);
+
+            const countElements = document.querySelectorAll('.text-gray-400');
+            countElements.forEach(element => {
+                if (element.textContent.includes('jobs')) {
+                    if (totalJobs <= displayLimit) {
+                        element.textContent = `(${actualDisplayCount} jobs)`;
+                    } else {
+                        element.textContent = `(${actualDisplayCount} of ${totalJobs} jobs)`;
+                    }
+                }
+            });
+        }
+
+        // Auto-load latest job when page loads - Updated
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there are any jobs available (only check visible jobs)
             const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
 
             if (firstJobCard) {
@@ -440,6 +573,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
             // Initialize other functionality
             initializeSearchAndFilters();
+
+            // Update the job count on initial load
+            const visibleJobs = document.querySelectorAll('.left-job-card[data-job-id]').length;
+            updateJobCount(visibleJobs);
         });
 
         // AJAX function to load job details (updated with auto-load support)
@@ -912,10 +1049,18 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Update job count display
         function updateJobCount(count) {
+            const totalJobs = <?php echo count($jobs); ?>;
+            const displayLimit = 5;
+            const actualDisplayCount = Math.min(count, displayLimit);
+
             const countElements = document.querySelectorAll('.text-gray-400');
             countElements.forEach(element => {
                 if (element.textContent.includes('jobs')) {
-                    element.textContent = `(${count} jobs)`;
+                    if (totalJobs <= displayLimit) {
+                        element.textContent = `(${actualDisplayCount} jobs)`;
+                    } else {
+                        element.textContent = `(${actualDisplayCount} of ${totalJobs} jobs)`;
+                    }
                 }
             });
         }
@@ -956,7 +1101,12 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             };
         }
     </script>
+
 </div>
+
+<div class="pb-20"></div> <!-- This creates space before the footer -->
+
+
 
 <script src="/public/assets/js/firebase-config.js"></script>
 <script type="module" src="/public/assets/js/firebase-init.js"></script>

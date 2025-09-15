@@ -12,7 +12,7 @@ const SIKAP_FAQS = {
             q: "How does the job recommendation system work?",
             a: "Sikap uses machine learning algorithms that analyze your profile, skills, and preferences to match you with the most suitable job postings. It uses techniques like content-based filtering to ensure personalized results based on your qualifications."
         }, 
-        {
+        { 
             q: "Is Sikap free to use?",
             a: "Yes. Sikap is completely free for job seekers, employers, and PESO Rosario staff. It is a public service platform developed under the goals of the PESO Act of 1999 (RA 8759)."
         },
