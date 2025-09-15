@@ -6,7 +6,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
         <div class="text-center">
-            <h2 class="mt-2 text-3xl font-extrabold text-center text-gray-900">
+            <h2 class="mt-2 text-3xl font-extrabold text-center text-grayMain">
                 Personal Information
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
