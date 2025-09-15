@@ -137,7 +137,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                     Clear Filters
                                 </button>
                                 <button onclick="exportToPDF()" 
-                                        class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
+                                        class="px-4 py-2 text-sm text-white rounded-lg bg-primary hover:bg-primary/90">
                                     <i class="mr-1 fas fa-file-pdf"></i> Export PDF
                                 </button>
                             </div>

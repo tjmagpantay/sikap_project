@@ -36,80 +36,68 @@ class UserManagementController {
      * Handle AJAX suspend/unsuspend requests
      */
     public function updateStatus() {
-        // Clear any existing output buffers
+        // Clear any existing output
         while (ob_get_level()) {
             ob_end_clean();
         }
         
-        // Start fresh output buffer
-        ob_start();
-        
-        // Set headers
+        // Set content type to JSON
         header('Content-Type: application/json');
         
-        error_log("========= Status Update Request Started =========");
-        error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
-        error_log("POST Data: " . json_encode($_POST));
-        error_log("Request URI: " . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            error_log("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
-            ob_clean(); // Clear any output
-            $this->sendJson(['success' => false, 'error' => 'Invalid request method']);
-            return;
-        }
-
-        $user_id = $_POST['user_id'] ?? null;
-        $action = $_POST['action'] ?? null;
-        $user_type = $_POST['user_type'] ?? null;
-        
-        error_log("Parsed parameters:");
-        error_log("user_id: " . ($user_id ?? 'null'));
-        error_log("action: " . ($action ?? 'null'));
-        error_log("user_type: " . ($user_type ?? 'null'));
-
-        // Validate all required parameters
-        if (!$user_id || !$action || !$user_type) {
-            $this->sendJson([
-                'success' => false, 
-                'error' => 'Missing required parameters', 
-                'received' => [
-                    'user_id' => $user_id,
-                    'action' => $action,
-                    'user_type' => $user_type
-                ]
-            ]);
-            return;
-        }
-        
         try {
-            $new_status = $action === 'disable' ? 'disabled' : 'enabled';
-            error_log("Attempting to update {$user_type} status: user_id={$user_id}, new_status={$new_status}");
+            // Validate request method
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('Invalid request method');
+            }
+
+            // Get and validate parameters
+            $user_id = $_POST['user_id'] ?? null;
+            $action = $_POST['action'] ?? null;
+            $user_type = $_POST['user_type'] ?? null;
             
+            error_log("Status Update Request - Parameters: " . json_encode([
+                'user_id' => $user_id,
+                'action' => $action,
+                'user_type' => $user_type
+            ]));
+
+            if (!$user_id || !$action || !$user_type) {
+                throw new Exception('Missing required parameters');
+            }
+
+            // Determine new status
+            $new_status = $action === 'disable' ? 'disabled' : 'enabled';
+            
+            // Update status based on user type
+            $success = false;
             if ($user_type === 'jobseeker') {
+                error_log("Updating jobseeker status - ID: $user_id, New Status: $new_status");
                 $success = $this->model->updateJobseekerStatus($user_id, $new_status);
             } else {
+                error_log("Updating employer status - ID: $user_id, Action: $action");
                 $success = $this->model->updateEmployerStatus($user_id, $action);
             }
             
-            if ($success) {
-                $this->sendJson([
-                    'success' => true,
-                    'message' => ucfirst($action) . ' successful',
-                    'new_status' => $new_status
-                ]);
-            } else {
-                $this->sendJson([
-                    'success' => false,
-                    'error' => 'Failed to update status'
-                ]);
+            if (!$success) {
+                throw new Exception('Failed to update status');
             }
+
+            // Send success response
+            echo json_encode([
+                'success' => true,
+                'message' => ucfirst($action) . ' successful',
+                'new_status' => $new_status
+            ]);
+            
         } catch (Exception $e) {
-            $this->sendJson([
+            error_log("Status Update Error: " . $e->getMessage());
+            http_response_code(400);
+            echo json_encode([
                 'success' => false,
-                'error' => 'An error occurred: ' . $e->getMessage()
+                'error' => $e->getMessage()
             ]);
         }
+        exit;
     }
 
     /**
