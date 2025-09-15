@@ -12,23 +12,25 @@
             --sikap-border: #e2e8f0;
             --sikap-text: #334155;
             --sikap-text-light: #64748b;
-            --sikap-primary: #3b82f6;
+            --sikap-primary: #092c4c;
             --sikap-primary-dark: #2563eb;
             --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             --sikap-online: #22c55e;
+            --sikap-chat-bg: #f1f5f9; /* New gray background for chat area */
         }
- 
+
         @media (prefers-color-scheme: dark) {
             :root {
-                --sikap-bg: #0f172a;
-                --sikap-surface: #1e293b;
-                --sikap-border: #334155;
-                --sikap-text: #f1f5f9;
-                --sikap-text-light: #94a3b8;
-                --sikap-primary: #60a5fa;
-                --sikap-primary-dark: #3b82f6;
-                --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-                --sikap-online: #4ade80;
+                --sikap-bg: #ffffff;
+                --sikap-surface: #f8fafc;
+                --sikap-border: #e2e8f0;
+                --sikap-text: #334155;
+                --sikap-text-light: #64748b;
+                --sikap-primary: #092c4c;
+                --sikap-primary-dark: #2563eb;
+                --sikap-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+                --sikap-online: #22c55e;
+                --sikap-chat-bg: #f1f5f9;
             }
         }
 
@@ -138,6 +140,8 @@
             color: var(--sikap-text-light);
             transition: all 0.2s ease;
             border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
         }
 
         .sikap-close-btn:hover {
@@ -151,7 +155,7 @@
             padding: 1.25rem;
             overflow-y: auto;
             scroll-behavior: smooth;
-            background: var(--sikap-bg);
+            background: var(--sikap-chat-bg); /* Gray background for messages area */
         }
 
         .sikap-input-area {
@@ -180,7 +184,7 @@
         .sikap-input:focus {
             outline: none;
             border-color: var(--sikap-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(9, 44, 76, 0.1);
         }
 
         .sikap-input::placeholder {
@@ -202,7 +206,7 @@
         }
 
         .sikap-send-btn:hover {
-            background: #1d4ed8;
+            background: var(--sikap-primary-dark);
         }
 
         .sikap-send-btn:disabled {
@@ -242,7 +246,7 @@
             display: flex;
             gap: 4px;
             padding: 0.75rem 1rem;
-            background: var(--sikap-surface);
+            background: var(--sikap-bg); /* White background for typing indicator */
             border: 1px solid var(--sikap-border);
             border-radius: 1rem;
             width: fit-content;
@@ -281,21 +285,10 @@
         }
 
         .message-bubble.bot {
-            background: var(--sikap-surface);
+            background: var(--sikap-bg); /* White background for bot messages */
             color: var(--sikap-text);
             border: 1px solid var(--sikap-border);
             border-bottom-left-radius: 0.5rem;
-        }
-
-        .message-bubble.bot a {
-            color: var(--sikap-primary);
-            text-decoration: underline;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .message-bubble.bot a:hover {
-            color: var(--sikap-primary-dark);
         }
 
         .sikap-faq-button {
@@ -303,17 +296,18 @@
             width: 100%;
             padding: 1rem 1.25rem;
             text-align: left;
-            background: var(--sikap-surface);
+            background: var(--sikap-bg); /* White background for FAQ buttons */
             border: 1px solid var(--sikap-border);
             border-radius: 1rem;
             margin-bottom: 0.75rem;
             transition: all 0.2s ease;
             color: var(--sikap-text);
             font-size: 0.9375rem;
+            cursor: pointer;
         }
 
         .sikap-faq-button:hover {
-            background: var(--sikap-bg);
+            background: var(--sikap-surface);
             border-color: var(--sikap-primary);
             transform: translateY(-1px);
         }
@@ -364,7 +358,6 @@
     </style>
 </head>
 <body>
-
 
 <?php
 // Remove any output before this point
@@ -492,46 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const bubbleClass = sender === 'user' ? 'user' : 'bot';
             
-            const messageContent = text;
-            
             messageDiv.innerHTML = `
                 <div class="message-bubble ${bubbleClass}">
-                    ${messageContent}
+                    ${text}
                 </div>
             `;
             
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Make links clickable in bot messages
-            if (sender === 'bot') {
-                const links = messageDiv.getElementsByTagName('a');
-                Array.from(links).forEach(link => {
-                    link.onclick = (e) => {
-                        e.preventDefault();
-                        if (link.href.startsWith('mailto:')) {
-                            window.location.href = link.href;
-                        } else {
-                            window.open(link.href, '_blank');
-                        }
-                    };
-                });
-            }
         }, sender === 'bot' ? 1000 : 0);
     }
 
     window.showFAQMenu = function() {
         addMessage('bot', `
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <p style="font-weight: 600; color: var(--sikap-text); margin-bottom: 0.5rem;">
-                    <i class="fas fa-list-ul" style="color: var(--sikap-primary); margin-right: 0.5rem;"></i>
-                    How can I help you?
-                </p>
                 <button onclick="showFAQsByType('jobseeker')" 
                     class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-user-tie" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
-                    </div>
                     <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
                         <span style="font-weight: 500;">Job Seeker Help Center</span>
                         <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
@@ -542,9 +511,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
                 <button onclick="showFAQsByType('employer')" 
                     class="sikap-faq-button" style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sikap-primary); opacity: 0.1; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-building-circle-check" style="color: var(--sikap-primary); opacity: 1; font-size: 1.25rem;"></i>
-                    </div>
                     <div style="display: flex; flex-direction: column; align-items: start; gap: 0.25rem;">
                         <span style="font-weight: 500;">Employer Help Center</span>
                         <span style="font-size: 0.875rem; color: var(--sikap-text-light);">
@@ -597,29 +563,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showAnswer = function(type, question) {
         const faq = SIKAP_FAQS[type].find(f => f.q === question);
         if (faq) {
-            // Show user's question
             addMessage('user', faq.q);
             
-            // Get answer messages
             const messages = formatBulletPoints(faq.a);
-            const totalMessages = messages.length;
-            
-            // Show each message with delay
             messages.forEach((msg, index) => {
                 setTimeout(() => {
                     addMessage('bot', msg);
                     
-                    // After showing all answer messages
-                    if (index === totalMessages - 1) {
-                        // Add contact info
-                        setTimeout(() => {
-                            addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
-                            
-                            // Show menu after contact info
-                            setTimeout(showFAQMenu, 2000);
-                        }, 2000);
+                    // Show FAQ menu after last message
+                    if (index === messages.length - 1) {
+                        setTimeout(showFAQMenu, 2000);
                     }
-                }, (index + 1) * 2000);
+                }, (index + 1) * 2000); // 2 second delay between each message
             });
         }
     };
@@ -635,18 +590,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     normalizedInput.includes(faq.q.toLowerCase())) {
                     
                     const messages = formatBulletPoints(faq.a);
-                    const totalMessages = messages.length;
-
                     messages.forEach((msg, index) => {
                         setTimeout(() => {
                             addMessage('bot', msg);
-                            if (index === totalMessages - 1) {
-                                setTimeout(() => {
-                                    addMessage('bot', 'If you have any inquiries, please feel free to contact us via pesorosariobats@gmail.com or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
-                                    setTimeout(showFAQMenu, 2000);
-                                }, 2000);
+                            if (index === messages.length - 1) {
+                                setTimeout(showFAQMenu, 2000);
                             }
-                        }, (index + 1) * 2000);
+                        }, index * 2000); // 2 second delay between each message
                     });
                     
                     foundAnswer = true;
@@ -693,7 +643,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 </body>
 </html>
-
