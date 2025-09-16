@@ -206,13 +206,22 @@ class EventProgram
     public function notifyJobseekersAboutNewProgram($eventId)
     {
         try {
-            require_once __DIR__ . '/../services/NotificationService.php';
+            require_once __DIR__ . '/../services/EventEmailNotifService.php';
 
             // Use the same database connection from this model
-            $notificationService = new NotificationService($this->db);
-            return $notificationService->notifyJobseekersAboutNewProgram($eventId);
+            $notificationService = new EventEmailNotifService($this->db);
+            $result = $notificationService->notifyJobseekersAboutNewProgram($eventId);
+            
+            if ($result) {
+                error_log("✅ Email notifications sent successfully for event ID: " . $eventId);
+            } else {
+                error_log("⚠️ Failed to send email notifications for event ID: " . $eventId);
+            }
+            
+            return $result;
         } catch (Exception $e) {
             error_log("❌ Error in EventProgram::notifyJobseekersAboutNewProgram: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             return false;
         }
     }
