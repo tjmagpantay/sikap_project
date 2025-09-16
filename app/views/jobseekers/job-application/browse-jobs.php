@@ -217,23 +217,6 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
         <!-- Results Summary and Best Matches Button -->
         <div class="flex items-start justify-between mb-8">
-            <!-- Results Text -->
-            <div class="flex flex-col">
-                <div class="flex gap-2">
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        Results: <span id="resultsCount"><?php echo isset($jobs) ? count($jobs) : 0; ?></span> jobs found
-                    </h2>
-                </div>
-                <!-- Active Filters Display -->
-                <div id="activeFilters" class="flex flex-wrap gap-2 mt-2">
-                    <!-- Default "All Jobs" display (shown when no filters are active) -->
-                    <span id="allJobsTag" class="inline-flex items-center text-xs font-medium text-gray-400 ">
-                        All Jobs
-                    </span>
-                    <!-- Filters will be dynamically added here -->
-                </div>
-            </div>
-
             <!-- Filter Buttons -->
             <div class="flex gap-2">
                 <!-- Best Matches Button -->
@@ -256,6 +239,23 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     </svg>
                     <span id="sortAlphaText">A-Z</span>
                 </button>
+            </div>
+
+            <!-- Results Text - Hidden on mobile/tablet (md and below), visible on lg+ -->
+            <div class="flex-col hidden md:flex">
+                <div class="flex gap-2">
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Results: <span id="resultsCount"><?php echo isset($jobs) ? count($jobs) : 0; ?></span> jobs found
+                    </h2>
+                </div>
+                <!-- Active Filters Display -->
+                <div id="activeFilters" class="flex flex-wrap gap-2 mt-2">
+                    <!-- Default "All Jobs" display (shown when no filters are active) -->
+                    <span id="allJobsTag" class="inline-flex items-end text-xs font-medium text-gray-400">
+                        All Jobs
+                    </span>
+                    <!-- Filters will be dynamically added here -->
+                </div>
             </div>
         </div>
 

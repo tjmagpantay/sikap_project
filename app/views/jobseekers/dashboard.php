@@ -237,24 +237,25 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <div class="w-full lg:!w-1/3 lg:max-w-md lg:flex-shrink-0">
                 <div class="h-full">
                     <div>
-                        <p class="text-lg font-semibold text-grayMain">Jobs you might like</p>
+                        <p class="mb-2 text-lg font-semibold text-grayMain">Jobs you might like</p>
                     </div>
                     <!-- Filter Buttons -->
                     <div class="flex items-start w-full mb-2 border-b border-gray-200">
-                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
-                            data-filter="recent" onclick="filterJobs('recent', this)">
-                            <div class="flex flex-col items-center">
+                        <div class="flex items-center w-full p-1 space-x-1 rounded-lg bg-gray-50">
+                            <!-- Most Recent -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="recent" onclick="filterJobs('recent', this)">
                                 <span>Most Recent</span>
-                            </div>
-                        </button>
+                            </button>
 
-                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
-                            data-filter="matches" onclick="filterJobs('matches', this)">
-                            <div class="flex flex-col items-end w-full text-right">
+                            <!-- Best Matches -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="matches" onclick="filterJobs('matches', this)">
                                 <span>Best Matches</span>
-                            </div>
-                        </button>
+                            </button>
+                        </div>
                     </div>
+
 
                     <!-- Job Post Card Container - Fixed height with proper scrolling -->
                     <div class="overflow-y-auto" style="max-height: 70vh;">
@@ -447,14 +448,17 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Updated job filtering function - Only Most Recent and Best Matches
         function filterJobs(filterType, buttonElement) {
-            // Update active filter button
+            console.log('Filtering by:', filterType); // Debug log
+
+            // Update active filter button - Remove active styles from all buttons
             document.querySelectorAll('[data-filter]').forEach(btn => {
-                btn.classList.remove('border-primary', 'text-primary', 'active-filter');
-                btn.classList.add('border-transparent', 'text-grayMain');
+                btn.classList.remove('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
+                btn.classList.add('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
             });
 
-            buttonElement.classList.remove('border-transparent', 'text-grayMain');
-            buttonElement.classList.add('border-primary', 'text-primary', 'active-filter');
+            // Set active button with primary background and white text
+            buttonElement.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
+            buttonElement.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
 
             // Get all job cards
             const jobCards = document.querySelectorAll('.left-job-card');
@@ -467,6 +471,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     const dateB = parseInt(b.dataset.postedDate || 0);
                     return dateB - dateA; // Most recent first
                 });
+                console.log('Sorted by recent'); // Debug log
             } else if (filterType === 'matches') {
                 // Sort by best matches (match percentage)
                 sortedCards.sort((a, b) => {
@@ -474,6 +479,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     const matchB = parseFloat(b.dataset.matchPercentage || 0);
                     return matchB - matchA; // Highest match first
                 });
+                console.log('Sorted by matches'); // Debug log
             }
 
             // Show only top 5 jobs
@@ -513,29 +519,30 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
         // Initialize with "Most Recent" as default - Updated to match your working code
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-load first job on desktop only
-            if (window.innerWidth >= 1024) {
-                const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
-                if (firstJobCard) {
-                    const latestJobId = firstJobCard.getAttribute('data-job-id');
-                    loadJobDetails(latestJobId, firstJobCard, true);
-                }
-            } else {
-                // Mobile: Show welcome message
-                const container = document.getElementById('job-details-container');
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                        <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">Welcome!</h3>
-                        <p class="mt-1 text-xs text-gray-500">Tap on any job to view details</p>
-                    </div>
-                `;
-            }
+            console.log('DOM loaded, initializing filters'); // Debug log
 
-            // Set "Most Recent" as default active
+            // Set "Most Recent" as default active with proper styling
             const recentButton = document.querySelector('[data-filter="recent"]');
             if (recentButton) {
+                console.log('Setting Most Recent as default active'); // Debug log
+                
+                // Set initial active state
+                recentButton.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
+                recentButton.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
+
+                // Then run the filter
                 filterJobs('recent', recentButton);
+            }
+
+            // Auto-load first job on desktop only
+            if (window.innerWidth >= 1024) {
+                setTimeout(() => {
+                    const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
+                    if (firstJobCard) {
+                        const latestJobId = firstJobCard.getAttribute('data-job-id');
+                        loadJobDetails(latestJobId, firstJobCard, true);
+                    }
+                }, 200);
             }
 
             // Initialize other functionality
@@ -545,7 +552,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             const visibleJobs = document.querySelectorAll('.left-job-card[data-job-id]').length;
             updateJobCount(visibleJobs);
         });
-
+        
         // Update window resize handler to handle orientation changes
         window.addEventListener('resize', function() {
             // Clear any existing timeouts to prevent multiple calls
