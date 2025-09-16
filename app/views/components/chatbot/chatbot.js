@@ -1,5 +1,5 @@
 const SIKAP_FAQS = {
-    jobseeker: [
+    jobseeker: [ 
         {
             q: "What is Sikap?",
             a: "Sikap is a web-based employment platform developed for PESO Rosario, Batangas. It uses machine learning to provide personalized job recommendations and helps job seekers, employers, and PESO staff streamline the job application and recruitment process."
@@ -53,35 +53,33 @@ const SIKAP_FAQS = {
     ]
 };
 
-const contactInfo = `\n\nIf you have any inquiries, please feel free to contact us via <a href="mailto:pesorosariobats@gmail.com" style="color: #3b82f6; text-decoration: underline;">email</a> or through our official <a href="https://facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.`;
+// Contact info removed since it's now directly in the formatBulletPoints function
 
 function formatBulletPoints(text) {
     const parts = text.split('\n•');
-    if (parts.length <= 1) {
-        // For single messages, append contact info
-        return [text + contactInfo];
-    }
-
     let messages = [];
-    // Add the introduction (text before first bullet point)
-    messages.push(parts[0]);
     
-    // Add each bullet point as a separate message
-    for (let i = 1; i < parts.length; i++) {
-        messages.push('• ' + parts[i].trim());
+    if (parts.length <= 1) {
+        messages = [text];
+    } else {
+        // Add the introduction (text before first bullet point)
+        messages.push(parts[0]);
+        
+        // Add each bullet point as a separate message
+        for (let i = 1; i < parts.length; i++) {
+            messages.push('• ' + parts[i].trim());
+        }
+
+        // Add any concluding text (after the last bullet point)
+        const lastPart = parts[parts.length - 1];
+        if (lastPart.includes('\n\n')) {
+            const conclusion = lastPart.split('\n\n')[1];
+            messages.push(conclusion);
+        }
     }
 
-    // Add any concluding text (after the last bullet point)
-    const lastPart = parts[parts.length - 1];
-    if (lastPart.includes('\n\n')) {
-        const conclusion = lastPart.split('\n\n')[1];
-        messages.push(conclusion);
-    }
-
-    // Add contact info to the last message
-    if (messages.length > 0) {
-        messages[messages.length - 1] += contactInfo;
-    }
+    // Add contact info as a separate message
+    messages.push('\nIf you have any inquiries, please feel free to contact us through our official <a href="https://www.facebook.com/profile.php?id=100072009206931" target="_blank" style="color: #3b82f6; text-decoration: underline;">Facebook page</a>.');
 
     return messages;
 }

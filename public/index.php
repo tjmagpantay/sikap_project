@@ -156,18 +156,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new JobseekerController();
             $controller->uploadProfilePhoto();
             break;
-        case 'view-document':
-            require_once __DIR__ . '/../app/controllers/DocumentController.php';
-            $controller = new DocumentController();
-            $controller->viewDocument();
+        case 'jobseeker-documents':
+            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
             break;
         case 'download-document':
             require_once __DIR__ . '/../app/controllers/DocumentController.php';
             $controller = new DocumentController();
             $controller->downloadDocument();
-            break;
-        case 'jobseeker-documents':
-            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
             break;
         case 'jobseeker-applications':
             include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
