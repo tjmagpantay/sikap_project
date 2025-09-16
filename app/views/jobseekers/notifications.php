@@ -47,7 +47,7 @@
 
                 <?php if ($data['unreadCount'] > 0): ?>
                     <button onclick="markAllAsRead()"
-                        class="px-4 py-2 font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700">
+                        class="px-4 py-2 text-sm font-medium text-white transition-colors duration-200 rounded-lg bg-primary hover:bg-blue-700">
                         Mark All as Read
                     </button>
                 <?php endif; ?>
@@ -76,37 +76,37 @@
                         <div class="block overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300 <?php echo $notification['status'] === 'unread' ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''; ?>">
 
                             <!-- Header: Icon and Title -->
-                            <div class="flex items-start gap-4 p-6 pb-4 <?php echo $notification['status'] === 'unread' ? 'bg-blue-50' : 'bg-gray-50'; ?>">
+                            <div class="flex items-start gap-4 p-6 pb-4 <?php echo $notification['status'] === 'unread' ? 'bg-blue-100' : 'bg-gray-50'; ?>">
                                 <!-- Notification Icon -->
                                 <div class="flex-shrink-0">
-                                    <div class="flex items-center justify-center w-12 h-12 rounded-full <?php
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-full <?php
                                                                                                         echo $notification['type'] === 'program' ? 'bg-green-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : ($notification['type'] === 'application_update' ? 'bg-orange-100' : ($notification['type'] === 'interview' ? 'bg-purple-100' : 'bg-gray-100'))); ?>">
 
                                         <?php if ($notification['type'] === 'job_post'): ?>
                                             <!-- Job Post Icon -->
-                                            <svg class="w-6 h-6 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                            <svg class="w-4 h-4 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                                                 <path d="M28,8H21V6a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2V8H4a2,2,0,0,0-2,2V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10A2,2,0,0,0,28,8ZM13,6h6V8H13Zm15,4v9H4V10ZM4,26V21H28v5Z"></path>
                                                 <path d="M15,18h2a1,1,0,0,0,0-2H15a1,1,0,0,0,0,2Z"></path>
                                             </svg>
                                         <?php elseif ($notification['type'] === 'program'): ?>
                                             <!-- Program/Event Icon -->
-                                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         <?php elseif ($notification['type'] === 'application_update'): ?>
                                             <!-- Application Update Icon -->
-                                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         <?php elseif ($notification['type'] === 'interview'): ?>
                                             <!-- FIXED: Add Interview Icon -->
-                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         <?php else: ?>
                                             <!-- Default Icon -->
-                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         <?php endif; ?>
@@ -114,29 +114,16 @@
                                 </div>
 
                                 <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-gray-900 <?php echo $notification['status'] === 'unread' ? 'font-bold' : ''; ?>">
+                                    <h3 class="text-md font-semibold text-grayMain <?php echo $notification['status'] === 'unread' ? 'font-bold' : ''; ?>">
                                         <?php echo htmlspecialchars($notification['title']); ?>
                                     </h3>
-                                    <p class="text-sm text-gray-600">
+                                    <p class="text-xs text-gray-400">
                                         <?php
                                         $date = new DateTime($notification['created_at']);
                                         echo $date->format('M j, Y g:i A');
                                         ?>
                                     </p>
                                 </div>
-
-                                <!-- Unread indicator -->
-                                <?php if ($notification['status'] === 'unread'): ?>
-                                    <span class="flex-shrink-0 w-3 h-3 bg-blue-500 rounded-full"></span>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Card Body Content -->
-                            <div class="p-6 pt-4">
-                                <!-- Notification Message -->
-                                <p class="mb-4 text-sm text-gray-700">
-                                    <?php echo htmlspecialchars($notification['message']); ?>
-                                </p>
 
                                 <!-- Notification Type Tag -->
                                 <div class="flex flex-wrap gap-2 mb-4">
@@ -150,11 +137,27 @@
                                     <?php endif; ?>
                                 </div>
 
+
+                                <!-- Unread indicator -->
+                                <?php if ($notification['status'] === 'unread'): ?>
+                                    <span class="flex-shrink-0 w-3 h-3 mt-1 bg-blue-500 rounded-full"></span>
+                                <?php endif; ?>
+                                
+                            </div>
+
+                            <!-- Card Body Content -->
+                            <div class="p-6 pt-4">
+                                <!-- Notification Message -->
+                                <p class="mb-4 text-sm text-gray-700">
+                                    <?php echo htmlspecialchars($notification['message']); ?>
+                                </p>
+
+                                
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col gap-2 sm:flex-row">
                                     <?php if ($notification['status'] === 'unread'): ?>
                                         <button onclick="markAsRead(<?php echo $notification['notification_id']; ?>)"
-                                            class="px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 border border-blue-600 rounded-md hover:bg-blue-50">
+                                            class="px-4 py-2 text-xs font-medium transition-colors duration-200 border border-blue-900 rounded-md text-primary hover:bg-blue-50">
                                             Mark as Read
                                         </button>
                                     <?php endif; ?>
@@ -162,7 +165,7 @@
                                     <?php if (!empty($notification['link'])): ?>
                                         <a href="<?php echo htmlspecialchars($notification['link']); ?>"
                                             onclick="<?php if ($notification['status'] === 'unread'): ?>markAsRead(<?php echo $notification['notification_id']; ?>)<?php endif; ?>"
-                                            class="px-4 py-2 text-sm font-medium text-center text-white transition-colors duration-200 bg-blue-600 rounded-md hover:bg-blue-700">
+                                            class="px-4 py-2 text-xs font-medium text-center text-white transition-colors duration-200 rounded-md bg-primary hover:bg-blue-700">
                                             View Details
                                         </a>
                                     <?php endif; ?>
@@ -184,13 +187,13 @@
                             </a>
                         <?php endif; ?>
 
-                        <span class="px-4 py-2 text-white bg-blue-600 rounded-md">
+                        <span class="px-4 py-2 text-sm text-white rounded-md bg-primary">
                             Page <?php echo $data['currentPage']; ?>
                         </span>
 
                         <?php if ($data['hasNextPage']): ?>
                             <a href="?page=notifications-jobseeker&p=<?php echo $data['currentPage'] + 1; ?>"
-                                class="px-4 py-2 transition-colors duration-200 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                class="px-4 py-2 text-sm transition-colors duration-200 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                                 Next
                             </a>
                         <?php endif; ?>

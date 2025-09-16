@@ -508,7 +508,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M8 7V3m8 4V3m-9 8h10m-11 8h14a2 2 0 002-2V7a2 2 0 
-           00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+           00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                 </svg>
 
                                             </div>
@@ -601,6 +601,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         ?>
                                         <div class="flex items-start">
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full <?php echo $hasInterview ? 'bg-secondary' : (in_array($currentStatus, ['shortlisted']) ? 'bg-yellow-400' : 'bg-gray-300'); ?> border-4 border-white shadow-sm">
+
                                                 <svg class="w-4 h-4 <?php echo $hasInterview ? 'text-white' : 'text-white'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                 </svg>
@@ -679,7 +680,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         <?php if (isset($resignationRequest) && $resignationRequest): ?>
                                             <div class="flex items-start">
                                                 <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-4 border-white shadow-sm 
-                                                    <?php echo $resignationRequest['request_status'] === 'approved' ? 'bg-green-500' : ($resignationRequest['request_status'] === 'rejected' ? 'bg-red-500' : 'bg-orange-500'); ?>">
+                                                    <?php echo $resignationRequest['request_status'] === 'approved' ? 'bg-primary' : ($resignationRequest['request_status'] === 'rejected' ? 'bg-primary' : 'bg-orange-500'); ?>">
                                                     <?php if ($resignationRequest['request_status'] === 'approved'): ?>
                                                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -689,10 +690,9 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                         </svg>
                                                     <?php else: ?>
-                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                    <?php endif; ?>
+                                                        <?php endif; ?>
                                                 </div>
                                                 <div class="flex-1 min-w-0 ml-4">
                                                     <div class="flex items-center justify-between gap-3">
@@ -763,14 +763,15 @@ $currentStatus = $application['application_status'] ?? 'pending';
                         </div>
 
                         <!-- Quick Actions -->
-                        <div class="flex w-full gap-3">
+                        <div class="flex flex-col w-full gap-3 sm:flex-row">
                             <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
                                 class="flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                 </svg>
-                                View Job Posting
+                                <span class="sm:hidden">View Job Posting</span>
+                                <span class="hidden sm:inline">View Job</span>
                             </a>
 
                             <button onclick="window.print()"
@@ -779,7 +780,8 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
-                                Print Application
+                                <span class="sm:hidden">Print Application</span>
+                                <span class="hidden sm:inline">Print</span>
                             </button>
 
                             <button
@@ -789,7 +791,8 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                 </svg>
-                                Share Application
+                                <span class="sm:hidden">Share Application</span>
+                                <span class="hidden sm:inline">Share</span>
                             </button>
                         </div>
 

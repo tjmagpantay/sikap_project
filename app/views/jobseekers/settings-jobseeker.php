@@ -224,9 +224,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             <!-- Account Information -->
             <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
                 <div class="flex items-start gap-3 mb-6">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50">
-                        <i class="text-lg text-indigo-600 fas fa-user-circle"></i>
-                    </div>
+                    
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Account Information</h3>
                         <p class="mt-1 text-sm text-gray-600">Your account details and registration information</p>

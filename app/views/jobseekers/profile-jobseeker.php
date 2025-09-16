@@ -161,32 +161,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                   </div>
                 </div>
 
-                <!-- Stats Section -->
-                <div>
-                  <h2 class="mb-3 text-lg font-semibold text-primary">Activity Stats</h2>
-                  <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 text-center rounded-lg bg-gray-50">
-                      <div class="text-lg font-bold text-primary">
-                        <?php
-                        // You'll need to add this query to count applications
-                        // For now, using placeholder - replace with actual count
-                        echo isset($applicationCount) ? $applicationCount : '0';
-                        ?>
-                      </div>
-                      <div class="text-xs text-gray-600">Applications</div>
-                    </div>
-                    <div class="p-3 text-center rounded-lg bg-gray-50">
-                      <div class="text-lg font-bold text-primary">
-                        <?php
-                        // You'll need to add this query to count interviews
-                        // For now, using placeholder - replace with actual count
-                        echo isset($interviewCount) ? $interviewCount : '0';
-                        ?>
-                      </div>
-                      <div class="text-xs text-gray-600">Interviews</div>
-                    </div>
-                  </div>
-                </div>
+
               </div>
             </div>
           </div>
