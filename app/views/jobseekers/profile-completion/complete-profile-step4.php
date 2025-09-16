@@ -119,8 +119,8 @@ if (!empty($workExperience)) {
                 <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-medium text-gray-900">Current Employment</h3>
-                        <div class="flex items-center space-x-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5  text-xs font-medium bg-blue-100 text-primary">
                                 Currently Working
                             </span>
                             <button onclick="editExperience(<?php echo $currentWork['experience_id']; ?>)" class="text-blue-600 hover:text-blue-800">
@@ -129,14 +129,19 @@ if (!empty($workExperience)) {
                                 </svg>
                             </button>
                             <!-- Updated delete button to use form submission -->
-                            <form method="POST" action="?page=delete-work-experience" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this work experience?')">
+                            <form method="POST" action="?page=delete-work-experience"
+                                onsubmit="return confirm('Are you sure you want to delete this work experience?')"
+                                class="flex items-center">
                                 <input type="hidden" name="delete_experience_id" value="<?php echo $currentWork['experience_id']; ?>">
-                                <button type="submit" class="text-red-600 hover:text-red-800">
+                                <button type="submit" class="flex items-center text-red-600 hover:text-red-800">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 
+                     1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
                             </form>
+
                         </div>
                     </div>
 

@@ -307,9 +307,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                     <div>
                                                         <div class="text-sm font-medium text-green-600">Scheduled</div>
                                                         <div class="text-xs text-gray-500"><?php echo date('M j, Y g:i A', strtotime($application['interview_date'])); ?></div>
-                                                        <?php if (!empty($application['interview_location'])): ?>
-                                                            <div class="text-xs text-gray-500">📍 <?php echo htmlspecialchars($application['interview_location']); ?></div>
-                                                        <?php endif; ?>
+                                                        
                                                     </div>
                                                 </div>
                                             <?php else: ?>

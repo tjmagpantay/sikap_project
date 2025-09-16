@@ -103,10 +103,11 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                     foreach ($cvAttachments as $cvAttachment): ?>
                                         <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
                                             <div class="flex items-center gap-3">
-                                                <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg">
-                                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                    </svg>
+                                                <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-lg">
+                                                    <img
+                                                        src="../public/assets/icons/pdf-icon.png"
+                                                        alt="Icon"
+                                                        class="object-cover w-8 h-8" />
                                                 </div>
                                                 <div>
                                                     <p class="text-sm font-medium text-gray-900">CV (Curriculum Vitae)</p>
@@ -115,10 +116,6 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                             </div>
                                             <a href="../<?php echo htmlspecialchars($cvAttachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg>
                                                 View
                                             </a>
                                         </div>
@@ -128,10 +125,11 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                     foreach ($resumeAttachments as $resumeAttachment): ?>
                                         <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
                                             <div class="flex items-center gap-3">
-                                                <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
-                                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                    </svg>
+                                                <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-lg">
+                                                    <img
+                                                        src="../public/assets/icons/pdf-icon.png"
+                                                        alt="Icon"
+                                                        class="object-cover w-8 h-8" />
                                                 </div>
                                                 <div>
                                                     <p class="text-sm font-medium text-gray-900">Resume</p>
@@ -140,10 +138,6 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                             </div>
                                             <a href="../<?php echo htmlspecialchars($resumeAttachment['file_path']); ?>" target="_blank"
                                                 class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg>
                                                 View
                                             </a>
                                         </div>
@@ -266,25 +260,28 @@ $currentStatus = $application['application_status'] ?? 'pending';
 
                             <!-- Status Display -->
                             <?php if (!$application['is_finalized']): ?>
+
                                 <!-- Incomplete Application Status -->
-                                <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <div class="flex items-center justify-center w-10 h-10 mr-3 bg-orange-500 rounded-full">
-                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
+                                <div class="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                                    <div class="flex items-center">
+                                        <!-- Icon + Text grouped -->
+                                        <div class="flex items-start gap-2">
+                                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
                                             <div>
-                                                <p class="text-sm font-medium text-orange-700">In Progress</p>
-                                                <p class="text-xs text-orange-600">
+                                                <p class="text-sm font-medium text-secondary">In Progress</p>
+                                                <p class="text-xs text-yellow-500">
                                                     Step <?php echo $application['current_step']; ?> of 4 completed
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             <?php else: ?>
+
                                 <!-- Complete Application Status -->
                                 <div class="p-4 mb-4 border rounded-lg border-primary bg-blue-50">
                                     <div class="flex items-center justify-between">
@@ -416,7 +413,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                 <?php elseif ($application['application_status'] === 'hired' && !$resignationRequest): ?>
                                     <!-- Can submit resignation request -->
                                     <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
-                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium border border-transparent border-gray-200 rounded-md text-primary focus:outline-none focus:ring-2 focus:ring-offset-2">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
@@ -445,7 +442,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                         </div>
 
                         <!-- Enhanced Application Timeline -->
-                        <div class="mb-6 sm:mb-8">
+                        <div class="py-4 mb-6 border-t sm:mb-8">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900">Application Timeline</h3>
 
                             <!-- Timeline Container with Connecting Lines -->
@@ -459,7 +456,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                     <?php if (!$application['is_finalized']): ?>
                                         <!-- For Incomplete Applications - Show "Application in Progress" -->
                                         <div class="flex items-start">
-                                            <div class="relative z-10 flex items-center justify-center w-8 h-8 bg-orange-500 border-4 border-white rounded-full shadow-sm">
+                                            <div class="relative z-10 flex items-center justify-center w-8 h-8 border-4 border-white rounded-full shadow-sm bg-primary">
                                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
@@ -472,12 +469,12 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     </span>
                                                 </div>
                                                 <p class="mt-1 text-xs text-gray-500">
-                                                    Complete your application to submit it for review.
+                                                    Complete your application to submit it for review. <br>
                                                     Started: <?php echo date('M j, Y g:i A', strtotime($application['applied_at'])); ?>
                                                 </p>
                                                 <div class="mt-2">
                                                     <a href="?page=apply-job&job_id=<?php echo $application['job_id']; ?>&application_id=<?php echo $application['application_id']; ?>&step=<?php echo $application['current_step']; ?>"
-                                                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600">
+                                                        class="inline-flex items-center px-3 py-1 text-xs font-medium border border-gray-200 rounded-md text-primary">
                                                         <i class="mr-1 fas fa-arrow-right"></i>
                                                         Continue Application
                                                     </a>
@@ -509,8 +506,11 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         <div class="flex items-start">
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 bg-gray-300 border-4 border-white rounded-full shadow-sm">
                                                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10m-11 8h14a2 2 0 002-2V7a2 2 0 
+           00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
+
                                             </div>
                                             <div class="flex-1 min-w-0 ml-4">
                                                 <div class="flex items-center justify-between gap-3">
@@ -528,8 +528,10 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                         <div class="flex items-start">
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 bg-gray-300 border-4 border-white rounded-full shadow-sm">
                                                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 13l4 4L19 7" />
                                                 </svg>
+
                                             </div>
                                             <div class="flex-1 min-w-0 ml-4">
                                                 <div class="flex items-center justify-between gap-3">
@@ -643,15 +645,18 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                             <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-4 border-white shadow-sm <?php echo $currentStatus === 'hired' ? 'bg-primary' : ($currentStatus === 'rejected' ? 'bg-red-500' : 'bg-gray-300'); ?>">
                                                 <?php if ($currentStatus === 'hired'): ?>
                                                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 <?php elseif ($currentStatus === 'rejected'): ?>
                                                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 <?php else: ?>
                                                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 <?php endif; ?>
                                             </div>
@@ -719,7 +724,7 @@ $currentStatus = $application['application_status'] ?? 'pending';
                                                     </p>
 
                                                     <?php if (!empty($resignationRequest['resignation_reason'])): ?>
-                                                        <div class="p-2 mt-2 text-xs text-gray-600 bg-gray-100 rounded">
+                                                        <div class="p-4 mt-2 text-xs text-gray-600 bg-gray-100 rounded">
                                                             <strong>Your reason:</strong> <?php echo nl2br(htmlspecialchars($resignationRequest['resignation_reason'])); ?>
                                                         </div>
                                                     <?php endif; ?>
@@ -738,13 +743,10 @@ $currentStatus = $application['application_status'] ?? 'pending';
                         </div>
 
                         <!-- Application Information -->
-                        <div class="mb-6 sm:mb-8">
+                        <div class="py-4 mb-6 border-t border-gray-200 sm:mb-8">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900">Application Information</h3>
                             <div class="space-y-4">
-                                <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                    <span class="text-sm font-light text-gray-600">Application ID:</span>
-                                    <span class="text-sm font-medium text-primary">#<?php echo str_pad($application['application_id'], 6, '0', STR_PAD_LEFT); ?></span>
-                                </div>
+
 
                                 <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
                                     <span class="text-sm font-light text-gray-600">Applied:</span>
