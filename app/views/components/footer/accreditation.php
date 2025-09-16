@@ -3,47 +3,51 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<div class="min-h-screen px-4 py-16 bg-gray-50 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+    <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-         <div class="mb-12 text-center">
-                <h1 class="mb-5 text-3xl font-bold tracking-wide text-gray-900 sm:text-4xl">Employer Accreditation</h1>
-                <div class="w-20 h-1.5 mx-auto bg-blue-600 rounded-full"></div>
-                 <p class="mt-4 text-gray-600">
+        <div class="mb-12 text-center" data-aos="fade-up">
+            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+                Employer Accreditation
+            </h1>
+            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
                 Required documents and guidelines for employer verification on Sikap
             </p>
-            </div>
+            <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
+        </div>
 
         <!-- Main Content -->
-        <div class="p-8 bg-white rounded-lg shadow">
+        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
             <!-- Introduction -->
-            <section class="mb-8">
-                <p class="text-gray-700">
+            <div class="p-6 mb-8 text-sm rounded-lg bg-gray-50/50 text-grayMain">
+                <p>
                     To maintain the quality and legitimacy of job postings on Sikap, all employers must complete an accreditation process before posting job opportunities. This process helps protect job seekers and ensures compliance with labor regulations.
                 </p>
-            </section>
+            </div>
 
             <!-- Required Documents -->
-            <section class="mb-8">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">Required Documents</h2>
+            <h2 class="mb-6 text-lg font-bold text-grayMain sm:text-xl">Required Documents</h2>
 
-                <!-- Letter of Intent -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">1. Letter of Intent</h3>
-                    <p class="mb-4 text-gray-700">A formal letter from your company stating:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Letter of Intent -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">1. Letter of Intent</h3>
+                    <p class="mb-4 text-sm">A formal letter from your company stating:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Intent to participate in PESO Rosario's employment programs</li>
                         <li>Brief overview of hiring needs</li>
                         <li>Commitment to fair labor practices</li>
                         <li>Contact person's details</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Company Profile -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">2. Company Profile</h3>
-                    <p class="mb-4 text-gray-700">A comprehensive document containing:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Company Profile -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">2. Company Profile</h3>
+                    <p class="mb-4 text-sm">A comprehensive document containing:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Company history and background</li>
                         <li>Business nature and main activities</li>
                         <li>Organizational structure</li>
@@ -51,92 +55,106 @@ include_once __DIR__ . '/../navbar.php';
                         <li>Past hiring activities and retention rates</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Business Permit -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">3. Updated Business Permit</h3>
-                    <p class="mb-4 text-gray-700">Current year's business permit that shows:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Business Permit -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">3. Updated Business Permit</h3>
+                    <p class="mb-4 text-sm">Current year's business permit that shows:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Legal business name and address</li>
                         <li>Nature of business</li>
                         <li>Validity period</li>
                         <li>Local government authorization</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Certificate of No Pending Case -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">4. Certificate of No Pending Case</h3>
-                    <p class="mb-4 text-gray-700">Documentation from SEC/DOLE confirming:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Certificate of No Pending Case -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">4. Certificate of No Pending Case</h3>
+                    <p class="mb-4 text-sm">Documentation from SEC/DOLE confirming:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>No pending labor disputes or violations</li>
                         <li>Clean record of labor law compliance</li>
                         <li>No unresolved employee complaints</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- SEC/DOLE Registration -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">5. SEC or DOLE Registration</h3>
-                    <p class="mb-4 text-gray-700">Official registration documents proving:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- SEC/DOLE Registration -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">5. SEC or DOLE Registration</h3>
+                    <p class="mb-4 text-sm">Official registration documents proving:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Legal business registration with SEC (for corporations/partnerships)</li>
                         <li>DOLE registration (for sole proprietorships)</li>
                         <li>Authority to conduct business in the Philippines</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Certificate of No Objection -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">6. Certificate of No Objection</h3>
-                    <p class="mb-4 text-gray-700">Required for local recruitment activities:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Certificate of No Objection -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">6. Certificate of No Objection</h3>
+                    <p class="mb-4 text-sm">Required for local recruitment activities:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Clearance for conducting recruitment in Rosario</li>
                         <li>Acknowledgment from local authorities</li>
                         <li>Compliance with local employment ordinances</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- POEA Registration -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">7. POEA Registration</h3>
-                    <p class="mb-4 text-gray-700">Required only for overseas recruitment:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- POEA Registration -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">7. POEA Registration</h3>
+                    <p class="mb-4 text-sm">Required only for overseas recruitment:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Valid POEA license</li>
                         <li>Authorization to recruit for overseas employment</li>
                         <li>Compliance with international labor standards</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Job Vacancies List -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">8. List of Job Vacancies with Qualifications</h3>
-                    <p class="mb-4 text-gray-700">Detailed listing including:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Job Vacancies List -->
+            <div class="relative mb-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">8. List of Job Vacancies with Qualifications</h3>
+                    <p class="mb-4 text-sm">Detailed listing including:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Position titles and descriptions</li>
                         <li>Required qualifications and experience</li>
                         <li>Salary ranges and benefits</li>
                         <li>Number of vacancies per position</li>
                     </ul>
                 </div>
+            </div>
 
-                <!-- Phil-JobNet Registration -->
-                <div class="p-6 mb-6 border rounded-lg bg-gray-50">
-                    <h3 class="mb-3 text-xl font-semibold text-gray-800">9. Phil-JobNet Registration</h3>
-                    <p class="mb-4 text-gray-700">Proof of registration with the national job portal:</p>
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <!-- Phil-JobNet Registration -->
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">9. Phil-JobNet Registration</h3>
+                    <p class="mb-4 text-sm">Proof of registration with the national job portal:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Active Phil-JobNet employer account</li>
                         <li>Integration with national employment database</li>
                         <li>Compliance with DOLE's online job matching system</li>
                     </ul>
                 </div>
-            </section>
+            </div>
 
             <!-- Submission Process -->
-            <section class="mb-8">
-                <h2 class="mb-4 text-2xl font-bold text-gray-900">Submission Process</h2>
-                <div class="p-6 rounded-lg bg-blue-50">
-                    <ol class="pl-8 ml-4 space-y-4 text-gray-700 list-decimal">
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Submission Process</h2>
+                    <ol class="ml-6 space-y-4 text-sm list-decimal text-grayMain">
                         <li>Register an employer account on Sikap</li>
                         <li>Prepare all required documents in digital format (PDF preferred)</li>
                         <li>Submit documents through your employer dashboard</li>
@@ -145,34 +163,63 @@ include_once __DIR__ . '/../navbar.php';
                         <li>Receive accreditation approval notification</li>
                     </ol>
                 </div>
-            </section>
+            </div>
 
             <!-- Document Validity -->
-            <section class="mb-8">
-                <h2 class="mb-4 text-2xl font-bold text-gray-900">Document Validity</h2>
-                <div class="p-6 border rounded-lg">
-                    <ul class="pl-8 ml-4 space-y-2 text-gray-700 list-disc">
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Document Validity</h2>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                         <li>Business Permit: Must be current year</li>
                         <li>SEC/DOLE Documents: Must be valid and updated</li>
                         <li>Certificates: Not older than 6 months from date of issuance</li>
                         <li>POEA License: Must be active and current</li>
                     </ul>
                 </div>
-            </section>
+            </div>
 
             <!-- Contact Information -->
-            <section class="p-6 mt-8 text-center rounded-lg bg-gray-50">
-                <h2 class="mb-4 text-xl font-bold text-gray-900">Need Assistance?</h2>
-                <p class="mb-4 text-gray-700">
+            <div class="p-6 mt-8 text-center rounded-lg bg-primary/10">
+                <h2 class="mb-4 text-base font-bold text-grayMain sm:text-lg">Need Assistance?</h2>
+                <p class="mb-4 text-sm text-gray-600">
                     For questions about employer accreditation, contact PESO Rosario:
                 </p>
-                <p class="text-gray-700">
-                    Email: <a href="mailto:pesorosariobats@gmail.com" class="text-blue-600 hover:underline">pesorosariobats@gmail.com</a><br>
+                <p class="text-sm text-gray-600">
+                    Email: <a href="mailto:pesorosariobats@gmail.com" class="font-medium text-primary hover:underline">pesorosariobats@gmail.com</a><br>
                     Phone: (319) 555-0115
                 </p>
-            </section>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- AOS Animation Library CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<!-- AOS Animation Library JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50,
+            delay: 100,
+            disable: 'mobile',
+            startEvent: 'DOMContentLoaded',
+            useClassNames: false,
+            disableMutationObserver: false,
+            debounceDelay: 50,
+            throttleDelay: 99,
+        });
+    });
+
+    // Refresh AOS on window resize
+    window.addEventListener('resize', function() {
+        AOS.refresh();
+    });
+</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>
