@@ -6,7 +6,7 @@
     <title>Modern Sikap Assistant</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
+        :root { 
             --sikap-bg: #ffffff;
             --sikap-surface: #f8fafc;
             --sikap-border: #e2e8f0;
@@ -409,42 +409,11 @@
 </div>
 
 <!-- Chatbot Scripts -->
-<script src="/sikap/app/views/components/chatbot/chatbot.js"></script>
+<script src="/sikap/app/views/components/chatbot/chatbot.js" defer></script>
 <script>
+// This is now handled by chatbot.js
 function formatBulletPoints(text) {
-    // Split by newline and bullet points
-    const parts = text.split('\n');
-    let messages = [];
-    let currentMessage = '';
-
-    parts.forEach(part => {
-        if (part.trim() === '') {
-            if (currentMessage) {
-                messages.push(currentMessage);
-                currentMessage = '';
-            }
-        } else if (part.startsWith('•')) {
-            if (currentMessage) {
-                messages.push(currentMessage);
-            }
-            currentMessage = part;
-        } else if (part.startsWith('🔒')) {
-            if (currentMessage) {
-                messages.push(currentMessage);
-            }
-            currentMessage = part;
-        } else if (currentMessage) {
-            currentMessage += ' ' + part;
-        } else {
-            currentMessage = part;
-        }
-    });
-
-    if (currentMessage) {
-        messages.push(currentMessage);
-    }
-
-    return messages.filter(msg => msg.trim() !== '');
+    return window.SIKAP_FAQS.formatBulletPoints(text);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

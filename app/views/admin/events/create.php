@@ -130,7 +130,7 @@ include_once __DIR__ . '/../components/admin_auth_check.php';
                     </form>
                 </div>
             </div>
-        </div>
+        </div> 
     </div>
 
     <script>
