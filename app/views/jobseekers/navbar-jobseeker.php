@@ -56,11 +56,7 @@ if (!isset($jobseeker) || empty($jobseeker)) {
             @click="toggleNotifications()"
             class="relative transition-all duration-200 rounded-full hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             <!-- Notification Badge - Improved positioning and size -->
-            <span x-show="unreadCount > 0"
-              x-text="unreadCount"
-              class="absolute -top-1 -left-1 flex items-center justify-center min-w-[16px] h-[16px] text-xs font-semibold text-red-500 "
-              :class="unreadCount > 99 ? 'text-[10px] px-1' : ''">
-            </span>
+
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
               viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
               class="w-6 h-6 text-gray-500 transition-colors duration-200">
@@ -71,6 +67,12 @@ if (!isset($jobseeker) || empty($jobseeker)) {
                         5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 
                         0m5.714 0a3 3 0 1 1-5.714 0" />
             </svg>
+            <span x-show="unreadCount > 0"
+              x-text="unreadCount"
+              class="absolute -top-0.5 -right-1 flex items-center justify-center min-w-[14px] h-[14px] text-[10px] text-primary bg-yellow-400 rounded-full"
+              :class="unreadCount > 99 ? 'text-[9px] px-1' : ''">
+            </span>
+
 
           </button>
 
@@ -400,14 +402,14 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           </a></li>
 
         <li><a href="?page=explore-companies" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
-<svg xmlns="http://www.w3.org/2000/svg" 
-         fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
-         class="w-5 h-5 text-gray-500">
-      <path stroke-linecap="round" stroke-linejoin="round" 
-            d="M8.25 7.5V6A2.25 2.25 0 0 1 10.5 3.75h3A2.25 2.25 0 0 1 15.75 6v1.5m-7.5 0h7.5m-7.5 0a3 3 0 0 0-3 3v7.5a3 
+            <svg xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              class="w-5 h-5 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8.25 7.5V6A2.25 2.25 0 0 1 10.5 3.75h3A2.25 2.25 0 0 1 15.75 6v1.5m-7.5 0h7.5m-7.5 0a3 3 0 0 0-3 3v7.5a3 
                3 0 0 0 3 3h7.5a3 3 0 0 0 3-3v-7.5a3 3 0 0 0-3-3m-7.5 0h-.75a2.25 2.25 0 0 0-2.25 2.25v1.5a2.25 2.25 0 
                0 0 2.25 2.25h.75m7.5-6h.75a2.25 2.25 0 0 1 2.25 2.25v1.5a2.25 2.25 0 0 1-2.25 2.25h-.75" />
-    </svg>
+            </svg>
 
             Explore Companies
           </a></li>
