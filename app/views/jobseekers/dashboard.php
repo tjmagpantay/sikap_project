@@ -4,7 +4,7 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen sm:px-6 md:px-16 lg:px-24 ">
+<div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Hero Section with Background -->
         <div class="relative px-6 py-4 overflow-hidden rounded-lg sm:px-8 sm:py-12 lg:px-12 lg:py-16">
@@ -33,13 +33,13 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             </div>
         </div>
 
-        <!-- Job Filtering Section - Same Width as Hero, White Background -->
-        <div class="relative py-4 mb-6 sm:px-8 lg:px-12 ">
+        <!-- Job Filtering Section - Improved responsiveness -->
+        <div class="relative py-4 mb-6 sm:px-8 lg:px-12">
             <div class="flex flex-col max-w-5xl gap-6 mx-auto">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
 
-                    <!-- Search Jobs (Much Wider) -->
-                    <div class="flex-1 lg:!flex-[5] lg:!max-w-none lg:!min-w-0">
+                    <!-- Search Jobs - Reduced width to match left section -->
+                    <div class="w-full lg:w-1/3 lg:max-w-md lg:flex-shrink-0">
                         <div class="flex items-center gap-3 px-4 py-3 transition-all bg-white border border-gray-300 rounded-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary hover:border-primary/50">
                             <input type="text" id="jobSearch"
                                 placeholder="Search Jobs"
@@ -50,223 +50,226 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         </div>
                     </div>
 
-                    <!-- Location Filter -->
-                    <div class="flex-1 lg:flex-none lg:w-32">
-                        <div class="relative" x-data="{ open: false, selected: 'Location' }">
-                            <button @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm appearance-none shadow-smm hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
+                    <!-- Filter Dropdowns Container - Takes remaining 2/3 space -->
+                    <div class="flex flex-col w-full gap-4 lg:flex-row lg:w-2/3 lg:min-w-0">
 
-                            <!-- Dropdown Menu -->
-                            <div x-show="open"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-                                x-cloak>
-                                <div class="py-1">
-                                    <button @click="selected = 'Location'; open = false; filterByLocation('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        All Locations
-                                    </button>
-                                    <button @click="selected = 'Manila'; open = false; filterByLocation('manila')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Manila
-                                    </button>
-                                    <button @click="selected = 'Quezon City'; open = false; filterByLocation('quezon-city')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Quezon City
-                                    </button>
-                                    <button @click="selected = 'Makati'; open = false; filterByLocation('makati')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Makati
-                                    </button>
-                                    <button @click="selected = 'Taguig'; open = false; filterByLocation('taguig')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Taguig
-                                    </button>
-                                    <button @click="selected = 'Pasig'; open = false; filterByLocation('pasig')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Pasig
-                                    </button>
-                                    <button @click="selected = 'Cebu'; open = false; filterByLocation('cebu')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Cebu
-                                    </button>
-                                    <button @click="selected = 'Davao'; open = false; filterByLocation('davao')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Davao
-                                    </button>
+                        <!-- Location Filter - Hidden on screens below 640px (sm) -->
+                        <div class="flex-1 hidden sm:block">
+                            <div class="relative w-full" x-data="{ open: false, selected: 'Location' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected" class="text-gray-500 truncate"></span>
+                                    <svg class="flex-shrink-0 w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <div class="py-1">
+                                        <button @click="selected = 'Location'; open = false; filterByLocation('')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            All Locations
+                                        </button>
+                                        <button @click="selected = 'Manila'; open = false; filterByLocation('manila')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Manila
+                                        </button>
+                                        <button @click="selected = 'Quezon City'; open = false; filterByLocation('quezon-city')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Quezon City
+                                        </button>
+                                        <button @click="selected = 'Makati'; open = false; filterByLocation('makati')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Makati
+                                        </button>
+                                        <button @click="selected = 'Taguig'; open = false; filterByLocation('taguig')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Taguig
+                                        </button>
+                                        <button @click="selected = 'Pasig'; open = false; filterByLocation('pasig')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Pasig
+                                        </button>
+                                        <button @click="selected = 'Cebu'; open = false; filterByLocation('cebu')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Cebu
+                                        </button>
+                                        <button @click="selected = 'Davao'; open = false; filterByLocation('davao')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Davao
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Industry Filter -->
-                    <div class="flex-1 lg:flex-none lg:w-32">
-                        <div class="relative" x-data="{ open: false, selected: 'Industry' }">
-                            <button @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
+                        <!-- Industry Filter - Hidden on screens below 640px (sm) -->
+                        <div class="flex-1 hidden sm:block">
+                            <div class="relative w-full" x-data="{ open: false, selected: 'Industry' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected" class="text-gray-500 truncate"></span>
+                                    <svg class="flex-shrink-0 w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
 
-                            <!-- Dropdown Menu -->
-                            <div x-show="open"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-                                x-cloak>
-                                <div class="py-1">
-                                    <button @click="selected = 'Industry'; open = false; filterByIndustry('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        All Industries
-                                    </button>
-                                    <button @click="selected = 'Technology'; open = false; filterByIndustry('technology')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Technology
-                                    </button>
-                                    <button @click="selected = 'Healthcare'; open = false; filterByIndustry('healthcare')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Healthcare
-                                    </button>
-                                    <button @click="selected = 'Education'; open = false; filterByIndustry('education')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Education
-                                    </button>
-                                    <button @click="selected = 'Finance'; open = false; filterByIndustry('finance')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Finance
-                                    </button>
-                                    <button @click="selected = 'Retail'; open = false; filterByIndustry('retail')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Retail
-                                    </button>
-                                    <button @click="selected = 'Manufacturing'; open = false; filterByIndustry('manufacturing')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Manufacturing
-                                    </button>
-                                    <button @click="selected = 'Hospitality'; open = false; filterByIndustry('hospitality')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Hospitality
-                                    </button>
-                                    <button @click="selected = 'Construction'; open = false; filterByIndustry('construction')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Construction
-                                    </button>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <div class="py-1">
+                                        <button @click="selected = 'Industry'; open = false; filterByIndustry('')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            All Industries
+                                        </button>
+                                        <button @click="selected = 'Technology'; open = false; filterByIndustry('technology')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Technology
+                                        </button>
+                                        <button @click="selected = 'Healthcare'; open = false; filterByIndustry('healthcare')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Healthcare
+                                        </button>
+                                        <button @click="selected = 'Education'; open = false; filterByIndustry('education')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Education
+                                        </button>
+                                        <button @click="selected = 'Finance'; open = false; filterByIndustry('finance')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Finance
+                                        </button>
+                                        <button @click="selected = 'Retail'; open = false; filterByIndustry('retail')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Retail
+                                        </button>
+                                        <button @click="selected = 'Manufacturing'; open = false; filterByIndustry('manufacturing')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Manufacturing
+                                        </button>
+                                        <button @click="selected = 'Hospitality'; open = false; filterByIndustry('hospitality')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Hospitality
+                                        </button>
+                                        <button @click="selected = 'Construction'; open = false; filterByIndustry('construction')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Construction
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Workplace Filter -->
-                    <div class="flex-1 lg:flex-none lg:w-32">
-                        <div class="relative" x-data="{ open: false, selected: 'Workplace' }">
-                            <button @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                <span x-text="selected" class="text-gray-500 truncate"></span>
-                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
+                        <!-- Workplace Filter - Hidden on screens below 640px (sm) -->
+                        <div class="flex-1 hidden sm:block">
+                            <div class="relative w-full" x-data="{ open: false, selected: 'Workplace' }">
+                                <button @click="open = !open"
+                                    @click.away="open = false"
+                                    class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                    <span x-text="selected" class="text-gray-500 truncate"></span>
+                                    <svg class="flex-shrink-0 w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
 
-                            <!-- Dropdown Menu -->
-                            <div x-show="open"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-                                x-cloak>
-                                <div class="py-1">
-                                    <button @click="selected = 'Workplace'; open = false; filterByWorkplace('')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        All Types
-                                    </button>
-                                    <button @click="selected = 'On-site'; open = false; filterByWorkplace('on-site')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        On-site
-                                    </button>
-                                    <button @click="selected = 'Remote'; open = false; filterByWorkplace('remote')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Remote
-                                    </button>
-                                    <button @click="selected = 'Hybrid'; open = false; filterByWorkplace('hybrid')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Hybrid
-                                    </button>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open"
+                                    x-transition:enter="transition ease-out duration-100"
+                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <div class="py-1">
+                                        <button @click="selected = 'Workplace'; open = false; filterByWorkplace('')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            All Types
+                                        </button>
+                                        <button @click="selected = 'On-site'; open = false; filterByWorkplace('on-site')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            On-site
+                                        </button>
+                                        <button @click="selected = 'Remote'; open = false; filterByWorkplace('remote')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Remote
+                                        </button>
+                                        <button @click="selected = 'Hybrid'; open = false; filterByWorkplace('hybrid')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Hybrid
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Apply Filter Button -->
-                    <div class="flex gap-2 lg:flex-shrink-0">
-                        <button type="button" id="clearFilters"
-                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
-                            Apply Filter
-                        </button>
+                        <!-- Apply Filter Button -->
+                        <div class="hidden sm:block sm:w-auto lg:flex-shrink-0 lg:self-stretch">
+
+                            <button type="button" id="clearFilters"
+                                class="w-full h-full px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap sm:w-auto">
+                                Apply Filter
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Dashboard Content -->
-        <div class="flex flex-col gap-6 lg:flex-row">
-            <!-- Left Side - Job Cards -->
-            <div class="w-full lg:!w-1/3 lg:max-w-md">
-                <div class="">
+        <!-- Main Dashboard Content - Fixed height issues -->
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+            <!-- Left Side - Job Cards - Fixed height overflow -->
+            <div class="w-full lg:!w-1/3 lg:max-w-md lg:flex-shrink-0">
+                <div class="h-full">
                     <div>
-                        <p class="text-lg font-semibold text-grayMain">Jobs you might like</p>
+                        <p class="mb-2 text-lg font-semibold text-grayMain">Jobs you might like</p>
                     </div>
                     <!-- Filter Buttons -->
                     <div class="flex items-start w-full mb-2 border-b border-gray-200">
-
-                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
-                            data-filter="recent" onclick="filterJobs('recent', this)">
-                            <div class="flex flex-col items-center">
+                        <div class="flex items-center w-full p-1 space-x-1 rounded-lg bg-gray-50">
+                            <!-- Most Recent -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="recent" onclick="filterJobs('recent', this)">
                                 <span>Most Recent</span>
-                            </div>
-                        </button>
+                            </button>
 
-                        <button class="flex-1 py-4 text-sm font-medium text-gray-400 transition-colors border-b-2 border-transparent hover:text-grayMain hover:border-primary"
-                            data-filter="matches" onclick="filterJobs('matches', this)">
-                            <div class="flex flex-col items-end w-full text-right">
+                            <!-- Best Matches -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="matches" onclick="filterJobs('matches', this)">
                                 <span>Best Matches</span>
-                            </div>
-                        </button>
-
+                            </button>
+                        </div>
                     </div>
-                    <!-- Job Post Card -->
-                    <div class="overflow-y-auto" style="max-height: 600px;">
+
+
+                    <!-- Job Post Card Container - Fixed height with proper scrolling -->
+                    <div class="overflow-y-auto" style="max-height: 70vh;">
                         <?php if (!empty($jobs)): ?>
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 <?php
                                 $displayedJobs = array_slice($jobs, 0, 5); // Limit to 5 jobs
                                 $totalJobs = count($jobs);
                                 ?>
 
                                 <?php foreach ($displayedJobs as $job): ?>
+                                    <!-- Job cards with mobile redirect functionality -->
                                     <div class="relative p-6 transition-all duration-300 ease-in-out transform border border-gray-200 rounded-lg cursor-pointer hover:border-primary hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] left-job-card <?php echo (isset($_GET['job_id']) && $_GET['job_id'] == $job['job_id'] ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-gray-50'); ?>"
-                                        onclick="loadJobDetails(<?php echo $job['job_id']; ?>, this)"
+                                        onclick="handleJobCardClick(<?php echo $job['job_id']; ?>, this)"
                                         data-job-id="<?php echo $job['job_id']; ?>"
                                         data-posted-date="<?php echo strtotime($job['created_at']); ?>"
                                         data-match-percentage="<?php echo $job['match_percentage'] ?? 0; ?>"
@@ -386,28 +389,22 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
+
                             </div>
 
-                            <!-- View More Jobs Button/Text - Only show if there are more than 5 jobs -->
-                            <?php if ($totalJobs > 5): ?>
-                                <div class="mt-6 text-center">
-                                    <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg hover:border-primary hover:shadow-md">
-                                        <p class="mb-2 text-sm text-gray-600">
-                                            Showing 5 of <?php echo $totalJobs; ?> jobs available
-                                        </p>
-                                        <a href="?page=job-search"
-                                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-md text-primary hover:bg-primary hover:text-white hover:shadow-lg hover:scale-105">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                            </svg>
-                                            View more jobs on job search page
-                                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
+                            <!-- View All Jobs Link - Added below cards -->
+                            <div class="py-6 text-center">
+                                <a href="?page=browse-jobs"
+                                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-md text-primary hover:bg-primary hover:text-white hover:shadow-lg hover:scale-105">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    View All Jobs
+                                    <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                </a>
+                            </div>
 
                         <?php else: ?>
                             <div class="p-8 text-center">
@@ -419,10 +416,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
             </div>
 
-            <!-- Right Side - Job Details Preview -->
-            <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">
+            <!-- Right Side - Job Details Preview - Hidden on md and below, visible on lg+ -->
+            <div class="hidden w-full lg:block lg:!w-2/3 lg:min-w-0 lg:flex-1 lg:h-auto">
                 <!-- AJAX Container for job details -->
-                <div id="job-details-container">
+                <div id="job-details-container" class="h-full min-h-[70vh]">
                     <!-- Default State - Will be replaced by auto-loaded latest job -->
                     <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
                         <div class="w-12 h-12 mb-4 border-b-2 rounded-full animate-spin border-primary"></div>
@@ -433,21 +430,35 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         </div>
     </div>
 
-
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
+        // New function to handle job card clicks - mobile vs desktop behavior
+        function handleJobCardClick(jobId, cardElement) {
+            // Check if we're on mobile (screen width less than 1024px - lg breakpoint)
+            if (window.innerWidth < 1024) {
+                // Mobile: Redirect to full job details page
+                window.location.href = `?page=view-job&job_id=${jobId}`;
+            } else {
+                // Desktop: Use AJAX to load details in right panel
+                loadJobDetails(jobId, cardElement, false);
+            }
+        }
+
         // Updated job filtering function - Only Most Recent and Best Matches
         function filterJobs(filterType, buttonElement) {
-            // Update active filter button
+            console.log('Filtering by:', filterType); // Debug log
+
+            // Update active filter button - Remove active styles from all buttons
             document.querySelectorAll('[data-filter]').forEach(btn => {
-                btn.classList.remove('border-primary', 'text-primary', 'active-filter');
-                btn.classList.add('border-transparent', 'text-grayMain');
+                btn.classList.remove('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
+                btn.classList.add('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
             });
 
-            buttonElement.classList.remove('border-transparent', 'text-grayMain');
-            buttonElement.classList.add('border-primary', 'text-primary', 'active-filter');
+            // Set active button with primary background and white text
+            buttonElement.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
+            buttonElement.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
 
             // Get all job cards
             const jobCards = document.querySelectorAll('.left-job-card');
@@ -460,6 +471,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     const dateB = parseInt(b.dataset.postedDate || 0);
                     return dateB - dateA; // Most recent first
                 });
+                console.log('Sorted by recent'); // Debug log
             } else if (filterType === 'matches') {
                 // Sort by best matches (match percentage)
                 sortedCards.sort((a, b) => {
@@ -467,6 +479,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     const matchB = parseFloat(b.dataset.matchPercentage || 0);
                     return matchB - matchA; // Highest match first
                 });
+                console.log('Sorted by matches'); // Debug log
             }
 
             // Show only top 5 jobs
@@ -497,78 +510,39 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             // Update job count
             updateJobCount(visibleCards.length);
 
-            // Auto-select first visible job
-            if (visibleCards.length > 0) {
+            // Auto-select first visible job (only on desktop)
+            if (visibleCards.length > 0 && window.innerWidth >= 1024) {
                 const firstJobId = visibleCards[0].getAttribute('data-job-id');
                 loadJobDetails(firstJobId, visibleCards[0], true);
             }
         }
 
-        // Initialize with "Most Recent" as default
+        // Initialize with "Most Recent" as default - Updated to match your working code
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-load first job
-            const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
-            if (firstJobCard) {
-                const latestJobId = firstJobCard.getAttribute('data-job-id');
-                loadJobDetails(latestJobId, firstJobCard, true);
-            }
+            console.log('DOM loaded, initializing filters'); // Debug log
 
-            // Set "Most Recent" as default active
+            // Set "Most Recent" as default active with proper styling
             const recentButton = document.querySelector('[data-filter="recent"]');
             if (recentButton) {
+                console.log('Setting Most Recent as default active'); // Debug log
+                
+                // Set initial active state
+                recentButton.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
+                recentButton.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
+
+                // Then run the filter
                 filterJobs('recent', recentButton);
             }
-        });
 
-        // Update job count display
-        function updateJobCount(count) {
-            const totalJobs = <?php echo count($jobs); ?>;
-
-            document.querySelectorAll('[data-filter] span .text-gray-400').forEach(element => {
-                const filterType = element.closest('[data-filter]').dataset.filter;
-                element.textContent = `(${count} jobs)`;
-            });
-        }
-
-        // Update job count display - Updated to handle the limit
-        function updateJobCount(count) {
-            const totalJobs = <?php echo count($jobs); ?>;
-            const displayLimit = 5;
-            const actualDisplayCount = Math.min(count, displayLimit);
-
-            const countElements = document.querySelectorAll('.text-gray-400');
-            countElements.forEach(element => {
-                if (element.textContent.includes('jobs')) {
-                    if (totalJobs <= displayLimit) {
-                        element.textContent = `(${actualDisplayCount} jobs)`;
-                    } else {
-                        element.textContent = `(${actualDisplayCount} of ${totalJobs} jobs)`;
+            // Auto-load first job on desktop only
+            if (window.innerWidth >= 1024) {
+                setTimeout(() => {
+                    const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
+                    if (firstJobCard) {
+                        const latestJobId = firstJobCard.getAttribute('data-job-id');
+                        loadJobDetails(latestJobId, firstJobCard, true);
                     }
-                }
-            });
-        }
-
-        // Auto-load latest job when page loads - Updated
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if there are any jobs available (only check visible jobs)
-            const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
-
-            if (firstJobCard) {
-                // Get the first job ID (latest job)
-                const latestJobId = firstJobCard.getAttribute('data-job-id');
-
-                // Auto-load the latest job details
-                loadJobDetails(latestJobId, firstJobCard, true);
-            } else {
-                // No jobs available - show empty state
-                const container = document.getElementById('job-details-container');
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                        <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">No jobs available</h3>
-                        <p class="mt-1 text-xs text-gray-500">Check back later for new job opportunities</p>
-                    </div>
-                `;
+                }, 200);
             }
 
             // Initialize other functionality
@@ -578,146 +552,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             const visibleJobs = document.querySelectorAll('.left-job-card[data-job-id]').length;
             updateJobCount(visibleJobs);
         });
+        
+        // Update window resize handler to handle orientation changes
+        window.addEventListener('resize', function() {
+            // Clear any existing timeouts to prevent multiple calls
+            clearTimeout(window.resizeTimeout);
 
-        // AJAX function to load job details (updated with auto-load support)
-        function loadJobDetails(jobId, cardElement, isAutoLoad = false) {
-            console.log('Loading job details for ID:', jobId, 'Auto-load:', isAutoLoad);
-
-            // Show loading state
-            const container = document.getElementById('job-details-container');
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                    <div class="w-12 h-12 mb-4 border-b-2 rounded-full animate-spin border-primary"></div>
-                    <p class="text-gray-500">${isAutoLoad ? 'Loading latest job...' : 'Loading job details...'}</p>
-                </div>
-            `;
-
-            // Only update card styling if not auto-loading
-            if (!isAutoLoad) {
-                // Update active card styling
-                document.querySelectorAll('.left-job-card').forEach(card => {
-                    card.classList.remove('border-primary', 'bg-primary/5');
-                    card.classList.add('border-gray-200');
-                });
-            }
-
-            // Set active card (whether auto-load or manual click)
-            if (cardElement) {
-                cardElement.classList.remove('border-gray-200');
-                cardElement.classList.add('border-primary', 'bg-primary/5');
-            }
-
-            // Make AJAX request
-            const url = `?page=get-job-details-ajax&job_id=${jobId}`;
-            console.log('Making AJAX request to:', url);
-
-            fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+            window.resizeTimeout = setTimeout(function() {
+                // If switching from mobile to desktop, auto-load first visible job
+                if (window.innerWidth >= 1024) {
+                    const firstVisibleCard = document.querySelector('.left-job-card[style*="block"], .left-job-card:not([style*="none"])');
+                    if (firstVisibleCard && !document.querySelector('.left-job-card.border-primary')) {
+                        const jobId = firstVisibleCard.getAttribute('data-job-id');
+                        loadJobDetails(jobId, firstVisibleCard, true);
                     }
-                })
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
-
-                    // Handle different HTTP status codes
-                    if (response.status === 404) {
-                        throw new Error('Job not found');
-                    } else if (response.status === 500) {
-                        throw new Error('Server error occurred');
-                    } else if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    // Check content type
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        return response.text().then(text => {
-                            console.error('Expected JSON but got:', text);
-                            throw new Error('Server returned non-JSON response');
-                        });
-                    }
-
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Parsed response data:', data);
-
-                    if (data.success) {
-                        container.innerHTML = data.html;
-
-                        // Force refresh of any event listeners on the new content
-                        setTimeout(() => {
-                            // Re-attach any event listeners if needed
-                            const saveButtons = container.querySelectorAll('button[onclick*="toggleSaveJob"]');
-                            saveButtons.forEach(btn => {
-                                // Ensure the button has the correct state
-                                const icon = btn.querySelector('i');
-                                if (icon) {
-                                    // Force a visual refresh
-                                    btn.style.opacity = '0.9';
-                                    setTimeout(() => {
-                                        btn.style.opacity = '1';
-                                    }, 10);
-                                }
-                            });
-                        }, 100);
-
-                        // Show success message only for manual clicks, not auto-loads
-                        if (!isAutoLoad) {
-                            console.log('Job details loaded successfully');
-                        }
-                    } else {
-                        container.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                            <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
-                            <h3 class="mt-4 text-lg font-medium text-gray-900">Error loading job details</h3>
-                            <p class="mt-1 text-xs text-gray-500">${data.message || 'Please try again'}</p>
-                        </div>
-                    `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-
-                    // For auto-load errors, show a more user-friendly message
-                    const errorMessage = isAutoLoad ? 'Welcome! Select a job to view details' : 'Connection Error';
-                    const errorIcon = isAutoLoad ? 'fas fa-briefcase' : 'fas fa-exclamation-triangle';
-                    const errorDescription = isAutoLoad ? 'Click on any job from the list to see its full details' : 'Please check your connection and try again';
-
-                    container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                        <i class="text-5xl ${isAutoLoad ? 'text-gray-300' : 'text-red-300'} ${errorIcon}"></i>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">${errorMessage}</h3>
-                        <p class="mt-1 text-xs text-gray-500">${errorDescription}</p>
-                        ${!isAutoLoad ? `
-                            <p class="mt-2 text-xs text-red-500">Error: ${error.message}</p>
-                            <button onclick="loadJobDetails(${jobId}, this.closest('.left-job-card') || cardElement)" 
-                                    class="px-4 py-2 mt-3 text-xs text-white rounded bg-primary hover:bg-primary/90">
-                                Retry
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                });
-        }
-
-        // Initialize search and filters functionality
-        function initializeSearchAndFilters() {
-            // Real-time search with debounce
-            const searchInput = document.getElementById('jobSearch');
-            if (searchInput) {
-                searchInput.addEventListener('input', debounce(applyAllFilters, 300));
-            }
-
-            // Clear filters button
-            const clearButton = document.getElementById('clearFilters');
-            if (clearButton) {
-                clearButton.addEventListener('click', clearAllFilters);
-            }
-        }
+                }
+            }, 250);
+        });
 
         // Updated toggleSaveJob function with better error handling and real-time updates
         function toggleSaveJob(jobId, button) {
@@ -925,11 +776,11 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         function applyAllFilters() {
             const searchTerm = document.getElementById('jobSearch').value.toLowerCase().trim();
 
-            // Get selected values from dropdowns
-            const selectedLocation = getDropdownValue('Location');
-            const selectedJobType = getDropdownValue('Job Type');
-            const selectedIndustry = getDropdownValue('Industry');
-            const selectedWorkplace = getDropdownValue('Workplace');
+            // Get selected values from dropdowns (only on desktop where dropdowns are visible)
+            const selectedLocation = window.innerWidth >= 640 ? getDropdownValue('Location') : '';
+            const selectedJobType = '';
+            const selectedIndustry = window.innerWidth >= 640 ? getDropdownValue('Industry') : '';
+            const selectedWorkplace = window.innerWidth >= 640 ? getDropdownValue('Workplace') : '';
 
             const jobCards = document.querySelectorAll('.left-job-card');
             let visibleCount = 0;
@@ -947,24 +798,16 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                     }
                 }
 
-                // Location filter
-                if (selectedLocation && selectedLocation !== 'Location' && shouldShow) {
+                // Location filter (only on desktop)
+                if (selectedLocation && selectedLocation !== 'Location' && shouldShow && window.innerWidth >= 640) {
                     const locationText = card.querySelector('.text-gray-600').textContent.toLowerCase();
                     if (!locationText.includes(selectedLocation.toLowerCase())) {
                         shouldShow = false;
                     }
                 }
 
-                // Job type filter
-                if (selectedJobType && selectedJobType !== 'Job Type' && shouldShow) {
-                    const jobTypeElement = card.querySelector('.text-primary');
-                    if (jobTypeElement && !jobTypeElement.textContent.toLowerCase().includes(selectedJobType.toLowerCase())) {
-                        shouldShow = false;
-                    }
-                }
-
-                // Industry filter
-                if (selectedIndustry && selectedIndustry !== 'Industry' && shouldShow) {
+                // Industry filter (only on desktop)
+                if (selectedIndustry && selectedIndustry !== 'Industry' && shouldShow && window.innerWidth >= 640) {
                     const categoryElements = card.querySelectorAll('.text-primary');
                     let hasMatchingCategory = false;
                     categoryElements.forEach(element => {
@@ -995,8 +838,8 @@ include_once __DIR__ . '/navbar-jobseeker.php';
             // Show message if no results
             showNoResultsMessage(visibleCount === 0);
 
-            // Auto-load first visible job after filtering
-            if (firstVisibleCard) {
+            // Auto-load first visible job after filtering (only on desktop)
+            if (firstVisibleCard && window.innerWidth >= 1024) {
                 const jobId = firstVisibleCard.getAttribute('data-job-id');
                 loadJobDetails(jobId, firstVisibleCard, true);
             }
@@ -1100,6 +943,148 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 timeout = setTimeout(later, wait);
             };
         }
+
+        // Add the missing loadJobDetails function
+        function loadJobDetails(jobId, cardElement, isAutoLoad = false) {
+            console.log('Loading job details for ID:', jobId, 'Auto-load:', isAutoLoad);
+
+            // Show loading state
+            const container = document.getElementById('job-details-container');
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                    <div class="w-12 h-12 mb-4 border-b-2 rounded-full animate-spin border-primary"></div>
+                    <p class="text-gray-500">${isAutoLoad ? 'Loading latest job...' : 'Loading job details...'}</p>
+                </div>
+            `;
+
+            // Only update card styling if not auto-loading
+            if (!isAutoLoad) {
+                // Update active card styling
+                document.querySelectorAll('.left-job-card').forEach(card => {
+                    card.classList.remove('border-primary', 'bg-primary/5');
+                    card.classList.add('border-gray-200');
+                });
+            }
+
+            // Set active card (whether auto-load or manual click)
+            if (cardElement) {
+                cardElement.classList.remove('border-gray-200');
+                cardElement.classList.add('border-primary', 'bg-primary/5');
+            }
+
+            // Make AJAX request - Using your working endpoint format
+            const url = `?page=get-job-details-ajax&job_id=${jobId}`;
+            console.log('Making AJAX request to:', url);
+
+            fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+
+                    // Handle different HTTP status codes
+                    if (response.status === 404) {
+                        throw new Error('Job not found');
+                    } else if (response.status === 500) {
+                        throw new Error('Server error occurred');
+                    } else if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    // Check content type
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Expected JSON but got:', text);
+                            throw new Error('Server returned non-JSON response');
+                        });
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Parsed response data:', data);
+
+                    if (data.success) {
+                        container.innerHTML = data.html;
+
+                        // Force refresh of any event listeners on the new content
+                        setTimeout(() => {
+                            // Re-attach any event listeners if needed
+                            const saveButtons = container.querySelectorAll('button[onclick*="toggleSaveJob"]');
+                            saveButtons.forEach(btn => {
+                                // Ensure the button has the correct state
+                                const icon = btn.querySelector('i');
+                                if (icon) {
+                                    // Force a visual refresh
+                                    btn.style.opacity = '0.9';
+                                    setTimeout(() => {
+                                        btn.style.opacity = '1';
+                                    }, 10);
+                                }
+                            });
+                        }, 100);
+
+                        // Show success message only for manual clicks, not auto-loads
+                        if (!isAutoLoad) {
+                            console.log('Job details loaded successfully');
+                        }
+                    } else {
+                        container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                            <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Error loading job details</h3>
+                            <p class="mt-1 text-xs text-gray-500">${data.message || 'Please try again'}</p>
+                        </div>
+                    `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+
+                    // For auto-load errors, show a more user-friendly message
+                    const errorMessage = isAutoLoad ? 'Welcome! Select a job to view details' : 'Connection Error';
+                    const errorIcon = isAutoLoad ? 'fas fa-briefcase' : 'fas fa-exclamation-triangle';
+                    const errorDescription = isAutoLoad ? 'Click on any job from the list to see its full details' : 'Please check your connection and try again';
+
+                    container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                        <i class="text-5xl ${isAutoLoad ? 'text-gray-300' : 'text-red-300'} ${errorIcon}"></i>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">${errorMessage}</h3>
+                        <p class="mt-1 text-xs text-gray-500">${errorDescription}</p>
+                        ${!isAutoLoad ? `
+                            <p class="mt-2 text-xs text-red-500">Error: ${error.message}</p>
+                            <button onclick="loadJobDetails(${jobId}, this.closest('.left-job-card') || cardElement)" 
+                                    class="px-4 py-2 mt-3 text-xs text-white rounded bg-primary hover:bg-primary/90">
+                                Retry
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                });
+        }
+
+        // Add missing initializeSearchAndFilters function
+        function initializeSearchAndFilters() {
+            // Add search input event listener with debounce
+            const searchInput = document.getElementById('jobSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(applyAllFilters, 300));
+            }
+
+            // Add apply filter button event listener
+            const applyFilterBtn = document.getElementById('clearFilters');
+            if (applyFilterBtn) {
+                applyFilterBtn.addEventListener('click', applyAllFilters);
+            }
+        }
+
+        // ...rest of your existing JavaScript code...
     </script>
 
 </div>

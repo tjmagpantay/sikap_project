@@ -370,76 +370,46 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <?php elseif (isset($hasApplied) && $hasApplied === true): ?>
                                 <?php if (isset($incompleteApplication) && !empty($incompleteApplication)): ?>
                                     <!-- INCOMPLETE APPLICATION - Show Detailed Progress -->
-                                    <div class="p-4 mb-4 border border-orange-200 rounded-lg bg-orange-50">
+                                    <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                         <div class="flex items-center justify-between mb-3">
                                             <div class="flex items-center">
-                                                <i class="mr-3 text-2xl text-orange-500 fas fa-clock"></i>
+                                                <i class="mr-3 text-2xl text-primary fas fa-clock"></i>
                                                 <div>
-                                                    <p class="text-sm font-medium text-orange-700">Application in Progress</p>
-                                                    <p class="text-xs text-orange-600">
+                                                    <p class="text-sm font-medium text-primary">Application in Progress</p>
+                                                    <p class="text-xs text-blue-700">
                                                         Step <?php echo $incompleteApplication['current_step']; ?> of 4 completed
                                                     </p>
                                                 </div>
                                             </div>
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
                                                 <?php echo round(($incompleteApplication['current_step'] / 4) * 100); ?>% Complete
                                             </span>
                                         </div>
 
-                                        <!-- Progress Steps -->
-                                        <div class="mb-4">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <span class="text-xs font-medium text-orange-700">Application Progress</span>
-                                                <span class="text-xs text-orange-600">Step <?php echo $incompleteApplication['current_step']; ?> of 4</span>
-                                            </div>
-
-                                            <!-- Progress Bar -->
-                                            <div class="w-full h-2 bg-orange-200 rounded-full">
-                                                <div class="h-2 transition-all duration-300 bg-orange-500 rounded-full"
-                                                    style="width: <?php echo ($incompleteApplication['current_step'] / 4) * 100; ?>%"></div>
-                                            </div>
-
-                                            <!-- Step Labels -->
-                                            <div class="flex justify-between mt-2 text-xs">
-                                                <span class="<?php echo $incompleteApplication['current_step'] >= 1 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                    Documents
-                                                </span>
-                                                <span class="<?php echo $incompleteApplication['current_step'] >= 2 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                    Questions
-                                                </span>
-                                                <span class="<?php echo $incompleteApplication['current_step'] >= 3 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                    Eligibility
-                                                </span>
-                                                <span class="<?php echo $incompleteApplication['current_step'] >= 4 ? 'text-orange-700 font-medium' : 'text-orange-400'; ?>">
-                                                    Review
-                                                </span>
-                                            </div>
-                                        </div>
+                                        
 
                                         <!-- Current Step Info -->
-                                        <div class="p-3 mb-3 bg-orange-100 border border-orange-300 rounded-md">
+                                        <div class="p-3 mb-3 bg-blue-100 border border-blue-300 rounded-md">
                                             <div class="flex items-start">
-                                                <div class="flex items-center justify-center w-6 h-6 mr-3 bg-orange-500 rounded-full">
-                                                    <span class="text-xs font-bold text-white"><?php echo $incompleteApplication['current_step']; ?></span>
-                                                </div>
+             
                                                 <div class="flex-1">
                                                     <?php
                                                     switch ($incompleteApplication['current_step']) {
                                                         case 1:
-                                                            echo '<p class="text-sm font-medium text-orange-800">Step 1: Documents & Personal Info</p>';
-                                                            echo '<p class="mt-1 text-xs text-orange-700">Upload your resume/CV and complete personal information.</p>';
+                                                            echo '<p class="text-xs font-medium text-primary">Step 1: Documents & Personal Info</p>';
+                                                            echo '<p class="mt-1 text-xs text-primary">Upload your resume/CV and complete personal information.</p>';
                                                             break;
                                                         case 2:
-                                                            echo '<p class="text-sm font-medium text-orange-800">Step 2: Screening Questions</p>';
-                                                            echo '<p class="mt-1 text-xs text-orange-700">Answer employer screening questions for this position.</p>';
+                                                            echo '<p class="text-xs font-medium text-primary">Step 2: Screening Questions</p>';
+                                                            echo '<p class="mt-1 text-xs text-primary">Answer employer screening questions for this position.</p>';
                                                             break;
                                                         case 3:
-                                                            echo '<p class="text-sm font-medium text-orange-800">Step 3: Eligibility Information</p>';
-                                                            echo '<p class="mt-1 text-xs text-orange-700">Provide eligibility details and program interests.</p>';
+                                                            echo '<p class="text-xs font-medium text-primary">Step 3: Eligibility Information</p>';
+                                                            echo '<p class="mt-1 text-xs text-primary ">Provide eligibility details and program interests.</p>';
                                                             break;
                                                         case 4:
-                                                            echo '<p class="text-sm font-medium text-orange-800">Step 4: Review & Submit</p>';
-                                                            echo '<p class="mt-1 text-xs text-orange-700">Review your application and submit to employer.</p>';
+                                                            echo '<p class="text-xs font-medium text-primary">Step 4: Review & Submit</p>';
+                                                            echo '<p class="mt-1 text-xs text-primary">Review your application and submit to employer.</p>';
                                                             break;
                                                     }
                                                     ?>
@@ -450,13 +420,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <!-- Action Buttons -->
                                         <div class="flex gap-2">
                                             <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&application_id=<?php echo $incompleteApplication['application_id']; ?>&step=<?php echo $incompleteApplication['current_step']; ?>"
-                                                class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium transition-colors bg-orange-500 rounded-md text-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                                                <i class="mr-2 fas fa-play"></i>
+                                                class="flex items-center justify-center flex-1 px-4 py-3 text-sm font-medium text-white transition-colors border rounded-md bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                 Continue Application
                                             </a>
                                             <a href="?page=view-application&application_id=<?php echo $incompleteApplication['application_id']; ?>"
-                                                class="flex items-center justify-center px-4 py-3 text-sm font-medium text-orange-600 transition-colors bg-orange-100 border border-orange-300 rounded-md hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                                                <i class="mr-2 fas fa-eye"></i>
+                                                class="flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors bg-orange-100 border border-gray-200 rounded-md text-primary hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                                               
                                                 View Details
                                             </a>
                                         </div>
@@ -469,19 +438,19 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                             <?php
                                             switch ($applicationStatus) {
                                                 case 'pending':
-                                                    echo 'border-yellow-200 bg-yellow-50';
+                                                    echo 'border-blue-200 bg-blue-50';
                                                     break;
                                                 case 'reviewed':
                                                     echo 'border-blue-200 bg-blue-50';
                                                     break;
                                                 case 'shortlisted':
-                                                    echo 'border-purple-200 bg-purple-50';
+                                                    echo 'border-blue-200 bg-blue-50';
                                                     break;
                                                 case 'hired':
-                                                    echo 'border-green-200 bg-green-50';
+                                                    echo 'border-blue-200 bg-blue-50';
                                                     break;
                                                 case 'rejected':
-                                                    echo 'border-red-200 bg-red-50';
+                                                    echo 'border-red-200 bg-red-50';            
                                                     break;
                                                 default:
                                                     echo 'border-gray-200 bg-gray-50';
@@ -493,16 +462,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                         <?php
                                                         switch ($applicationStatus) {
                                                             case 'pending':
-                                                                echo 'border-yellow-500 bg-yellow-100';
+                                                                echo 'border-blue-500 bg-blue-100';
                                                                 break;
                                                             case 'reviewed':
                                                                 echo 'border-blue-500 bg-blue-100';
                                                                 break;
                                                             case 'shortlisted':
-                                                                echo 'border-purple-600 bg-purple-100';
+                                                                echo 'border-blue-500 bg-blue-100';
                                                                 break;
                                                             case 'hired':
-                                                                echo 'border-green-600 bg-green-100';
+                                                                echo 'border-blue-500 bg-blue-100';
                                                                 break;
                                                             case 'rejected':
                                                                 echo 'border-red-600 bg-red-100';
@@ -515,22 +484,22 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                         <?php
                                                         switch ($applicationStatus) {
                                                             case 'pending':
-                                                                echo '<svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                echo '<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                       </svg>';
                                                                 break;
                                                             case 'reviewed':
-                                                                echo '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                echo '<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                                                       </svg>';
                                                                 break;
                                                             case 'shortlisted':
-                                                                echo '<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                echo '<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
                                                                       </svg>';
                                                                 break;
                                                             case 'hired':
-                                                                echo '<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                echo '<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                                       </svg>';
                                                                 break;
@@ -551,16 +520,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                             <?php
                                                             switch ($applicationStatus) {
                                                                 case 'pending':
-                                                                    echo 'text-yellow-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'reviewed':
-                                                                    echo 'text-blue-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'shortlisted':
-                                                                    echo 'text-purple-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'hired':
-                                                                    echo 'text-green-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'rejected':
                                                                     echo 'text-red-700';
@@ -595,19 +564,19 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                             <?php
                                                             switch ($applicationStatus) {
                                                                 case 'pending':
-                                                                    echo 'text-yellow-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'reviewed':
-                                                                    echo 'text-blue-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'shortlisted':
-                                                                    echo 'text-purple-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'hired':
-                                                                    echo 'text-green-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'rejected':
-                                                                    echo 'text-red-600';
+                                                                    echo 'text-red-700';
                                                                     break;
                                                                 default:
                                                                     echo 'text-gray-600';
@@ -645,16 +614,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                             <?php
                                                             switch ($applicationStatus) {
                                                                 case 'pending':
-                                                                    echo 'text-yellow-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'reviewed':
-                                                                    echo 'text-blue-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'shortlisted':
-                                                                    echo 'text-purple-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'hired':
-                                                                    echo 'text-green-700';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'rejected':
                                                                     echo 'text-red-700';
@@ -667,16 +636,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                             <?php
                                                             switch ($applicationStatus) {
                                                                 case 'pending':
-                                                                    echo 'text-yellow-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'reviewed':
-                                                                    echo 'text-blue-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'shortlisted':
-                                                                    echo 'text-purple-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'hired':
-                                                                    echo 'text-green-600';
+                                                                    echo 'text-primary';
                                                                     break;
                                                                 case 'rejected':
                                                                     echo 'text-red-600';
@@ -695,35 +664,35 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <!-- Status-specific detailed message -->
                                         <?php if ($applicationStatus === 'pending'): ?>
                                             <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                                                <p class="text-sm text-yellow-800">
+                                                <p class="text-xs text-yellow-800">
                                                     <i class="mr-2 fas fa-hourglass-half"></i>
                                                     Your application is being reviewed by the employer. You'll be notified when there's an update.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'reviewed'): ?>
                                             <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
-                                                <p class="text-sm text-blue-800">
+                                                <p class="text-xs text-blue-800">
                                                     <i class="mr-2 fas fa-search"></i>
                                                     Your application is currently under detailed review. The employer is evaluating your qualifications.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'shortlisted'): ?>
                                             <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
-                                                <p class="text-sm text-purple-800">
+                                                <p class="text-xs text-blue-800">
                                                     <i class="mr-2 fas fa-star"></i>
                                                     Congratulations! You've been shortlisted for this position. The employer may contact you soon for the next steps.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'hired'): ?>
                                             <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
-                                                <p class="text-sm text-green-800">
+                                                <p class="text-xs text-green-800">
                                                     <i class="mr-2 fas fa-check-circle"></i>
                                                     Congratulations! You've been hired for this position. The employer will contact you with further details.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'rejected'): ?>
                                             <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
-                                                <p class="text-sm text-red-800">
+                                                <p class="text-xs text-red-800">
                                                     <i class="mr-2 fas fa-info-circle"></i>
                                                     Thank you for your interest. Unfortunately, you were not selected for this position. Keep applying to other opportunities!
                                                 </p>
@@ -737,16 +706,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                 <?php
                                                 switch ($applicationStatus) {
                                                     case 'pending':
-                                                        echo 'text-yellow-600 bg-yellow-100 hover:bg-yellow-200';
+                                                        echo 'text-white bg-primary ';
                                                         break;
                                                     case 'reviewed':
-                                                        echo 'text-blue-600 bg-blue-100 hover:bg-blue-200';
+                                                        echo 'text-white bg-primary';
                                                         break;
                                                     case 'shortlisted':
-                                                        echo 'text-purple-600 bg-purple-100 hover:bg-purple-200';
+                                                        echo 'text-white bg-primary';
                                                         break;
                                                     case 'hired':
-                                                        echo 'text-green-600 bg-green-100 hover:bg-green-200';
+                                                        echo 'text-white bg-primary';
                                                         break;
                                                     case 'rejected':
                                                         echo 'text-red-600 bg-red-100 hover:bg-red-200';
@@ -755,7 +724,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                         echo 'text-gray-600 bg-gray-100 hover:bg-gray-200';
                                                 }
                                                 ?>">
-                                                <i class="mr-2 fas fa-eye"></i>
+                                               
                                                 View Application
                                             </a>
                                             <a href="?page=my-applications"

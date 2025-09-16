@@ -25,12 +25,12 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                     <h1 class="mb-4 text-2xl font-bold text-gray-900">Event Not Found</h1>
                     <p class="mb-6 text-gray-600">The event you're looking for doesn't exist or may have been removed.</p>
                     <div class="flex gap-3">
-                        <a href="?page=jobseeker-programs"
+                        <a href="?page=programs-jobseeker"
                             class="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium transition-colors duration-200 border rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
                             <i class="mr-2 text-xs fas fa-calendar"></i>
                             Back to Programs
                         </a>
-                        <a href="?page=jobseeker-dashboard"
+                        <a href="?page=dashboard"
                             class="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium transition-colors duration-200 border rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
                             <i class="mr-2 text-xs fas fa-home"></i>
                             Dashboard
@@ -43,18 +43,18 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 <?php else: ?>
 
     <!-- Event Details -->
-    <div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
+    <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
         <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
             <!-- Breadcrumbs -->
             <nav class="mb-6">
                 <div class="flex items-center space-x-2 text-sm">
-                    <a href="?page=jobseeker-dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                    <a href="?page=dashboard" class="text-gray-500 transition-colors hover:text-primary">
                         Dashboard
                     </a>
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    <a href="?page=jobseeker-programs" class="text-gray-500 transition-colors hover:text-primary">
+                    <a href="?page=programs-jobseeker" class="text-gray-500 transition-colors hover:text-primary">
                         Programs & Events
                     </a>
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

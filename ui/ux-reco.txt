@@ -1,13 +1,15 @@
-For Badge
+ <div class="flex items-start w-full mb-2 border-b border-gray-200">
+                        <div class="flex items-center w-full p-1 space-x-1 rounded-lg bg-gray-50">
+                            <!-- Most Recent -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="recent" onclick="filterJobs('recent', this)">
+                                <span>Most Recent</span>
+                            </button>
 
-<style>
-.match-badge-excellent {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-}
-.match-badge-good {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-}
-.match-badge-fair {
-    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-}
-</style>
+                            <!-- Best Matches -->
+                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
+                                data-filter="matches" onclick="filterJobs('matches', this)">
+                                <span>Best Matches</span>
+                            </button>
+                        </div>
+                    </div>

@@ -4,8 +4,20 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="px-6 py-8">
-    <div class="mx-auto max-w-7xl">
+<div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
+    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6">
+            <div class="flex items-center space-x-2 text-sm">
+                <a href="?page=dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                    Dashboard
+                </a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="font-medium text-primary">Saved Jobs</span>
+            </div>
+        </nav>
 
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8">
@@ -13,7 +25,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <h1 class="text-2xl font-bold text-gray-900">Saved Jobs</h1>
                 <p class="mt-1 text-sm text-gray-600">Jobs you've bookmarked for later</p>
             </div>
-
         </div>
 
         <!-- Saved Jobs List -->
@@ -22,7 +33,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 <i class="mb-4 text-6xl text-gray-400 fas fa-bookmark"></i>
                 <h3 class="mb-2 text-lg font-medium text-gray-900">No saved jobs yet</h3>
                 <p class="mb-6 text-gray-500">Save jobs you're interested in to view them later</p>
-                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary ">
+                <a href="?page=browse-jobs" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-secondary">
                     <i class="mr-2 fas fa-search"></i>
                     Browse Jobs
                 </a>
@@ -90,7 +101,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                             <!-- Action Buttons -->
                             <div class="flex flex-col gap-2 mb-4">
-
                                 <!-- Apply Button -->
                                 <?php if (isset($job['has_applied']) && $job['has_applied']): ?>
                                     <span class="px-4 py-2 text-sm font-medium text-center text-white border rounded-md bg-primary">
@@ -102,15 +112,14 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     </span>
                                 <?php else: ?>
                                     <a href="?page=apply-job&job_id=<?php echo $job['job_id']; ?>&step=1"
-                                        class="px-4 py-2 text-sm font-medium text-center text-white border rounded-md bg-primary">
-
+                                        class="px-4 py-2 text-sm font-medium text-center text-white border rounded-md bg-primary hover:bg-secondary">
                                         Apply Now
                                     </a>
                                 <?php endif; ?>
                             </div>
 
                             <!-- Footer: Posted Date -->
-                            <div class="flex items-center justify-between pt-4 mt-2 ">
+                            <div class="flex items-center justify-between pt-4 mt-2">
                                 <span class="text-xs text-gray-500">
                                     Posted <?php echo date('M d, Y', strtotime($job['created_at'])); ?>
                                 </span>

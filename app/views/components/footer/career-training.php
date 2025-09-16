@@ -3,29 +3,32 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<div class="min-h-screen px-4 py-16 bg-gray-50 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+    <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center">
-            <h1 class="mb-5 text-3xl font-bold tracking-wide text-gray-900 sm:text-4xl">Career Training Resources</h1>
-            <div class="w-20 h-1.5 mx-auto bg-blue-600 rounded-full"></div>
-            <p class="mt-6 text-lg text-gray-600">
+        <div class="mb-12 text-center" data-aos="fade-up">
+            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+                Career Training Resources
+            </h1>
+            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
                 Enhance your skills and advance your career with these training opportunities
             </p>
+            <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
         <!-- Main Content -->
-        <div class="p-8 bg-white rounded-lg shadow-lg">
+        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
             <!-- Skills Development -->
-            <section class="mb-12">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">Skills Development Programs</h2>
-                <div class="space-y-6">
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Skills Development Programs</h2>
+                    
                     <!-- Technical Skills -->
-                    <div class="p-6 border rounded-lg">
-                        <h3 class="mb-4 text-xl font-semibold text-blue-600">Technical Skills Training</h3>
-                        <div class="space-y-4 text-gray-700">
-                            <p>Develop practical skills through:</p>
-                            <ul class="pl-6 space-y-2 list-disc">
+                    <div class="mb-6 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
+                        <div class="p-6">
+                            <h3 class="mb-3 font-semibold text-md text-grayMain">Technical Skills Training</h3>
+                            <p class="mb-3 text-sm text-grayMain">Develop practical skills through:</p>
+                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                                 <li>TESDA certification programs</li>
                                 <li>Industry-specific workshops</li>
                                 <li>Hands-on training sessions</li>
@@ -35,11 +38,11 @@ include_once __DIR__ . '/../navbar.php';
                     </div>
 
                     <!-- Soft Skills -->
-                    <div class="p-6 border rounded-lg">
-                        <h3 class="mb-4 text-xl font-semibold text-blue-600">Professional Development</h3>
-                        <div class="space-y-4 text-gray-700">
-                            <p>Enhance your workplace skills:</p>
-                            <ul class="pl-6 space-y-2 list-disc">
+                    <div class="transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
+                        <div class="p-6">
+                            <h3 class="mb-3 font-semibold text-md text-grayMain">Professional Development</h3>
+                            <p class="mb-3 text-sm text-grayMain">Enhance your workplace skills:</p>
+                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
                                 <li>Communication workshops</li>
                                 <li>Leadership training</li>
                                 <li>Time management</li>
@@ -49,103 +52,141 @@ include_once __DIR__ . '/../navbar.php';
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <!-- Digital Skills -->
-            <section class="mb-12">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">Digital Skills Training</h2>
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div class="p-6 bg-gray-50 rounded-lg">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-800">Basic Digital Skills</h3>
-                        <ul class="pl-6 space-y-2 text-gray-700 list-disc">
-                            <li>Microsoft Office Suite</li>
-                            <li>Email and communication tools</li>
-                            <li>Internet research</li>
-                            <li>Basic data entry</li>
-                            <li>File management</li>
-                        </ul>
-                    </div>
-                    <div class="p-6 bg-gray-50 rounded-lg">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-800">Advanced Digital Skills</h3>
-                        <ul class="pl-6 space-y-2 text-gray-700 list-disc">
-                            <li>Digital marketing</li>
-                            <li>Web development</li>
-                            <li>Data analysis</li>
-                            <li>Graphic design</li>
-                            <li>Social media management</li>
-                        </ul>
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Digital Skills Training</h2>
+                    
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <!-- Basic Digital Skills -->
+                        <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
+                            <h3 class="mb-3 font-semibold text-md text-grayMain">Basic Digital Skills</h3>
+                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
+                                <li>Microsoft Office Suite</li>
+                                <li>Email and communication tools</li>
+                                <li>Internet research</li>
+                                <li>Basic data entry</li>
+                                <li>File management</li>
+                            </ul>
+                        </div>
+
+                        <!-- Advanced Digital Skills -->
+                        <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
+                            <h3 class="mb-3 font-semibold text-md text-grayMain">Advanced Digital Skills</h3>
+                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
+                                <li>Digital marketing</li>
+                                <li>Web development</li>
+                                <li>Data analysis</li>
+                                <li>Graphic design</li>
+                                <li>Social media management</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <!-- Language Training -->
-            <section class="mb-12">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">Language Skills</h2>
-                <div class="p-6 border rounded-lg">
-                    <div class="space-y-4 text-gray-700">
-                        <p>Improve your language proficiency:</p>
-                        <ul class="pl-6 space-y-2 list-disc">
-                            <li>Business English communication</li>
-                            <li>Technical writing</li>
-                            <li>Public speaking</li>
-                            <li>Customer service communication</li>
-                            <li>Professional email writing</li>
-                        </ul>
-                    </div>
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Language Skills</h2>
+                    <p class="mb-3 text-sm text-grayMain">Improve your language proficiency:</p>
+                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
+                        <li>Business English communication</li>
+                        <li>Technical writing</li>
+                        <li>Public speaking</li>
+                        <li>Customer service communication</li>
+                        <li>Professional email writing</li>
+                    </ul>
                 </div>
-            </section>
+            </div>
 
             <!-- Training Schedule -->
-            <section class="mb-12">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">Upcoming Training Sessions</h2>
-                <div class="overflow-hidden border rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Training</th>
-                                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Schedule</th>
-                                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">MS Office Basics</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Every Monday</td>
-                                <td class="px-6 py-4 whitespace-nowrap">2 weeks</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">Communication Skills</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Every Wednesday</td>
-                                <td class="px-6 py-4 whitespace-nowrap">3 weeks</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">Digital Marketing</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Every Friday</td>
-                                <td class="px-6 py-4 whitespace-nowrap">4 weeks</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Upcoming Training Sessions</h2>
+                    
+                    <div class="overflow-hidden border rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Training</th>
+                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Schedule</th>
+                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">MS Office Basics</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Monday</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">2 weeks</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Communication Skills</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Wednesday</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">3 weeks</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Digital Marketing</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Friday</td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">4 weeks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </section>
+            </div>
 
             <!-- Registration Process -->
-            <section class="p-6 bg-blue-50 rounded-lg">
-                <h2 class="mb-6 text-2xl font-bold text-gray-900">How to Register</h2>
-                <div class="space-y-4">
-                    <ol class="pl-6 space-y-3 text-gray-700 list-decimal">
+            <div class="relative transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
+                <div class="p-6">
+                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">How to Register</h2>
+                    
+                    <ol class="ml-6 space-y-2 text-sm list-decimal text-grayMain">
                         <li>Visit PESO Rosario office or register online</li>
                         <li>Select your preferred training program</li>
                         <li>Submit required documents</li>
                         <li>Pay training fee (if applicable)</li>
                         <li>Receive confirmation and schedule</li>
                     </ol>
-                    <div class="p-4 mt-4 bg-white rounded-lg">
-                        <p class="font-medium text-blue-600">Note: Some programs are free of charge for qualified individuals.</p>
+                    
+                    <div class="p-4 mt-4 rounded-lg bg-gray-50">
+                        <p class="text-sm font-medium text-primary">Note: Some programs are free of charge for qualified individuals.</p>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- AOS Animation Library CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<!-- AOS Animation Library JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50,
+            delay: 100,
+            disable: 'mobile',
+            startEvent: 'DOMContentLoaded',
+            useClassNames: false,
+            disableMutationObserver: false,
+            debounceDelay: 50,
+            throttleDelay: 99,
+        });
+    });
+
+    // Refresh AOS on window resize
+    window.addEventListener('resize', function() {
+        AOS.refresh();
+    });
+</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>
