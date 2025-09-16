@@ -248,6 +248,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 max="<?php echo date('Y-m-d', strtotime('-16 years')); ?>"
                                 min="1940-01-01"
                                 class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                oninput="validateBirthdate(this)"
                                 onchange="validateBirthdate(this)">
                             <div id="date_of_birth_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
@@ -384,13 +385,22 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 <script>
     // Validation functions
     function validateName(input, fieldName) {
-        const value = input.value.trim();
+        let value = input.value.trim();
         const errorDiv = document.getElementById(fieldName + '_error');
         const nameRegex = /^[a-zA-Z\s]+$/;
 
         // Reset styles
         input.classList.remove('border-red-500', 'border-green-500');
         errorDiv.classList.add('hidden');
+
+        // Block invalid characters immediately
+        if (!nameRegex.test(value)) {
+            const cleanValue = value.replace(/[^a-zA-Z\s]/g, '');
+            input.value = cleanValue;
+            value = cleanValue;
+            showError(input, errorDiv, 'Only letters and spaces are allowed');
+            return false;
+        }
 
         if (value === '') {
             if (fieldName !== 'middle_name') {
@@ -410,10 +420,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             return false;
         }
 
-        if (!nameRegex.test(value)) {
-            showError(input, errorDiv, 'Only letters and spaces are allowed');
-            return false;
-        }
+        // Capitalize each word
+        const capitalizedValue = value.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+        
+        input.value = capitalizedValue;
 
         // Valid
         input.classList.add('border-green-500');
@@ -421,13 +433,24 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
     }
 
     function validateMiddleName(input) {
-        const value = input.value.trim();
+        let value = input.value.trim();
         const errorDiv = document.getElementById('middle_name_error');
         const nameRegex = /^[a-zA-Z\s]*$/; // Allow empty for middle name
 
         // Reset styles
         input.classList.remove('border-red-500', 'border-green-500');
         errorDiv.classList.add('hidden');
+
+        // Block invalid characters immediately
+        if (!nameRegex.test(value)) {
+            const cleanValue = value.replace(/[^a-zA-Z\s]/g, '');
+            input.value = cleanValue;
+            value = cleanValue;
+            if (value !== '') { // Only show error if they tried to enter invalid characters
+                showError(input, errorDiv, 'Only letters and spaces are allowed');
+                return false;
+            }
+        }
 
         if (value === '') {
             return true; // Middle name is optional
@@ -438,10 +461,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             return false;
         }
 
-        if (!nameRegex.test(value)) {
-            showError(input, errorDiv, 'Only letters and spaces are allowed');
-            return false;
-        }
+        // Capitalize each word
+        const capitalizedValue = value.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+        
+        input.value = capitalizedValue;
 
         // Valid
         input.classList.add('border-green-500');
@@ -451,6 +476,8 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
     function validateBirthdate(input) {
         const value = input.value;
         const errorDiv = document.getElementById('date_of_birth_error');
+        const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 16));
+        const minDate = new Date('1940-01-01');
 
         // Reset styles
         input.classList.remove('border-red-500', 'border-green-500');
@@ -462,21 +489,24 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
         }
 
         const birthDate = new Date(value);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
 
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        if (age < 16) {
-            showError(input, errorDiv, 'You must be at least 16 years old');
+        // Check if it's a valid date
+        if (isNaN(birthDate.getTime())) {
+            showError(input, errorDiv, 'Please enter a valid date');
             return false;
         }
 
-        if (birthDate.getFullYear() < 1940) {
+        // Check minimum date
+        if (birthDate < minDate) {
             showError(input, errorDiv, 'Year must be 1940 or later');
+            input.value = ''; // Clear invalid input
+            return false;
+        }
+
+        // Check maximum date (16 years ago)
+        if (birthDate > maxDate) {
+            showError(input, errorDiv, 'You must be at least 16 years old');
+            input.value = ''; // Clear invalid input
             return false;
         }
 
@@ -486,7 +516,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
     }
 
     function validateAddress(input) {
-        const value = input.value.trim();
+        let value = input.value;
         const errorDiv = document.getElementById('address_error');
         const countSpan = document.getElementById('address_count');
         const addressRegex = /^[a-zA-Z0-9\s,.#-]*$/;
@@ -508,10 +538,30 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
             return false;
         }
 
+        // Remove invalid characters immediately
         if (!addressRegex.test(value)) {
+            const cleanValue = value.replace(/[^a-zA-Z0-9\s,.#-]/g, '');
+            input.value = cleanValue;
+            value = cleanValue;
             showError(input, errorDiv, 'Address contains invalid characters');
             return false;
         }
+
+        // Capitalize first letter of each word
+        const capitalizedValue = value
+            .split(' ')
+            .map(word => {
+                if (word === '') return word; // Keep empty spaces as is
+                // Split by special characters but keep them
+                return word.split(/([,.#-])/).map(part => {
+                    if (part.length === 0) return part;
+                    if (/^[,.#-]$/.test(part)) return part; // Keep special characters as is
+                    return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+                }).join('');
+            })
+            .join(' ');
+        
+        input.value = capitalizedValue;
 
         // Valid
         input.classList.add('border-green-500');
@@ -555,9 +605,30 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
     }
 
     function showError(input, errorDiv, message) {
+        // Add shake animation class
         input.classList.add('border-red-500');
+        input.style.animation = 'none';
+        input.offsetHeight; // Trigger reflow
+        input.style.animation = 'shake 0.5s';
+        
+        // Make error message more visible
         errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
+        errorDiv.classList.add('text-red-600', 'font-medium');
+
+        // Add animation keyframes if they don't exist
+        if (!document.getElementById('shakeAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'shakeAnimation';
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 
     // Form submission validation
