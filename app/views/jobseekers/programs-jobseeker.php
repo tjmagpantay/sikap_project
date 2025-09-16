@@ -4,7 +4,7 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/navbar-jobseeker.php';
 ?>
 
-<div class="min-h-screen sm:px-6 md:px-16 lg:px-24">
+<div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Breadcrumbs -->
         <nav class="mb-6">
@@ -32,7 +32,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 </div>
 
                 <!-- Filter Tabs -->
-                <div class="flex flex-wrap gap-6 mb-8">
+                <div class="flex flex-wrap gap-4 mb-8">
                     <button class="relative px-2 py-3 text-sm font-medium text-blue-600 transition-all duration-200 filter-btn group active" onclick="filterEvents('all')" data-category="all">
                         All Events
                         <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-100 bg-blue-600"></span>
@@ -92,7 +92,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     <h3 class="mb-3 text-base font-medium leading-tight sm:text-lg">
                                         <?php echo htmlspecialchars($event['title']); ?>
                                     </h3>
-                                    
+
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs opacity-60">
                                             <?php echo date('g:i A', strtotime($event['time_start'])); ?>
@@ -133,7 +133,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                     <!-- Upcoming Events Card -->
                     <div class="p-6 bg-white border border-gray-100 rounded-lg shadow-sm">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-900">Upcoming Events</h3>
+                        <h3 class="mb-4 text-lg font-semibold text-grayMain">Upcoming Events</h3>
                         <div class="space-y-4">
                             <?php
                             $upcomingEvents = array_filter($allEvents, function ($event) {
@@ -146,7 +146,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                     <div class="pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
                                         <!-- Title and Tag on Same Row -->
                                         <div class="flex items-start justify-between gap-3 mb-1">
-                                            <h4 class="flex-1 text-sm font-medium leading-tight text-gray-900">
+                                            <h4 class="flex-1 text-sm font-medium leading-tight text-gray-600">
                                                 <?php echo htmlspecialchars($event['title']); ?>
                                             </h4>
                                             <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-blue-600 bg-blue-50">
