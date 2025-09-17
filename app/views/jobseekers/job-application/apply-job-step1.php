@@ -141,7 +141,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-blue-600">
+                            <p class="text-xs text-blue-600">
                                 <strong>Note:</strong> Documents marked as "Currently Selected" are already attached to this application.
                                 You can modify your selection, but only one resume and one CV will be used.
                             </p>
@@ -238,14 +238,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         </div>
                     </div>
 
-                    <!-- Save Resume to Profile Option -->
-                    <div class="mt-3" id="save-resume-to-profile-option" style="display: none;">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="save_resume_to_profile" value="1"
-                                class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary/50 focus:border-primary">
-                            <span class="ml-2 text-sm text-gray-700">Save this resume to my profile for future applications</span>
-                        </label>
-                    </div>
+                   
 
                     <!-- Existing Resume Documents -->
                     <?php
@@ -418,15 +411,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         <?php endif; ?>
                     </div>
 
-                    <!-- Save CV to Profile Option -->
-                    <div class="mt-3" id="save-cv-to-profile-option" style="display: none;">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="save_cv_to_profile" value="1"
-                                class="w-4 h-4 border-gray-300 rounded text-primary focus:ring-primary/50 focus:border-primary">
-                            <span class="ml-2 text-sm text-gray-700">Save this CV to my profile for future applications</span>
-                        </label>
-                    </div>
-                </div>
+
 
                 <div class="mt-8 mb-6 border-t border-gray-200"> </div>
 

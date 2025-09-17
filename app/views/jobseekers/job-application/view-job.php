@@ -784,12 +784,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
 
                                 <?php else: ?>
                                     <!-- Profile Complete - Show Apply Button -->
-                                    <div class="p-4 mb-4 border border-green-200 rounded-lg bg-green-50">
+                                    <div class="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                         <div class="flex items-center">
                                             <i class="mr-3 text-primary fas fa-paper-plane"></i>
                                             <div>
-                                                <p class="text-sm font-medium text-green-700">Ready to Apply</p>
-                                                <p class="text-xs text-green-600">Start your application for this position</p>
+                                                <p class="text-sm font-medium text-primary">Ready to Apply</p>
+                                                <p class="text-xs text-blue-600">Start your application for this position</p>
                                             </div>
                                         </div>
                                     </div>

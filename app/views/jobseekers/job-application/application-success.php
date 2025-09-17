@@ -49,7 +49,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                 <div class="mb-8">
                     <h2 class="mb-4 text-lg font-semibold text-primary">Application Details</h2>
 
-                    <div class="p-4 space-y-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div class="p-4 space-y-3 border border-gray-200 rounded-lg ">
                         <div class="flex justify-between">
                             <span class="text-sm font-medium text-gray-600">Application ID:</span>
                             <span class="text-sm font-semibold text-primary">#<?php echo str_pad($applicationData['application_id'], 6, '0', STR_PAD_LEFT); ?></span>

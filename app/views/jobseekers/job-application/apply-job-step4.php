@@ -29,7 +29,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                         echo htmlspecialchars($companyName);
                         ?>
                     </p>
-                    
+
                 </div>
             </div>
         </div>
@@ -161,7 +161,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                             Edit
                         </a>
                     </div>
-                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div class="p-4 border border-gray-200 rounded-lg ">
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <span class="block mb-1 text-xs font-medium text-gray-500">Full Name:</span>
@@ -195,7 +195,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                             Edit
                         </a>
                     </div>
-                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div class="p-4 border border-gray-200 rounded-lg ">
                         <div class="space-y-4">
                             <!-- Resume/CV Documents -->
                             <?php
@@ -209,11 +209,36 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                     <span class="block mb-2 text-xs font-medium text-gray-500">Resume/CV Documents:</span>
                                     <div class="space-y-2">
                                         <?php foreach ($resumeAttachments as $resume): ?>
-                                            <div class="flex items-center p-2 bg-white border border-gray-100 rounded">
-                                                <svg class="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                                                </svg>
-                                                <a href="<?php echo htmlspecialchars($resume['file_path']); ?>"
+                                            <div class="flex items-center p-4 bg-white border border-gray-100 rounded">
+                                                <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                                    <img
+                                                        src="../public/assets/icons/pdf-icon.png"
+                                                        alt="Icon"
+                                                        class="object-cover w-8 h-8" />
+                                                </div>
+
+                                                <?php
+                                                // FIXED: Construct proper file path for web access
+                                                $filePath = $resume['file_path'];
+
+                                                // Remove leading slash if present and ensure it starts from the right directory
+                                                $filePath = ltrim($filePath, '/');
+
+                                                // If the path doesn't start with uploads, add the correct base path
+                                                if (!str_starts_with($filePath, 'uploads/')) {
+                                                    // Handle legacy paths that might be stored differently
+                                                    if (str_starts_with($filePath, '../uploads/')) {
+                                                        $filePath = substr($filePath, 3); // Remove '../'
+                                                    } elseif (!str_contains($filePath, 'uploads/')) {
+                                                        $filePath = 'uploads/applications/' . basename($filePath);
+                                                    }
+                                                }
+
+                                                // Construct the web-accessible URL
+                                                $fileUrl = '../' . $filePath;
+                                                ?>
+
+                                                <a href="<?php echo htmlspecialchars($fileUrl); ?>"
                                                     target="_blank"
                                                     class="text-sm font-medium text-primary hover:text-blue-700">
                                                     <?php echo htmlspecialchars($resume['file_type']); ?> Document
@@ -248,7 +273,24 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                 <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
                                                 </svg>
-                                                <a href="<?php echo htmlspecialchars($attachment['file_path']); ?>"
+
+                                                <?php
+                                                // FIXED: Construct proper file path for additional documents
+                                                $filePath = $attachment['file_path'];
+                                                $filePath = ltrim($filePath, '/');
+
+                                                if (!str_starts_with($filePath, 'uploads/')) {
+                                                    if (str_starts_with($filePath, '../uploads/')) {
+                                                        $filePath = substr($filePath, 3);
+                                                    } elseif (!str_contains($filePath, 'uploads/')) {
+                                                        $filePath = 'uploads/applications/' . basename($filePath);
+                                                    }
+                                                }
+
+                                                $fileUrl = '../' . $filePath;
+                                                ?>
+
+                                                <a href="<?php echo htmlspecialchars($fileUrl); ?>"
                                                     target="_blank"
                                                     class="text-sm font-medium text-primary hover:text-blue-700">
                                                     <?php echo htmlspecialchars($attachment['file_type']); ?> Document
@@ -283,14 +325,14 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 Edit
                             </a>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <div class="p-4 border border-gray-200 rounded-lg ">
                             <div class="space-y-4">
                                 <?php foreach ($answers as $index => $answer): ?>
                                     <div class="p-3 pl-4 bg-white border-l-4 rounded-r border-primary">
                                         <p class="mb-1 text-sm font-medium text-gray-900">
                                             <?php echo htmlspecialchars($answer['question_text']); ?>
                                         </p>
-                                        <p class="text-sm text-gray-700">
+                                        <p class="text-sm text-gray-700"> Answer:
                                             <?php echo nl2br(htmlspecialchars($answer['answer'])); ?>
                                         </p>
                                     </div>
@@ -313,7 +355,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                 Edit
                             </a>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <div class="p-4 border border-gray-200 rounded-lg ">
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <span class="block mb-1 text-xs font-medium text-gray-500">Interested Program:</span>
@@ -424,11 +466,11 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         if (confirmInfo && agreeTerms && understandProcess) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            submitBtn.classList.add('bg-blue-600', 'hover:bg-primary');
         } else {
             submitBtn.disabled = true;
             submitBtn.classList.add('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            submitBtn.classList.remove('bg-blue-600', 'hover:bg-primary');
         }
     }
 

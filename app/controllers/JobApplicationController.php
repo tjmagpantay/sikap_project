@@ -102,7 +102,7 @@ class JobApplicationController
             // Allow user to navigate to any step they've reached or go backwards
             // Don't override the step from URL unless it's invalid
             if ($step > $existingApplication['current_step']) {
-                $step = $existingApplication['current_step'];
+                $step = $existingApp['current_step'];
             }
 
             // Update current_step if user is moving to a new step they haven't reached
@@ -343,49 +343,35 @@ class JobApplicationController
                     error_log("DEBUG Step1: New resume uploaded and attached");
                 }
             } elseif (!empty($selectedResumes)) {
-                // SELECTED EXISTING RESUME - Check if it's already attached
+                // SELECTED EXISTING RESUME - Clear existing and add selected one
                 $selectedResumePath = $selectedResumes[0]; // Only take first one
 
-                // Check if this resume is already attached
-                $alreadyAttached = false;
-                foreach ($currentResumeAttachments as $attachment) {
-                    if ($attachment['file_path'] === $selectedResumePath) {
-                        $alreadyAttached = true;
-                        break;
-                    }
+                error_log("DEBUG Step1: Processing selected resume: " . $selectedResumePath);
 
-                    // Also check profile document reference
-                    if (!empty($attachment['profile_document_id'])) {
-                        $profileDoc = $this->findProfileDocumentById($attachment['profile_document_id']);
-                        if ($profileDoc && $profileDoc['file_path'] === $selectedResumePath) {
-                            $alreadyAttached = true;
-                            break;
-                        }
-                    }
-                }
+                // Clear existing resume attachments first
+                $this->jobApplicationModel->clearResumeAttachments($application_id);
 
-                if (!$alreadyAttached) {
-                    // Clear existing resume attachments and add the selected one
-                    $this->jobApplicationModel->clearResumeAttachments($application_id);
-
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedResumePath);
-                    if ($profileDoc) {
-                        $this->jobApplicationModel->saveApplicationAttachmentReference(
-                            $application_id,
-                            $profileDoc['document_id'],
-                            'Resume'
-                        );
-                        error_log("DEBUG Step1: Selected resume attached (not duplicate)");
+                // Find the profile document and save it to application attachments
+                $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedResumePath);
+                if ($profileDoc) {
+                    // FIXED: Save as application attachment with proper reference
+                    $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
+                    if ($result) {
+                        $resumeHandled = true;
+                        error_log("DEBUG Step1: Selected resume attached successfully");
                     } else {
-                        // Fallback: direct file attachment
-                        $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
-                        error_log("DEBUG Step1: Selected resume attached as direct file");
+                        error_log("ERROR Step1: Failed to attach selected resume");
                     }
                 } else {
-                    error_log("DEBUG Step1: Selected resume is already attached - skipping");
+                    // Fallback: direct file attachment
+                    $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
+                    if ($result) {
+                        $resumeHandled = true;
+                        error_log("DEBUG Step1: Selected resume attached as direct file");
+                    } else {
+                        error_log("ERROR Step1: Failed to attach selected resume as direct file");
+                    }
                 }
-
-                $resumeHandled = true;
             } else {
                 // NO NEW SELECTION - Keep existing resume attachments if any
                 if (!empty($currentResumeAttachments)) {
@@ -420,49 +406,35 @@ class JobApplicationController
                     error_log("DEBUG Step1: New CV uploaded and attached");
                 }
             } elseif (!empty($selectedCvs)) {
-                // SELECTED EXISTING CV - Check if it's already attached
+                // SELECTED EXISTING CV - Clear existing and add selected one
                 $selectedCvPath = $selectedCvs[0]; // Only take first one
 
-                // Check if this CV is already attached
-                $alreadyAttached = false;
-                foreach ($currentCvAttachments as $attachment) {
-                    if ($attachment['file_path'] === $selectedCvPath) {
-                        $alreadyAttached = true;
-                        break;
-                    }
+                error_log("DEBUG Step1: Processing selected CV: " . $selectedCvPath);
 
-                    // Also check profile document reference
-                    if (!empty($attachment['profile_document_id'])) {
-                        $profileDoc = $this->findProfileDocumentById($attachment['profile_document_id']);
-                        if ($profileDoc && $profileDoc['file_path'] === $selectedCvPath) {
-                            $alreadyAttached = true;
-                            break;
-                        }
-                    }
-                }
+                // Clear existing CV attachments first
+                $this->jobApplicationModel->clearCvAttachments($application_id);
 
-                if (!$alreadyAttached) {
-                    // Clear existing CV attachments and add the selected one
-                    $this->jobApplicationModel->clearCvAttachments($application_id);
-
-                    $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedCvPath);
-                    if ($profileDoc) {
-                        $this->jobApplicationModel->saveApplicationAttachmentReference(
-                            $application_id,
-                            $profileDoc['document_id'],
-                            'CV'
-                        );
-                        error_log("DEBUG Step1: Selected CV attached (not duplicate)");
+                // Find the profile document and save it to application attachments
+                $profileDoc = $this->findProfileDocumentByPath($jobseeker['jobseeker_id'], $selectedCvPath);
+                if ($profileDoc) {
+                    // FIXED: Save as application attachment with proper reference
+                    $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
+                    if ($result) {
+                        $cvHandled = true;
+                        error_log("DEBUG Step1: Selected CV attached successfully");
                     } else {
-                        // Fallback: direct file attachment
-                        $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
-                        error_log("DEBUG Step1: Selected CV attached as direct file");
+                        error_log("ERROR Step1: Failed to attach selected CV");
                     }
                 } else {
-                    error_log("DEBUG Step1: Selected CV is already attached - skipping");
+                    // Fallback: direct file attachment
+                    $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
+                    if ($result) {
+                        $cvHandled = true;
+                        error_log("DEBUG Step1: Selected CV attached as direct file");
+                    } else {
+                        error_log("ERROR Step1: Failed to attach selected CV as direct file");
+                    }
                 }
-
-                $cvHandled = true;
             } else {
                 // NO NEW SELECTION - Keep existing CV attachments if any
                 if (!empty($currentCvAttachments)) {
@@ -563,26 +535,34 @@ class JobApplicationController
     private function handleStep3($job, $jobseeker, $application_id)
     {
         try {
+            if (!$application_id) {
+                throw new Exception('Application ID is required for Step 3');
+            }
+
             $eligibilityData = [
                 'application_id' => $application_id,
                 'interested_program' => $_POST['interested_program'] ?? 'None',
                 'priority_sector' => $_POST['priority_sector'] ?? 'None'
             ];
 
-            // Save or update eligibility data
-            if (!$this->jobApplicationModel->saveApplicationEligibility($eligibilityData)) {
-                throw new Exception('Failed to save eligibility data');
+            // FIXED: Clear existing eligibility first
+            $this->jobApplicationModel->clearApplicationEligibility($application_id);
+
+            // Save new eligibility
+            $result = $this->jobApplicationModel->saveApplicationEligibility($eligibilityData);
+
+            if (!$result) {
+                throw new Exception('Failed to save eligibility information');
             }
 
             // Update current step
             $this->jobApplicationModel->updateApplication($application_id, ['current_step' => 4]);
 
-            // Redirect to step 4
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&success=' . urlencode('Step 3 completed successfully!'));
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&success=' . urlencode('Eligibility information saved successfully!'));
             exit;
         } catch (Exception $e) {
             error_log('Error in handleStep3: ' . $e->getMessage());
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=3&application_id=' . $application_id . '&error=' . urlencode('Failed to save Step 3. Please try again.'));
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=3&application_id=' . $application_id . '&error=' . urlencode($e->getMessage()));
             exit;
         }
     }

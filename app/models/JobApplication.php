@@ -66,15 +66,12 @@ class JobApplication
     public function saveApplicationAnswer($application_id, $question_id, $answer)
     {
         try {
-            $sql = "INSERT INTO job_application_answers (application_id, question_id, answer) 
-                    VALUES (:application_id, :question_id, :answer)
-                    ON DUPLICATE KEY UPDATE answer = :answer";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
-                'application_id' => $application_id,
-                'question_id' => $question_id,
-                'answer' => $answer
-            ]);
+            $stmt = $this->db->prepare("
+                INSERT INTO job_application_answers (application_id, question_id, answer) 
+                VALUES (?, ?, ?) 
+                ON DUPLICATE KEY UPDATE answer = VALUES(answer)
+            ");
+            return $stmt->execute([$application_id, $question_id, $answer]);
         } catch (PDOException $e) {
             error_log('Error saving application answer: ' . $e->getMessage());
             return false;
@@ -84,9 +81,11 @@ class JobApplication
     public function saveApplicationAttachment($application_id, $file_path, $file_type)
     {
         try {
-            $sql = "INSERT INTO application_attachments (application_id, file_path, file_type, uploaded_at) 
-                VALUES (?, ?, ?, NOW())";
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->db->prepare("
+                INSERT INTO application_attachments (application_id, file_path, file_type) 
+                VALUES (?, ?, ?) 
+                ON DUPLICATE KEY UPDATE file_path = VALUES(file_path), uploaded_at = NOW()
+            ");
             return $stmt->execute([$application_id, $file_path, $file_type]);
         } catch (PDOException $e) {
             error_log('Error saving application attachment: ' . $e->getMessage());
@@ -261,12 +260,19 @@ class JobApplication
     public function getApplicationAttachments($application_id)
     {
         try {
-            $sql = "SELECT * FROM application_attachments 
-                WHERE application_id = :application_id 
-                ORDER BY uploaded_at";
+            // FIXED: Use the correct table name - should be 'application_attachments'
+            $sql = "SELECT aa.*, aa.attachment_id, aa.file_path, aa.file_type, aa.uploaded_at
+                FROM application_attachments aa 
+                WHERE aa.application_id = ? 
+                ORDER BY aa.uploaded_at";
+
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['application_id' => $application_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->execute([$application_id]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("DEBUG getApplicationAttachments: Found " . count($results) . " attachments for application_id: $application_id");
+
+            return $results;
         } catch (PDOException $e) {
             error_log('Error getting application attachments: ' . $e->getMessage());
             return [];
@@ -382,9 +388,11 @@ class JobApplication
     public function deleteApplicationAnswers($application_id)
     {
         try {
-            $sql = "DELETE FROM job_application_answers WHERE application_id = :application_id";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute(['application_id' => $application_id]);
+            $stmt = $this->db->prepare("DELETE FROM job_application_answers WHERE application_id = ?");
+            $result = $stmt->execute([$application_id]);
+            $deletedRows = $stmt->rowCount();
+            error_log("DEBUG: Deleted $deletedRows answers for application $application_id");
+            return $result;
         } catch (PDOException $e) {
             error_log('Error deleting application answers: ' . $e->getMessage());
             return false;
@@ -413,6 +421,25 @@ class JobApplication
             return $result;
         } catch (PDOException $e) {
             error_log('Error saving application eligibility: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateApplicationEligibility($application_id, $data)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE job_application_eligibility 
+                SET interested_program = ?, priority_sector = ?, updated_at = NOW() 
+                WHERE application_id = ?
+            ");
+            return $stmt->execute([
+                $data['interested_program'],
+                $data['priority_sector'],
+                $application_id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error updating application eligibility: ' . $e->getMessage());
             return false;
         }
     }
@@ -451,10 +478,14 @@ class JobApplication
     public function clearResumeAttachments($application_id)
     {
         try {
-            $sql = "DELETE FROM application_attachments 
-                    WHERE application_id = ? AND LOWER(file_type) = 'resume'";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([$application_id]);
+            $stmt = $this->db->prepare("
+                DELETE FROM application_attachments 
+                WHERE application_id = ? AND LOWER(file_type) = 'resume'
+            ");
+            $result = $stmt->execute([$application_id]);
+            $deletedRows = $stmt->rowCount();
+            error_log("DEBUG: Cleared $deletedRows resume attachments for application $application_id");
+            return $result;
         } catch (PDOException $e) {
             error_log('Error clearing resume attachments: ' . $e->getMessage());
             return false;
@@ -464,10 +495,14 @@ class JobApplication
     public function clearCvAttachments($application_id)
     {
         try {
-            $sql = "DELETE FROM application_attachments 
-                    WHERE application_id = ? AND LOWER(file_type) = 'cv'";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([$application_id]);
+            $stmt = $this->db->prepare("
+                DELETE FROM application_attachments 
+                WHERE application_id = ? AND LOWER(file_type) = 'cv'
+            ");
+            $result = $stmt->execute([$application_id]);
+            $deletedRows = $stmt->rowCount();
+            error_log("DEBUG: Cleared $deletedRows CV attachments for application $application_id");
+            return $result;
         } catch (PDOException $e) {
             error_log('Error clearing CV attachments: ' . $e->getMessage());
             return false;
@@ -733,6 +768,21 @@ class JobApplication
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log('Error checking resignation eligibility: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Add this method to the JobApplication class:
+    public function clearApplicationEligibility($application_id)
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM job_application_eligibility WHERE application_id = ?");
+            $result = $stmt->execute([$application_id]);
+            $deletedRows = $stmt->rowCount();
+            error_log("DEBUG: Cleared $deletedRows eligibility records for application $application_id");
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error clearing application eligibility: ' . $e->getMessage());
             return false;
         }
     }
