@@ -1083,6 +1083,23 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                 applyFilterBtn.addEventListener('click', applyAllFilters);
             }
         }
+        function shareJob(jobTitle, jobUrl) {
+    if (navigator.share) {
+        navigator.share({
+            title: jobTitle,
+            text: `Check out this job opportunity: ${jobTitle}`,
+            url: jobUrl
+        }).then(() => {
+            console.log('Job shared successfully');
+        }).catch((error) => {
+            console.error('Error sharing job:', error);
+            // Fallback to alert if share fails
+            alert('Share feature not supported');
+        });
+    } else {
+        alert('Share feature not supported');
+    }
+}
 
         // ...rest of your existing JavaScript code...
     </script>

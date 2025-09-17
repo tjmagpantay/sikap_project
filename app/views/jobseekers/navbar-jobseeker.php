@@ -51,11 +51,17 @@ if (!isset($jobseeker) || empty($jobseeker)) {
     <div class="items-center hidden lg:flex">
       <ul class="flex items-center gap-4">
         <!-- Notification Dropdown -->
-        <li x-data="notificationDropdown()" class="relative">
+        <li x-data="notificationDropdown()" class="relative flex items-center">
           <button
             @click="toggleNotifications()"
             class="relative transition-all duration-200 rounded-full hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             <!-- Notification Badge - Improved positioning and size -->
+            <span x-show="unreadCount > 0"
+              x-text="unreadCount"
+              class="absolute -top-0.5 -left-1 flex items-center justify-center p-2 min-w-[14px] h-[14px] text-xs text-primary bg-secondary rounded-full"
+              :class="unreadCount > 99 ? 'text-[9px] px-2' : ''">
+            </span>
+
 
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
               viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -67,12 +73,6 @@ if (!isset($jobseeker) || empty($jobseeker)) {
                         5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 
                         0m5.714 0a3 3 0 1 1-5.714 0" />
             </svg>
-            <span x-show="unreadCount > 0"
-              x-text="unreadCount"
-              class="absolute -top-0.5 -right-1 flex items-center justify-center min-w-[14px] h-[14px] text-[10px] text-primary bg-yellow-400 rounded-full"
-              :class="unreadCount > 99 ? 'text-[9px] px-1' : ''">
-            </span>
-
 
           </button>
 

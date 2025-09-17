@@ -12,6 +12,35 @@ module.exports = {
       },
       fontSize: {
         '2xs': '0.625rem', // 10px
+        '3xs': '0.5625rem', // 9px - Added for notification badges with 99+ items
+      },
+      spacing: {
+        '0.5': '0.125rem', // 2px
+        '1.5': '0.375rem', // 6px
+        '2.5': '0.625rem', // 10px
+        '3.5': '0.875rem', // 14px
+        '14': '3.5rem', // 56px
+        '18': '4.5rem', // 72px
+      },
+      minWidth: {
+        '3': '0.75rem', // 12px
+        '3.5': '0.875rem', // 14px
+        '4': '1rem', // 16px
+      },
+      width: {
+        '2.5': '0.625rem', // 10px
+        '3.5': '0.875rem', // 14px
+      },
+      height: {
+        '2.5': '0.625rem', // 10px
+        '3.5': '0.875rem', // 14px
+      },
+      inset: {
+        '0.5': '0.125rem', // 2px
+        '1.5': '0.375rem', // 6px
+        '-0.5': '-0.125rem', // -2px
+        '-1': '-0.25rem', // -4px
+        '-1.5': '-0.375rem', // -6px
       },
       colors: {
         primary: '#092C4C',

@@ -67,9 +67,11 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                     </svg>
 
                 </button>
-
                 <!-- Share Button -->
-                <button class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" title="Share">
+                <button 
+                    onclick="shareJob('<?php echo htmlspecialchars($selectedJob['job_title'], ENT_QUOTES); ?>', window.location.origin + window.location.pathname + '?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>')"
+                    class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" 
+                    title="Share">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#828282" stroke-width="1.5" />
                         <path d="M14 6.5L9 10" stroke="#828282" stroke-width="1.5" stroke-linecap="round" />

@@ -70,28 +70,76 @@
 
   .border-primary {
     @apply border border-primary;
-
-  }
-    /* PROGRESS STEPPER COMPONENTS
-  .progress-stepper {
-    @apply flex items-center justify-between mb-10;
   }
 
-  .progress-step {
-    @apply flex flex-col items-center flex-1 min-w-[100px] shrink-0;
+  /* NOTIFICATION COMPONENTS */
+  .notification-badge {
+    @apply absolute -top-0.5 -right-1 flex items-center justify-center min-w-3.5 h-3.5 text-2xs font-medium text-primary bg-yellow-400 rounded-full;
   }
 
-  .progress-step-label {
-    @apply mt-2 text-xs text-center font-inter;
+  .notification-badge-large {
+    @apply text-3xs px-1;
   }
 
-  .progress-step-label.active {
-    @apply font-normal text-primary;
+  .notification-card {
+    @apply block overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300;
   }
 
-  .progress-step-label.inactive {
-    @apply text-gray-400;
-  } */
+  .notification-card-unread {
+    @apply border-l-4 border-l-blue-500 bg-blue-50;
+  }
+
+  .notification-header {
+    @apply flex items-start gap-4 p-6 pb-4;
+  }
+
+  .notification-header-unread {
+    @apply bg-blue-100;
+  }
+
+  .notification-icon {
+    @apply flex items-center justify-center w-8 h-8 rounded-full;
+  }
+
+  .notification-icon-job {
+    @apply bg-blue-100;
+  }
+
+  .notification-icon-program {
+    @apply bg-green-100;
+  }
+
+  .notification-icon-application {
+    @apply bg-orange-100;
+  }
+
+  .notification-icon-interview {
+    @apply bg-purple-100;
+  }
+
+  .notification-title {
+    @apply text-base font-semibold text-grayMain;
+  }
+
+  .notification-title-unread {
+    @apply font-bold;
+  }
+
+  .notification-message {
+    @apply mb-4 text-xs text-gray-700;
+  }
+
+  .notification-tag {
+    @apply px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full;
+  }
+
+  .notification-tag-unread {
+    @apply px-3 py-1 text-xs text-blue-700 bg-blue-100 rounded-full;
+  }
+
+  .notification-dot {
+    @apply flex-shrink-0 w-3 h-3 mt-1 bg-blue-500 rounded-full;
+  }
 
   /* CARD */
   .company-card {
@@ -179,6 +227,21 @@
 
   .text-grayMain {
     color: #303030;
+  }
+
+  /* Text truncation utilities */
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
 
   /* Hero Card Specific Gradients */
