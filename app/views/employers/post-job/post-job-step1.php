@@ -102,7 +102,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
             <?php endif; ?>
 
             <!-- Form -->
-            <form class="space-y-6 font-inter" method="POST" action="?page=post-job&step=1<?php echo $job_id ? '&job_id=' . $job_id : ''; ?>">
+            <form class="space-y-6 font-inter" method="POST" action="?page=post-job&step=1<?php echo $job_id ? '&job_id=' . $job_id : ''; ?>" id="job-form">
                 <!-- Hidden field to ensure step progression -->
                 <input type="hidden" name="continue_to_step2" value="1">
 
@@ -118,44 +118,128 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         value="<?php echo htmlspecialchars($jobData['job_title'] ?? $_POST['job_title'] ?? ''); ?>"
                         placeholder="e.g., Senior Web Developer"
                         class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary placeholder:text-xs">
+                    <div id="job-title-error" class="hidden mt-1 text-xs text-red-600"></div>
+                    
                 </div>
 
                 <!-- Job Category -->
                 <div>
                     <label for="job_category_id" class="block mb-1 text-sm font-medium text-primary">Job Category <span class="text-red-500">*</span></label>
-                    <select id="job_category_id" name="job_category_id" required
-                        class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
-                        <option value="">Select Category</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?php echo $category['job_category_id']; ?>"
-                                <?php echo (($jobData['job_category_id'] ?? $_POST['job_category_id'] ?? '') == $category['job_category_id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($category['category_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div class="relative" x-data="{ open: false, selected: '<?php echo !empty($jobData['job_category_id']) ? (array_search($jobData['job_category_id'], array_column($categories, 'job_category_id')) !== false ? $categories[array_search($jobData['job_category_id'], array_column($categories, 'job_category_id'))]['category_name'] : 'Select Category') : 'Select Category'; ?>', selectedValue: '<?php echo $jobData['job_category_id'] ?? $_POST['job_category_id'] ?? ''; ?>' }">
+                        <button type="button" @click="open = !open"
+                            @click.away="open = false"
+                            class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <span x-text="selected" :class="{'text-gray-500': selected === 'Select Category', 'text-gray-900': selected !== 'Select Category'}"></span>
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1 overflow-y-auto max-h-60">
+                                <?php foreach ($categories as $category): ?>
+                                    <button type="button" @click="selected = '<?php echo htmlspecialchars($category['category_name']); ?>'; selectedValue = '<?php echo $category['job_category_id']; ?>'; open = false; document.getElementById('job_category_id').value = '<?php echo $category['job_category_id']; ?>'; document.getElementById('job_category_id').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        <?php echo htmlspecialchars($category['category_name']); ?>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <!-- Hidden input for form submission -->
+                        <input type="hidden" id="job_category_id" name="job_category_id" :value="selectedValue">
+                    </div>
+                    <div id="job-category-error" class="hidden mt-1 text-xs text-red-600"></div>
                 </div>
 
                 <!-- Job Type -->
                 <div>
                     <label for="job_type" class="block mb-1 text-sm font-medium text-primary">Job Type <span class="text-red-500">*</span></label>
-                    <select id="job_type" name="job_type" required
-                        class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
-                        <option value="">Select Job Type</option>
-                        <option value="full-time" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'full-time') ? 'selected' : ''; ?>>Full-time</option>
-                        <option value="part-time" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'part-time') ? 'selected' : ''; ?>>Part-time</option>
-                        <option value="contract" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'contract') ? 'selected' : ''; ?>>Contract</option>
-                        <option value="internship" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'internship') ? 'selected' : ''; ?>>Internship</option>
-                        <option value="freelance" <?php echo (($jobData['job_type'] ?? $_POST['job_type'] ?? '') == 'freelance') ? 'selected' : ''; ?>>Freelance</option>
-                    </select>
+                    <div class="relative" x-data="{ 
+                        open: false, 
+                        selected: '<?php
+                                    $jobTypeValue = $jobData['job_type'] ?? $_POST['job_type'] ?? '';
+                                    $jobTypes = [
+                                        'full-time' => 'Full-time',
+                                        'part-time' => 'Part-time',
+                                        'contract' => 'Contract',
+                                        'internship' => 'Internship',
+                                        'freelance' => 'Freelance'
+                                    ];
+                                    echo !empty($jobTypeValue) && isset($jobTypes[$jobTypeValue]) ? $jobTypes[$jobTypeValue] : 'Select Job Type';
+                                    ?>', 
+                        selectedValue: '<?php echo $jobTypeValue; ?>' 
+                    }">
+                        <button type="button" @click="open = !open"
+                            @click.away="open = false"
+                            class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <span x-text="selected" :class="{'text-gray-500': selected === 'Select Job Type', 'text-gray-900': selected !== 'Select Job Type'}"></span>
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1">
+                                <button type="button" @click="selected = 'Full-time'; selectedValue = 'full-time'; open = false; document.getElementById('job_type').value = 'full-time'; document.getElementById('job_type').dispatchEvent(new Event('change'));"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Full-time
+                                </button>
+                                <button type="button" @click="selected = 'Part-time'; selectedValue = 'part-time'; open = false; document.getElementById('job_type').value = 'part-time'; document.getElementById('job_type').dispatchEvent(new Event('change'));"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Part-time
+                                </button>
+                                <button type="button" @click="selected = 'Contract'; selectedValue = 'contract'; open = false; document.getElementById('job_type').value = 'contract'; document.getElementById('job_type').dispatchEvent(new Event('change'));"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Contract
+                                </button>
+                                <button type="button" @click="selected = 'Internship'; selectedValue = 'internship'; open = false; document.getElementById('job_type').value = 'internship'; document.getElementById('job_type').dispatchEvent(new Event('change'));"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Internship
+                                </button>
+                                <button type="button" @click="selected = 'Freelance'; selectedValue = 'freelance'; open = false; document.getElementById('job_type').value = 'freelance'; document.getElementById('job_type').dispatchEvent(new Event('change'));"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Freelance
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden input for form submission -->
+                        <input type="hidden" id="job_type" name="job_type" :value="selectedValue">
+                    </div>
+                    <div id="job-type-error" class="hidden mt-1 text-xs text-red-600"></div>
                 </div>
 
                 <!-- Location -->
                 <div>
                     <label for="location" class="block mb-1 text-sm font-medium text-primary">Location <span class="text-red-500">*</span></label>
                     <input id="location" name="location" type="text" required
+                        maxlength="100"
                         value="<?php echo htmlspecialchars($jobData['location'] ?? $_POST['location'] ?? ''); ?>"
                         placeholder="e.g., Manila, Philippines"
                         class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                    <div id="location-error" class="hidden mt-1 text-xs text-red-600"></div>
+                    <div class="mt-1 text-xs text-gray-400">
+                        Format: City, Country or City, Province
+                    </div>
                 </div>
 
                 <!-- Workplace Option -->
@@ -210,18 +294,27 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                 <div>
                     <label for="skills" class="block mb-1 text-sm font-medium text-primary">Required Skills</label>
                     <input id="skills" name="skills" type="text"
+                        maxlength="500"
                         value="<?php echo htmlspecialchars(implode(', ', $jobData['skills'] ?? []) ?: ($_POST['skills'] ?? '')); ?>"
                         placeholder="e.g., PHP, JavaScript, MySQL, Communication"
                         class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
-                    <p class="mt-1 text-xs text-gray-400">Separate skills with commas</p>
+                    <div id="skills-error" class="hidden mt-1 text-xs text-red-600"></div>
+                    <div class="mt-1 text-xs text-gray-400">
+                        Separate skills with commas. Each skill should be 1-30 characters.
+                    </div>
                 </div>
 
                 <!-- Job Summary -->
                 <div>
                     <label for="job_summary" class="block mb-1 text-sm font-medium text-primary">Job Summary <span class="text-red-500">*</span></label>
                     <textarea id="job_summary" name="job_summary" rows="3" required
+                        maxlength="2000"
                         placeholder="Brief description of the role (2-3 sentences)"
                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-primary focus:border-primary"><?php echo htmlspecialchars($jobData['job_summary'] ?? $_POST['job_summary'] ?? ''); ?></textarea>
+                    <div id="job-summary-error" class="hidden mt-1 text-xs text-red-600"></div>
+                    <div class="mt-1 text-xs text-gray-400">
+                        <span id="summary-count">0</span>/2000 characters. Minimum 20 characters required.
+                    </div>
                 </div>
 
                 <!-- Pay Information -->
@@ -229,33 +322,96 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     <!-- Pay Type -->
                     <div>
                         <label for="pay_type" class="block mb-1 text-sm font-medium text-primary">Pay Type</label>
-                        <select id="pay_type" name="pay_type"
-                            class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
-                            <option value="">Select Pay Type</option>
-                            <option value="monthly" <?php echo (($jobData['pay_type'] ?? $_POST['pay_type'] ?? '') == 'monthly') ? 'selected' : ''; ?>>Monthly</option>
-                            <option value="hourly" <?php echo (($jobData['pay_type'] ?? $_POST['pay_type'] ?? '') == 'hourly') ? 'selected' : ''; ?>>Hourly</option>
-                            <option value="weekly" <?php echo (($jobData['pay_type'] ?? $_POST['pay_type'] ?? '') == 'weekly') ? 'selected' : ''; ?>>Weekly</option>
-                            <option value="project-based" <?php echo (($jobData['pay_type'] ?? $_POST['pay_type'] ?? '') == 'project-based') ? 'selected' : ''; ?>>Project-based</option>
-                        </select>
+                        <div class="relative" x-data="{ 
+                            open: false, 
+                            selected: '<?php
+                                        $payTypeValue = $jobData['pay_type'] ?? $_POST['pay_type'] ?? '';
+                                        $payTypes = [
+                                            'monthly' => 'Monthly',
+                                            'hourly' => 'Hourly',
+                                            'weekly' => 'Weekly',
+                                            'project-based' => 'Project-based',
+                                            'negotiable' => 'Negotiable'
+                                        ];
+                                        echo !empty($payTypeValue) && isset($payTypes[$payTypeValue]) ? $payTypes[$payTypeValue] : 'Select Pay Type';
+                                        ?>', 
+                            selectedValue: '<?php echo $payTypeValue; ?>' 
+                        }">
+                            <button type="button" @click="open = !open"
+                                @click.away="open = false"
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" :class="{'text-gray-500': selected === 'Select Pay Type', 'text-gray-900': selected !== 'Select Pay Type'}"></span>
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button type="button" @click="selected = 'Monthly'; selectedValue = 'monthly'; open = false; document.getElementById('pay_type').value = 'monthly'; document.getElementById('pay_type').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Monthly
+                                    </button>
+                                    <button type="button" @click="selected = 'Hourly'; selectedValue = 'hourly'; open = false; document.getElementById('pay_type').value = 'hourly'; document.getElementById('pay_type').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Hourly
+                                    </button>
+                                    <button type="button" @click="selected = 'Weekly'; selectedValue = 'weekly'; open = false; document.getElementById('pay_type').value = 'weekly'; document.getElementById('pay_type').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Weekly
+                                    </button>
+                                    <button type="button" @click="selected = 'Project-based'; selectedValue = 'project-based'; open = false; document.getElementById('pay_type').value = 'project-based'; document.getElementById('pay_type').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Project-based
+                                    </button>
+                                    <button type="button" @click="selected = 'Negotiable'; selectedValue = 'negotiable'; open = false; document.getElementById('pay_type').value = 'negotiable'; document.getElementById('pay_type').dispatchEvent(new Event('change'));"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                        Negotiable
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" id="pay_type" name="pay_type" :value="selectedValue">
+                        </div>
+                        <div id="pay-type-error" class="hidden mt-1 text-xs text-red-600"></div>
                     </div>
 
                     <!-- Pay Range -->
                     <div>
                         <label for="pay_range" class="block mb-1 text-sm font-medium text-primary">Pay Range</label>
                         <input id="pay_range" name="pay_range" type="text"
+                            maxlength="50"
                             value="<?php echo htmlspecialchars($jobData['pay_range'] ?? $_POST['pay_range'] ?? ''); ?>"
-                            placeholder="e.g., 20,000 - 40,000"
+                            placeholder="e.g., 20000 - 40000"
                             class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                        <div id="pay-range-error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div class="mt-1 text-xs text-gray-400">
+                            Format: minimum - maximum (numbers only)
+                        </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-400">You can choose to show or hide pay information in the application settings later</p>
 
                 <!-- Full Description -->
                 <div>
                     <label for="full_description" class="block mb-1 text-sm font-medium text-primary">Full Description <span class="text-red-500">*</span></label>
                     <textarea id="full_description" name="full_description" rows="5" required
+                        maxlength="5000"
                         placeholder="Detailed description of the job, responsibilities, and requirements"
                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-primary focus:border-primary"><?php echo htmlspecialchars($jobData['full_description'] ?? $_POST['full_description'] ?? ''); ?></textarea>
+                    <div id="full-description-error" class="hidden mt-1 text-xs text-red-600"></div>
+                    <div class="mt-1 text-xs text-gray-400">
+                        <span id="description-count">0</span>/5000 characters. Minimum 100 characters required.
+                    </div>
                 </div>
 
                 <!-- Application Timeline -->
@@ -266,6 +422,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         <input id="application_start" name="application_start" type="datetime-local"
                             value="<?php echo htmlspecialchars($jobData['application_start'] ?? $_POST['application_start'] ?? ''); ?>"
                             class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                        <div id="application-start-error" class="hidden mt-1 text-xs text-red-600"></div>
                         <p class="mt-1 text-xs text-gray-400">Leave empty to start accepting applications immediately</p>
                     </div>
 
@@ -275,6 +432,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         <input id="application_deadline" name="application_deadline" type="datetime-local"
                             value="<?php echo htmlspecialchars($jobData['application_deadline'] ?? $_POST['application_deadline'] ?? ''); ?>"
                             class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                        <div id="application-deadline-error" class="hidden mt-1 text-xs text-red-600"></div>
                         <p class="mt-1 text-xs text-gray-400">Set when applications should stop being accepted</p>
                     </div>
                 </div>
@@ -301,68 +459,461 @@ include_once __DIR__ . '/../components/navbar-employer.php';
     </div>
 </div>
 
+<!-- Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const minAgeInput = document.getElementById('min_age');
-        const maxAgeInput = document.getElementById('max_age');
-        const ageError = document.getElementById('age-error');
-        const submitBtn = document.getElementById('submit-btn');
+        // Get form elements
+        const form = document.getElementById('job-form');
+        const jobTitle = document.getElementById('job_title');
+        const jobCategory = document.getElementById('job_category_id');
+        const jobType = document.getElementById('job_type');
+        const location = document.getElementById('location');
+        const minAge = document.getElementById('min_age');
+        const maxAge = document.getElementById('max_age');
+        const skills = document.getElementById('skills');
+        const jobSummary = document.getElementById('job_summary');
+        const payType = document.getElementById('pay_type');
+        const payRange = document.getElementById('pay_range');
+        const fullDescription = document.getElementById('full_description');
+        const applicationStart = document.getElementById('application_start');
+        const applicationDeadline = document.getElementById('application_deadline');
 
-        function validateAgeRange() {
-            const minAge = parseInt(minAgeInput.value);
-            const maxAge = parseInt(maxAgeInput.value);
+        // Character counters
+        const titleCount = document.getElementById('title-count');
+        const locationCount = document.getElementById('location-count');
+        const skillsCount = document.getElementById('skills-count');
+        const summaryCount = document.getElementById('summary-count');
+        const payRangeCount = document.getElementById('pay-range-count');
+        const descriptionCount = document.getElementById('description-count');
 
-            // Clear previous errors
-            ageError.classList.add('hidden');
-            ageError.textContent = '';
+        // Prevent input beyond maxlength for all fields
+        function enforceMaxLength(element, maxLength) {
+            element.addEventListener('input', function() {
+                if (this.value.length > maxLength) {
+                    this.value = this.value.slice(0, maxLength);
+                }
+            });
 
-            // Reset input styles
-            minAgeInput.classList.remove('border-red-500');
-            maxAgeInput.classList.remove('border-red-500');
-
-            let isValid = true;
-            let errorMessage = '';
-
-            // Validate individual ages
-            if (minAgeInput.value && (minAge < 16 || minAge > 65)) {
-                errorMessage = 'Minimum age must be between 16 and 65 years.';
-                minAgeInput.classList.add('border-red-500');
-                isValid = false;
-            }
-
-            if (maxAgeInput.value && (maxAge < 16 || maxAge > 65)) {
-                errorMessage = 'Maximum age must be between 16 and 65 years.';
-                maxAgeInput.classList.add('border-red-500');
-                isValid = false;
-            }
-
-            // Validate age range
-            if (minAgeInput.value && maxAgeInput.value && minAge >= maxAge) {
-                errorMessage = 'Maximum age must be greater than minimum age.';
-                minAgeInput.classList.add('border-red-500');
-                maxAgeInput.classList.add('border-red-500');
-                isValid = false;
-            }
-
-            // Show error if validation failed
-            if (!isValid) {
-                ageError.textContent = errorMessage;
-                ageError.classList.remove('hidden');
-            }
-
-            return isValid;
+            element.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    if (this.value.length > maxLength) {
+                        this.value = this.value.slice(0, maxLength);
+                        updateAllCharacterCounts();
+                    }
+                }, 0);
+            });
         }
 
-        // Add event listeners for real-time validation
-        minAgeInput.addEventListener('input', validateAgeRange);
-        maxAgeInput.addEventListener('input', validateAgeRange);
-        minAgeInput.addEventListener('blur', validateAgeRange);
-        maxAgeInput.addEventListener('blur', validateAgeRange);
+        // Apply maxlength enforcement to all text fields
+        enforceMaxLength(jobTitle, 100);
+        enforceMaxLength(location, 100);
+        enforceMaxLength(skills, 500);
+        enforceMaxLength(jobSummary, 2000);
+        enforceMaxLength(payRange, 50);
+        enforceMaxLength(fullDescription, 5000);
 
-        // Validate on form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (!validateAgeRange()) {
+        // Validation functions
+        function validateJobTitle() {
+            const value = jobTitle.value.trim();
+            const regex = /^[A-Za-z0-9\s.,&/-]{3,100}$/;
+            const errorElement = document.getElementById('job-title-error');
+
+            clearError(jobTitle, errorElement);
+
+            if (!value) {
+                showError(jobTitle, errorElement, 'Job title is required.');
+                return false;
+            }
+
+            if (value.length < 3) {
+                showError(jobTitle, errorElement, 'Job title must be at least 3 characters long.');
+                return false;
+            }
+
+            if (value.length > 100) {
+                showError(jobTitle, errorElement, 'Job title cannot exceed 100 characters.');
+                return false;
+            }
+
+            if (!regex.test(value)) {
+                showError(jobTitle, errorElement, 'Job title contains invalid characters. Only letters, numbers, spaces, and common symbols (.,&/-) are allowed.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateJobCategory() {
+            const value = jobCategory.value;
+            const errorElement = document.getElementById('job-category-error');
+
+            clearError(jobCategory, errorElement);
+
+            if (!value) {
+                showError(jobCategory, errorElement, 'Please select a job category.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateJobType() {
+            const value = jobType.value;
+            const errorElement = document.getElementById('job-type-error');
+
+            clearError(jobType, errorElement);
+
+            if (!value) {
+                showError(jobType, errorElement, 'Please select a job type.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateLocation() {
+            const value = location.value.trim();
+            const regex = /^[A-Za-z\s,.-]{3,100}$/;
+            const errorElement = document.getElementById('location-error');
+
+            clearError(location, errorElement);
+
+            if (!value) {
+                showError(location, errorElement, 'Location is required.');
+                return false;
+            }
+
+            if (value.length < 3) {
+                showError(location, errorElement, 'Location must be at least 3 characters long.');
+                return false;
+            }
+
+            if (value.length > 100) {
+                showError(location, errorElement, 'Location cannot exceed 100 characters.');
+                return false;
+            }
+
+            if (!regex.test(value)) {
+                showError(location, errorElement, 'Location format should be "City, Country" or "City, Province". Only letters, spaces, commas, periods, and hyphens are allowed.');
+                return false;
+            }
+
+            if (!value.includes(',')) {
+                showError(location, errorElement, 'Please use format: City, Country or City, Province.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateAgeRange() {
+            const minValue = parseInt(minAge.value);
+            const maxValue = parseInt(maxAge.value);
+            const errorElement = document.getElementById('age-error');
+
+            clearError(minAge, errorElement);
+            clearError(maxAge, errorElement);
+
+            // Both empty is valid
+            if (!minAge.value && !maxAge.value) {
+                return true;
+            }
+
+            // Validate individual values
+            if (minAge.value) {
+                if (minValue < 16 || minValue > 65) {
+                    showError(minAge, errorElement, 'Minimum age must be between 16 and 65.');
+                    return false;
+                }
+            }
+
+            if (maxAge.value) {
+                if (maxValue < 16 || maxValue > 65) {
+                    showError(maxAge, errorElement, 'Maximum age must be between 16 and 65.');
+                    return false;
+                }
+            }
+
+            // Validate range
+            if (minAge.value && maxAge.value && minValue >= maxValue) {
+                showError(minAge, errorElement, 'Maximum age must be greater than minimum age.');
+                minAge.classList.add('border-red-500');
+                maxAge.classList.add('border-red-500');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateSkills() {
+            const value = skills.value.trim();
+            const errorElement = document.getElementById('skills-error');
+
+            clearError(skills, errorElement);
+
+            // Skills are optional
+            if (!value) {
+                return true;
+            }
+
+            if (value.length > 500) {
+                showError(skills, errorElement, 'Skills cannot exceed 500 characters.');
+                return false;
+            }
+
+            const skillArray = value.split(',').map(skill => skill.trim()).filter(skill => skill);
+
+            for (let skill of skillArray) {
+                if (skill.length < 1 || skill.length > 30) {
+                    showError(skills, errorElement, 'Each skill must be between 1 and 30 characters.');
+                    return false;
+                }
+
+                // Check if skill is numbers only (unless it's tech-related)
+                if (/^\d+$/.test(skill) && !['C++', 'HTML5', 'CSS3', 'PHP7', 'PHP8'].includes(skill)) {
+                    showError(skills, errorElement, `"${skill}" appears to be numbers only. Please provide valid skill names.`);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function validateJobSummary() {
+            const value = jobSummary.value.trim();
+            const errorElement = document.getElementById('job-summary-error');
+
+            clearError(jobSummary, errorElement);
+
+            if (!value) {
+                showError(jobSummary, errorElement, 'Job summary is required.');
+                return false;
+            }
+
+            if (value.length < 20) {
+                showError(jobSummary, errorElement, 'Job summary must be at least 20 characters long.');
+                return false;
+            }
+
+            if (value.length > 2000) {
+                showError(jobSummary, errorElement, 'Job summary cannot exceed 2000 characters.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validatePayRange() {
+            const payTypeValue = payType.value;
+            const payRangeValue = payRange.value.trim();
+            const errorElement = document.getElementById('pay-range-error');
+
+            clearError(payRange, errorElement);
+
+            // If no pay type selected, pay range should be empty
+            if (!payTypeValue && payRangeValue) {
+                showError(payRange, errorElement, 'Please select a pay type first.');
+                return false;
+            }
+
+            // If pay type selected but no range (optional)
+            if (payTypeValue && !payRangeValue) {
+                return true; // Optional
+            }
+
+            if (payRangeValue) {
+                if (payRangeValue.length > 50) {
+                    showError(payRange, errorElement, 'Pay range cannot exceed 50 characters.');
+                    return false;
+                }
+
+                // Check format: number - number
+                const rangeRegex = /^\d+\s*-\s*\d+$/;
+
+                if (!rangeRegex.test(payRangeValue)) {
+                    showError(payRange, errorElement, 'Pay range format should be: minimum - maximum (e.g., 20000 - 40000)');
+                    return false;
+                }
+
+                const parts = payRangeValue.split('-').map(part => parseInt(part.trim()));
+                const min = parts[0];
+                const max = parts[1];
+
+                if (min >= max) {
+                    showError(payRange, errorElement, 'Maximum pay must be greater than minimum pay.');
+                    return false;
+                }
+
+                if (min <= 0 || max <= 0) {
+                    showError(payRange, errorElement, 'Pay amounts must be greater than 0.');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function validateFullDescription() {
+            const value = fullDescription.value.trim();
+            const errorElement = document.getElementById('full-description-error');
+
+            clearError(fullDescription, errorElement);
+
+            if (!value) {
+                showError(fullDescription, errorElement, 'Full description is required.');
+                return false;
+            }
+
+            if (value.length < 100) {
+                showError(fullDescription, errorElement, 'Full description must be at least 100 characters long.');
+                return false;
+            }
+
+            if (value.length > 5000) {
+                showError(fullDescription, errorElement, 'Full description cannot exceed 5000 characters.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateApplicationDates() {
+            const startValue = applicationStart.value;
+            const deadlineValue = applicationDeadline.value;
+            const startError = document.getElementById('application-start-error');
+            const deadlineError = document.getElementById('application-deadline-error');
+
+            clearError(applicationStart, startError);
+            clearError(applicationDeadline, deadlineError);
+
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            // Validate start date
+            if (startValue) {
+                const startDate = new Date(startValue);
+                if (startDate < today) {
+                    showError(applicationStart, startError, 'Application start date cannot be in the past.');
+                    return false;
+                }
+            }
+
+            // Validate deadline
+            if (deadlineValue) {
+                const deadlineDate = new Date(deadlineValue);
+                if (deadlineDate < today) {
+                    showError(applicationDeadline, deadlineError, 'Application deadline cannot be in the past.');
+                    return false;
+                }
+
+                // If both dates are provided, deadline should be after start
+                if (startValue) {
+                    const startDate = new Date(startValue);
+                    if (deadlineDate <= startDate) {
+                        showError(applicationDeadline, deadlineError, 'Application deadline must be after the start date.');
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        // Helper functions
+        function showError(element, errorElement, message) {
+            element.classList.add('border-red-500');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function clearError(element, errorElement) {
+            element.classList.remove('border-red-500');
+            errorElement.textContent = '';
+            errorElement.classList.add('hidden');
+        }
+
+        // Character counters
+        function updateAllCharacterCounts() {
+            if (titleCount) titleCount.textContent = jobTitle.value.length;
+            if (locationCount) locationCount.textContent = location.value.length;
+            if (skillsCount) skillsCount.textContent = skills.value.length;
+            if (summaryCount) summaryCount.textContent = jobSummary.value.length;
+            if (payRangeCount) payRangeCount.textContent = payRange.value.length;
+            if (descriptionCount) descriptionCount.textContent = fullDescription.value.length;
+        }
+
+        // Event listeners for real-time validation and character counting
+        jobTitle.addEventListener('input', function() {
+            updateAllCharacterCounts();
+        });
+        jobTitle.addEventListener('blur', validateJobTitle);
+
+        location.addEventListener('input', function() {
+            updateAllCharacterCounts();
+        });
+        location.addEventListener('blur', validateLocation);
+
+        skills.addEventListener('input', function() {
+            updateAllCharacterCounts();
+        });
+        skills.addEventListener('blur', validateSkills);
+
+        jobSummary.addEventListener('input', function() {
+            updateAllCharacterCounts();
+            validateJobSummary();
+        });
+
+        payRange.addEventListener('input', function() {
+            updateAllCharacterCounts();
+        });
+        payRange.addEventListener('blur', validatePayRange);
+
+        fullDescription.addEventListener('input', function() {
+            updateAllCharacterCounts();
+            validateFullDescription();
+        });
+
+        jobCategory.addEventListener('change', validateJobCategory);
+        jobType.addEventListener('change', validateJobType);
+        minAge.addEventListener('input', validateAgeRange);
+        maxAge.addEventListener('input', validateAgeRange);
+        payType.addEventListener('change', validatePayRange);
+        applicationStart.addEventListener('change', validateApplicationDates);
+        applicationDeadline.addEventListener('change', validateApplicationDates);
+
+        // Initialize character counts
+        updateAllCharacterCounts();
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Run all validations
+            if (!validateJobTitle()) isValid = false;
+            if (!validateJobCategory()) isValid = false;
+            if (!validateJobType()) isValid = false;
+            if (!validateLocation()) isValid = false;
+            if (!validateAgeRange()) isValid = false;
+            if (!validateSkills()) isValid = false;
+            if (!validateJobSummary()) isValid = false;
+            if (!validatePayRange()) isValid = false;
+            if (!validateFullDescription()) isValid = false;
+            if (!validateApplicationDates()) isValid = false;
+
+            if (!isValid) {
                 e.preventDefault();
+
+                // Scroll to first error
+                const firstError = document.querySelector('.border-red-500');
+                if (firstError) {
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+
                 return false;
             }
         });
