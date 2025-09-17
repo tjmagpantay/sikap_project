@@ -112,14 +112,14 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-primary">
-                            Enhance your job posting with attachments
+                            Enhance your job posting with PDF attachments
                         </h3>
                         <div class="mt-2 text-xs text-primary">
                             <ul class="space-y-1 list-disc list-inside">
-                                <li>Company brochures or presentations</li>
-                                <li>Job specification documents</li>
-                                <li>Benefits and perks information</li>
-                                <li>Office photos or virtual tour materials</li>
+                                <li>Company brochures or presentations (PDF)</li>
+                                <li>Job specification documents (PDF)</li>
+                                <li>Benefits and perks information (PDF)</li>
+                                <li>Company profile or organizational chart (PDF)</li>
                             </ul>
                         </div>
                     </div>
@@ -132,7 +132,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                 <!-- File Upload Section -->
                 <div>
                     <label class="block mb-3 text-sm font-medium text-primary">
-                        Upload Job-Related Documents
+                        Upload PDF Documents
                     </label>
 
                     <div class="p-6 text-center transition-colors border-2 border-dashed rounded-lg border-primary hover:border-blue-400" style="border-width:2px; border-style:dashed !important; border-color:currentColor !important;">
@@ -143,21 +143,24 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             <div>
                                 <label for="attachments" class="cursor-pointer">
                                     <span class="block mt-2 text-sm font-medium text-primary hover:text-blue-500">
-                                        Click to upload files
+                                        Click to upload PDF files
                                     </span>
                                     <input id="attachments" name="attachments[]" type="file" multiple
-                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                        accept=".pdf"
                                         class="sr-only">
                                 </label>
                                 <p class="mt-1 text-xs text-gray-500">
-                                    or drag and drop
+                                    or drag and drop PDF files
                                 </p>
                             </div>
                             <p class="text-xs text-gray-500">
-                                PDF only and up to 5MB each
+                                <strong>PDF files only</strong> • Maximum 5MB each • Up to 5 files
                             </p>
                         </div>
                     </div>
+
+                    <!-- Validation Error Display -->
+                    <div id="validationError" class="hidden mt-2 text-xs text-red-600"></div>
 
                     <!-- File Preview Area -->
                     <div id="filePreview" class="mt-4 space-y-2">
@@ -173,8 +176,8 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             <?php foreach ($existingAttachments as $attachment): ?>
                                 <div class="flex items-center justify-between p-3 border border-blue-200 rounded-lg bg-blue-50">
                                     <div class="flex items-center">
-                                        <svg class="w-5 h-5 mr-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                        <svg class="w-5 h-5 mr-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
                                         </svg>
                                         <span class="text-sm text-primary">
                                             <?php echo htmlspecialchars(basename($attachment['file_path'])); ?>
@@ -221,7 +224,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </button>
-                        <button type="submit"
+                        <button type="submit" id="submitBtn"
                             class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
                             Continue to Questions
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,32 +239,89 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 </div>
 
 <script>
-    // File upload preview
+    // File validation function
+    function validateFile(file) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const allowedType = 'application/pdf';
+
+        if (file.type !== allowedType) {
+            return `${file.name} is not a PDF file. Only PDF files are allowed.`;
+        }
+
+        if (file.size > maxSize) {
+            return `${file.name} is too large. Maximum file size is 5MB.`;
+        }
+
+        return null;
+    }
+
+    // Show validation error
+    function showValidationError(message) {
+        const errorDiv = document.getElementById('validationError');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    // Hide validation error
+    function hideValidationError() {
+        const errorDiv = document.getElementById('validationError');
+        errorDiv.classList.add('hidden');
+    }
+
+    // File upload preview with validation
     document.getElementById('attachments').addEventListener('change', function(e) {
         const filePreview = document.getElementById('filePreview');
+        const files = Array.from(e.target.files);
+        const maxFiles = 5;
+
+        hideValidationError();
         filePreview.innerHTML = '';
 
-        Array.from(e.target.files).forEach((file, index) => {
+        // Check number of files
+        if (files.length > maxFiles) {
+            showValidationError(`Too many files selected. Maximum ${maxFiles} files allowed.`);
+            this.value = '';
+            return;
+        }
+
+        // Validate each file
+        let hasErrors = false;
+        for (let file of files) {
+            const error = validateFile(file);
+            if (error) {
+                showValidationError(error);
+                hasErrors = true;
+                break;
+            }
+        }
+
+        if (hasErrors) {
+            this.value = '';
+            return;
+        }
+
+        // Display valid files
+        files.forEach((file, index) => {
             const fileItem = document.createElement('div');
-            fileItem.className = 'flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg';
+            fileItem.className = 'flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg';
 
             fileItem.innerHTML = `
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                </svg>
-                <div>
-                    <div class="text-sm font-medium text-primary">${file.name}</div>
-                    <div class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <div class="text-sm font-medium text-green-700">${file.name}</div>
+                        <div class="text-xs text-green-600">${(file.size / 1024 / 1024).toFixed(2)} MB • PDF</div>
+                    </div>
                 </div>
-            </div>
-            <button type="button" onclick="removeFileFromInput(${index})" 
-                    class="text-red-600 hover:text-red-700">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        `;
+                <button type="button" onclick="removeFileFromInput(${index})" 
+                        class="text-red-600 hover:text-red-700">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            `;
 
             filePreview.appendChild(fileItem);
         });
@@ -285,7 +345,6 @@ include_once __DIR__ . '/../components/navbar-employer.php';
     // Remove existing attachment
     function removeAttachment(attachmentId) {
         if (confirm('Are you sure you want to remove this attachment?')) {
-            // AJAX call to remove attachment
             fetch(`?page=remove-attachment&id=${attachmentId}`, {
                     method: 'POST',
                     headers: {
@@ -303,7 +362,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         }
     }
 
-    // Drag and drop functionality
+    // Enhanced drag and drop with validation
     const dropZone = document.querySelector('.border-dashed');
 
     dropZone.addEventListener('dragover', (e) => {
@@ -320,14 +379,48 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         e.preventDefault();
         dropZone.classList.remove('border-blue-400', 'bg-blue-50');
 
-        const files = e.dataTransfer.files;
-        const dataTransfer = new DataTransfer();
+        const files = Array.from(e.dataTransfer.files);
+        const maxFiles = 5;
 
-        Array.from(files).forEach((file) => {
+        hideValidationError();
+
+        // Check number of files
+        if (files.length > maxFiles) {
+            showValidationError(`Too many files dropped. Maximum ${maxFiles} files allowed.`);
+            return;
+        }
+
+        // Validate each file
+        let hasErrors = false;
+        for (let file of files) {
+            const error = validateFile(file);
+            if (error) {
+                showValidationError(error);
+                hasErrors = true;
+                break;
+            }
+        }
+
+        if (hasErrors) {
+            return;
+        }
+
+        // Set valid files to input
+        const dataTransfer = new DataTransfer();
+        files.forEach((file) => {
             dataTransfer.items.add(file);
         });
 
         document.getElementById('attachments').files = dataTransfer.files;
         document.getElementById('attachments').dispatchEvent(new Event('change'));
+    });
+
+    // Prevent form submission if validation errors exist
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const errorDiv = document.getElementById('validationError');
+        if (!errorDiv.classList.contains('hidden')) {
+            e.preventDefault();
+            showValidationError('Please fix the file validation errors before proceeding.');
+        }
     });
 </script>
