@@ -115,7 +115,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             Why use screening questions?
                         </h3>
                         <div class="mt-2 text-xs text-primary">
-                            <p>Screening questions help you filter candidates before reviewing their full applications. Use them to ask about experience, availability, or specific requirements.</p>
+                            <p>Screening questions help you filter candidates before reviewing their full applications. Maximum 10 questions allowed.</p>
                         </div>
                     </div>
                 </div>
@@ -127,11 +127,11 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                 <div id="questionsContainer" class="space-y-4">
                     <?php if (!empty($existingQuestions)): ?>
                         <?php foreach ($existingQuestions as $index => $question): ?>
-                            <div class="p-4 border border-gray-200 rounded-lg question-item">
+                            <div class="p-4 border border-gray-200 rounded-lg question-item" data-question-index="<?php echo $index; ?>">
                                 <div class="flex items-start justify-between mb-3">
                                     <h4 class="text-sm font-medium text-gray-900">Question <?php echo $index + 1; ?></h4>
                                     <button type="button" onclick="removeQuestion(this)"
-                                        class="text-red-600 hover:text-red-700"> 
+                                        class="text-red-600 hover:text-red-700">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                         </svg>
@@ -141,36 +141,91 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 <div class="space-y-3">
                                     <div>
                                         <label class="block mb-1 text-sm font-medium text-gray-700">
-                                            Question Text
+                                            Question Text <span class="text-red-500">*</span>
                                         </label>
                                         <textarea name="questions[<?php echo $index; ?>][text]" rows="2" required
+                                            maxlength="200"
                                             placeholder="Enter your question..."
-                                            class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"><?php echo htmlspecialchars($question['question_text']); ?></textarea>
+                                            class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                                            oninput="updateQuestionCharCount(this)"><?php echo htmlspecialchars($question['question_text']); ?></textarea>
+                                        <div class="mt-1 text-xs text-gray-400">
+                                            <span class="question-char-count">0</span>/200 characters
+                                        </div>
                                     </div>
 
                                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                         <div>
                                             <label class="block mb-1 text-sm font-medium text-gray-700">
-                                                Question Type
+                                                Question Type <span class="text-red-500">*</span>
                                             </label>
-                                            <select name="questions[<?php echo $index; ?>][type]"
-                                                onchange="toggleOptions(this)"
-                                                class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                                                <option value="text" <?php echo $question['question_type'] == 'text' ? 'selected' : ''; ?>>Text Input</option>
-                                                <option value="radio" <?php echo $question['question_type'] == 'radio' ? 'selected' : ''; ?>>Multiple Choice (Single)</option>
-                                                <option value="checkbox" <?php echo $question['question_type'] == 'checkbox' ? 'selected' : ''; ?>>Multiple Choice (Multiple)</option>
-                                                <option value="dropdown" <?php echo $question['question_type'] == 'dropdown' ? 'selected' : ''; ?>>Dropdown</option>
-                                            </select>
+                                            <div class="relative" x-data="{ 
+                                                open: false, 
+                                                selected: '<?php
+                                                            $types = [
+                                                                'text' => 'Text Input',
+                                                                'radio' => 'Multiple Choice (Single)',
+                                                                'checkbox' => 'Multiple Choice (Multiple)',
+                                                                'dropdown' => 'Dropdown'
+                                                            ];
+                                                            echo $types[$question['question_type']] ?? 'Text Input';
+                                                            ?>', 
+                                                selectedValue: '<?php echo $question['question_type']; ?>' 
+                                            }">
+                                                <button type="button" @click="open = !open"
+                                                    @click.away="open = false"
+                                                    class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                                    <span x-text="selected" :class="{'text-gray-500': selected === 'Select Type', 'text-gray-900': selected !== 'Select Type'}"></span>
+                                                    <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                    </svg>
+                                                </button>
+
+                                                <div x-show="open"
+                                                    x-transition:enter="transition ease-out duration-100"
+                                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                                    x-transition:leave="transition ease-in duration-75"
+                                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                                    x-cloak>
+                                                    <div class="py-1">
+                                                        <button type="button" @click="selected = 'Text Input'; selectedValue = 'text'; open = false; toggleOptions('text', $el.closest('.question-item'))"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                            Text Input
+                                                        </button>
+                                                        <button type="button" @click="selected = 'Multiple Choice (Single)'; selectedValue = 'radio'; open = false; toggleOptions('radio', $el.closest('.question-item'))"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                            Multiple Choice (Single)
+                                                        </button>
+                                                        <button type="button" @click="selected = 'Multiple Choice (Multiple)'; selectedValue = 'checkbox'; open = false; toggleOptions('checkbox', $el.closest('.question-item'))"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                            Multiple Choice (Multiple)
+                                                        </button>
+                                                        <button type="button" @click="selected = 'Dropdown'; selectedValue = 'dropdown'; open = false; toggleOptions('dropdown', $el.closest('.question-item'))"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                            Dropdown
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <input type="hidden" name="questions[<?php echo $index; ?>][type]" :value="selectedValue">
+                                            </div>
                                         </div>
 
-                                        <div class="options-container" style="<?php echo in_array($question['question_type'], ['text']) ? 'display: none;' : ''; ?>">
+                                        <div class="options-container" style="<?php echo $question['question_type'] == 'text' ? 'display: none;' : ''; ?>">
                                             <label class="block mb-1 text-sm font-medium text-gray-700">
-                                                Options (separated by |)
+                                                Options (separated by |) <span class="text-red-500">*</span>
                                             </label>
                                             <input type="text" name="questions[<?php echo $index; ?>][options]"
+                                                maxlength="500"
                                                 value="<?php echo htmlspecialchars($question['question_option'] ?? ''); ?>"
                                                 placeholder="Option 1|Option 2|Option 3"
-                                                class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                                class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                                                oninput="updateOptionsCharCount(this)">
+                                            <div class="mt-1 text-xs text-gray-400">
+                                                <span class="options-char-count">0</span>/500 characters
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -181,12 +236,12 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 
                 <!-- Add Question Button -->
                 <div class="text-center">
-                    <button type="button" onclick="addQuestion()"
+                    <button type="button" onclick="addQuestion()" id="addQuestionBtn"
                         class="inline-flex items-center px-4 py-2 text-sm font-medium bg-white border rounded-md text-primary border-primary hover:bg-blue-50">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                         </svg>
-                        Add Question
+                        Add Question (<span id="questionCounter"><?php echo count($existingQuestions); ?></span>/10)
                     </button>
                 </div>
 
@@ -234,13 +289,63 @@ include_once __DIR__ . '/../components/navbar-employer.php';
     </div>
 </div>
 
+<!-- Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
     let questionCount = <?php echo count($existingQuestions); ?>;
+    const maxQuestions = 10;
+
+    // Character limit enforcement
+    function enforceMaxLength(element, maxLength) {
+        element.addEventListener('input', function() {
+            if (this.value.length > maxLength) {
+                this.value = this.value.slice(0, maxLength);
+            }
+        });
+
+        element.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                if (this.value.length > maxLength) {
+                    this.value = this.value.slice(0, maxLength);
+                    updateAllCharCounts();
+                }
+            }, 0);
+        });
+    }
+
+    // Update character counts
+    function updateQuestionCharCount(textarea) {
+        const container = textarea.closest('.question-item');
+        const counter = container.querySelector('.question-char-count');
+        if (counter) {
+            counter.textContent = textarea.value.length;
+        }
+    }
+
+    function updateOptionsCharCount(input) {
+        const container = input.closest('.options-container');
+        const counter = container.querySelector('.options-char-count');
+        if (counter) {
+            counter.textContent = input.value.length;
+        }
+    }
+
+    function updateAllCharCounts() {
+        document.querySelectorAll('textarea[name*="[text]"]').forEach(updateQuestionCharCount);
+        document.querySelectorAll('input[name*="[options]"]').forEach(updateOptionsCharCount);
+    }
 
     function addQuestion() {
+        if (questionCount >= maxQuestions) {
+            alert(`Maximum ${maxQuestions} questions allowed.`);
+            return;
+        }
+
         const container = document.getElementById('questionsContainer');
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-item border border-gray-200 rounded-lg p-4';
+        questionDiv.setAttribute('data-question-index', questionCount);
 
         questionDiv.innerHTML = `
         <div class="flex items-start justify-between mb-3">
@@ -256,35 +361,82 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         <div class="space-y-3">
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700">
-                    Question Text
+                    Question Text <span class="text-red-500">*</span>
                 </label>
                 <textarea name="questions[${questionCount}][text]" rows="2" required
+                          maxlength="200"
                           placeholder="Enter your question..."
-                          class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"></textarea>
+                          class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                          oninput="updateQuestionCharCount(this)"></textarea>
+                <div class="mt-1 text-xs text-gray-400">
+                    <span class="question-char-count">0</span>/200 characters
+                </div>
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700">
-                        Question Type
+                        Question Type <span class="text-red-500">*</span>
                     </label>
-                    <select name="questions[${questionCount}][type]" 
-                            onchange="toggleOptions(this)"
-                            class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                        <option value="text">Text Input</option>
-                        <option value="radio">Multiple Choice (Single)</option>
-                        <option value="checkbox">Multiple Choice (Multiple)</option>
-                        <option value="dropdown">Dropdown</option>
-                    </select>
+                    <div class="relative" x-data="{ 
+                        open: false, 
+                        selected: 'Text Input', 
+                        selectedValue: 'text' 
+                    }">
+                        <button type="button" @click="open = !open"
+                            @click.away="open = false"
+                            class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <span x-text="selected" :class="{'text-gray-500': selected === 'Select Type', 'text-gray-900': selected !== 'Select Type'}"></span>
+                            <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <div x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                            x-cloak>
+                            <div class="py-1">
+                                <button type="button" @click="selected = 'Text Input'; selectedValue = 'text'; open = false; toggleOptions('text', $el.closest('.question-item'))"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Text Input
+                                </button>
+                                <button type="button" @click="selected = 'Multiple Choice (Single)'; selectedValue = 'radio'; open = false; toggleOptions('radio', $el.closest('.question-item'))"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Multiple Choice (Single)
+                                </button>
+                                <button type="button" @click="selected = 'Multiple Choice (Multiple)'; selectedValue = 'checkbox'; open = false; toggleOptions('checkbox', $el.closest('.question-item'))"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Multiple Choice (Multiple)
+                                </button>
+                                <button type="button" @click="selected = 'Dropdown'; selectedValue = 'dropdown'; open = false; toggleOptions('dropdown', $el.closest('.question-item'))"
+                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                    Dropdown
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="questions[${questionCount}][type]" :value="selectedValue">
+                    </div>
                 </div>
 
                 <div class="options-container" style="display: none;">
                     <label class="block mb-1 text-sm font-medium text-gray-700">
-                        Options (separated by |)
+                        Options (separated by |) <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="questions[${questionCount}][options]" 
+                           maxlength="500"
                            placeholder="Option 1|Option 2|Option 3"
-                           class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                           class="block w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                           oninput="updateOptionsCharCount(this)">
+                    <div class="mt-1 text-xs text-gray-400">
+                        <span class="options-char-count">0</span>/500 characters
+                    </div>
                 </div>
             </div>
         </div>
@@ -293,12 +445,21 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         container.appendChild(questionDiv);
         questionCount++;
         updateQuestionNumbers();
+        updateAddButtonState();
+
+        // Apply character limit enforcement to new elements
+        const newTextarea = questionDiv.querySelector('textarea');
+        const newOptionsInput = questionDiv.querySelector('input[name*="[options]"]');
+        if (newTextarea) enforceMaxLength(newTextarea, 200);
+        if (newOptionsInput) enforceMaxLength(newOptionsInput, 500);
     }
 
     function removeQuestion(button) {
         if (confirm('Are you sure you want to remove this question?')) {
             button.closest('.question-item').remove();
+            questionCount--;
             updateQuestionNumbers();
+            updateAddButtonState();
         }
     }
 
@@ -309,23 +470,97 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         });
     }
 
-    function toggleOptions(selectElement) {
-        const optionsContainer = selectElement.closest('.question-item').querySelector('.options-container');
-        const selectedType = selectElement.value;
+    function updateAddButtonState() {
+        const addBtn = document.getElementById('addQuestionBtn');
+        const counter = document.getElementById('questionCounter');
 
-        if (selectedType === 'text') {
-            optionsContainer.style.display = 'none';
-            optionsContainer.querySelector('input').required = false;
+        counter.textContent = questionCount;
+
+        if (questionCount >= maxQuestions) {
+            addBtn.disabled = true;
+            addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            addBtn.classList.remove('hover:bg-blue-50');
         } else {
-            optionsContainer.style.display = 'block';
-            optionsContainer.querySelector('input').required = true;
+            addBtn.disabled = false;
+            addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            addBtn.classList.add('hover:bg-blue-50');
         }
     }
 
-    // Initialize existing questions
+    function toggleOptions(selectedType, questionItem) {
+        const optionsContainer = questionItem.querySelector('.options-container');
+        const optionsInput = questionItem.querySelector('input[name*="[options]"]');
+
+        if (selectedType === 'text') {
+            optionsContainer.style.display = 'none';
+            if (optionsInput) optionsInput.required = false;
+        } else {
+            optionsContainer.style.display = 'block';
+            if (optionsInput) optionsInput.required = true;
+        }
+    }
+
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('select[name*="[type]"]').forEach(select => {
-            toggleOptions(select);
+        // Initialize character counts for existing questions
+        updateAllCharCounts();
+        updateAddButtonState();
+
+        // Apply character limits to existing elements
+        document.querySelectorAll('textarea[name*="[text]"]').forEach(el => enforceMaxLength(el, 200));
+        document.querySelectorAll('input[name*="[options]"]').forEach(el => enforceMaxLength(el, 500));
+
+        // Initialize existing dropdowns
+        document.querySelectorAll('.question-item').forEach(item => {
+            const typeInput = item.querySelector('input[name*="[type]"]');
+            if (typeInput) {
+                toggleOptions(typeInput.value, item);
+            }
         });
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        const questions = document.querySelectorAll('.question-item');
+
+        questions.forEach((question, index) => {
+            const textarea = question.querySelector('textarea[name*="[text]"]');
+            const typeInput = question.querySelector('input[name*="[type]"]');
+            const optionsInput = question.querySelector('input[name*="[options]"]');
+
+            // Validate question text
+            if (!textarea.value.trim()) {
+                alert(`Question ${index + 1}: Question text is required.`);
+                isValid = false;
+                return;
+            }
+
+            if (textarea.value.trim().length < 5) {
+                alert(`Question ${index + 1}: Question text must be at least 5 characters long.`);
+                isValid = false;
+                return;
+            }
+
+            // Validate options for non-text types
+            if (typeInput.value !== 'text' && optionsInput) {
+                if (!optionsInput.value.trim()) {
+                    alert(`Question ${index + 1}: Options are required for this question type.`);
+                    isValid = false;
+                    return;
+                }
+
+                const options = optionsInput.value.split('|').filter(opt => opt.trim());
+                if (options.length < 2) {
+                    alert(`Question ${index + 1}: At least 2 options are required.`);
+                    isValid = false;
+                    return;
+                }
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+        }
     });
 </script>
