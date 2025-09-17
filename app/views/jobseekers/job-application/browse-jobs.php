@@ -4,6 +4,11 @@ include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../navbar-jobseeker.php';
 ?>
 
+<!-- Add SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="../public/assets/css/sweetalert2.min.css">
+<script src="../public/assets/js/sweetalert2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Breadcrumbs -->
@@ -244,7 +249,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             <!-- Results Text - Hidden on mobile/tablet (md and below), visible on lg+ -->
             <div class="flex-col hidden md:flex">
                 <div class="flex gap-2">
-                    <h2 class="text-lg font-semibold text-grayMain">
+                    <h2 class="text-lg font-semibold text-gray-600">
                         Results: <span id="resultsCount"><?php echo isset($jobs) ? count($jobs) : 0; ?></span> jobs found
                     </h2>
                 </div>
@@ -264,7 +269,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             <div class="py-12 text-center">
                 <i class="mb-4 text-6xl text-gray-400 fas fa-briefcase"></i>
                 <h3 class="mb-2 text-lg font-medium text-gray-900">No jobs available</h3>
-                <p class="text-gray-500">Check back later for new job postings</p>
+                <p class="text-sm text-gray-500">Check back later for new job postings</p>
             </div>
         <?php else: ?>
             <div id="jobListingsContainer" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -852,15 +857,32 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         const svgIcon = button.querySelector('svg');
         const originalFill = svgIcon.getAttribute('fill');
 
+        // Show loading state
         svgIcon.classList.add('animate-pulse');
         button.disabled = true;
+
+        // FIXED: Optimistically update UI first (immediate feedback)
+        if (isSaved) {
+            button.setAttribute('data-saved', 'false');
+            svgIcon.setAttribute('fill', 'none');
+            button.title = 'Save job for later';
+            button.className = 'relative z-10 p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-100 hover:text-yellow-600';
+        } else {
+            button.setAttribute('data-saved', 'true');
+            svgIcon.setAttribute('fill', 'currentColor');
+            button.title = 'Remove from saved jobs';
+            button.className = 'relative z-10 p-2 rounded-md transition-colors text-secondary hover:bg-yellow-50';
+        }
 
         const formData = new FormData();
         formData.append('job_id', jobId);
 
         fetch(`?page=${action}`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -869,9 +891,10 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
 
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
+                    // If we get HTML instead of JSON, there's likely a server error
                     return response.text().then(text => {
-                        console.error('Expected JSON but got:', text);
-                        throw new Error('Server returned non-JSON response');
+                        console.error('Server returned HTML instead of JSON:', text);
+                        throw new Error('Server error - please try again');
                     });
                 }
 
@@ -879,28 +902,95 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
             })
             .then(data => {
                 if (data.success) {
+                    // Success - UI already updated optimistically
+                    // Show SweetAlert2 success message with custom styling
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message || `Job ${isSaved ? 'removed from saved jobs' : 'saved successfully'}!`,
+                        icon: 'success',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end',
+                        customClass: {
+                            popup: 'colored-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                } else {
+                    // Server returned success=false - revert UI changes
                     if (isSaved) {
-                        button.setAttribute('data-saved', 'false');
-                        svgIcon.setAttribute('fill', 'none');
-                        button.title = 'Save job for later';
-                        button.className = 'relative z-10 p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-yellow-600';
-                    } else {
+                        // Was trying to unsave but failed - revert to saved state
                         button.setAttribute('data-saved', 'true');
                         svgIcon.setAttribute('fill', 'currentColor');
                         button.title = 'Remove from saved jobs';
-                        button.className = 'relative z-10 p-2 rounded-md text-yellow-600 hover:bg-yellow-50';
+                        button.className = 'relative z-10 p-2 rounded-md transition-colors text-secondary hover:bg-yellow-50';
+                    } else {
+                        // Was trying to save but failed - revert to unsaved state
+                        button.setAttribute('data-saved', 'false');
+                        svgIcon.setAttribute('fill', 'none');
+                        button.title = 'Save job for later';
+                        button.className = 'relative z-10 p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-100 hover:text-yellow-600';
                     }
 
-                    showToast(data.message || 'Job ' + (isSaved ? 'unsaved' : 'saved') + ' successfully!', 'success');
-                } else {
-                    svgIcon.setAttribute('fill', originalFill);
-                    showToast(data.message || 'Error occurred', 'error');
+                    // Show custom error message
+                    Swal.fire({
+                        title: 'Oops!',
+                        text: data.message || 'Something went wrong. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again',
+                        customClass: {
+                            popup: 'error-popup',
+                            title: 'error-title',
+                            content: 'error-content',
+                            confirmButton: 'error-button'
+                        }
+                    });
                 }
             })
             .catch(error => {
-                svgIcon.setAttribute('fill', originalFill);
                 console.error('Fetch error:', error);
-                showToast('Error occurred while ' + (isSaved ? 'unsaving' : 'saving') + ' job', 'error');
+
+                // Network error - revert UI changes
+                if (isSaved) {
+                    // Was trying to unsave but failed - revert to saved state
+                    button.setAttribute('data-saved', 'true');
+                    svgIcon.setAttribute('fill', 'currentColor');
+                    button.title = 'Remove from saved jobs';
+                    button.className = 'relative z-10 p-2 rounded-md transition-colors text-secondary hover:bg-yellow-50';
+                } else {
+                    // Was trying to save but failed - revert to unsaved state
+                    button.setAttribute('data-saved', 'false');
+                    svgIcon.setAttribute('fill', 'none');
+                    button.title = 'Save job for later';
+                    button.className = 'relative z-10 p-2 rounded-md transition-colors text-gray-500 hover:bg-gray-100 hover:text-yellow-600';
+                }
+
+                // Show custom connection error
+                Swal.fire({
+                    title: 'Connection Problem!',
+                    text: 'Unable to connect to the server. Please check your internet connection and try again.',
+                    icon: 'warning',
+                    confirmButtonText: 'Retry',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        popup: 'connection-error-popup',
+                        title: 'connection-error-title',
+                        content: 'connection-error-content',
+                        confirmButton: 'connection-confirm-button',
+                        cancelButton: 'connection-cancel-button'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Retry the action
+                        toggleSaveJob(jobId, button);
+                    }
+                });
             })
             .finally(() => {
                 svgIcon.classList.remove('animate-pulse');
@@ -936,4 +1026,72 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         // Show visual feedback
         showToast('Jobs sorted ' + (newOrder === 'asc' ? 'A-Z' : 'Z-A'), 'success');
     }
+
+    function showCustomToast(message, type = 'success', duration = 3000) {
+        // Remove existing toasts
+        document.querySelectorAll('.custom-toast').forEach(toast => toast.remove());
+
+        const toast = document.createElement('div');
+        toast.className = `custom-toast fixed top-4 right-4 z-[9999] max-w-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out translate-x-full`;
+
+        let bgColor, iconColor, icon;
+
+        if (type === 'success') {
+            bgColor = 'bg-green-500';
+            iconColor = 'text-white';
+            icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>`;
+        } else if (type === 'error') {
+            bgColor = 'bg-red-500';
+            iconColor = 'text-white';
+            icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>`;
+        } else if (type === 'warning') {
+            bgColor = 'bg-yellow-500';
+            iconColor = 'text-white';
+            icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>`;
+        }
+
+        toast.innerHTML = `
+        <div class="flex items-center ${bgColor} text-white rounded-lg p-3">
+            <div class="flex-shrink-0 ${iconColor}">
+                ${icon}
+            </div>
+            <div class="ml-3 text-sm font-medium">
+                ${message}
+            </div>
+            <button onclick="this.closest('.custom-toast').remove()" class="ml-auto -mx-1.5 -my-1.5 text-white hover:text-gray-200 rounded-lg p-1.5 hover:bg-black/20 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+            toast.classList.add('translate-x-0');
+        }, 10);
+
+        // Auto remove after duration
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, duration);
+    }
+
+    // Then in your success case, you can use either:
+    showCustomToast(`Job ${isSaved ? 'removed from saved jobs' : 'saved successfully'}!`, 'success');
+    // OR the SweetAlert2 version as above
 </script>
