@@ -4,338 +4,410 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen bg-gray-50">
-    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
-        <!-- Header with breadcrumbs -->
-        <div class="mb-8">
-            <!-- Breadcrumb Navigation -->
-            <nav class="flex mb-4" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a href="?page=employer-dashboard" class="inline-flex items-center text-sm text-gray-400 hover:text-gray-600">
+<div class="min-h-screen ">
+    <div class="px-6 py-8">
+        <div class="mx-auto max-w-7xl">
 
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            <a href="?page=manage-jobs" class="ml-1 text-sm text-gray-400 hover:text-gray-600 md:ml-2">
-                                Job Management
-                            </a>
-                        </div>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="ml-1 text-sm font-medium text-primary md:ml-2">View Job</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-            <h1 class="text-2xl font-bold text-gray-900">Job Details</h1>
-        </div>
-
-        <!-- Main Flex Layout -->
-        <div class="flex flex-col gap-8 md:flex-row">
-
-            <!-- Left Section - Main Content (8/12 width) -->
-            <div class="w-full space-y-6 md:w-8/12">
-
-                <!-- Header Card -->
-                <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
-                    <div class="p-6">
-                        <!-- Job Title and Badges -->
-                        <div class="flex items-start justify-between mb-6">
-                            <div>
-                                <h1 class="text-xl font-semibold text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h1>
-                                <div class="flex items-center gap-3">
-                                    <!-- Employment Type Badge -->
-                                    <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-100 rounded-sm text-primary">
-                                        <?php echo strtoupper(str_replace('-', ' ', $job['job_type'])); ?>
-                                    </span>
-
-                                    <!-- Status Badge -->
-                                    <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium
-                                        <?php
-                                        switch ($job['job_status']) {
-                                            case 'open':
-                                                echo 'bg-green-100 text-green-800';
-                                                break;
-                                            case 'closed':
-                                                echo 'bg-red-100 text-red-800';
-                                                break;
-                                            case 'paused':
-                                                echo 'bg-yellow-100 text-yellow-800';
-                                                break;
-                                            case 'draft':
-                                                echo 'bg-gray-100 text-gray-800';
-                                                break;
-                                            default:
-                                                echo 'bg-gray-100 text-gray-800';
-                                        }
-                                        ?>">
-                                        <?php echo strtoupper($job['job_status']); ?>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="flex items-center gap-2">
-                                <?php if ($job['job_status'] == 'open'): ?>
-                                    <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=paused'"
-                                        class="flex items-center px-4 py-2 text-sm font-medium text-yellow-800 transition-colors border border-yellow-200 rounded-lg bg-yellow-50 hover:bg-yellow-100">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Pause
-                                    </button>
-                                <?php elseif ($job['job_status'] == 'paused'): ?>
-                                    <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=open'"
-                                        class="flex items-center px-4 py-2 text-sm font-medium text-green-800 transition-colors border border-green-200 rounded-lg bg-green-50 hover:bg-green-100">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Resume
-                                    </button>
-                                <?php endif; ?>
-
-                                <button onclick="window.location.href='?page=edit-job&id=<?php echo $job['job_id']; ?>'"
-                                    class="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-gray-800 rounded-lg hover:bg-gray-900">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Edit
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Application Info Bar -->
-                        <div class="flex justify-between p-4 mx-4 mb-6 rounded-lg bg-gray-50">
-                            <div class="text-start">
-                                <div class="text-xs text-gray-400">Days remaining</div>
-                                <div class="text-sm text-primary">
-                                    <?php
-                                    if (!empty($job['application_deadline'])) {
-                                        $deadline = new DateTime($job['application_deadline']);
-                                        $now = new DateTime();
-                                        if ($deadline > $now) {
-                                            echo $now->diff($deadline)->days;
-                                        } else {
-                                            echo '0';
-                                        }
-                                    } else {
-                                        echo '∞';
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                            <div class="text-start">
-                                <div class="text-xs text-gray-400">Application Start</div>
-                                <div class="text-sm text-primary">
-                                    <?php echo $job['application_start'] ? date('M j, Y', strtotime($job['application_start'])) : 'Immediately'; ?>
-                                </div>
-                            </div>
-                            <div class="text-start">
-                                <div class="text-xs text-gray-400">Application End</div>
-                                <div class="text-sm text-primary">
-                                    <?php echo $job['application_deadline'] ? date('M j, Y', strtotime($job['application_deadline'])) : 'No deadline'; ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Job Summary -->
-                        <div class="mb-8">
-                            <h2 class="mb-1 font-semibold text-primary text-md">Job Summary</h2>
-                            <p class="text-sm font-light text-gray-600"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
-                        </div>
-
-                        <!-- Skills -->
-                        <?php if (!empty($job['skills'])): ?>
-                            <div class="mb-8">
-                                <h2 class="mb-1 font-semibold text-primary text-md">Skills</h2>
-                                <div class="flex flex-wrap gap-2">
-                                    <?php
-                                    $uniqueSkills = array_unique($job['skills']);
-                                    foreach ($uniqueSkills as $skill):
-                                    ?>
-                                        <span class="px-3 py-1 text-sm font-light text-gray-600 bg-gray-100 rounded-sm">
-                                            <?php echo htmlspecialchars($skill); ?>
-                                        </span>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Basic Information -->
-                        <div class="mb-8">
-                            <h2 class="mb-1 font-semibold text-primary text-md">Basic Information</h2>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <div class="text-xs text-gray-400">Category</div>
-                                    <div class="text-sm text-primary"><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></div>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-gray-400">Type</div>
-                                    <div class="text-sm text-primary"><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></div>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-gray-400">Location</div>
-                                    <div class="text-sm text-primary"><?php echo htmlspecialchars($job['location']); ?></div>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-gray-400">Workplace</div>
-                                    <div class="text-sm text-primary"><?php echo ucfirst($job['workplace_option']); ?></div>
-                                </div>
-
-                                <!-- Age Requirements -->
-                                <?php if (!empty($job['min_age']) || !empty($job['max_age'])): ?>
-                                    <div>
-                                        <div class="text-xs text-gray-400">Age Requirement</div>
-                                        <div class="text-sm text-primary">
-                                            <?php
-                                            if (!empty($job['min_age']) && !empty($job['max_age'])) {
-                                                echo $job['min_age'] . ' - ' . $job['max_age'] . ' years old';
-                                            } elseif (!empty($job['min_age'])) {
-                                                echo 'Minimum ' . $job['min_age'] . ' years old';
-                                            } elseif (!empty($job['max_age'])) {
-                                                echo 'Maximum ' . $job['max_age'] . ' years old';
-                                            }
-                                            ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($job['show_pay'] && ($job['salary'] || $job['pay_range'])): ?>
-                                    <div>
-                                        <div class="text-xs text-gray-400">Salary Range</div>
-                                        <div class="text-sm text-primary">
-                                            <?php
-                                            if ($job['salary']) {
-                                                echo '₱' . number_format($job['salary'], 2);
-                                                if ($job['pay_type']) echo ' / ' . $job['pay_type'];
-                                            } elseif ($job['pay_range']) {
-                                                echo htmlspecialchars($job['pay_range']);
-                                            }
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs text-gray-400">Pay Type</div>
-                                        <div class="text-sm text-primary"><?php echo ucfirst($job['pay_type'] ?? 'Monthly'); ?></div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- Full Description -->
-                        <?php if ($job['full_description'] && $job['full_description'] != $job['job_summary']): ?>
-                            <div class="mb-8">
-                                <h2 class="mb-1 font-semibold text-primary text-md">Full Description</h2>
-                                <div class="text-sm font-light text-gray-600">
-                                    <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Attachments -->
-                        <div>
-                            <h2 class="mb-1 font-semibold text-primary text-md">Attachments</h2>
-                            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
-                                <div class="flex items-center">
-                                    <!-- Larger container with bigger image -->
-                                    <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
-                                        <img
-                                            src="../public/assets/icons/pdf-icon.png"
-                                            alt="Icon"
-                                            class="object-cover w-8 h-8" />
-                                    </div>
-                                    <div>
-                                        <div class="text-sm text-primary">Attachment.pdf</div>
-                                        <div class="text-xs text-gray-400">280kB</div>
-                                    </div>
-                                </div>
-                                <button class="px-4 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                    Download ↓
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Breadcrumbs -->
+            <nav class="mb-6">
+                <div class="flex items-center space-x-2 text-sm">
+                    <a href="?page=employer-dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                        Dashboard
+                    </a>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <a href="?page=manage-jobs" class="text-gray-500 transition-colors hover:text-primary">
+                        Job Management
+                    </a>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span class="font-medium text-primary"><?php echo htmlspecialchars($job['job_title'] ?? 'Job Details'); ?></span>
                 </div>
-            </div>
+            </nav>
 
-            <!-- Right Section - Sidebar (4/12 width) -->
-            <div class="w-full md:w-4/12">
+            <!-- Main Flex Layout -->
+            <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
+                <!-- Left Section - Main Content -->
+                <div class="w-full space-y-6 lg:w-8/12">
+                    <!-- Job Details Card -->
+                    <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
+                        <!-- Job Header with Gray Background -->
+                        <div class="p-4 border-b border-gray-200 sm:p-6 bg-gray-50">
+                            <div class="flex items-start justify-between mb-6">
+                                <div>
+                                    <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl"><?php echo htmlspecialchars($job['job_title']); ?></h1>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <!-- Employment Type Badge -->
+                                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-gray-100 rounded-sm text-primary">
+                                            <?php echo strtoupper(str_replace('-', ' ', $job['job_type'])); ?>
+                                        </span>
 
-                <!-- Single Sidebar Card -->
-                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <!-- Application Statistics -->
-                    <div class="mb-8">
-                        <h3 class="mb-4 text-xl font-semibold text-gray-900">Application Statistics</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Total Applications:</span>
-                                <span class="font-bold text-primary text-md"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Pending Review:</span>
-                                <span class="font-bold text-primary text-md"><?php echo $job['pending_count'] ?? 0; ?></span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Shortlisted:</span>
-                                <span class="font-bold text-primary text-md"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 rounded-md bg-gray-50">
-                                <span class="text-sm font-light text-gray-600">Hired:</span>
-                                <span class="font-bold text-primary text-md"><?php echo $job['hired_count'] ?? 0; ?></span>
-                            </div>
-                        </div>
-                    </div>
+                                        <!-- Status Badge -->
+                                        <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium
+                                            <?php
+                                            switch ($job['job_status']) {
+                                                case 'open':
+                                                    echo 'bg-gray-100 text-primary';
+                                                    break;
+                                                case 'closed':
+                                                    echo 'bg-red-100 text-red-800';
+                                                    break;
+                                                case 'paused':
+                                                    echo 'bg-yellow-100 text-primary';
+                                                    break;
+                                                case 'draft':
+                                                    echo 'bg-gray-100 text-primary';
+                                                    break;
+                                                default:
+                                                    echo 'bg-gray-100 text-gray-800';
+                                            }
+                                            ?>">
+                                            <?php echo strtoupper($job['job_status']); ?>
+                                        </span>
+                                    </div>
+                                </div>
 
-                    <!-- Posted Date -->
-                    <div class="flex justify-between mb-8">
-                        <!-- Posted Date -->
-                        <div class="flex-1 text-center">
-                            <div class="mb-1 text-sm font-medium text-gray-500">Posted</div>
-                            <div class="text-sm font-semibold text-primary">
-                                <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
-                            </div>
-                        </div>
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-2">
+                                    <?php if ($job['job_status'] == 'open'): ?>
+                                        <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=paused'"
+                                            class="flex items-center px-4 py-2 text-sm font-medium text-yellow-800 transition-colors border border-yellow-200 rounded-lg bg-yellow-50 hover:bg-yellow-100">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Pause
+                                        </button>
+                                    <?php elseif ($job['job_status'] == 'paused'): ?>
+                                        <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=open'"
+                                            class="flex items-center px-4 py-2 text-sm font-medium text-green-800 transition-colors border border-green-200 rounded-lg bg-green-50 hover:bg-green-100">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Resume
+                                        </button>
+                                    <?php endif; ?>
 
-                        <!-- Vertical Separator -->
-                        <div class="self-center h-12 border-r border-gray-600"></div>
-
-                        <!-- Last Updated -->
-                        <?php if ($job['updated_at'] != $job['created_at']): ?>
-                            <div class="flex-1 text-center">
-                                <div class="mb-1 text-sm text-gray-500">Last Updated</div>
-                                <div class="text-sm font-semibold text-primary">
-                                    <?php echo date('M j, Y', strtotime($job['updated_at'])); ?>
+                                    <button onclick="window.location.href='?page=edit-job&id=<?php echo $job['job_id']; ?>'"
+                                        class="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors bg-gray-800 rounded-lg hover:bg-gray-900">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </button>
                                 </div>
                             </div>
-                        <?php else: ?>
-                            <!-- Empty column to maintain layout -->
-                            <div class="flex-1 text-center">
-                                <div class="mb-1 text-sm text-gray-500">&nbsp;</div>
-                                <div class="text-sm font-semibold text-primary">&nbsp;</div>
+
+                            <!-- Application Timeline Bar -->
+                            <?php if (!empty($job['application_start']) || !empty($job['application_deadline'])): ?>
+                                <div class="p-3 border border-gray-300 rounded-lg">
+                                    <div class="flex justify-between text-center sm:text-left">
+                                        <!-- Days remaining -->
+                                        <div class="flex-1">
+                                            <div class="text-xs text-gray-400">Days remaining</div>
+                                            <div class="text-sm text-primary">
+                                                <?php
+                                                if (!empty($job['application_deadline'])) {
+                                                    $deadline = new DateTime($job['application_deadline']);
+                                                    $now = new DateTime();
+                                                    if ($deadline > $now) {
+                                                        echo $now->diff($deadline)->days;
+                                                    } else {
+                                                        echo '0';
+                                                    }
+                                                } else {
+                                                    echo '∞';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- Application Start -->
+                                        <div class="flex-1 text-center">
+                                            <div class="text-xs text-gray-400">Application Start</div>
+                                            <div class="text-sm text-primary">
+                                                <?php echo $job['application_start'] ? date('M j, Y', strtotime($job['application_start'])) : 'Immediately'; ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- Application End -->
+                                        <div class="flex-1 text-center">
+                                            <div class="text-xs text-gray-400">Application End</div>
+                                            <div class="text-sm text-primary">
+                                                <?php echo $job['application_deadline'] ? date('M j, Y', strtotime($job['application_deadline'])) : 'No deadline'; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+
+
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="p-4 sm:p-6">
+                            <!-- Job Summary -->
+                            <div class="mb-8">
+                                <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Job Summary</h2>
+                                <p class="text-sm text-gray-600 sm:text-base"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
                             </div>
-                        <?php endif; ?>
+
+                            <!-- Skills Required -->
+                            <?php if (!empty($job['skills']) && is_array($job['skills'])): ?>
+                                <div class="mb-8">
+                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Skills Required</h2>
+                                    <div class="flex flex-wrap gap-2">
+                                        <?php
+                                        $uniqueSkills = array_unique($job['skills']);
+                                        foreach ($uniqueSkills as $skill):
+                                        ?>
+                                            <span class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">
+                                                <?php echo htmlspecialchars($skill); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Basic Information -->
+                            <div class="mb-8">
+                                <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Basic Information</h2>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div>
+                                        <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Category</div>
+                                        <div class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($job['category_name'] ?? 'N/A'); ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Type</div>
+                                        <div class="mt-1 text-sm text-gray-900"><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Location</div>
+                                        <div class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($job['location']); ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Workplace</div>
+                                        <div class="mt-1 text-sm text-gray-900"><?php echo ucfirst($job['workplace_option']); ?></div>
+                                    </div>
+
+                                    <!-- Age Requirements -->
+                                    <?php if (!empty($job['min_age']) || !empty($job['max_age'])): ?>
+                                        <div>
+                                            <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Age Requirement</div>
+                                            <div class="mt-1 text-sm text-gray-900">
+                                                <?php
+                                                if (!empty($job['min_age']) && !empty($job['max_age'])) {
+                                                    echo $job['min_age'] . ' - ' . $job['max_age'] . ' years old';
+                                                } elseif (!empty($job['min_age'])) {
+                                                    echo 'Minimum ' . $job['min_age'] . ' years old';
+                                                } elseif (!empty($job['max_age'])) {
+                                                    echo 'Maximum ' . $job['max_age'] . ' years old';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if ($job['show_pay'] && ($job['salary'] || $job['pay_range'])): ?>
+                                        <div>
+                                            <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Salary Range</div>
+                                            <div class="mt-1 text-sm text-gray-900">
+                                                <?php
+                                                if ($job['salary']) {
+                                                    echo '₱' . number_format($job['salary'], 2);
+                                                    if ($job['pay_type']) echo ' / ' . $job['pay_type'];
+                                                } elseif ($job['pay_range']) {
+                                                    echo htmlspecialchars($job['pay_range']);
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Full Description -->
+                            <?php if (!empty($job['full_description']) && $job['full_description'] !== $job['job_summary']): ?>
+                                <div class="mb-8">
+                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Full Description</h2>
+                                    <div class="text-sm text-gray-600 sm:text-base">
+                                        <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Job Attachments - Only show if there are attachments -->
+                            <?php if (!empty($job['attachments']) && is_array($job['attachments'])): ?>
+                                <div class="mb-8">
+                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Job Attachments</h2>
+                                    <div class="space-y-3">
+                                        <?php foreach ($job['attachments'] as $attachment): ?>
+                                            <?php
+                                            // Extract file extension and name
+                                            $file_extension = strtolower(pathinfo($attachment['file_path'], PATHINFO_EXTENSION));
+                                            $file_name = basename($attachment['file_path']);
+
+                                            // Define icon path based on file extension
+                                            $icon_path = match ($file_extension) {
+                                                'pdf' => '/sikap/public/assets/icons/pdf-icon.png',
+                                                'doc', 'docx' => '/sikap/public/assets/icons/word-icon.png',
+                                                'jpg', 'jpeg', 'png', 'gif' => '/sikap/public/assets/icons/image-icon.png',
+                                                'zip', 'rar' => '/sikap/public/assets/icons/archive-icon.png',
+                                                'txt' => '/sikap/public/assets/icons/text-icon.png',
+                                                'xls', 'xlsx' => '/sikap/public/assets/icons/excel-icon.png',
+                                                'ppt', 'pptx' => '/sikap/public/assets/icons/powerpoint-icon.png',
+                                                default => '/sikap/public/assets/icons/file-icon.png'
+                                            };
+
+                                            // Get file size
+                                            $file_size = '';
+                                            $full_path = __DIR__ . '/../../../uploads/' . basename($attachment['file_path']);
+                                            if (file_exists($full_path)) {
+                                                $size_bytes = filesize($full_path);
+                                                if ($size_bytes < 1024) {
+                                                    $file_size = $size_bytes . ' B';
+                                                } elseif ($size_bytes < 1048576) {
+                                                    $file_size = round($size_bytes / 1024, 1) . ' KB';
+                                                } else {
+                                                    $file_size = round($size_bytes / 1048576, 1) . ' MB';
+                                                }
+                                            }
+                                            ?>
+                                            <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="flex items-center justify-center w-12 h-12 mr-3 rounded-lg bg-red-50">
+                                                        <img src="<?php echo $icon_path; ?>"
+                                                            alt="<?php echo strtoupper($file_extension); ?> Icon"
+                                                            class="w-6 h-6"
+                                                            onerror="this.src='/sikap/public/assets/icons/file-icon.png'" />
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            <?php echo htmlspecialchars($file_name); ?>
+                                                        </div>
+                                                        <div class="text-xs text-gray-500">
+                                                            <?php echo $file_size; ?>
+                                                            <?php if ($file_size): ?> • <?php endif; ?>
+                                                            <?php
+                                                            echo match ($file_extension) {
+                                                                'pdf' => 'PDF Document',
+                                                                'doc' => 'Word Document',
+                                                                'docx' => 'Word Document',
+                                                                'xls' => 'Excel Spreadsheet',
+                                                                'xlsx' => 'Excel Spreadsheet',
+                                                                'ppt' => 'PowerPoint Presentation',
+                                                                'pptx' => 'PowerPoint Presentation',
+                                                                'txt' => 'Text Document',
+                                                                'jpg', 'jpeg', 'png', 'gif' => 'Image File',
+                                                                'zip', 'rar' => 'Archive File',
+                                                                default => strtoupper($file_extension) . ' File'
+                                                            };
+                                                            ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex gap-2">
+                                                    <!-- View/Preview Button (for PDFs and images) using your existing controller -->
+                                                    <?php if (in_array($file_extension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])): ?>
+                                                        <a href="?page=view-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?>"
+                                                            target="_blank"
+                                                            class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+
+                                                            View
+                                                        </a>
+                                                    <?php endif; ?>
+
+                                                    <!-- Download Button using your existing controller -->
+                                                    <a href="?page=download-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?>"
+                                                        class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        Download
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <?php if (($job['total_applications'] ?? $job['application_count'] ?? 0) > 0): ?>
-                        <div>
-                            <button onclick="window.location.href='?page=view-all-applicants&job_id=<?php echo $job['job_id']; ?>'"
-                                class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                                View All Applications
-                            </button>
+                </div>
+
+                <!-- Right Section - Sidebar -->
+                <div class="w-full lg:w-4/12">
+                    <!-- Single Sidebar Card -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6">
+                        <!-- Application Statistics -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="mb-4 text-lg font-semibold text-gray-900 sm:text-xl">Application Statistics</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                    <span class="text-sm font-medium text-gray-600">Total Applications:</span>
+                                    <span class="text-lg font-bold text-primary"><?php echo $job['total_applications'] ?? $job['application_count'] ?? 0; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                    <span class="text-sm font-medium text-gray-600">Pending Review:</span>
+                                    <span class="text-lg font-bold text-primary"><?php echo $job['pending_count'] ?? 0; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                    <span class="text-sm font-medium text-gray-600">Shortlisted:</span>
+                                    <span class="text-lg font-bold text-primary"><?php echo $job['shortlisted_count'] ?? 0; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                    <span class="text-sm font-bold text-gray-600">Hired:</span>
+                                    <span class="text-lg font-bold text-green-600"><?php echo $job['hired_count'] ?? 0; ?></span>
+                                </div>
+                            </div>
                         </div>
-                    <?php endif; ?>
+
+                        <!-- Job Information -->
+                        <div class="mb-6 sm:mb-8">
+                            <div class="flex justify-between text-center">
+                                <!-- Posted Date -->
+                                <div class="flex-1">
+                                    <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Posted</div>
+                                    <div class="mt-1 text-sm font-semibold text-gray-900">
+                                        <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
+                                    </div>
+                                </div>
+
+                                <!-- Vertical Separator -->
+                                <div class="w-px mx-4 bg-gray-200"></div>
+
+                                <!-- Last Updated -->
+                                <div class="flex-1">
+                                    <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                        <?php echo ($job['updated_at'] != $job['created_at']) ? 'Updated' : 'Status'; ?>
+                                    </div>
+                                    <div class="mt-1 text-sm font-semibold text-gray-900">
+                                        <?php
+                                        if ($job['updated_at'] != $job['created_at']) {
+                                            echo date('M j, Y', strtotime($job['updated_at']));
+                                        } else {
+                                            echo ucfirst($job['job_status']);
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="space-y-3">
+                            <?php if (($job['total_applications'] ?? $job['application_count'] ?? 0) > 0): ?>
+                                <button onclick="window.location.href='?page=view-all-applicants&job_id=<?php echo $job['job_id']; ?>'"
+                                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary-600">
+                                    View All Applications
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

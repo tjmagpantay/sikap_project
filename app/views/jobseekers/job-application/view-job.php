@@ -67,6 +67,43 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         </a>
                                     </div>
                                 </div>
+
+                                <!-- Action Buttons Box -->
+                                <div class="flex items-center gap-2 p-2">
+                                    <!-- Verified Badge -->
+                                    <button class="flex items-center justify-center w-8 h-8 transition-colors border rounded-lg text-primary border-primary bg-primary/10 hover:bg-primary/20" title="Verified">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#10364B">
+                                            <path d="M14.01 21c-.49 0-.95-.23-1.33-.43-.24-.12-.53-.27-.68-.27s-.47.15-.7.27c-.48.25-1.08.55-1.72.38-.66-.17-1.02-.75-1.34-1.21-.13-.21-.31-.49-.43-.56-.12-.07-.44-.08-.71-.1-.54-.03-1.21-.06-1.7-.53-.48-.49-.51-1.16-.54-1.7-.01-.26-.03-.59-.07-.71-.06-.11-.35-.29-.55-.43-.46-.3-1.03-.67-1.21-1.31-.17-.64.13-1.24.38-1.72.12-.24.27-.53.27-.68s-.15-.47-.27-.7c-.25-.48-.55-1.08-.38-1.72.17-.66.75-1.02 1.21-1.34.2-.13.49-.31.56-.43.07-.12.08-.44.1-.71.03-.54.06-1.21.53-1.7.49-.48 1.16-.51 1.7-.54.26-.01.59-.03.71-.07.11-.06.29-.35.43-.55.3-.46.67-1.03 1.31-1.21.64-.17 1.24.13 1.72.38.24.12.53.27.68.27s.47-.15.7-.27c.48-.25 1.08-.55 1.72-.38.66.17 1.02.75 1.34 1.21.13.21.31.49.43.56.12.07.44.08.71.1.54.03 1.21.06 1.7.53.48.49.51 1.16.54 1.7.01.26.03.59.07.71.06.11.35.29.55.43.46.3 1.03.67 1.21 1.31.17.64-.13 1.24-.38 1.72-.12.24-.27.53-.27.68s.15.47.27.7c.25.48.55 1.08.38 1.72-.17.66-.75 1.02-1.21 1.34-.2.13-.49.31-.56.43-.07.12-.08.44-.1.71-.03.54-.06 1.21-.53 1.7-.49.48-1.16.51-1.7.54-.26.01-.59.03-.71.07-.11.06-.29.35-.43.55-.3.46-.67 1.03-1.31 1.21-.13.04-.26.05-.39.05Zm-4.02-16.5c-.1.04-.33.38-.44.57-.24.37-.51.79-.94 1.04-.44.25-.94.28-1.39.3-.22.01-.63.03-.72.1-.06.08-.08.48-.09.7-.02.45-.05.95-.3 1.39-.25.44-.67.72-1.04.95-.18.11-.52.33-.56.44-.01.11.16.46.26.66.2.4.44.83.44 1.34s-.24.94-.44 1.34c-.1.2-.27.55-.26.66.04.11.38.34.56.45.37.23.79.51 1.04.95.25.44.28.94.3 1.39.01.22.03.63.1.72.08.06.48.08.7.09.45.02.95.05 1.39.3.44.25.72.67.95 1.04.11.18.33.52.44.56.11.04.46-.16.66-.26.4-.2.83-.44 1.34-.44s.94.24 1.34.44c.2.1.55.27.66.26.11-.04.34-.38.45-.56.23-.37.51-.79.95-1.04.44-.25.94-.28 1.39-.3.22-.01.63-.03.72-.1.06-.08.08-.48.09-.7.02-.45.05-.95.3-1.39.25-.44.67-.72 1.04-.95.18-.11.52-.33.56-.44.01-.11-.16-.46-.26-.66-.2-.4-.44-.83-.44-1.34s.24-.94.44-1.34c.1-.2.27-.55.26-.66-.04-.11-.38-.34-.56-.45-.37-.23-.79-.51-1.04-.95-.25-.44-.28-.94-.3-1.39-.01-.22-.03-.63-.1-.72-.08-.06-.48-.08-.7-.09-.45-.02-.95-.05-1.39-.3-.44-.25-.72-.67-.95-1.04-.11-.18-.33-.52-.44-.56-.1-.03-.45.17-.66.27-.4.2-.83.44-1.34.44s-.94-.24-1.34-.44c-.2-.1-.55-.27-.66-.27Zm.5 11.01c-.2 0-.39-.08-.53-.22l-2.54-2.53c-.29-.29-.29-.77 0-1.06.29-.29.77-.29 1.06 0l1.98 1.98 4.99-4.99c.29-.29.77-.29 1.06 0s.29.77 0 1.06l-5.52 5.52c-.14.14-.33.22-.53.22Z" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Share Button -->
+                                    <button 
+                                        onclick="shareJob('<?php echo htmlspecialchars($job['job_title'], ENT_QUOTES); ?>', window.location.href)"
+                                        class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" 
+                                        title="Share">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#828282" stroke-width="1.5" />
+                                            <path d="M14 6.5L9 10" stroke="#828282" stroke-width="1.5" stroke-linecap="round" />
+                                            <path d="M14 17.5L9 14" stroke="#828282" stroke-width="1.5" stroke-linecap="round" />
+                                            <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#828282" stroke-width="1.5" />
+                                            <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#828282" stroke-width="1.5" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Save Button -->
+                                    <?php if (isset($profileCompleted) && $profileCompleted): ?>
+                                        <button onclick="toggleSaveJob(<?php echo $job['job_id']; ?>, this)"
+                                            class="flex items-center justify-center w-8 h-8 transition-colors border border-gray-400 rounded-lg <?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'text-yellow-500 bg-yellow-50 border-yellow-300' : 'text-gray-500 bg-gray-50'; ?> hover:bg-gray-100"
+                                            title="<?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'Remove from saved' : 'Save job'; ?>">
+                                            <i class="text-sm <?php echo (isset($job['is_saved']) && $job['is_saved']) ? 'fas' : 'far'; ?> fa-bookmark"></i>
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" title="Complete profile to save jobs" disabled>
+                                            <i class="text-sm far fa-bookmark"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
 
                             <!-- Application Timeline Bar -->
@@ -246,15 +283,16 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                 </div>
                             <?php endif; ?>
 
-                            <!-- Job Attachments -->
-                            <?php if (!empty($job['attachments'])): ?>
+                            <!-- Job Attachments - Only show if there are attachments -->
+                            <?php if (!empty($job['attachments']) && is_array($job['attachments'])): ?>
                                 <div class="mb-8">
-                                    <h2 class="mb-1 font-semibold text-primary text-md">Job Attachments</h2>
+                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Job Attachments</h2>
                                     <div class="space-y-3">
                                         <?php foreach ($job['attachments'] as $attachment): ?>
                                             <?php
-                                            // Extract file extension for each attachment
+                                            // Extract file extension and name
                                             $file_extension = strtolower(pathinfo($attachment['file_path'], PATHINFO_EXTENSION));
+                                            $file_name = basename($attachment['file_path']);
 
                                             // Define icon path based on file extension
                                             $icon_path = match ($file_extension) {
@@ -267,20 +305,36 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                 'ppt', 'pptx' => '/sikap/public/assets/icons/powerpoint-icon.png',
                                                 default => '/sikap/public/assets/icons/file-icon.png'
                                             };
+
+                                            // Get file size
+                                            $file_size = '';
+                                            $full_path = __DIR__ . '/../../../../uploads/job_attachments/' . basename($attachment['file_path']);
+                                            if (file_exists($full_path)) {
+                                                $size_bytes = filesize($full_path);
+                                                if ($size_bytes < 1024) {
+                                                    $file_size = $size_bytes . ' B';
+                                                } elseif ($size_bytes < 1048576) {
+                                                    $file_size = round($size_bytes / 1024, 1) . ' KB';
+                                                } else {
+                                                    $file_size = round($size_bytes / 1048576, 1) . ' MB';
+                                                }
+                                            }
                                             ?>
                                             <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
                                                 <div class="flex items-center">
-                                                    <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                                    <div class="flex items-center justify-center w-12 h-12 mr-3 rounded-lg bg-red-50">
                                                         <img src="<?php echo $icon_path; ?>"
                                                             alt="<?php echo strtoupper($file_extension); ?> Icon"
-                                                            class="object-cover w-8 h-8"
+                                                            class="w-6 h-6"
                                                             onerror="this.src='/sikap/public/assets/icons/file-icon.png'" />
                                                     </div>
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900">
-                                                            <?php echo htmlspecialchars(basename($attachment['file_path'])); ?>
+                                                            <?php echo htmlspecialchars($file_name); ?>
                                                         </div>
                                                         <div class="text-xs text-gray-500">
+                                                            <?php echo $file_size; ?>
+                                                            <?php if ($file_size): ?> • <?php endif; ?>
                                                             <?php
                                                             echo match ($file_extension) {
                                                                 'pdf' => 'PDF Document',
@@ -306,7 +360,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                         <a href="?page=view-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?><?php echo isset($attachment['attachment_id']) ? '&attachment_id=' . $attachment['attachment_id'] : ''; ?>"
                                                             target="_blank"
                                                             class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                            <i class="mr-2 fas fa-eye"></i>
+                                
                                                             View
                                                         </a>
                                                     <?php endif; ?>
@@ -314,7 +368,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                     <!-- Download Button -->
                                                     <a href="?page=download-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?><?php echo isset($attachment['attachment_id']) ? '&attachment_id=' . $attachment['attachment_id'] : ''; ?>"
                                                         class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                                        <i class="mr-2 fas fa-download"></i>
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
                                                         Download
                                                     </a>
                                                 </div>
@@ -386,12 +442,12 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                             </span>
                                         </div>
 
-                                        
+
 
                                         <!-- Current Step Info -->
                                         <div class="p-3 mb-3 bg-blue-100 border border-blue-300 rounded-md">
                                             <div class="flex items-start">
-             
+
                                                 <div class="flex-1">
                                                     <?php
                                                     switch ($incompleteApplication['current_step']) {
@@ -425,7 +481,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                             </a>
                                             <a href="?page=view-application&application_id=<?php echo $incompleteApplication['application_id']; ?>"
                                                 class="flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors bg-orange-100 border border-gray-200 rounded-md text-primary hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                                               
+
                                                 View Details
                                             </a>
                                         </div>
@@ -450,7 +506,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                     echo 'border-blue-200 bg-blue-50';
                                                     break;
                                                 case 'rejected':
-                                                    echo 'border-red-200 bg-red-50';            
+                                                    echo 'border-red-200 bg-red-50';
                                                     break;
                                                 default:
                                                     echo 'border-gray-200 bg-gray-50';
@@ -665,35 +721,35 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                         <?php if ($applicationStatus === 'pending'): ?>
                                             <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
                                                 <p class="text-xs text-yellow-800">
-                                                    <i class="mr-2 fas fa-hourglass-half"></i>
+                                                   
                                                     Your application is being reviewed by the employer. You'll be notified when there's an update.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'reviewed'): ?>
                                             <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                                 <p class="text-xs text-blue-800">
-                                                    <i class="mr-2 fas fa-search"></i>
+                                                  
                                                     Your application is currently under detailed review. The employer is evaluating your qualifications.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'shortlisted'): ?>
                                             <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
                                                 <p class="text-xs text-blue-800">
-                                                    <i class="mr-2 fas fa-star"></i>
+                                                   
                                                     Congratulations! You've been shortlisted for this position. The employer may contact you soon for the next steps.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'hired'): ?>
                                             <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
                                                 <p class="text-xs text-green-800">
-                                                    <i class="mr-2 fas fa-check-circle"></i>
+                                                   
                                                     Congratulations! You've been hired for this position. The employer will contact you with further details.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'rejected'): ?>
                                             <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
                                                 <p class="text-xs text-red-800">
-                                                    <i class="mr-2 fas fa-info-circle"></i>
+                                                    
                                                     Thank you for your interest. Unfortunately, you were not selected for this position. Keep applying to other opportunities!
                                                 </p>
                                             </div>
@@ -724,7 +780,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                                                         echo 'text-gray-600 bg-gray-100 hover:bg-gray-200';
                                                 }
                                                 ?>">
-                                               
+
                                                 View Application
                                             </a>
                                             <a href="?page=my-applications"
@@ -807,13 +863,13 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
                             <h3 class="mb-4 text-lg font-semibold text-gray-900">Job Information</h3>
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                    <span class="text-sm font-light text-gray-600">Posted:</span>
+                                    <span class="text-sm font-medium text-gray-600">Posted:</span>
                                     <span class="text-sm font-medium text-primary"><?php echo date('M j, Y', strtotime($job['created_at'])); ?></span>
                                 </div>
 
                                 <?php if (!empty($job['application_deadline'])): ?>
                                     <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                        <span class="text-sm font-light text-gray-600">Deadline:</span>
+                                        <span class="text-sm font-medium text-gray-600">Deadline:</span>
                                         <span class="text-sm font-medium <?php echo (strtotime($job['application_deadline']) < time()) ? 'text-red-600' : 'text-primary'; ?>">
                                             <?php echo date('M j, Y', strtotime($job['application_deadline'])); ?>
                                         </span>
@@ -843,3 +899,28 @@ include_once __DIR__ . '/../navbar-jobseeker.php'; ?>
         </div>
     </div>
 </div>
+
+<script>
+// Add the shareJob function that's referenced in the share button
+function shareJob(jobTitle, url) {
+    if (navigator.share) {
+        navigator.share({
+            title: jobTitle,
+            url: url
+        }).catch(console.error);
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Job link copied to clipboard!');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+                alert('Failed to copy job link. Please try manually sharing the link.');
+            });
+        } else {
+            // If clipboard API is not available, just show the URL in an alert
+            alert('Job URL: ' + url);
+        }
+    }
+}
+</script>

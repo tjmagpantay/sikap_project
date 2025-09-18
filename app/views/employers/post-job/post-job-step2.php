@@ -303,16 +303,17 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         // Display valid files
         files.forEach((file, index) => {
             const fileItem = document.createElement('div');
-            fileItem.className = 'flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg';
+            fileItem.className = 'flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg';
 
             fileItem.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                    </svg>
+                <div class="flex items-center gap-2">
+                    <img
+                        src="../public/assets/icons/pdf-icon.png"
+                        alt="Icon"
+                    class="object-cover w-8 h-8" />
                     <div>
-                        <div class="text-sm font-medium text-green-700">${file.name}</div>
-                        <div class="text-xs text-green-600">${(file.size / 1024 / 1024).toFixed(2)} MB • PDF</div>
+                        <div class="text-sm font-medium text-primary">${file.name}</div>
+                        <div class="text-xs text-primary">${(file.size / 1024 / 1024).toFixed(2)} MB • PDF</div>
                     </div>
                 </div>
                 <button type="button" onclick="removeFileFromInput(${index})" 

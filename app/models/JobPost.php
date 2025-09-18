@@ -545,28 +545,28 @@ class JobPost
                            COALESCE(app_stats.shortlisted_count, 0) as shortlisted_count,
                            COALESCE(app_stats.rejected_count, 0) as rejected_count,
                            COALESCE(app_stats.hired_count, 0) as hired_count
-                    FROM job_post jp 
-                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                    LEFT JOIN (
-                        SELECT employer_id, MIN(business_name) as business_name
-                        FROM employers_business
-                        GROUP BY employer_id
-                    ) eb ON e.employer_id = eb.employer_id
-                    LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
-                    LEFT JOIN (
-                        SELECT job_id,
-                               COUNT(*) as total_applications,
-                               SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending_count,
-                               SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed_count,
-                               SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
-                               SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
-                               SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired_count
-                        FROM job_application 
-                        WHERE is_finalized = 1
-                        GROUP BY job_id
-                    ) app_stats ON jp.job_id = app_stats.job_id
-                    WHERE jp.job_id = :job_id";
+                FROM job_post jp 
+                LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN (
+                    SELECT employer_id, MIN(business_name) as business_name
+                    FROM employers_business
+                    GROUP BY employer_id
+                ) eb ON e.employer_id = eb.employer_id
+                LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
+                LEFT JOIN (
+                    SELECT job_id,
+                           COUNT(*) as total_applications,
+                           SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+                           SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed_count,
+                           SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
+                           SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+                           SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired_count
+                    FROM job_application 
+                    WHERE is_finalized = 1
+                    GROUP BY job_id
+                ) app_stats ON jp.job_id = app_stats.job_id
+                WHERE jp.job_id = :job_id";
 
             // Add employer verification if provided
             if ($employer_id) {
@@ -582,9 +582,10 @@ class JobPost
             $stmt->execute($params);
             $job = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Get job skills
+            // Get job skills and attachments
             if ($job) {
                 $job['skills'] = $this->getJobSkills($job_id);
+                $job['attachments'] = $this->getJobAttachments($job_id);
             }
 
             return $job;

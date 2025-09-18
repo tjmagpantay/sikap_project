@@ -5,12 +5,14 @@ class DocumentController
 {
     private $jobseekerModel;
     private $jobPostModel;
+    private $employerModel;
 
     public function __construct()
     {
         require_once __DIR__ . '/../models/User.php';
         require_once __DIR__ . '/../models/Jobseeker.php';
         require_once __DIR__ . '/../models/JobPost.php';
+        require_once __DIR__ . '/../models/Employer.php';
         $this->jobseekerModel = new Jobseeker();
         $this->jobPostModel = new JobPost();
     }
@@ -452,4 +454,6 @@ class DocumentController
 
         return $content_types[$file_extension] ?? 'application/octet-stream';
     }
+
+    
 }

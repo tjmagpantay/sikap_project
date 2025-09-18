@@ -279,7 +279,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Requirements</span>
                         <div class="flex flex-wrap gap-2 mt-2">
                             <?php if (($fullJobData['resume_required'] ?? '1') == '1'): ?>
-                                <span class="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-primary">
+                                <span class="inline-flex items-center px-3 py-1 text-sm bg-gray-50 text-primary">
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                     </svg>
@@ -287,7 +287,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 </span>
                             <?php endif; ?>
                             <?php if (($fullJobData['allow_cover_letter'] ?? '1') == '1'): ?>
-                                <span class="inline-flex items-center px-3 py-1 text-sm text-blue-800 bg-blue-100">
+                                <span class="inline-flex items-center px-3 py-1 text-sm bg-gray-50 text-primary">
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                     </svg>
@@ -295,7 +295,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 </span>
                             <?php endif; ?>
                             <?php if (($fullJobData['screening_questions_enabled'] ?? '0') == '1'): ?>
-                                <span class="inline-flex items-center px-3 py-1 text-sm text-purple-800 bg-purple-100">
+                                <span class="inline-flex items-center px-3 py-1 text-sm bg-gray-50 text-primary">
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                     </svg>
@@ -322,10 +322,11 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             <?php foreach ($fullJobData['attachments'] as $attachment): ?>
                                 <div class="p-3 bg-white border rounded-md">
                                     <div class="flex items-center">
-                                        <div class="flex items-center justify-center w-12 h-12 mr-3 bg-blue-100 rounded-md hover:bg-blue-200">
-                                            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                                            </svg>
+                                        <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
+                                            <img
+                                                src="../public/assets/icons/pdf-icon.png"
+                                                alt="Icon"
+                                                class="object-cover w-8 h-8" />
                                         </div>
                                         <div class="flex-1">
                                             <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(basename($attachment['file_path'])); ?></p>

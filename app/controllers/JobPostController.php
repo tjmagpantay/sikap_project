@@ -488,11 +488,16 @@ class JobPostController
             exit;
         }
 
-        // Get job details with application statistics
+        // Get job details with application statistics and attachments
         $job = $this->jobPostModel->getJobWithApplicationStats($job_id, $employer['employer_id']);
         if (!$job) {
             header('Location: ?page=manage-jobs&error=' . urlencode('Job not found or access denied.'));
             exit;
+        }
+
+        // Ensure attachments are included if not already present
+        if (!isset($job['attachments'])) {
+            $job['attachments'] = $this->jobPostModel->getJobAttachments($job_id);
         }
 
         include __DIR__ . '/../views/employers/view-job.php';
@@ -519,6 +524,10 @@ class JobPostController
             header('Location: ?page=browse-jobs&error=' . urlencode('This job is no longer available.'));
             exit;
         }
+
+        // Get job skills and attachments
+        $job['skills'] = $this->jobPostModel->getJobSkills($job_id);
+        $job['attachments'] = $this->jobPostModel->getJobAttachments($job_id);
 
         // Check if user has already applied (if logged in as jobseeker)
         $hasApplied = false;
