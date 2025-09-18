@@ -440,7 +440,7 @@ class EmployerController
             'business_industry' => trim($data['business_industry']),
             'business_address' => trim($data['business_address']),
             'business_contact' => trim($data['business_contact']),
-            'business_size' => trim($data['business_size']), // Changed from business_team_size
+            'business_team_size' => trim($data['business_team_size']), // ✅ FIXED: Map form field to correct DB column
             'business_established_year' => trim($data['business_established_year']),
             'business_website' => trim($data['business_website'] ?? ''),
             'business_email' => trim($data['business_email'] ?? '')
@@ -652,8 +652,8 @@ class EmployerController
                 }
             }
 
-            // Generate unique filename
-            $filename = $type . '_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+            // Generate unique filename - similar to jobseeker format
+            $filename = $type . '_' . $employer['employer_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
 
             error_log("DEBUG: Attempting to move file to: $filePath");
@@ -661,7 +661,7 @@ class EmployerController
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
                 error_log("DEBUG: File moved successfully");
-                // Return relative path for database storage
+                // Return relative path for database storage - consistent format
                 return 'uploads/documents/' . $filename;
             } else {
                 $error = 'Failed to move uploaded file';
@@ -1049,5 +1049,131 @@ class EmployerController
             echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
         }
         exit;
+    }
+
+    public function viewDocument()
+    {
+        $this->handleDocumentRequest(false); // false = view in browser
+    }
+
+    public function downloadDocument()
+    {
+        $this->handleDocumentRequest(true); // true = force download
+    }
+
+    private function handleDocumentRequest($forceDownload = false)
+    {
+        // Check if user is logged in and is an employer
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) { // 2 = ROLE_EMPLOYER
+            http_response_code(403);
+            die('Access denied');
+        }
+
+        // Get parameters
+        $type = $_GET['type'] ?? '';
+        $employer_id = $_GET['employer_id'] ?? '';
+
+        // Validate parameters
+        if (empty($type) || empty($employer_id)) {
+            http_response_code(400);
+            die('Missing parameters');
+        }
+
+        // Check if the logged-in user owns this employer profile
+        $currentEmployer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$currentEmployer || $currentEmployer['employer_id'] != $employer_id) {
+            http_response_code(403);
+            die('Access denied - You can only access your own documents');
+        }
+
+        // Get the document from database
+        $documents = $this->employerModel->getDocuments($employer_id);
+        if (empty($documents[$type])) {
+            http_response_code(404);
+            die('Document not found in database');
+        }
+
+        $filePath = $documents[$type];
+
+        // Debug the file path
+        error_log("DEBUG: File path from database: $filePath");
+
+        // Build full path - similar to jobseeker document handling
+        if (strpos($filePath, 'uploads/documents/') === 0) {
+            // Path already includes uploads/documents/
+            $fullPath = __DIR__ . '/../../' . $filePath;
+        } else {
+            // Just filename, add full path
+            $fullPath = __DIR__ . '/../../uploads/documents/' . $filePath;
+        }
+
+        error_log("DEBUG: Full file path: $fullPath");
+
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            error_log("Document file not found: $fullPath");
+            http_response_code(404);
+            die('Document file not found on server');
+        }
+
+        // Get file info
+        $fileInfo = pathinfo($fullPath);
+        $extension = strtolower($fileInfo['extension'] ?? 'pdf');
+
+        // Generate a clean filename for download
+        $cleanType = str_replace('_', ' ', $type);
+        $cleanType = ucwords($cleanType);
+        $fileName = $cleanType . '.' . $extension;
+
+        // Set appropriate headers based on file type
+        switch ($extension) {
+            case 'pdf':
+                $mimeType = 'application/pdf';
+                break;
+            case 'doc':
+                $mimeType = 'application/msword';
+                break;
+            case 'docx':
+                $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                break;
+            default:
+                $mimeType = 'application/octet-stream';
+        }
+
+        // Clear any previous output
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Set headers
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($fullPath));
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+
+        if ($forceDownload) {
+            // Force download
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        } else {
+            // Try to display in browser (works well for PDFs)
+            header('Content-Disposition: inline; filename="' . $fileName . '"');
+        }
+
+        // Output the file
+        if (readfile($fullPath) === false) {
+            error_log("Failed to read file: $fullPath");
+            http_response_code(500);
+            die('Error reading file');
+        }
+
+        exit;
+    }
+
+
+    // Add method to get documents (if not exists)
+    // This should already exist in your Employer model, but ensure it returns the right format
+    public function getEmployerDocuments($employer_id)
+    {
+        return $this->employerModel->getDocuments($employer_id);
     }
 }

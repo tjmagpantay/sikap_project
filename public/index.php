@@ -451,9 +451,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerController();
             $controller->showProfile();
             break;
+            
+        case 'view-employer-document':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->viewDocument();
+            break;
+
         case 'download-employer-document':
-            require_once __DIR__ . '/../app/controllers/EmployerDocumentController.php';
-            $controller = new EmployerDocumentController();
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
             $controller->downloadDocument();
             break;
 
