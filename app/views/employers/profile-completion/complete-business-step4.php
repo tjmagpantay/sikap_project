@@ -43,9 +43,6 @@ error_log("DEBUG: Documents retrieved: " . print_r($documents, true));
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Upload Required Documents
             </h2>
-            <p class="mt-2 text-sm text-center text-gray-600">
-                Step 4/5 - Business Documents
-            </p>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Upload all required business documents (PDF format only, max 5MB each)
             </p>
