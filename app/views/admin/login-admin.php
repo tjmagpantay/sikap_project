@@ -4,16 +4,12 @@ include_once __DIR__ . '/components/navbar-admin.php';
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="flex items-center justify-center px-4 py-16 ">
+<div class="flex items-center justify-center px-4 py-12">
     <div class="flex flex-col-reverse w-full max-w-2xl overflow-hidden bg-white shadow-lg md:flex-row rounded-xl">
         <!-- Left: Login Card -->
         <div class="flex flex-col justify-center w-full px-6 py-8 md:w-1/2 lg:px-12">
             <div class="mb-6 text-center">
-                <div class="flex justify-center mb-4">
-                    <div class="p-3 bg-blue-100 rounded-full">
-                        <i class="text-2xl text-white fas fa-shield-alt"></i>
-                    </div>
-                </div>
+                
                 <h2 class="text-3xl font-bold text-gray-900">Admin Portal</h2>
                 <p class="mt-2 text-sm text-gray-600">Administrative access only</p>
             </div>
@@ -27,41 +23,41 @@ include_once __DIR__ . '/components/navbar-admin.php';
                 </div>
             <?php endif; ?>
 
-        <?php 
-$isLocked = isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= 5 && 
-            (time() - $_SESSION['last_attempt_time']) < 300;
-?>
+            <?php
+            $isLocked = isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= 5 &&
+                (time() - $_SESSION['last_attempt_time']) < 300;
+            ?>
 
-<form class="space-y-5" method="POST" action="?page=admin-login">
-    <!-- Email -->
-    <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input id="email" name="email" type="email" required
-            placeholder="Enter admin email"
-            class="block w-full px-3 py-2 mt-1 text-sm border rounded-md shadow-sm"
-            <?php echo $isLocked ? 'disabled' : ''; ?>>
-    </div>
+            <form class="space-y-5" method="POST" action="?page=admin-login">
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input id="email" name="email" type="email" required
+                        placeholder="Enter admin email"
+                        class="block w-full px-3 py-3 mt-1 text-sm border rounded-md shadow-sm"
+                        <?php echo $isLocked ? 'disabled' : ''; ?>>
+                </div>
 
-    <!-- Password -->
-    <div class="mt-2">
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input id="password" name="password" type="password" required
-            placeholder="Enter admin password"
-            class="block w-full px-3 py-2 mt-1 text-sm border rounded-md shadow-sm"
-            <?php echo $isLocked ? 'disabled' : ''; ?>>
-    </div>
+                <!-- Password -->
+                <div class="mt-2">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input id="password" name="password" type="password" required
+                        placeholder="Enter admin password"
+                        class="block w-full px-3 py-3 mt-1 text-sm border rounded-md shadow-sm"
+                        <?php echo $isLocked ? 'disabled' : ''; ?>>
+                </div>
 
-    <!-- Submit -->
-    <button type="submit"
-        class="w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90"
-        <?php echo $isLocked ? 'disabled style="cursor:not-allowed;opacity:0.6;"' : ''; ?>>
-        Access Admin Dashboard
-    </button>
-</form>
+                <!-- Submit -->
+                <button type="submit"
+                    class="w-full px-4 py-3 mt-4 text-sm font-semibold text-white rounded-md shadow bg-primary hover:bg-primary/90"
+                    <?php echo $isLocked ? 'disabled style="cursor:not-allowed;opacity:0.6;"' : ''; ?>>
+                    Access Admin Dashboard
+                </button>
+            </form>
 
 
 
-            
+
         </div>
 
         <!-- Right: Image Carousel -->
@@ -96,48 +92,55 @@ $isLocked = isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >=
         </div>
     </div>
 </div>
+        <!-- Employer sign in link placed below the card -->
+        <div class="text-center ">
+            <p class="text-xs text-gray-600">
+                This login is for administrators only. 
+            </p>
+        </div>
 
 <script>
     document.querySelector("form").addEventListener("submit", function(e) {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
 
-    // Basic email format check
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Basic email format check
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email || !password) {
-        e.preventDefault(); // stop form from submitting
-        Swal.fire({
-            icon: "warning",
-            title: "Missing Fields",
-            text: "Please enter both email and password.",
-            confirmButtonColor: "#2563eb"
-        });
-        return;
-    }
+        if (!email || !password) {
+            e.preventDefault(); // stop form from submitting
+            Swal.fire({
+                icon: "warning",
+                title: "Missing Fields",
+                text: "Please enter both email and password.",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
 
-    if (!emailPattern.test(email)) {
-        e.preventDefault();
-        Swal.fire({
-            icon: "error",
-            title: "Invalid Email",
-            text: "Please enter a valid email address.",
-            confirmButtonColor: "#2563eb"
-        });
-        return;
-    }
+        if (!emailPattern.test(email)) {
+            e.preventDefault();
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
 
-    if (password.length < 6) {
-        e.preventDefault();
-        Swal.fire({
-            icon: "error",
-            title: "Wrong Password",
-            text: "Try again.",
-            confirmButtonColor: "#2563eb"
-        });
-        return;
-    }
-});
+        if (password.length < 6) {
+            e.preventDefault();
+            Swal.fire({
+                icon: "error",
+                title: "Wrong Password",
+                text: "Try again.",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
+    });
+
     function togglePassword() {
         const passwordInput = document.getElementById('password');
         const showIcon = document.getElementById('password-icon-show');
@@ -153,5 +156,4 @@ $isLocked = isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >=
             showIcon.classList.remove('hidden');
         }
     }
-
 </script>

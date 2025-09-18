@@ -21,7 +21,7 @@ $endDate = date('M j');
 
         <!-- Greeting Section -->
         <div class="px-4 mt-12 mb-12 sm:px-0">
-            <div class="flex flex-col items-start justify-between sm:flex-row sm:items-center">
+            <div class="flex flex-col items-start justify-between lg:flex-row lg:items-center">
                 <!-- Left side: Greeting -->
                 <div>
                     <h2 class="text-2xl font-bold text-gray-900">
@@ -33,17 +33,50 @@ $endDate = date('M j');
                 </div>
 
                 <!-- Right side: Date Range Selector -->
-                <div class="flex items-center mt-4 sm:mt-0">
-                    <button class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <div class="relative flex items-center mt-4 lg:mt-0" x-data="{ 
+    open: false, 
+    startDate: '<?php echo $startDate; ?>', 
+    endDate: '<?php echo $endDate; ?>',
+    updateDateRange(days) {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - days);
+        
+        this.startDate = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        this.endDate = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        // Update the page with new date range
+        window.location.href = `?page=dashboard&date_range=${days}`;
+    }
+}">
+                    <button @click="open = !open" @click.away="open = false"
+                        class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
-                        <span class="hidden sm:inline"><?php echo $startDate; ?> - <?php echo $endDate; ?></span>
+                        <span class="hidden sm:inline" x-text="`${startDate} - ${endDate}`"></span>
                         <span class="sm:hidden">Date Range</span>
                         <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
+
+                    <!-- Date Range Dropdown -->
+                    <div x-show="open" x-cloak
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="absolute left-0 z-50 w-48 mt-1 bg-white rounded-md shadow-lg top-full ring-1 ring-black ring-opacity-5">
+                        <div class="py-1">
+                            <button @click="updateDateRange(7); open = false" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Last 7 days</button>
+                            <button @click="updateDateRange(14); open = false" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Last 14 days</button>
+                            <button @click="updateDateRange(30); open = false" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Last 30 days</button>
+                            <button @click="updateDateRange(90); open = false" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Last 90 days</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -221,9 +254,9 @@ $endDate = date('M j');
         <div class="px-4 mb-8 sm:px-0">
             <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm">
                 <div class="px-6 py-5 border-b border-gray-200">
-                    <div class="flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                    <div class="flex flex-col justify-between lg:flex-row lg:items-center">
                         <!-- Left side: Title and Count -->
-                        <div class="flex items-center mb-4 sm:mb-0">
+                        <div class="flex items-center mb-4 lg:mb-0">
                             <h3 class="text-xl font-semibold text-gray-900">
                                 Recent Job Post
                             </h3>
@@ -233,12 +266,12 @@ $endDate = date('M j');
                         </div>
 
                         <!-- Right side: Filters -->
-                        <div class="flex flex-col w-full gap-3 sm:flex-row sm:items-center sm:w-auto sm:space-x-4">
+                        <div class="flex flex-col w-full gap-3 lg:flex-row lg:items-center lg:w-auto lg:space-x-4 lg:gap-0">
                             <!-- Job Status Filter -->
                             <div class="relative" x-data="{ open: false, selected: 'Job status' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full sm:min-w-[140px]">
+                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full lg:min-w-[140px]">
                                     <span x-text="selected"></span>
                                     <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -253,7 +286,7 @@ $endDate = date('M j');
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg sm:w-48 ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg lg:right-0 lg:left-auto lg:w-48 ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <a href="?page=dashboard"
@@ -314,7 +347,7 @@ $endDate = date('M j');
                             <div class="relative" x-data="{ open: false, selected: 'All Jobs' }">
                                 <button @click="open = !open"
                                     @click.away="open = false"
-                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full sm:min-w-[140px]">
+                                    class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full lg:min-w-[140px]">
                                     <span x-text="selected"></span>
                                     <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -329,7 +362,7 @@ $endDate = date('M j');
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg sm:w-48 ring-1 ring-black ring-opacity-5"
+                                    class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg lg:right-0 lg:left-auto lg:w-48 ring-1 ring-black ring-opacity-5"
                                     x-cloak>
                                     <div class="py-1">
                                         <a href="?page=manage-jobs"
@@ -674,101 +707,101 @@ $endDate = date('M j');
                                         </a>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
-                        <!-- Empty State for Mobile -->
-                        <?php if (empty($jobs)): ?>
-                            <div class="px-6 py-16 text-center lg:hidden">
-                                <div class="flex flex-col items-center">
-                                    <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full">
-                                        <i class="text-2xl text-gray-400 fas fa-briefcase"></i>
-                                    </div>
-                                    <h3 class="mt-4 text-lg font-medium text-gray-900">No job posts yet</h3>
-                                    <p class="max-w-sm mt-2 text-sm text-gray-500">
-                                        Create your first job post to start attracting qualified candidates to your company.
-                                    </p>
-                                    <div class="mt-6">
-                                        <a href="?page=post-job"
-                                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                            <i class="mr-2 fas fa-plus"></i>
-                                            Post Your First Job
-                                        </a>
-                                    </div>
-                                </div>
+                <!-- Empty State for Mobile -->
+                <?php if (empty($jobs)): ?>
+                    <div class="px-6 py-16 text-center lg:hidden">
+                        <div class="flex flex-col items-center">
+                            <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full">
+                                <i class="text-2xl text-gray-400 fas fa-briefcase"></i>
                             </div>
-                        <?php endif; ?>
-
-                        <!-- Pagination -->
-                        <div class="px-6 py-4 border-t border-gray-200">
-                            <?php if ($totalJobCount > 5): ?>
-                                <div class="flex flex-col items-center justify-center sm:flex-row">
-                                    <!-- Pagination controls -->
-                                    <nav class="flex mb-4 space-x-1 sm:mb-0" aria-label="Pagination">
-                                        <!-- Previous Page -->
-                                        <?php if ($hasPrevPage): ?>
-                                            <a href="?page=dashboard&p=<?php echo $currentPage - 1; ?>"
-                                                class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                                </svg>
-                                            </a>
-                                        <?php else: ?>
-                                            <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                                </svg>
-                                            </span>
-                                        <?php endif; ?>
-
-                                        <!-- Page Numbers -->
-                                        <?php
-                                        $startPage = max(1, $currentPage - 2);
-                                        $endPage = min($totalPages, $currentPage + 2);
-
-                                        for ($i = $startPage; $i <= $endPage; $i++):
-                                        ?>
-                                            <?php if ($i == $currentPage): ?>
-                                                <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white rounded bg-primary">
-                                                    <?php echo sprintf('%02d', $i); ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <a href="?page=dashboard&p=<?php echo $i; ?>"
-                                                    class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 transition-colors duration-200 rounded hover:bg-gray-100">
-                                                    <?php echo sprintf('%02d', $i); ?>
-                                                </a>
-                                            <?php endif; ?>
-                                        <?php endfor; ?>
-
-                                        <!-- Next Page -->
-                                        <?php if ($hasNextPage): ?>
-                                            <a href="?page=dashboard&p=<?php echo $currentPage + 1; ?>"
-                                                class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </a>
-                                        <?php else: ?>
-                                            <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </span>
-                                        <?php endif; ?>
-                                    </nav>
-
-                                    <div class="text-sm text-center text-gray-700 sm:text-right sm:ml-4">
-                                        Showing <?php echo (($currentPage - 1) * 5) + 1; ?> to <?php echo min($currentPage * 5, $totalJobCount); ?> of <?php echo $totalJobCount; ?> results
-                                    </div>
-                                </div>
-                            <?php else: ?>
-                                <div class="text-sm text-center text-gray-500">
-                                    Showing all <?php echo $totalJobCount; ?> job<?php echo $totalJobCount != 1 ? 's' : ''; ?>
-                                </div>
-                            <?php endif; ?>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">No job posts yet</h3>
+                            <p class="max-w-sm mt-2 text-sm text-gray-500">
+                                Create your first job post to start attracting qualified candidates to your company.
+                            </p>
+                            <div class="mt-6">
+                                <a href="?page=post-job"
+                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <i class="mr-2 fas fa-plus"></i>
+                                    Post Your First Job
+                                </a>
+                            </div>
                         </div>
                     </div>
+                <?php endif; ?>
+
+                <!-- Pagination -->
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <?php if ($totalJobCount > 5): ?>
+                        <div class="flex flex-col items-center justify-center sm:flex-row">
+                            <!-- Pagination controls -->
+                            <nav class="flex mb-4 space-x-1 sm:mb-0" aria-label="Pagination">
+                                <!-- Previous Page -->
+                                <?php if ($hasPrevPage): ?>
+                                    <a href="?page=dashboard&p=<?php echo $currentPage - 1; ?>"
+                                        class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </span>
+                                <?php endif; ?>
+
+                                <!-- Page Numbers -->
+                                <?php
+                                $startPage = max(1, $currentPage - 2);
+                                $endPage = min($totalPages, $currentPage + 2);
+
+                                for ($i = $startPage; $i <= $endPage; $i++):
+                                ?>
+                                    <?php if ($i == $currentPage): ?>
+                                        <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white rounded bg-primary">
+                                            <?php echo sprintf('%02d', $i); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <a href="?page=dashboard&p=<?php echo $i; ?>"
+                                            class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 transition-colors duration-200 rounded hover:bg-gray-100">
+                                            <?php echo sprintf('%02d', $i); ?>
+                                        </a>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
+
+                                <!-- Next Page -->
+                                <?php if ($hasNextPage): ?>
+                                    <a href="?page=dashboard&p=<?php echo $currentPage + 1; ?>"
+                                        class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </span>
+                                <?php endif; ?>
+                            </nav>
+
+                            <div class="text-sm text-center text-gray-700 sm:text-right sm:ml-4">
+                                Showing <?php echo (($currentPage - 1) * 5) + 1; ?> to <?php echo min($currentPage * 5, $totalJobCount); ?> of <?php echo $totalJobCount; ?> results
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-sm text-center text-gray-500">
+                            Showing all <?php echo $totalJobCount; ?> job<?php echo $totalJobCount != 1 ? 's' : ''; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

@@ -131,9 +131,9 @@ include_once __DIR__ . '/components/navbar-employer.php';
         <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm">
             <!-- Table Header with Filters -->
             <div class="px-6 py-5 border-b border-gray-200">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col justify-between lg:flex-row lg:items-center">
                     <!-- Title and Count -->
-                    <div class="flex items-center">
+                    <div class="flex items-center mb-4 lg:mb-0">
                         <h3 class="text-xl font-semibold text-gray-900">
                             All Candidates
                         </h3>
@@ -179,7 +179,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                     </div>
 
                     <!-- Filters Row -->
-                    <div class="flex flex-wrap items-center gap-3" x-data="{ 
+                    <div class="flex flex-col w-full gap-3 lg:flex-row lg:items-center lg:w-auto lg:space-x-4 lg:gap-0 lg:justify-end" x-data="{ 
                         jobOpen: false, 
                         statusOpen: false, 
                         dateOpen: false 
@@ -187,7 +187,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         <!-- Applied For Filter -->
                         <div class="relative">
                             <button @click="jobOpen = !jobOpen" @click.away="jobOpen = false"
-                                class="inline-flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm w-36 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                class="inline-flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm lg:w-36 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                                 <span class="flex items-center">
                                     <?php echo !empty($selectedJob) ? htmlspecialchars($selectedJob) : 'Applied For'; ?>
                                 </span>
@@ -203,7 +203,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                 x-transition:leave="transition ease-in duration-75"
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-64 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg"
+                                class="absolute left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg lg:w-64 lg:right-0 lg:left-auto"
                                 style="display: none;">
                                 <div class="p-2">
                                     <a href="?<?php echo http_build_query(array_merge($_GET, ['job' => ''])); ?>"
@@ -229,7 +229,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         <!-- Status Filter -->
                         <div class="relative">
                             <button @click="statusOpen = !statusOpen" @click.away="statusOpen = false"
-                                class="inline-flex items-center justify-between w-40 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                class="inline-flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm lg:w-40 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                                 <span class="flex items-center">
                                     <?php
                                     switch ($selectedStatus) {
@@ -250,7 +250,6 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                             echo 'Shortlisted';
                                             break;
                                         default:
-                                            echo '';
                                             echo 'All Status';
                                     }
                                     ?>
@@ -267,7 +266,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                 x-transition:leave="transition ease-in duration-75"
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 z-50 w-48 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg"
+                                class="absolute left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg lg:w-48 lg:right-0 lg:left-auto"
                                 style="display: none;">
                                 <div class="p-2">
                                     <a href="?<?php echo http_build_query(array_merge($_GET, ['status' => ''])); ?>"
@@ -315,7 +314,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <input type="date"
                                 value="<?php echo htmlspecialchars($selectedDate); ?>"
                                 onchange="window.location.href = '?' + new URLSearchParams({...Object.fromEntries(new URLSearchParams(window.location.search)), date: this.value}).toString()"
-                                class="px-4 py-3 text-sm border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                class="w-full px-4 py-3 text-sm border border-gray-300 rounded-sm lg:w-auto focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                         </div>
 
                         <!-- Clear Filters Button -->
@@ -347,7 +346,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                     </div>
                 </div>
             <?php else: ?>
-                <div class="w-full overflow-visible">
+                <!-- Desktop Table View (Hidden on Mobile) -->
+                <div class="hidden w-full overflow-visible lg:block">
                     <table class="w-full divide-y divide-gray-300 table-fixed">
                         <!-- Table Header -->
                         <thead class="bg-primary">
@@ -572,6 +572,184 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Card View (Visible on Mobile Only) -->
+                <div class="space-y-4 lg:hidden">
+                    <?php
+                    // Flatten all applicants from all job groups with job titles and apply filters
+                    $allApplicants = [];
+                    foreach ($jobGroups as $jobTitle => $applicants) {
+                        foreach ($applicants as $app) {
+                            $app['job_title'] = $jobTitle;
+
+                            // Apply filtering logic
+                            $showRow = true;
+
+                            // Filter by job
+                            if (!empty($selectedJob) && $jobTitle !== $selectedJob) {
+                                $showRow = false;
+                            }
+
+                            // Filter by status
+                            if (!empty($selectedStatus) && $app['application_status'] !== $selectedStatus) {
+                                $showRow = false;
+                            }
+
+                            // Filter by date
+                            if (!empty($selectedDate)) {
+                                $appDate = date('Y-m-d', strtotime($app['applied_at']));
+                                if ($appDate !== $selectedDate) {
+                                    $showRow = false;
+                                }
+                            }
+
+                            if ($showRow) {
+                                $allApplicants[] = $app;
+                            }
+                        }
+                    }
+
+                    // Sort by applied date (newest first)
+                    usort($allApplicants, function ($a, $b) {
+                        return strtotime($b['applied_at']) - strtotime($a['applied_at']);
+                    });
+
+                    if (empty($allApplicants)):
+                    ?>
+                        <div class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gray-100 rounded-full">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class="mt-4 text-lg font-medium text-gray-900">No candidates found</h3>
+                                <p class="max-w-sm mt-2 text-sm text-gray-500">
+                                    Try adjusting your filters to see more results.
+                                </p>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($allApplicants as $app): ?>
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <!-- Card Header -->
+                                <div class="flex items-start justify-between p-4 pb-2">
+                                    <div class="flex items-center flex-1">
+                                        <!-- Profile Picture -->
+                                        <?php if (!empty($app['profile_picture'])): ?>
+                                            <img src="<?php echo htmlspecialchars($app['profile_picture']); ?>" alt="Profile" class="object-cover w-12 h-12 mr-3 border border-gray-200 rounded-md">
+                                        <?php else: ?>
+                                            <div class="flex items-center justify-center w-12 h-12 mr-3 bg-gray-100 rounded-full">
+                                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold leading-tight text-gray-900">
+                                                <?php echo htmlspecialchars($app['first_name'] . ' ' . $app['last_name']); ?>
+                                            </h3>
+                                            <p class="mt-1 text-sm text-gray-600">
+                                                <?php echo htmlspecialchars($app['email'] ?? ''); ?>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Badge -->
+                                    <div class="flex-shrink-0 ml-4">
+                                        <?php
+                                        $statusStyles = [
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
+                                            'accepted' => 'bg-green-100 text-green-800',
+                                            'rejected' => 'bg-red-100 text-red-800',
+                                            'shortlisted' => 'bg-purple-100 text-purple-800'
+                                        ];
+
+                                        $statusLabels = [
+                                            'pending' => 'Pending',
+                                            'accepted' => 'Accepted',
+                                            'rejected' => 'Rejected',
+                                            'shortlisted' => 'Shortlisted'
+                                        ];
+
+                                        $statusClass = $statusStyles[$app['application_status']] ?? 'bg-gray-100 text-gray-800';
+                                        $statusLabel = $statusLabels[$app['application_status']] ?? ucfirst($app['application_status']);
+                                        ?>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo $statusClass; ?>">
+                                            <?php echo $statusLabel; ?>
+                                        </span>
+                                    </div>
+
+                                    <!-- More Actions Menu -->
+                                    <div class="relative ml-2" x-data="{ open: false }">
+                                        <button @click="open = !open"
+                                            @click.away="open = false"
+                                            class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-sm hover:text-gray-600 hover:bg-gray-50">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Mobile Dropdown Menu -->
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <?php if ($app['application_status'] == 'pending'): ?>
+                                                    <a href="?page=accept-application&application_id=<?php echo $app['application_id']; ?>"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <i class="mr-3 text-green-400 fas fa-check"></i>
+                                                        Accept Application
+                                                    </a>
+                                                    <a href="?page=reject-application&application_id=<?php echo $app['application_id']; ?>"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <i class="mr-3 text-red-400 fas fa-times"></i>
+                                                        Reject Application
+                                                    </a>
+                                                <?php endif; ?>
+                                                <a href="?page=view-candidate&candidate_id=<?php echo $app['jobseeker_id']; ?>"
+                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <i class="mr-3 text-blue-400 fas fa-user"></i>
+                                                    View Profile
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="px-4 py-4">
+                                    <!-- Job Applied For -->
+                                    <div class="mb-3">
+                                        <span class="text-sm font-medium text-gray-700">Applied for:</span>
+                                        <span class="ml-1 text-sm text-gray-900"><?php echo htmlspecialchars($app['job_title']); ?></span>
+                                    </div>
+
+                                    <!-- Applied Date -->
+                                    <div class="mb-4 text-sm text-gray-500">
+                                        Applied: <?php echo date('M j, Y - g:i A', strtotime($app['applied_at'])); ?>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex gap-2">
+                                        <!-- Review Application Button -->
+                                        <a href="?page=review-application&application_id=<?php echo $app['application_id']; ?>"
+                                            class="flex-1 px-4 py-2 text-sm font-medium text-center text-white transition-colors duration-200 rounded-sm bg-primary hover:bg-secondary">
+                                            Review Application
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
