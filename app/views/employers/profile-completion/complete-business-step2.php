@@ -10,7 +10,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
                 Founding Information
             </h2>
-            
+
             <p class="mt-2 text-sm text-center text-gray-500">
                 Provide your company's founding information
             </p>
@@ -269,10 +269,10 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <!-- Team Size -->
                     <div>
-                        <label for="business_size" class="block mb-1 text-xs font-medium text-gray-500">
+                        <label for="business_team_size" class="block mb-1 text-xs font-medium text-gray-500">
                             Team Size <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($business['business_size'] ?? $_POST['business_size'] ?? ''); ?>' || 'Select team size' }">
+                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($business['business_team_size'] ?? $_POST['business_team_size'] ?? ''); ?>' || 'Select team size' }">
                             <button type="button" @click="open = !open"
                                 @click.away="open = false"
                                 class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
@@ -284,7 +284,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                             </button>
 
                             <!-- Hidden input for form submission -->
-                            <input type="hidden" name="business_size" x-model="selected === 'Select team size' ? '' : selected" required>
+                            <input type="hidden" name="business_team_size" x-model="selected === 'Select team size' ? '' : selected" required>
 
                             <!-- Dropdown Menu -->
                             <div x-show="open"
@@ -298,29 +298,44 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 x-cloak>
                                 <div class="py-1">
                                     <button type="button"
-                                        @click="selected = '1-10'; open = false"
+                                        @click="selected = '1-10 employees'; open = false"
                                         class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                         1-10 employees
                                     </button>
                                     <button type="button"
-                                        @click="selected = '11-50'; open = false"
+                                        @click="selected = '11-50 employees'; open = false"
                                         class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                         11-50 employees
                                     </button>
                                     <button type="button"
-                                        @click="selected = '51-100'; open = false"
+                                        @click="selected = '51-200 employees'; open = false"
                                         class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        51-100 employees
+                                        51-200 employees
                                     </button>
                                     <button type="button"
-                                        @click="selected = '100+'; open = false"
+                                        @click="selected = '201-500 employees'; open = false"
                                         class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        100+ employees
+                                        201-500 employees
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = '501-1000 employees'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        501-1000 employees
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = '1000+ employees'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        1000+ employees
+                                    </button>
+                                    <button type="button"
+                                        @click="selected = 'Just me'; open = false"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                        Just me
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div id="business_size_error" class="hidden mt-1 text-xs text-red-600"></div>
+                        <div id="business_team_size_error" class="hidden mt-1 text-xs text-red-600"></div>
                     </div>
 
                     <!-- Year of Establishment -->
@@ -557,8 +572,8 @@ include_once __DIR__ . '/../components/navbar-employer.php';
     function validateAllFields() {
         let allValid = true;
 
-        // Validate dropdown fields
-        const dropdownFields = ['business_type', 'business_industry', 'business_size'];
+        // ✅ FIXED: Updated dropdown fields array to use correct field names
+        const dropdownFields = ['business_type', 'business_industry', 'business_team_size'];
         dropdownFields.forEach(fieldName => {
             const isValid = validateDropdown(fieldName);
             if (!isValid) {
@@ -629,7 +644,8 @@ include_once __DIR__ . '/../components/navbar-employer.php';
     document.addEventListener('alpine:init', () => {
         // Add event listeners for dropdown changes
         setTimeout(() => {
-            const dropdownInputs = document.querySelectorAll('input[name="business_type"], input[name="business_industry"], input[name="business_size"]');
+            // ✅ FIXED: Updated to use correct field name
+            const dropdownInputs = document.querySelectorAll('input[name="business_type"], input[name="business_industry"], input[name="business_team_size"]');
             dropdownInputs.forEach(input => {
                 const observer = new MutationObserver(() => {
                     updateSubmitButton();

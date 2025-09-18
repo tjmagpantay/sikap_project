@@ -23,7 +23,7 @@ if (!empty($business['business_socials'])) {
         </div>
     </div>
 
-    <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-4xl"> <!-- ✅ FIXED: Increased max width -->
+    <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl"> <!-- ✅ FIXED: Increased max width -->
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
             <!-- Enhanced Progress bar with clickable steps -->
             <div class="mb-6">

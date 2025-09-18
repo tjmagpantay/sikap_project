@@ -415,51 +415,54 @@ class EmployerController
         }
     }
 
-    private function handleBusinessStep2($employer_id, $data, &$error, &$success)
-    {
-        // Debug to see what data is being received
-        error_log("DEBUG: Step 2 data received: " . print_r($data, true));
+private function handleBusinessStep2($employer_id, $data, &$error, &$success)
+{
+    // Debug to see what data is being received
+    error_log("DEBUG: Step 2 data received: " . print_r($data, true));
 
-        // Check if form was submitted
-        if (!isset($data['submit_step2'])) {
-            $error = 'Invalid form submission.';
-            return;
-        }
+    // Check if form was submitted
+    if (!isset($data['submit_step2'])) {
+        $error = 'Invalid form submission.';
+        return;
+    }
 
-        $required = ['business_type', 'business_industry', 'business_address', 'business_contact', 'business_size', 'business_established_year'];
-        foreach ($required as $field) {
-            if (empty($data[$field])) {
-                $error = "Please fill in all required fields. Missing: $field";
-                error_log("DEBUG: Missing field: $field");
-                return;
-            }
-        }
-
-        $businessData = [
-            'business_type' => trim($data['business_type']),
-            'business_industry' => trim($data['business_industry']),
-            'business_address' => trim($data['business_address']),
-            'business_contact' => trim($data['business_contact']),
-            'business_team_size' => trim($data['business_team_size']), // ✅ FIXED: Map form field to correct DB column
-            'business_established_year' => trim($data['business_established_year']),
-            'business_website' => trim($data['business_website'] ?? ''),
-            'business_email' => trim($data['business_email'] ?? '')
-        ];
-
-        error_log("DEBUG: Business data to save: " . print_r($businessData, true));
-
-        $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
-
-        if ($result) {
-            error_log("DEBUG: Step 2 data saved successfully");
-            header('Location: ?page=complete-employer-business&step=3&success=' . urlencode('Founding information saved!'));
-            exit;
-        } else {
-            error_log("DEBUG: Failed to save step 2 data");
-            $error = 'Failed to save founding information. Please try again.';
+    // ✅ FIXED: Updated required fields array - changed 'business_size' to 'business_team_size'
+    $required = ['business_type', 'business_industry', 'business_address', 'business_contact', 'business_team_size', 'business_established_year'];
+    
+    foreach ($required as $field) {
+        if (empty($data[$field])) {
+            $error = "Please fill in all required fields. Missing: $field";
+            error_log("DEBUG: Missing field: $field");
+            error_log("DEBUG: Available fields: " . implode(', ', array_keys($data)));
             return;
         }
     }
+
+    $businessData = [
+        'business_type' => trim($data['business_type']),
+        'business_industry' => trim($data['business_industry']),
+        'business_address' => trim($data['business_address']),
+        'business_contact' => trim($data['business_contact']),
+        'business_team_size' => trim($data['business_team_size']), // ✅ FIXED: Correct field mapping
+        'business_established_year' => trim($data['business_established_year']),
+        'business_website' => trim($data['business_website'] ?? ''),
+        'business_email' => trim($data['business_email'] ?? '')
+    ];
+
+    error_log("DEBUG: Business data to save: " . print_r($businessData, true));
+
+    $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
+
+    if ($result) {
+        error_log("DEBUG: Step 2 data saved successfully");
+        header('Location: ?page=complete-employer-business&step=3&success=' . urlencode('Founding information saved!'));
+        exit;
+    } else {
+        error_log("DEBUG: Failed to save step 2 data");
+        $error = 'Failed to save founding information. Please try again.';
+        return;
+    }
+}
 
     private function handleBusinessStep3($employer_id, $data, &$error, &$success)
     {
