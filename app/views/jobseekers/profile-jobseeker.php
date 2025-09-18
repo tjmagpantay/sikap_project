@@ -40,11 +40,10 @@ include_once __DIR__ . '/navbar-jobseeker.php';
       <!-- Main Dashboard Content - Same as Dashboard -->
       <div class="flex flex-col gap-6 lg:flex-row">
         <!-- Left Side - 1/3 Width (Same as Dashboard) -->
-        <!-- Left Side - 1/3 Width (Same as Dashboard) -->
         <div class="w-full mx-auto lg:w-1/3 lg:max-w-md">
           <div class="sticky top-8">
             <div class="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
-              <div class="p-6 border-b border-gray-200" style="background-image: url('assets/images/profile-header-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+              <div class="p-6 border-b border-gray-200" style="background-image: url('assets/images/profile-header-bg.svg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                 <div class="flex items-center space-x-4">
                   <!-- Profile Logo/Image -->
                   <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
@@ -167,21 +166,6 @@ include_once __DIR__ . '/navbar-jobseeker.php';
           </div>
         </div>
 
-        <?php
-        // Add these queries to your PHP file to get the stats data:
-
-        /*
-// Count total applications for this jobseeker
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM job_applications WHERE jobseeker_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$applicationCount = $stmt->fetchColumn();
-
-// Count interviews (assuming you have an interviews table or status field)
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM job_applications WHERE jobseeker_id = ? AND status IN ('interview_scheduled', 'interviewed')");
-$stmt->execute([$_SESSION['user_id']]);
-$interviewCount = $stmt->fetchColumn();
-*/
-        ?>
 
         <!-- Right Side - 2/3 Width (Same as Dashboard) -->
         <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">
