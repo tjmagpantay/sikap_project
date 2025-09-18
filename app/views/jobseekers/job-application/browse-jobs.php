@@ -403,17 +403,19 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
 
-                                                <!-- FIXED: Better Positioned Tooltip -->
-                                                <div class="absolute right-0 z-50 px-3 py-2 mb-3 text-xs text-white transition-all duration-200 transform -translate-y-1 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content bottom-full whitespace-nowrap">
+                                                <!-- FIXED: Better Positioned Tooltip - Now appears above -->
+                                                <div class="absolute right-0 z-50 px-3 py-2 mb-2 text-xs text-white transition-all duration-200 transform translate-y-0 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content bottom-full whitespace-nowrap">
                                                     <div class="text-center min-w-max">
                                                         <div class="flex items-center gap-1 font-medium text-yellow-300">
-                                                            ⚠️ <span>Low Match</span>
+                                                            <span>Low Match</span>
                                                         </div>
                                                         <div class="mt-1">No strong matches found.</div>
                                                         <div class="text-gray-300 mt-0.5">Consider improving your profile</div>
                                                     </div>
-                                                    <!-- Tooltip Arrow -->
-                                                    <div class="absolute w-0 h-0 border-t-4 border-l-4 border-r-4 border-transparent top-full right-4 border-t-gray-900"></div>
+                                                    <!-- Tooltip Arrow - Points down from tooltip to icon -->
+                                                    <div class="absolute transform -translate-x-1/2 left-1/2 top-full">
+                                                        <div class="w-0 h-0 border-t-4 border-l-4 border-r-4 border-transparent border-t-gray-900"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endif; ?>
@@ -442,7 +444,7 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
     /* FIXED: Enhanced Tooltip Styling with Proper Z-index and Positioning */
     .tooltip-container:hover .tooltip-content {
         opacity: 1 !important;
-        transform: translateY(0) !important;
+        transform: translateY(-8px) !important;
         pointer-events: auto;
     }
 
@@ -466,17 +468,9 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         transition: color 0.2s ease-in-out;
     }
 
-    /* Better tooltip arrow */
-    .tooltip-content::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        right: 16px;
-        width: 0;
-        height: 0;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid #1f2937;
+    /* Better tooltip arrow positioning - centered and pointing down */
+    .tooltip-content .absolute.left-1\/2 {
+        left: 50%;
     }
 
     /* Make sure cards don't clip overflowing elements */
@@ -499,17 +493,30 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
         overflow: visible;
     }
 
-    /* Additional fix for mobile responsiveness */
+    /* Additional spacing for tooltip */
+    .tooltip-content {
+        margin-bottom: 8px;
+    }
+
+    /* Mobile responsive tooltip */
     @media (max-width: 640px) {
         .tooltip-content {
             right: -20px;
             left: auto;
-            transform: translateX(0);
+            transform: translateX(0) translateY(-8px);
             min-width: 200px;
         }
 
-        .tooltip-content::after {
-            right: 30px;
+        .tooltip-content .absolute.left-1\/2 {
+            left: 75%;
+        }
+    }
+
+    /* Ensure tooltip doesn't get cut off at screen edges */
+    @media (max-width: 480px) {
+        .tooltip-content {
+            right: -50px;
+            min-width: 220px;
         }
     }
 </style>

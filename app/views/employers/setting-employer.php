@@ -24,7 +24,7 @@ if (!isset($employer)) {
 include_once __DIR__ . '/components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen">
+<div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
         <!-- Header with breadcrumbs -->
         <div class="mb-8">
@@ -58,22 +58,22 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </nav>
 
             <div class="flex items-center mb-2 space-x-3">
-                <h1 class="text-2xl font-bold text-gray-900">Account Settings</h1>
+                <h1 class="text-2xl font-bold text-mainGray sm:text-3xl">Account Settings</h1>
             </div>
-            <p class="text-gray-600">Manage your company account security and preferences</p>
+            <p class="text-sm text-gray-600 sm:text-base">Manage your company account security and preferences</p>
         </div>
 
         <!-- Settings Content -->
         <div class="space-y-6">
             <!-- Change Password -->
-            <div class="p-6 bg-white rounded-lg shadow">
-                <div class="flex items-start justify-between">
+            <div class="p-4 bg-white rounded-lg shadow sm:p-6">
+                <div class="flex flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
                     <div class="flex-1">
                         <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
                         <p class="mt-1 text-sm text-gray-600">Update your password to keep your account secure</p>
                     </div>
                     <button onclick="togglePasswordForm()"
-                        class="flex items-center px-4 py-2 text-sm font-medium transition-colors border rounded-md border-primary text-primary bg-blue-50 hover:bg-blue-100">
+                        class="flex items-center w-full px-4 py-2 text-sm font-medium transition-colors border rounded-md sm:w-auto border-primary text-primary bg-blue-50 hover:bg-blue-100">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2H9a2 2 0 01-2-2m2-2h.01M15 7h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -82,7 +82,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                 </div>
 
                 <!-- Password Change Form (Hidden by default) -->
-                <div id="password-form" class="hidden pt-6 mt-6 border-t border-gray-200">
+                <div id="password-form" class="hidden pt-4 mt-4 border-t border-gray-200 sm:pt-6 sm:mt-6">
                     <form class="max-w-md space-y-4">
                         <div>
                             <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
@@ -99,13 +99,13 @@ include_once __DIR__ . '/components/navbar-employer.php';
                             <input type="password" id="confirm-password" name="confirm_password"
                                 class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col gap-3 sm:flex-row">
                             <button type="submit"
-                                class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                class="w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md sm:w-auto bg-primary hover:bg-secondary">
                                 Update Password
                             </button>
                             <button type="button" onclick="togglePasswordForm()"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
+                                class="w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-gray-100 rounded-md sm:w-auto hover:bg-gray-200">
                                 Cancel
                             </button>
                         </div>
@@ -114,15 +114,15 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </div>
 
             <!-- Email Preferences -->
-            <div class="p-6 bg-white rounded-lg shadow" id="email-preferences">
+            <div class="p-4 bg-white rounded-lg shadow sm:p-6" id="email-preferences">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Email Preferences</h3>
                     <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Application Notifications</h4>
                             <p class="text-xs text-gray-500">Get notified when candidates apply to your job posts</p>
                         </div>
@@ -139,8 +139,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Candidate Matches</h4>
                             <p class="text-xs text-gray-500">Receive recommendations for qualified candidates</p>
                         </div>
@@ -157,8 +157,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Job Post Updates</h4>
                             <p class="text-xs text-gray-500">Get notified about job post performance and statistics</p>
                         </div>
@@ -175,8 +175,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Platform Updates</h4>
                             <p class="text-xs text-gray-500">Receive updates about new features and hiring insights</p>
                         </div>
@@ -197,22 +197,22 @@ include_once __DIR__ . '/components/navbar-employer.php';
                 <!-- Save Button -->
                 <div class="flex justify-end mt-6">
                     <button id="save-email-preferences"
-                        class="px-4 py-2 text-white rounded-md bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="w-full px-4 py-2 text-white rounded-md sm:w-auto bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Save Preferences
                     </button>
                 </div>
             </div>
 
             <!-- Company Visibility Settings -->
-            <div class="p-6 bg-white rounded-lg shadow" id="visibility-settings">
+            <div class="p-4 bg-white rounded-lg shadow sm:p-6" id="visibility-settings">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Company Visibility Settings</h3>
                     <p class="mt-1 text-sm text-gray-600">Control how your company appears to job seekers</p>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Company Profile Visibility</h4>
                             <p class="text-xs text-gray-500">Allow job seekers to view your company profile and information</p>
                         </div>
@@ -229,8 +229,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
                             <p class="text-xs text-gray-500">Display contact details on job posts and company profile</p>
                         </div>
@@ -247,8 +247,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Job Post Analytics</h4>
                             <p class="text-xs text-gray-500">Show application statistics and job performance metrics</p>
                         </div>
@@ -267,20 +267,20 @@ include_once __DIR__ . '/components/navbar-employer.php';
                 </div>
 
                 <div class="mt-6">
-                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                    <button id="save-visibility-settings" class="w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md sm:w-auto bg-primary hover:bg-secondary">
                         Save Visibility Settings
                     </button>
                 </div>
             </div>
 
             <!-- Account Information -->
-            <div class="p-6 bg-white rounded-lg shadow">
+            <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Company Account Information</h3>
                     <p class="mt-1 text-sm text-gray-600">Your company account details and registration information</p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                     <div>
                         <p class="text-sm text-gray-500">Company Name</p>
                         <p class="text-sm font-medium text-gray-900">
@@ -332,15 +332,15 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </div>
 
             <!-- Hiring Preferences -->
-            <div class="p-6 bg-white rounded-lg shadow" id="hiring-preferences">
+            <div class="p-4 bg-white rounded-lg shadow sm:p-6" id="hiring-preferences">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Hiring Preferences</h3>
                     <p class="mt-1 text-sm text-gray-600">Set your default preferences for hiring and recruitment</p>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Auto-screen Applications</h4>
                             <p class="text-xs text-gray-500">Automatically filter applications based on job requirements</p>
                         </div>
@@ -357,8 +357,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Send Auto-replies</h4>
                             <p class="text-xs text-gray-500">Automatically acknowledge receipt of applications</p>
                         </div>
@@ -375,8 +375,8 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div>
+                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-gray-900">Priority Candidate Alerts</h4>
                             <p class="text-xs text-gray-500">Get immediate alerts for high-priority candidate applications</p>
                         </div>
@@ -395,38 +395,38 @@ include_once __DIR__ . '/components/navbar-employer.php';
                 </div>
 
                 <div class="mt-6">
-                    <button class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                    <button id="save-hiring-preferences" class="w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md sm:w-auto bg-primary hover:bg-secondary">
                         Save Hiring Preferences
                     </button>
                 </div>
             </div>
 
             <!-- Danger Zone -->
-            <div class="p-6 bg-white border-l-4 border-red-400 rounded-lg shadow">
+            <div class="p-4 bg-white border-l-4 border-red-400 rounded-lg shadow sm:p-6">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-red-900">Danger Zone</h3>
                     <p class="mt-1 text-sm text-red-700">These actions cannot be undone and will affect your company account</p>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
-                        <div>
+                    <div class="flex flex-col items-start justify-between p-4 space-y-3 rounded-lg sm:flex-row sm:items-center sm:space-y-0 bg-red-50">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-red-900">Deactivate Company Account</h4>
                             <p class="text-xs text-red-600">Temporarily disable your account and hide all job posts (can be reactivated)</p>
                         </div>
                         <button onclick="confirmDeactivation()"
-                            class="px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md hover:bg-red-50">
+                            class="w-full px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md sm:w-auto hover:bg-red-50">
                             Deactivate
                         </button>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
-                        <div>
+                    <div class="flex flex-col items-start justify-between p-4 space-y-3 rounded-lg sm:flex-row sm:items-center sm:space-y-0 bg-red-50">
+                        <div class="flex-1">
                             <h4 class="text-sm font-medium text-red-900">Delete Company Account</h4>
                             <p class="text-xs text-red-600">Permanently delete your company account, job posts, and all associated data</p>
                         </div>
                         <button onclick="confirmDeletion()"
-                            class="px-4 py-2 text-sm font-medium text-white transition-colors bg-red-600 rounded-md hover:bg-red-700">
+                            class="w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-red-600 rounded-md sm:w-auto hover:bg-red-700">
                             Delete Account
                         </button>
                     </div>
@@ -681,7 +681,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
             .finally(() => {
                 // Reset button state
                 if (saveBtn) {
-                    saveBtn.textContent = 'Save Settings';
+                    saveBtn.textContent = 'Save Visibility Settings';
                     saveBtn.disabled = false;
                 }
             });
@@ -730,7 +730,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
             .finally(() => {
                 // Reset button state
                 if (saveBtn) {
-                    saveBtn.textContent = 'Save Preferences';
+                    saveBtn.textContent = 'Save Hiring Preferences';
                     saveBtn.disabled = false;
                 }
             });
