@@ -3,7 +3,7 @@
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
       <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
-      <a href="?page=landing" class="font-medium nav-brand">Sikap <span class="text-secondary">Employer</span></a>
+      <a href="?page=employer-dashboard" class="font-medium nav-brand">Sikap <span class="text-secondary">Employer</span></a>
     </div>
 
     <!-- Desktop Menu -->
@@ -249,31 +249,134 @@
     x-transition:leave-end="translate-x-full"
     class="fixed right-0 z-50 w-64 h-full p-6 mt-20 bg-white shadow-lg top-2 lg:hidden"
     style="display: none;">
-    <ul class="flex flex-col gap-4 mt-8">
-      <li><a href="?page=employer-dashboard" class="nav-link">Home</a></li>
-      <li><a href="?page=browse-candidates" class="nav-link">Browse Candidates</a></li>
-      <li><a href="?page=job-management" class="nav-link">Job Management</a></li>
-      <li><a href="?page=employer-programs" class="nav-link">Programs</a></li>
-      <li><a href="?page=employer-community" class="nav-link">Community</a></li>
-      <li><a href="?page=notifications-employer" class="nav-link">Notifications</a></li>
-      <li><a href="?page=job-applications" class="nav-link">Applications</a></li>
-      <li><a href="?page=employer-messages" class="nav-link">Messages</a></li>
 
-      <!-- Business Section -->
-      <li class="mt-4">
-        <p class="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Business</p>
-        <div class="pl-4 space-y-2">
-          <a href="?page=profile-employer" class="text-sm nav-link">Employer Profile</a>
-          <a href="?page=setting-employer" class="text-sm nav-link">Settings</a>
-          <a href="?page=contact-us" class="text-sm nav-link">Contact Us</a>
+    <div class="flex flex-col h-full">
+      <!-- Employer Profile Header -->
+      <div class="px-2 py-4 border-b border-gray-200">
+        <div class="flex items-center mb-3">
+          <div class="flex-1 min-w-0">
+            <h3 class="text-base font-semibold text-gray-900 truncate text-md">
+              <?php
+              if (!empty($_SESSION['business_name'])) {
+                echo htmlspecialchars($_SESSION['business_name']);
+              } elseif (!empty($_SESSION['first_name']) || !empty($_SESSION['last_name'])) {
+                echo htmlspecialchars(trim(($_SESSION['first_name'] ?? '') . ' ' . ($_SESSION['last_name'] ?? '')));
+              } else {
+                echo 'Employer Account';
+              }
+              ?>
+            </h3>
+            <?php if (!empty($_SESSION['email'])): ?>
+              <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($_SESSION['email']); ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($_SESSION['business_type']) || !empty($_SESSION['company_size'])): ?>
+              <p class="mt-1 text-xs text-gray-400 truncate">
+                <?php
+                $details = array_filter([
+                  $_SESSION['business_type'] ?? null,
+                  $_SESSION['company_size'] ?? null
+                ]);
+                echo htmlspecialchars(implode(' • ', $details));
+                ?>
+              </p>
+            <?php endif; ?>
+          </div>
         </div>
-      </li>
 
-      <li class="flex flex-col gap-2 mt-6">
-        <a href="?page=post-job" class="w-full text-center btn-primary">Post A Job</a>
-        <a href="?page=logout" class="w-full py-2 text-center text-red-600 border border-red-300 rounded-md hover:bg-red-50">Sign Out</a>
-      </li>
-    </ul>
+        <?php if (!empty($_SESSION['location'])): ?>
+          <div class="flex items-center mt-2 text-xs text-gray-500">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="truncate"><?php echo htmlspecialchars($_SESSION['location']); ?></span>
+          </div>
+        <?php endif; ?>
+      </div>
+
+      <hr>
+
+      <!-- Main Navigation -->
+      <ul class="flex flex-col space-y-1">
+        <!-- Employer Profile -->
+        <li>
+          <a href="?page=profile-employer"
+            @click="open = false"
+            class="flex items-center w-full px-2 py-4 font-medium text-gray-700 transition-colors duration-200 rounded-md text-md hover:bg-gray-100 hover:text-primary">
+            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Employer Profile
+          </a>
+        </li>
+
+        <!-- Home -->
+        <li>
+          <a href="?page=employer-dashboard"
+            @click="open = false"
+            class="flex items-center w-full px-2 py-4 font-medium text-gray-700 transition-colors duration-200 rounded-md text-md hover:bg-gray-100 hover:text-primary">
+            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Home
+          </a>
+        </li>
+
+        <!-- Browse Candidates -->
+        <li>
+          <a href="?page=view-all-applicants"
+            @click="open = false"
+            class="flex items-center w-full px-2 py-4 font-medium text-gray-700 transition-colors duration-200 rounded-md text-md hover:bg-gray-100 hover:text-primary">
+            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Browse Candidates
+          </a>
+        </li>
+
+        <!-- Job Management -->
+        <li>
+          <a href="?page=manage-jobs"
+            @click="open = false"
+            class="flex items-center w-full px-2 py-4 font-medium text-gray-700 transition-colors duration-200 rounded-md text-md hover:bg-gray-100 hover:text-primary">
+            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 7V6a3 3 0 013-3h0a3 3 0 013 3v1m-6 0h6m-9 4h12m-12 0v7a2 2 0 002 2h8a2 2 0 002-2v-7m-12 0V7h12v4" />
+            </svg>
+
+            Job Management
+          </a>
+        </li>
+      </ul>
+
+      <!-- Bottom Section -->
+      <div class="pt-6 mt-auto">
+        <!-- Post A Job Button -->
+        <div class="mb-4">
+          <a href="?page=post-job"
+            @click="open = false"
+            class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Post A Job
+          </a>
+        </div>
+
+        <!-- Sign Out -->
+        <div class="py-4 border-t border-gray-200">
+          <a href="?page=logout"
+            @click="open = false"
+            class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-red-700 transition-colors duration-200 border border-red-500 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+            <svg class="w-5 h-5 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Sign Out
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>
 

@@ -5,7 +5,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
 <div class="min-h-screen bg-gray-50">
-    <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
+    <div class="px-6 py-8 mx-auto max-w-7xl">
         <!-- Header with breadcrumbs -->
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -37,9 +37,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         </li>
                     </ol>
                 </nav>
-
             </div>
-
         </div>
 
         <!-- Main Flex Layout -->
@@ -73,13 +71,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <h1 class="text-lg font-semibold text-gray-900 sm:text-xl">
                                         <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>
                                     </h1>
-                                     <!-- Position Applied For -->
+                                    <!-- Position Applied For -->
                                     <p class="text-xs text-gray-700">
-                                            Applied: <?php echo  htmlspecialchars(date('M j, Y', strtotime($application['applied_at']))); ?>
+                                        Applied: <?php echo htmlspecialchars(date('M j, Y', strtotime($application['applied_at']))); ?>
                                     </p>
-
-
-                                   
                                 </div>
                             </div>
 
@@ -104,7 +99,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             echo 'bg-blue-100 text-primary border border-blue-200';
                                             break;
                                         case 'resigned':
-                                            echo 'bg-blue-100 text-priamry border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200';
                                             break;
                                         default:
                                             echo 'bg-gray-100 text-gray-800 border border-gray-200';
@@ -159,12 +154,11 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         </div>
                     </div>
 
-                    <!-- Main Content - Contact Information -->
+                    <!-- Main Content - Quick Actions -->
                     <div class="p-4 sm:p-6">
-
                         <h4 class="mb-3 text-sm font-semibold text-gray-900">Quick Actions</h4>
 
-                        <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
                             <!-- Accept Application Button -->
                             <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'resigned'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
@@ -218,12 +212,12 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </form>
                             <?php endif; ?>
 
-                            <!-- Set Resigned Button (New) -->
+                            <!-- Set Resigned Button -->
                             <?php if ($application['application_status'] === 'hired'): ?>
                                 <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <button type="submit"
                                         onclick="return confirm('Are you sure you want to set this employee as resigned? This action cannot be undone.')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-center text-orange-600 transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-orange-50 hover:bg-orange-600 hover:text-white">
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-center text-gray-600 transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-orange-50 hover:bg-gray-600 hover:text-white">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
@@ -233,26 +227,31 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php endif; ?>
 
                             <!-- Schedule Interview Button -->
-                            <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
-                                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
-                                </svg>
-                                Schedule Interview
-                            </button>
+                            <?php if (
+                                $application['application_status'] !== 'resigned' &&
+                                (!$resignationRequest || $resignationRequest['request_status'] === 'pending')
+                            ): ?>
+                                <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Schedule Interview
+                                </button>
+                            <?php endif; ?>
                         </div>
-
                     </div>
-
-                    <!-- Quick Actions Section -->
-
                 </div>
-                <div class="p-6 bg-white border border-gray-200 rounded-lg">
 
+                <!-- Resignation Request Card -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg sm:p-6">
                     <?php if ($resignationRequest && $resignationRequest['request_status'] === 'pending'): ?>
                         <!-- Resignation Request Pending Actions -->
-
                         <div class="flex items-start mb-4">
-
+                            <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-3 bg-orange-100 rounded-full">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
                             <div>
                                 <h5 class="text-sm font-semibold text-orange-800">Pending Resignation Request</h5>
                                 <p class="mt-1 text-sm text-orange-600">This employee has requested to resign from their position and awaits your decision.</p>
@@ -266,7 +265,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             </div>
                         <?php endif; ?>
 
-                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <!-- Approve Resignation Form -->
                             <form method="POST" action="?page=review-application&action=approveResignation&application_id=<?php echo $application['application_id']; ?>" class="space-y-3">
                                 <div>
@@ -307,18 +306,89 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             </form>
                         </div>
 
+                    <?php elseif ($resignationRequest && $resignationRequest['request_status'] === 'approved'): ?>
+                        <!-- Resignation Request Approved Message -->
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-start">
+                                <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-3 bg-blue-100 rounded-full">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-grayMain">Resignation Request Approved</h5>
+                                    <p class="py-2 text-sm text-gray-600">
+                                        You have successfully approved this employee's resignation request on
+                                        <?php echo date('F j, Y \a\t g:i A', strtotime($resignationRequest['reviewed_at'])); ?>.
+                                    </p>
+
+                                    <?php if (!empty($resignationRequest['employer_notes'])): ?>
+                                        <div class="p-3 mt-3 border border-gray-200 rounded-md">
+                                            <p class="mb-1 text-sm font-medium text-grayMain">Your Notes:</p>
+                                            <p class="text-sm text-gray-600"><?php echo nl2br(htmlspecialchars($resignationRequest['employer_notes'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="py-3">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-primary">
+                                            Employee Status: Resigned
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <?php elseif ($resignationRequest && $resignationRequest['request_status'] === 'rejected'): ?>
+                        <!-- Resignation Request Rejected Message -->
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-start">
+                                <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-3 bg-red-100 rounded-full">
+                                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-grayMain">Resignation Request Rejected</h5>
+                                    <p class="py-2 text-sm text-gray-600">
+                                        You have rejected this employee's resignation request on
+                                        <?php echo date('F j, Y \a\t g:i A', strtotime($resignationRequest['reviewed_at'])); ?>.
+                                    </p>
+
+                                    <?php if (!empty($resignationRequest['employer_notes'])): ?>
+                                        <div class="p-3 mt-3 bg-red-100 border border-red-200 rounded-md">
+                                            <p class="mb-1 text-sm font-medium text-grayMain">Reason for Rejection:</p>
+                                            <p class="text-sm text-gray-600"><?php echo nl2br(htmlspecialchars($resignationRequest['employer_notes'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="py-3">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-primary">
+                                            Employee Status: <?php echo ucfirst($application['application_status']); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <?php else: ?>
+                        <!-- No resignation request -->
+                        <div class="py-8 text-center">
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No Resignation Request</h3>
+                            <p class="mt-1 text-sm text-gray-500">This employee hasn't submitted any resignation request.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
 
-
-
-            <!-- Right Section - Detailed View with Tabs (8/12 width) -->
+            <!-- Right Section - Detailed View with Tabs -->
             <div class="w-full md:w-8/12">
                 <div class="overflow-hidden bg-white border border-gray-200 rounded-md shadow">
                     <!-- Tab Navigation -->
-                    <div class="border-b border-gray-200 ">
-                        <nav class="flex gap-8 px-6 space-x-8" aria-label="Tabs">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex px-4 space-x-8 sm:px-6" aria-label="Tabs">
                             <button @click="activeTab = 'profile'"
                                 :class="activeTab === 'profile' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="px-1 py-4 text-sm font-medium transition-colors duration-200 border-b-2 whitespace-nowrap">
@@ -343,7 +413,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     </div>
 
                     <!-- Tab Content -->
-                    <div class="p-6 min-h-[600px] border-t border-gray-200">
+                    <div class="p-4 min-h-[600px] border-t border-gray-200 overflow-visible sm:p-6">
                         <!-- Applicant Profile Tab -->
                         <div x-show="activeTab === 'profile'" class="space-y-6">
                             <!-- Personal Information Section -->
@@ -507,8 +577,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                             <?php endif; ?>
 
-
-
                             <!-- Certificates Section -->
                             <?php if (!empty($application['certificates'])): ?>
                                 <div class="space-y-4">
@@ -647,22 +715,22 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                 <?php
                                                 switch ($application['application_status']) {
                                                     case 'pending':
-                                                        echo 'bg-yellow-100 text-yellow-800';
+                                                        echo 'bg-gray-100 text-primary';
                                                         break;
                                                     case 'reviewed':
-                                                        echo 'bg-blue-100 text-blue-800';
+                                                        echo 'bg-gray-100 text-primary';
                                                         break;
                                                     case 'shortlisted':
-                                                        echo 'bg-purple-100 text-purple-800';
+                                                        echo 'bg-gray-100 text-primary';
                                                         break;
                                                     case 'rejected':
                                                         echo 'bg-red-100 text-red-800';
                                                         break;
                                                     case 'hired':
-                                                        echo 'bg-green-100 text-green-800';
+                                                        echo 'bg-gray-100 text-primary';
                                                         break;
                                                     default:
-                                                        echo 'bg-gray-100 text-gray-800';
+                                                        echo 'bg-gray-200 text-gray-800';
                                                 }
                                                 ?>">
                                             <?php echo ucfirst($application['application_status']); ?>
@@ -691,18 +759,103 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php endif; ?>
 
                             <!-- Application Status Management -->
-                            <div class="space-y-4">
+                            <div class="space-y-4 overflow-visible">
                                 <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Update Application Status</h4>
-                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4">
-                                    <div>
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4 overflow-visible">
+                                    <div class="overflow-visible">
                                         <label class="block mb-2 text-sm font-medium text-gray-700">Status</label>
-                                        <select name="status" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs">
-                                            <?php foreach (['pending', 'reviewed', 'shortlisted', 'rejected', 'hired', 'resigned'] as $status): ?>
-                                                <option value="<?php echo $status; ?>" <?php if ($application['application_status'] == $status) echo 'selected'; ?>>
-                                                    <?php echo ucfirst($status); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <div class="relative overflow-visible" x-data="{ 
+                                            open: false, 
+                                            selected: '<?php
+                                                        $statusLabels = [
+                                                            'pending' => 'Pending',
+                                                            'reviewed' => 'Reviewed',
+                                                            'shortlisted' => 'Shortlisted',
+                                                            'rejected' => 'Rejected',
+                                                            'hired' => 'Hired',
+                                                            'resigned' => 'Resigned'
+                                                        ];
+                                                        echo $statusLabels[$application['application_status']] ?? 'Pending';
+                                                        ?>', 
+                                            selectedValue: '<?php echo $application['application_status']; ?>' 
+                                        }">
+                                            <button type="button" @click="open = !open"
+                                                @click.away="open = false"
+                                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                                <span x-text="selected" :class="{'text-gray-500': selected === 'Select Status', 'text-gray-900': selected !== 'Select Status'}"></span>
+                                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </button>
+
+                                            <div x-show="open"
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                class="absolute left-0 z-[9999] w-full mt-2 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 border border-gray-200 max-h-64 overflow-y-auto"
+                                                style="z-index: 9999;"
+                                                x-cloak>
+                                                <div class="py-1">
+                                                    <button type="button" @click="selected = 'Pending'; selectedValue = 'pending'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Pending
+                                                        </div>
+                                                    </button>
+                                                    <button type="button" @click="selected = 'Reviewed'; selectedValue = 'reviewed'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Reviewed
+                                                        </div>
+                                                    </button>
+                                                    <button type="button" @click="selected = 'Shortlisted'; selectedValue = 'shortlisted'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Shortlisted
+                                                        </div>
+                                                    </button>
+                                                    <button type="button" @click="selected = 'Rejected'; selectedValue = 'rejected'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Rejected
+                                                        </div>
+                                                    </button>
+                                                    <button type="button" @click="selected = 'Hired'; selectedValue = 'hired'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Hired
+                                                        </div>
+                                                    </button>
+                                                    <button type="button" @click="selected = 'Resigned'; selectedValue = 'resigned'; open = false"
+                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414L8.586 11l-3.293 3.293a1 1 0 001.414 1.414L10 12.414l3.293 3.293a1 1 0 001.414-1.414L11.414 11l3.293-3.293z" clip-rule="evenodd" />
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <input type="hidden" name="status" :value="selectedValue">
+                                        </div>
                                     </div>
                                     <div class="flex space-x-3">
                                         <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
@@ -811,7 +964,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                 <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
                                                 <input type="text" name="interview_location"
                                                     value="<?php echo htmlspecialchars($interview['interview_location'] ?? ''); ?>"
-                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder:text-sm placeholder:text-gray-400"
+                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-xs placeholder:text-gray-400"
                                                     placeholder="Office address or online meeting link"
                                                     required>
                                             </div>
@@ -820,12 +973,12 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         <div>
                                             <label class="block mb-2 text-sm font-medium text-gray-700">Notes (Optional)</label>
                                             <textarea name="notes" rows="4"
-                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder:text-sm placeholder:text-gray-400"
+                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-xs placeholder:text-gray-400"
                                                 placeholder="Add any additional instructions or requirements for the candidate"><?php echo htmlspecialchars($interview['notes'] ?? ''); ?></textarea>
                                         </div>
 
                                         <div class="flex gap-3">
-                                            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
                                                 </svg>
@@ -834,7 +987,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                                             <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
                                                 <button type="button" @click="editingInterview = false"
-                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ">
                                                     Cancel
                                                 </button>
                                             <?php endif; ?>
