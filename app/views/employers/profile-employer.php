@@ -446,7 +446,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
 
                                         <?php if (!empty($documents[$type])): ?>
                                             <div class="flex flex-col space-y-1 text-right">
-                                                <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>"
+                                                <a href="?page=view-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>"
                                                     target="_blank" class="text-xs text-secondary hover:text-secondary/80">View</a>
                                                 <a href="?page=download-employer-document&type=<?php echo $type; ?>&employer_id=<?php echo $employer['employer_id']; ?>&download=1"
                                                     class="text-xs text-primary hover:text-primary/80">Download</a>

@@ -68,7 +68,7 @@
             style="display: none; width: 500px !important;">
 
             <!-- Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
               <button @click="markAllAsRead()"
                 x-show="unreadCount > 0"
@@ -509,32 +509,74 @@
         this.isOpen = false;
       },
 
-      // ENHANCED: Better notification display for job applications
+      // UPDATED: Enhanced notification icons with new color scheme
       getNotificationIcon(type) {
         switch (type) {
           case 'job_application':
             return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M9 7V6a3 3 0 013-3h0a3 3 0 013 3v1m-6 0h6m-9 4h12m-12 0v7a2 2 0 002 2h8a2 2 0 002-2v-7m-12 0V7h12v4" />
+          </svg>`;
+          case 'application_update':
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>`;
-          case 'program':
+          case 'interview':
             return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>`;
+          case 'program':
+          case 'event':
+            return `<svg class="w-4 h-4" fill="none" stroke="green" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>`;
+          case 'job_post':
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V9a2 2 0 11-4 0V6m0 0H8m0 0v2M7 7l10 10-5-5z" />
+            </svg>`;
+          case 'system':
+            return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>`;
           default:
             return `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM20 4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h4v-2H4V6h16v10h-2v2h2c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" />
             </svg>`;
         }
       },
 
+      // UPDATED: New color scheme using primary (blue), green, and secondary (yellow/orange) colors
       getNotificationBadgeColor(type) {
         switch (type) {
           case 'job_application':
-            return 'bg-purple-100 text-purple-600';
-          case 'program':
+            // Primary color - blue background
+            return 'bg-blue-100 text-primary';
+
+          case 'application_update':
+            // Green for positive updates
             return 'bg-green-100 text-green-600';
+
+          case 'interview':
+            // Secondary color - yellow/amber background
+            return 'bg-yellow-100 text-yellow-700';
+
+          case 'program':
+          case 'event':
+            // Primary color for programs/events
+            return 'bg-green-100 text-green-900';
+
+          case 'job_post':
+            // Green for job opportunities
+            return 'bg-green-100 text-green-600';
+
+          case 'system':
+            // Secondary color for system notifications
+            return 'bg-yellow-100 text-yellow-700';
+
           default:
-            return 'bg-blue-100 text-blue-600';
+            // Default to primary color
+            return 'bg-blue-100 text-primary';
         }
       },
 

@@ -217,7 +217,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <button type="submit"
                                         onclick="return confirm('Are you sure you want to set this employee as resigned? This action cannot be undone.')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-center text-gray-600 transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-orange-50 hover:bg-gray-600 hover:text-white">
+                                        class="items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm nline-flex bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
@@ -231,7 +231,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 $application['application_status'] !== 'resigned' &&
                                 (!$resignationRequest || $resignationRequest['request_status'] === 'pending')
                             ): ?>
-                                <button @click="activeTab = 'schedule'" class="w-full px-3 py-3 text-sm font-medium text-center transition-colors border rounded text-primary bg-blue-50 hover:bg-primary hover:text-white">
+                                <button @click="activeTab = 'schedule'" class="items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm nline-flex bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                     <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
                                     </svg>
@@ -388,7 +388,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                 <div class="overflow-hidden bg-white border border-gray-200 rounded-md shadow">
                     <!-- Tab Navigation -->
                     <div class="border-b border-gray-200">
-                        <nav class="flex px-4 space-x-8 sm:px-6" aria-label="Tabs">
+                        <nav class="flex gap-8 px-4 sm:px-6 " aria-label="Tabs">
                             <button @click="activeTab = 'profile'"
                                 :class="activeTab === 'profile' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="px-1 py-4 text-sm font-medium transition-colors duration-200 border-b-2 whitespace-nowrap">
