@@ -251,7 +251,7 @@ $endDate = date('M j');
         </div>
 
         <!-- Recent Job Posts Section -->
-        <div class="px-4 mb-8 ">
+        <div class="mb-8 ">
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm sm:px-0">
                             <div class="w-full ">
                 <div class="px-4 py-5 border-b border-gray-200">
@@ -589,7 +589,7 @@ $endDate = date('M j');
                     </tbody>
                 </table>
             </div>
-            </div>
+            
 
 
             <!-- Mobile Card View (Visible on Mobile Only) -->

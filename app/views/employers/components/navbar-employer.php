@@ -32,7 +32,15 @@
       <ul class="flex items-center gap-4">
         <!-- Notification Dropdown (NEW) -->
         <li x-data="notificationDropdown()" class="relative">
+                      <!-- Notification Badge -->
+            <span x-show="unreadCount > 0"
+              x-text="unreadCount"
+              class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-xs font-bold text-red-600 rounded-full  shadow-lg"
+              :class="unreadCount > 99 ? 'text-[10px] px-1' : ''"
+              style="z-index: 10;">
+            </span>
           <button
+          
             @click="toggleNotifications()"
             class="relative p-2 transition-all duration-200 rounded-full hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -45,13 +53,7 @@
                       5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 
                       0m5.714 0a3 3 0 1 1-5.714 0" />
             </svg>
-            <!-- Notification Badge -->
-            <span x-show="unreadCount > 0"
-              x-text="unreadCount"
-              class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white shadow-lg"
-              :class="unreadCount > 99 ? 'text-[10px] px-1' : ''"
-              style="z-index: 10;">
-            </span>
+
           </button>
 
           <!-- Notification Dropdown -->
