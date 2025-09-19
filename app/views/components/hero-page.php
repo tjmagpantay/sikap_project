@@ -58,9 +58,10 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
         <!-- Hero Image -->
         <img src="./assets/images/hero-page-img.png" alt="Job Seekers" class="w-full max-w-xs rounded-lg md:max-w-sm lg:max-w-md" />
 
-        <!-- Stat Cards for md+ screens (absolute) -->
+        <!-- Stat Cards for md+ screens (absolute) with animations -->
         <div class="hidden md:block">
-          <div class="absolute flex items-center gap-2 p-3 text-sm text-black bg-white rounded-lg shadow-md top-4 right-4 w-[200px]">
+          <!-- Top Right Card - Slides from Right -->
+          <div class="absolute flex items-center gap-2 p-3 text-sm text-black bg-white rounded-lg shadow-md top-4 right-4 w-[200px] animate-slide-in-right">
             <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg">
               <svg class="w-8 h-8 p-2" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -70,20 +71,21 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
               </svg>
             </div>
             <div class="flex flex-col items-start leading-tight">
-              <p class="font-bold text-md text-primary">21,078K</p>
+              <p class="font-bold text-md text-primary">1,000K</p>
               <p class="text-xs text-gray-600">Explore Open jobs</p>
             </div>
           </div>
 
-          <div class="absolute flex items-center gap-2 px-4 py-2 text-sm text-black bg-white rounded-lg shadow-md bottom-4 right-4 w-[200px] opacity-30">
+          <!-- Bottom Right Card - Slides from Right with delay -->
+          <div class="absolute flex items-center gap-2 px-4 py-2 text-sm text-black bg-white rounded-lg shadow-md bottom-4 right-4 w-[200px] opacity-20 animate-slide-in-right-delayed">
             <div class="flex flex-col items-start leading-tight">
               <p class="text-xs text-primary">Hi!</p>
               <p class="text-xs text-primary">We are happy to announce...</p>
             </div>
           </div>
 
-
-          <div class="absolute flex items-center gap-2  p-3 text-sm text-black bg-white rounded-lg shadow-md bottom-4 left-4 w-[200px]">
+          <!-- Bottom Left Card - Slides from Left with delay -->
+          <div class="absolute flex items-center gap-2 p-3 text-sm text-black bg-white rounded-lg shadow-md bottom-4 left-4 w-[200px] animate-slide-in-left-delayed">
             <!-- Container for SVG -->
             <div class="flex items-center justify-center p-3 rounded-lg bg-primary">
               <!-- Example Job/Briefcase SVG -->
@@ -108,3 +110,50 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
     </div>
   </div>
 </section>
+
+<style>
+/* Animation Keyframes */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Animation Classes */
+.animate-slide-in-right {
+  animation: slideInRight 1s ease-out 0.5s both;
+}
+
+.animate-slide-in-right-delayed {
+  animation: slideInRight 1s ease-out 1s both;
+}
+
+.animate-slide-in-left-delayed {
+  animation: slideInLeft 1s ease-out 1.5s both;
+}
+
+/* Hover effects for extra interactivity */
+.animate-slide-in-right:hover,
+.animate-slide-in-right-delayed:hover,
+.animate-slide-in-left-delayed:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+</style>

@@ -55,9 +55,11 @@
                 <ul id="userDropdown" class="hidden mt-2 ml-8 space-y-1">
                     <li>
                         <a href="?page=admin-jobseekers" class="flex items-center px-6 py-2 text-sm font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50 ">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                             </svg>
+
                             <span>Jobseekers</span>
                         </a>
                     </li>

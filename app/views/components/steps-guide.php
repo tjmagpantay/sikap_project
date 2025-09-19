@@ -75,12 +75,10 @@
                         </div>
                     </div>
                 </div>
-
-                
             </div>
 
             <!-- Right Image Section - Hidden below 640px -->
-            <div class="relative items-center justify-center hidden p-4 sm:block">
+            <div id="job-guide-image" class="relative items-center justify-center hidden p-4 sm:block">
                 <!-- Background gradient overlay -->
                 <div class="absolute inset-0 transition-transform duration-300 transform rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 hover:scale-105"></div>
 
@@ -89,45 +87,52 @@
                     <img src="./assets/images/job-guide-img.png"
                         alt="Professional job seeker success story"
                         class="object-cover transition-opacity duration-300 w-90% h-90% hover:opacity-90">
-
-                    <!-- Floating Success Indicator -->
-                    <div class="absolute z-20 p-3 bg-white border border-gray-100 shadow-xl -top-4 -right-4 rounded-xl" data-aos="zoom-in" data-aos-delay="400">
-                        <div class="flex items-center gap-3">
-                            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                            <span class="text-sm font-semibold text-gray-700">Success Rate: 95%</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* Initial state - hidden (image only) */
+    #job-guide-image {
+        opacity: 0;
+        transform: translateX(100px);
+        transition: all 0.8s ease-out;
+    }
 
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    /* Animated state - visible (image only) */
+    #job-guide-image.animate-in {
+        opacity: 1;
+        transform: translateX(0);
+    }
+</style>
+
 <script>
-    // Initialize AOS when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
+        // Create intersection observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Animate only the image
+                    const image = document.getElementById('job-guide-image');
+                    if (image) {
+                        image.classList.add('animate-in');
+                    }
 
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
+                    // Stop observing once animated
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2, // Trigger when 20% of the section is visible
+            rootMargin: '0px 0px -100px 0px' // Start animation 100px before the section is fully visible
+        });
+
+        // Start observing the steps guide section
+        const stepsSection = document.getElementById('steps-guide');
+        if (stepsSection) {
+            observer.observe(stepsSection);
+        }
     });
 </script>
