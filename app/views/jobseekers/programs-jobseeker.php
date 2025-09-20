@@ -33,7 +33,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
 
                 <!-- Filter Tabs -->
                 <div class="flex flex-wrap gap-4 mb-8">
-                    <button class="relative px-2 py-3 text-sm font-medium text-blue-600 transition-all duration-200 filter-btn group active" onclick="filterEvents('all')" data-category="all">
+                    <button class="relative px-2 py-3 text-sm font-medium transition-all duration-200 text-primary filter-btn group active" onclick="filterEvents('all')" data-category="all">
                         All Events
                         <span class="absolute bottom-0 left-0 w-full h-1 transition-transform duration-200 transform scale-x-100 bg-blue-600"></span>
                     </button>
@@ -149,7 +149,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                             <h4 class="flex-1 text-sm font-medium leading-tight text-gray-600">
                                                 <?php echo htmlspecialchars($event['title']); ?>
                                             </h4>
-                                            <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-blue-600 bg-blue-50">
+                                            <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-primary bg-blue-50">
                                                 <?php echo ucwords($event['type']); ?>
                                             </span>
                                         </div>

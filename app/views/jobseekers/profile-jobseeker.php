@@ -171,7 +171,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
         <div class="w-full lg:!w-2/3 lg:min-w-0 lg:flex-1">
           <div class="p-6 mb-6 bg-white border border-gray-200 shadow rounded-xl">
             <!-- Tab Navigation -->
-            <div class="relative flex gap-6 mb-6 border-b">
+            <div class="relative flex gap-6 mb-4 border-b">
               <div class="absolute bottom-0 left-0 w-full h-px bg-gray-200"></div>
 
               <!-- Dynamic Tabs -->

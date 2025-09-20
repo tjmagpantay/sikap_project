@@ -1,5 +1,5 @@
 <!-- Profile Content (Default Tab) -->
-<div class="grid w-full grid-cols-1 gap-4 mb-8 md:grid-cols-2">
+<div class="grid w-full grid-cols-1 gap-4 py-4 mb-8 border-t border-gray-200 md:grid-cols-2">
     <!-- Profile Details Header -->
     <div class="flex items-center justify-between w-full col-span-1 mb-4 md:col-span-2">
         <h4 class="text-base font-semibold text-primary">Profile Details</h4>
@@ -155,7 +155,7 @@
         <div class="flex flex-wrap gap-2">
             <div class="flex flex-wrap gap-2 p-4 border border-gray-200 rounded-lg">
                 <?php foreach ($skills as $skill): ?>
-                    <span class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 text-primary">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 rounded-md text-primary">
                         <?php echo htmlspecialchars($skill['skill_name'] ?? 'N/A'); ?>
                         <span class="ml-1 text-xs opacity-75">(<?php echo $skill['proficiency_level'] ?? 'N/A'; ?>)</span>
                     </span>

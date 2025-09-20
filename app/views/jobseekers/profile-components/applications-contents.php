@@ -1,9 +1,5 @@
-<?php
-// Remove the direct model access - this should come from controller
-// The $hiredApplications should be passed from the controller
-?>
-
-<div class="mb-6">
+<div class="grid w-full gap-4 py-4 mb-8 border-t border-gray-200 ">
+  <div class="mb-8">
   <h4 class="mb-4 text-base font-semibold text-primary">My Successful Applications</h4>
 
   <?php if (empty($hiredApplications)): ?>
@@ -36,7 +32,7 @@
               </div>
             </div>
             <div class="flex items-center">
-              <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 bg-green-100 rounded-full">
+              <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 rounded-md text-primary">
                 <i class="mr-1 fas fa-check-circle"></i>
                 Hired
               </span>
@@ -52,4 +48,5 @@
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
+</div>
 </div>
