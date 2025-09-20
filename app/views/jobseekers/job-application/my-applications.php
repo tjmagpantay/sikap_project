@@ -26,107 +26,117 @@ include_once __DIR__ . '/../navbar-jobseeker.php';
                     <h1 class="text-2xl font-semibold text-gray-900">My Applications</h1>
                     <p class="mt-1 text-sm text-gray-600">Track the status of your job applications</p>
                 </div>
+            </div>
+        </div>
 
-                <!-- Filter Section -->
-                <div class="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:gap-4 sm:mt-0">
+        <!-- Application Filtering Section -->
+        <div class="relative py-2 mb-6 sm:px-8 lg:px-12">
+            <div class="flex flex-col gap-6 mx-auto max-w-7xl">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
+
                     <!-- Status Filter -->
-                    <div class="relative" x-data="{ open: false, selected: 'All Status' }">
-                        <button @click="open = !open" @click.away="open = false"
-                            class="flex items-center justify-between w-full gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm sm:w-auto sm:min-w-[160px] hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
-                            <span x-text="selected" class="text-gray-700 truncate"></span>
-                            <svg class="flex-shrink-0 w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
+                    <div class="flex-1 lg:flex-none lg:w-48">
+                        <div class="relative" x-data="{ open: false, selected: 'All Status' }">
+                            <button @click="open = !open" @click.away="open = false"
+                                class="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="text-gray-700 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
 
-                        <!-- Dropdown Menu -->
-                        <div x-show="open"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg sm:right-0 sm:left-auto sm:w-48 ring-1 ring-black ring-opacity-5"
-                            x-cloak>
-                            <div class="py-1">
-                                <button @click="selected = 'All Status'; open = false; filterByStatus('')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    All Status
-                                </button>
-                                <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Pending
-                                </button>
-                                <button @click="selected = 'Under Review'; open = false; filterByStatus('reviewed')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Under Review
-                                </button>
-                                <button @click="selected = 'Shortlisted'; open = false; filterByStatus('shortlisted')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Shortlisted
-                                </button>
-                                <button @click="selected = 'Hired'; open = false; filterByStatus('hired')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Hired
-                                </button>
-                                <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Rejected
-                                </button>
-                                <button @click="selected = 'Resigned'; open = false; filterByStatus('resigned')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    Resigned
-                                </button>
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'All Status'; open = false; filterByStatus('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        All Status
+                                    </button>
+                                    <button @click="selected = 'Pending'; open = false; filterByStatus('pending')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Pending
+                                    </button>
+                                    <button @click="selected = 'Under Review'; open = false; filterByStatus('reviewed')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Under Review
+                                    </button>
+                                    <button @click="selected = 'Shortlisted'; open = false; filterByStatus('shortlisted')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Shortlisted
+                                    </button>
+                                    <button @click="selected = 'Hired'; open = false; filterByStatus('hired')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Hired
+                                    </button>
+                                    <button @click="selected = 'Rejected'; open = false; filterByStatus('rejected')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Rejected
+                                    </button>
+                                    <button @click="selected = 'Resigned'; open = false; filterByStatus('resigned')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        Resigned
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Interview Filter -->
-                    <div class="relative" x-data="{ open: false, selected: 'All Applications' }">
-                        <button @click="open = !open" @click.away="open = false"
-                            class="flex items-center justify-between w-full gap-2 px-4 py-3 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-sm shadow-sm sm:w-auto sm:min-w-[180px] hover:bg-gray-50 focus:ring-2 focus:ring-primary/50 hover:shadow-md">
-                            <span x-text="selected" class="text-gray-700 truncate"></span>
-                            <svg class="flex-shrink-0 w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
+                    <div class="flex-1 lg:flex-none lg:w-48">
+                        <div class="relative" x-data="{ open: false, selected: 'All Applications' }">
+                            <button @click="open = !open" @click.away="open = false"
+                                class="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <span x-text="selected" class="text-gray-700 truncate"></span>
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
 
-                        <!-- Dropdown Menu -->
-                        <div x-show="open"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg sm:right-0 sm:left-auto sm:w-48 ring-1 ring-black ring-opacity-5"
-                            x-cloak>
-                            <div class="py-1">
-                                <button @click="selected = 'All Applications'; open = false; filterByInterview('')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    All Applications
-                                </button>
-                                <button @click="selected = 'With Interview'; open = false; filterByInterview('with_interview')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    With Interview
-                                </button>
-                                <button @click="selected = 'No Interview'; open = false; filterByInterview('no_interview')"
-                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
-                                    No Interview
-                                </button>
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
+                                x-cloak>
+                                <div class="py-1">
+                                    <button @click="selected = 'All Applications'; open = false; filterByInterview('')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        All Applications
+                                    </button>
+                                    <button @click="selected = 'With Interview'; open = false; filterByInterview('with_interview')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        With Interview
+                                    </button>
+                                    <button @click="selected = 'No Interview'; open = false; filterByInterview('no_interview')"
+                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-100">
+                                        No Interview
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Clear Filter Button -->
-                    <button type="button" id="clearFilters" onclick="clearAllFilters()"
-                        class="w-full px-4 py-3 text-sm font-medium text-white transition-all rounded-sm shadow-sm sm:w-auto sm:min-w-[120px] sm:flex-shrink-0 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
-                        <span class="sm:hidden">Clear All Filters</span>
-                        <span class="hidden sm:inline">Clear Filters</span>
-                    </button>
+                    <div class="flex gap-2 lg:flex-shrink-0">
+                        <button type="button" id="clearFilters" onclick="clearAllFilters()"
+                            class="px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap">
+                            Clear Filters
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
