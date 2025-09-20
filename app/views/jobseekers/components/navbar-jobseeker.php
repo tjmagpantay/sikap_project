@@ -86,38 +86,39 @@ if (!isset($jobseeker) || empty($jobseeker)) {
             x-transition:leave-start="transform opacity-100 scale-100"
             x-transition:leave-end="transform opacity-0 scale-95"
             @click.away="isOpen = false"
-            class="absolute right-0 z-50 mt-2 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl w-[500px] max-h-[500px]"
-            style="display: none; width: 500px !important;">
+            class="absolute right-0 z-50 mt-3 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl w-[400px] max-h-[500px]"
+            style="display: none; top: calc(100% + 8px); width: 400px !important;">
+
 
             <!-- Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-              <h3 class="font-semibold text-mainGray text-md">Notifications</h3>
+            <div class="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+              <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
               <button @click="markAllAsRead()"
                 x-show="unreadCount > 0"
-                class="px-3 py-1 text-sm font-medium text-blue-600 transition-colors duration-200 rounded-md hover:text-blue-800 hover:bg-blue-100">
+                class="px-2 py-1 text-xs font-medium text-blue-600 transition-colors duration-200 rounded hover:text-blue-800 hover:bg-blue-100">
                 Mark all read
               </button>
             </div>
 
             <!-- Loading State -->
             <template x-if="loading">
-              <div class="flex items-center justify-center px-6 py-8 text-gray-500">
+              <div class="flex items-center justify-center px-4 py-6 text-gray-500">
                 <div class="flex items-center">
-                  <svg class="w-5 h-5 mr-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                   </svg>
-                  Loading notifications...
+                  <span class="text-sm">Loading...</span>
                 </div>
               </div>
             </template>
 
             <!-- Error State -->
             <template x-if="error && !loading">
-              <div class="px-6 py-8 text-center text-red-500">
-                <p x-text="error" class="mb-3"></p>
+              <div class="px-4 py-6 text-center text-red-500">
+                <p x-text="error" class="mb-2 text-sm"></p>
                 <button @click="fetchNotifications()"
-                  class="px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 rounded-md hover:text-blue-800 hover:bg-blue-50">
+                  class="px-3 py-1 text-xs font-medium text-blue-600 transition-colors duration-200 rounded hover:text-blue-800 hover:bg-blue-50">
                   Try again
                 </button>
               </div>
@@ -127,13 +128,13 @@ if (!isset($jobseeker) || empty($jobseeker)) {
             <div class="overflow-y-auto max-h-80">
               <!-- Empty State -->
               <template x-if="notifications.length === 0 && !loading && !error">
-                <div class="px-6 py-12 text-center">
-                  <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="px-4 py-8 text-center">
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM20 4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h4v-2H4V6h16v10h-2v2h2c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" />
                   </svg>
-                  <p class="font-medium text-gray-500">No notifications yet</p>
-                  <p class="mt-1 text-sm text-gray-400">We'll notify you when there's something new!</p>
+                  <p class="text-sm font-medium text-gray-500">No notifications yet</p>
+                  <p class="mt-1 text-xs text-gray-400">We'll notify you when there's something new!</p>
                 </div>
               </template>
 
@@ -142,19 +143,18 @@ if (!isset($jobseeker) || empty($jobseeker)) {
                 <div class="transition-all duration-200 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
                   :class="notification.status === 'unread' ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''"
                   @click="handleNotificationClick(notification)">
-                  <div class="px-6 py-4">
+                  <div class="px-4 py-3">
                     <div class="flex items-start justify-between">
                       <div class="flex-1 min-w-0">
                         <!-- Notification Icon -->
                         <div class="flex items-start">
                           <div class="flex-shrink-0">
-                            <!-- FIXED: Different background colors for different notification types -->
-                            <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                            <div class="flex items-center justify-center rounded-full w-7 h-7"
                               :class="notification.type === 'program' ? 'bg-green-100' : 'bg-blue-100'">
 
                               <!-- Job Post Icon -->
                               <template x-if="notification.type === 'job_post'">
-                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                <svg class="w-4 h-4 text-blue-600" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                                   <path d="M28,8H21V6a2,2,0,0,0-2-2H13a2,2,0,0,0-2,2V8H4a2,2,0,0,0-2,2V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10A2,2,0,0,0,28,8ZM13,6h6V8H13Zm15,4v9H4V10ZM4,26V21H28v5Z"></path>
                                   <path d="M15,18h2a1,1,0,0,0,0-2H15a1,1,0,0,0,0,2Z"></path>
                                 </svg>
@@ -162,22 +162,22 @@ if (!isset($jobseeker) || empty($jobseeker)) {
 
                               <!-- Program/Event Icon -->
                               <template x-if="notification.type === 'program'">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                               </template>
 
                               <!-- Application Update Icon -->
                               <template x-if="notification.type === 'application_update'">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </template>
 
-                              <!-- FIXED: Add Interview Notification Icon -->
+                              <!-- Interview Notification Icon -->
                               <template x-if="notification.type === 'interview'">
-                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -185,25 +185,25 @@ if (!isset($jobseeker) || empty($jobseeker)) {
 
                               <!-- Default Icon -->
                               <template x-if="notification.type !== 'job_post' && notification.type !== 'program' && notification.type !== 'application_update' && notification.type !== 'interview'">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </template>
                             </div>
                           </div>
-                          <div class="flex-1 ml-3">
-                            <h4 class="text-sm font-medium leading-5 text-gray-900"
+                          <div class="flex-1 ml-2">
+                            <h4 class="text-sm font-medium leading-4 text-gray-900"
                               :class="notification.status === 'unread' ? 'font-semibold' : ''"
                               x-text="notification.title">
                             </h4>
-                            <p class="mt-1 text-sm leading-5 text-gray-600 line-clamp-2" x-text="notification.message"></p>
-                            <p class="mt-2 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></p>
+                            <p class="mt-1 text-xs leading-4 text-gray-600 line-clamp-2" x-text="notification.message"></p>
+                            <p class="mt-1 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></p>
                           </div>
                         </div>
                       </div>
-                      <div class="flex items-center ml-4">
+                      <div class="flex items-center ml-2">
                         <span x-show="notification.status === 'unread'"
-                          class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></span>
+                          class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full"></span>
                       </div>
                     </div>
                   </div>
@@ -212,9 +212,9 @@ if (!isset($jobseeker) || empty($jobseeker)) {
             </div>
 
             <!-- Footer -->
-            <div class="px-6 py-3 border-t bg-gray-50">
+            <div class="px-4 py-2 border-t bg-gray-50">
               <a href="?page=notifications-jobseeker"
-                class="block text-sm font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
+                class="block text-xs font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
                 View all notifications →
               </a>
             </div>
@@ -295,6 +295,135 @@ if (!isset($jobseeker) || empty($jobseeker)) {
         </li>
       </ul>
 
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Menu - Fixed positioning -->
+  <div
+    x-show="open"
+    @click.away="open = false"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-95"
+    class="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg left-4 right-4 lg:hidden"
+    style="top: calc(100% + 8px); display: none;">
+
+    <div class="p-4">
+      <ul class="flex flex-col gap-3">
+        <!-- Profile Section -->
+        <li class="pb-3 mb-3 border-b border-gray-200">
+          <div class="flex items-center gap-3 px-3 py-2 mb-3">
+            <img src="<?php
+                      if (!empty($jobseeker['profile_picture'])) {
+                        echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
+                      } else {
+                        echo '/sikap/public/assets/images/default-avatar.jpg';
+                      }
+                      ?>" alt="Profile"
+              class="object-cover w-8 h-8 border-2 border-gray-300 rounded-full">
+            <span class="font-medium text-gray-700 text-md">
+              <?php echo htmlspecialchars($jobseeker['first_name'] . ' ' . $jobseeker['last_name']); ?>
+            </span>
+          </div>
+
+          <hr>
+
+          <div class="flex flex-col gap-2 mb-3">
+            <!-- Notifications Link -->
+            <a href="?page=notifications-jobseeker" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+              </svg>
+              Notifications
+            </a>
+
+            <!-- Saved Jobs Link -->
+            <a href="?page=saved-jobs" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+              </svg>
+              Saved Jobs
+            </a>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <!-- Profile Link -->
+            <a href="?page=profile-jobseeker" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275" />
+              </svg>
+              Profile
+            </a>
+
+            <!-- Applied Jobs Link -->
+            <a href="?page=my-applications" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6v6a2.25 2.25 0 01-2.25 2.25h-7.5A2.25 2.25 0 014.5 15v-6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0116.5 9z" />
+              </svg>
+              Applied Jobs
+            </a>
+
+            <!-- Settings Link -->
+            <a href="?page=settings-jobseeker" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Settings
+            </a>
+          </div>
+        </li>
+
+        <hr>
+
+        <!-- Main Navigation Links -->
+        <li><a href="?page=jobseeker-dashboard" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            Home
+          </a></li>
+
+        <li><a href="?page=browse-jobs" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            Job Search
+          </a></li>
+
+        <li><a href="?page=programs-jobseeker" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+            </svg>
+            Programs
+          </a></li>
+
+        <li><a href="?page=explore-companies" class="flex items-center gap-3 px-3 py-2 text-base text-gray-600 rounded-md hover:bg-gray-100 hover:text-primary" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              class="w-5 h-5 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8.25 7.5V6A2.25 2.25 0 0 1 10.5 3.75h3A2.25 2.25 0 0 1 15.75 6v1.5m-7.5 0h7.5m-7.5 0a3 3 0 0 0-3 3v7.5a3 
+               3 0 0 0 3 3h7.5a3 3 0 0 0 3-3v-7.5a3 3 0 0 0-3-3m-7.5 0h-.75a2.25 2.25 0 0 0-2.25 2.25v1.5a2.25 2.25 0 
+               0 0 2.25 2.25h.75m7.5-6h.75a2.25 2.25 0 0 1 2.25 2.25v1.5a2.25 2.25 0 0 1-2.25 2.25h-.75" />
+            </svg>
+
+            Explore Companies
+          </a></li>
+
+        <!-- Sign Out Button -->
+        <li class="pt-3 mt-3 border-t border-gray-200">
+          <a href="?page=logout" class="flex items-center gap-3 px-3 py-2 text-base font-medium text-red-600 rounded-md hover:bg-red-50" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+            Sign Out
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 

@@ -22,7 +22,7 @@ if (!isset($jobseeker) || empty($jobseeker)) {
     ];
 }
 
-include_once __DIR__ . '/navbar-jobseeker.php';
+include_once __DIR__ . '/components/navbar-jobseeker.php';
 ?>
 
 <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
@@ -144,7 +144,7 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                                         <h3 class="text-lg font-semibold text-gray-900 <?php echo $notification['status'] === 'unread' ? 'font-bold' : ''; ?>">
                                             <?php echo htmlspecialchars($notification['title']); ?>
                                         </h3>
-                                        <p class="text-xs text-gray-500 mt-1">
+                                        <p class="mt-1 text-xs text-gray-500">
                                             <?php
                                             $date = new DateTime($notification['created_at']);
                                             echo $date->format('M j, Y g:i A');
@@ -182,40 +182,39 @@ include_once __DIR__ . '/navbar-jobseeker.php';
                         <!-- Card Body -->
                         <div class="p-4">
                             <!-- Notification Message -->
-                            <p class="text-xs text-gray-700 mb-4 leading-relaxed">
+                            <p class="mb-4 text-xs leading-relaxed text-gray-700">
                                 <?php echo htmlspecialchars($notification['message']); ?>
                             </p>
+                        <!-- Action Buttons -->
+                        <div class="flex flex-row items-end gap-2 py-2 border-t border-gray-100">
+                            <?php if ($notification['status'] === 'unread'): ?>
+                                <button onclick="markAsRead(<?php echo $notification['notification_id']; ?>)"
+                                    class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Mark as Read
+                                </button>
+                            <?php endif; ?>
 
-                            <!-- Action Buttons -->
-                            <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-gray-100">
-                                <?php if ($notification['status'] === 'unread'): ?>
-                                    <button onclick="markAsRead(<?php echo $notification['notification_id']; ?>)"
-                                        class="flex items-center justify-center px-4 py-2 text-xs font-medium transition-colors border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400">
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Mark as Read
-                                    </button>
-                                <?php endif; ?>
-
-                                <?php if (!empty($notification['link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($notification['link']); ?>"
-                                        onclick="<?php if ($notification['status'] === 'unread'): ?>markAsRead(<?php echo $notification['notification_id']; ?>)<?php endif; ?>"
-                                        class="flex items-center justify-center px-4 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                        View Details
-                                    </a>
-                                <?php endif; ?>
-                            </div>
+                            <?php if (!empty($notification['link'])): ?>
+                                <a href="<?php echo htmlspecialchars($notification['link']); ?>"
+                                    onclick="<?php if ($notification['status'] === 'unread'): ?>markAsRead(<?php echo $notification['notification_id']; ?>)<?php endif; ?>"
+                                    class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                    View Details
+                                </a>
+                            <?php endif; ?>
+                        </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
 
                 <!-- Pagination -->
                 <?php if ($data['hasNextPage'] || $data['currentPage'] > 1): ?>
-                    <div class="flex justify-center mt-8 py-6 border-t border-gray-200">
+                    <div class="flex justify-center py-6 mt-8 border-t border-gray-200">
                         <div class="flex items-center gap-2">
                             <?php if ($data['currentPage'] > 1): ?>
                                 <a href="?page=notifications-jobseeker&p=<?php echo $data['currentPage'] - 1; ?>"
