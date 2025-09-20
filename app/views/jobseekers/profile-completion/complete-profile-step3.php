@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../navbar-jobseeker.php';
+include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
 // Debug - let's see what data we have
 error_log("Parsed education data: " . json_encode($_SESSION['parsed_resume_data']['education'] ?? []));

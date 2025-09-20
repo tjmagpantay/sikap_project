@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__ . '/components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-jobseeker.php';
+include_once __DIR__ . '/components/navbar-jobseeker.php';
 ?>
 
 <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24 ">

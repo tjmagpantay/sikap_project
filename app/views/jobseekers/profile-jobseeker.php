@@ -31,7 +31,7 @@ if (!isset($completionPercentage) || $completionPercentage === false) {
 ?>
 
 <?php include_once __DIR__ . '/../components/navbar-top.php';
-include_once __DIR__ . '/navbar-jobseeker.php';
+include_once __DIR__ . '/components/navbar-jobseeker.php';
 ?>
 
 <div class="min-h-screen">
