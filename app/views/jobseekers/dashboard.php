@@ -339,7 +339,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                                 </span>
                                             <?php endif; ?>
                                         </div>
-
                                         <!-- Row 5: Posted Date + Best Matches Info -->
                                         <div class="flex items-center justify-between text-xs text-gray-400 transition-colors duration-300">
                                             <span class="transition-colors duration-300 hover:text-gray-600">
@@ -347,44 +346,34 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                             </span>
 
                                             <span class="flex items-center gap-1 transition-all duration-300 text-primary hover:text-primary/80">
-                                                Best Matches:
-
                                                 <?php
                                                 $matchPercentage = $job['match_percentage'] ?? 50;
                                                 $hasRealRecommendation = $job['has_recommendation'] ?? false;
                                                 $isLowMatch = $matchPercentage < 20;
                                                 ?>
 
-                                                <!-- UPDATED: Real Match Percentage with Color Coding -->
-                                                <span class="text-sm font-medium transition-colors duration-300 hover:text-primary/80">
-                                                    <?= number_format($matchPercentage, 1) ?>%
-                                                </span>
+                                                <?php if (!$isLowMatch): ?>
+                                                    Best Matches:
+                                                    <!-- UPDATED: Real Match Percentage with Color Coding -->
+                                                    <span class="text-sm font-medium transition-colors duration-300 hover:text-primary/80 <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">
+                                                        <?= number_format($matchPercentage, 1) ?>%
+                                                    </span>
 
-
-                                                <!-- Low Match Warning Icon (Optional - only if you want it here too) -->
-                                                <?php if ($isLowMatch): ?>
-                                                    <div class="relative ml-1 group">
-                                                        <svg class="w-3 h-3 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <!-- Smaller Circle with check -->
+                                                    <span class="flex items-center justify-center w-5 h-5 transition-all duration-300 rounded-full hover:scale-110">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#10364B">
+                                                            <path d="M14.01 21c-.49 0-.95-.23-1.33-.43-.24-.12-.53-.27-.68-.27s-.47.15-.7.27c-.48.25-1.08.55-1.72.38-.66-.17-1.02-.75-1.34-1.21-.13-.21-.31-.49-.43-.56-.12-.07-.44-.08-.71-.1-.54-.03-1.21-.06-1.7-.53-.48-.49-.51-1.16-.54-1.7-.01-.26-.03-.59-.07-.71-.06-.11-.35-.29-.55-.43-.46-.3-1.03-.67-1.21-1.31-.17-.64.13-1.24.38-1.72.12-.24.27-.53.27-.68s-.15-.47-.27-.7c-.25-.48-.55-1.08-.38-1.72.17-.66.75-1.02 1.21-1.34.2-.13.49-.31.56-.43.07-.12.08-.44.1-.71.03-.54.06-1.21.53-1.7.49-.48 1.16-.51 1.7-.54.26-.01.59-.03.71-.07.11-.06.29-.35.43-.55.3-.46.67-1.03 1.31-1.21.64-.17 1.24.13 1.72.38.24.12.53.27.68.27s.47-.15.7-.27c.48-.25 1.08-.55 1.72-.38.66.17 1.02.75 1.34 1.21.13.21.31.49.43.56.12.07.44.08.71.1.54.03 1.21.06 1.7.53.48.49.51 1.16.54 1.7.01.26.03.59.07.71.06.11.35.29.55.43.46.3 1.03.67 1.21 1.31.17.64-.13 1.24-.38 1.72-.12.24-.27.53-.27.68s.15.47.27.7c.25.48.55 1.08.38 1.72-.17.66-.75 1.02-1.21 1.34-.2.13-.49.31-.56.43-.07.12-.08.44-.1.71-.03.54-.06 1.21-.53 1.7-.49.48-1.16.51-1.7.54-.26.01-.59.03-.71.07-.11.06-.29.35-.43.55-.3.46-.67 1.03-1.31 1.21-.13.04-.26.05-.39.05Zm-4.02-16.5c-.1.04-.33.38-.44.57-.24.37-.51.79-.94 1.04-.44.25-.94.28-1.39.3-.22.01-.63.03-.72.1-.06.08-.08.48-.09.7-.02.45-.05.95-.3 1.39-.25.44-.67.72-1.04.95-.18.11-.52.33-.56.44-.01.11.16.46.26.66.2.4.44.83.44 1.34s-.24.94-.44 1.34c-.1.2-.27.55-.26.66.04.11.38.34.56.45.37.23.79.51 1.04.95.25.44.28.94.3 1.39.01.22.03.63.1.72.08.06.48.08.7.09.45.02.95.05 1.39.3.44.25.72.67.95 1.04.11.18.33.52.44.56.11.04.46-.16.66-.26.4-.2.83-.44 1.34-.44s.94.24 1.34.44c.2.1.55.27.66.26.11-.04.34-.38.45-.56.23-.37.51-.79.95-1.04.44-.25.94-.28 1.39-.3.22-.01.63-.03.72-.1.06-.08.08-.48.09-.7.02-.45.05-.95.3-1.39.25-.44.67-.72 1.04-.95.18-.11.52-.33.56-.44.01-.11-.16-.46-.26-.66-.2-.4-.44-.83-.44-1.34s.24-.94.44-1.34c.1-.2.27-.55.26-.66-.04-.11-.38-.34-.56-.45-.37-.23-.79-.51-1.04-.95-.25-.44-.28-.94-.3-1.39-.01-.22-.03-.63-.1-.72-.08-.06-.48-.08-.7-.09-.45-.02-.95-.05-1.39-.3-.44-.25-.72-.67-.95-1.04-.11-.18-.33-.52-.44-.56-.1-.03-.45.17-.66.27-.4.2-.83.44-1.34.44s-.94-.24-1.34-.44c-.2-.1-.55-.27-.66-.27Zm.5 11.01c-.2 0-.39-.08-.53-.22l-2.54-2.53c-.29-.29-.29-.77 0-1.06.29-.29.77-.29 1.06 0l1.98 1.98 4.99-4.99c.29-.29.77-.29 1.06 0s.29.77 0 1.06l-5.52 5.52c-.14.14-.33.22-.53.22Z" />
+                                                        </svg>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <!-- Poor Match Display with Icon -->
+                                                    <span class="flex items-center gap-1 text-gray-400">
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                         </svg>
-
-                                                        <!-- Mini Tooltip for Dashboard -->
-                                                        <div class="absolute right-0 z-50 px-2 py-1 mb-2 text-xs text-white transition-opacity duration-200 bg-gray-800 rounded shadow-lg opacity-0 pointer-events-none bottom-full group-hover:opacity-100 whitespace-nowrap">
-                                                            <div class="text-center">
-                                                                <div class="text-yellow-300">⚠️ Low Match</div>
-                                                                <div class="text-gray-300">Improve profile</div>
-                                                            </div>
-                                                            <div class="absolute w-0 h-0 border-t-2 border-l-2 border-r-2 border-transparent top-full right-2 border-t-gray-800"></div>
-                                                        </div>
-                                                    </div>
+                                                        <span class="text-xs">Poor Match</span>
+                                                    </span>
                                                 <?php endif; ?>
-
-                                                <!-- Smaller Circle with check (unchanged) -->
-                                                <span class="flex items-center justify-center w-5 h-5 transition-all duration-300 rounded-full hover:scale-110">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#10364B">
-                                                        <path d="M14.01 21c-.49 0-.95-.23-1.33-.43-.24-.12-.53-.27-.68-.27s-.47.15-.7.27c-.48.25-1.08.55-1.72.38-.66-.17-1.02-.75-1.34-1.21-.13-.21-.31-.49-.43-.56-.12-.07-.44-.08-.71-.1-.54-.03-1.21-.06-1.7-.53-.48-.49-.51-1.16-.54-1.7-.01-.26-.03-.59-.07-.71-.06-.11-.35-.29-.55-.43-.46-.3-1.03-.67-1.21-1.31-.17-.64.13-1.24.38-1.72.12-.24.27-.53.27-.68s-.15-.47-.27-.7c-.25-.48-.55-1.08-.38-1.72.17-.66.75-1.02 1.21-1.34.2-.13.49-.31.56-.43.07-.12.08-.44.1-.71.03-.54.06-1.21.53-1.7.49-.48 1.16-.51 1.7-.54.26-.01.59-.03.71-.07.11-.06.29-.35.43-.55.3-.46.67-1.03 1.31-1.21.64-.17 1.24.13 1.72.38.24.12.53.27.68.27s.47-.15.7-.27c.48-.25 1.08-.55 1.72-.38.66.17 1.02.75 1.34 1.21.13.21.31.49.43.56.12.07.44.08.71.1.54.03 1.21.06 1.7.53.48.49.51 1.16.54 1.7.01.26.03.59.07.71.06.11.35.29.55.43.46.3 1.03.67 1.21 1.31.17.64-.13 1.24-.38 1.72-.12.24-.27.53-.27.68s.15.47.27.7c.25.48.55 1.08.38 1.72-.17.66-.75 1.02-1.21 1.34-.2.13-.49.31-.56.43-.07.12-.08.44-.1.71-.03.54-.06 1.21-.53 1.7-.49.48-1.16.51-1.7.54-.26.01-.59.03-.71.07-.11.06-.29.35-.43.55-.3.46-.67 1.03-1.31 1.21-.13.04-.26.05-.39.05Zm-4.02-16.5c-.1.04-.33.38-.44.57-.24.37-.51.79-.94 1.04-.44.25-.94.28-1.39.3-.22.01-.63.03-.72.1-.06.08-.08.48-.09.7-.02.45-.05.95-.3 1.39-.25.44-.67.72-1.04.95-.18.11-.52.33-.56.44-.01.11.16.46.26.66.2.4.44.83.44 1.34s-.24.94-.44 1.34c-.1.2-.27.55-.26.66.04.11.38.34.56.45.37.23.79.51 1.04.95.25.44.28.94.3 1.39.01.22.03.63.1.72.08.06.48.08.7.09.45.02.95.05 1.39.3.44.25.72.67.95 1.04.11.18.33.52.44.56.11.04.46-.16.66-.26.4-.2.83-.44 1.34-.44s.94.24 1.34.44c.2.1.55.27.66.26.11-.04.34-.38.45-.56.23-.37.51-.79.95-1.04.44-.25.94-.28 1.39-.3.22-.01.63-.03.72-.1.06-.08.08-.48.09-.7.02-.45.05-.95.3-1.39.25-.44.67-.72 1.04-.95.18-.11.52-.33.56-.44.01-.11-.16-.46-.26-.66-.2-.4-.44-.83-.44-1.34s.24-.94.44-1.34c.1-.2.27-.55.26-.66-.04-.11-.38-.34-.56-.45-.37-.23-.79-.51-1.04-.95-.25-.44-.28-.94-.3-1.39-.01-.22-.03-.63-.1-.72-.08-.06-.48-.08-.7-.09-.45-.02-.95-.05-1.39-.3-.44-.25-.72-.67-.95-1.04-.11-.18-.33-.52-.44-.56-.1-.03-.45.17-.66.27-.4.2-.83.44-1.34.44s-.94-.24-1.34-.44c-.2-.1-.55-.27-.66-.27Zm.5 11.01c-.2 0-.39-.08-.53-.22l-2.54-2.53c-.29-.29-.29-.77 0-1.06.29-.29.77-.29 1.06 0l1.98 1.98 4.99-4.99c.29-.29.77-.29 1.06 0s.29.77 0 1.06l-5.52 5.52c-.14.14-.33.22-.53.22Z" />
-                                                    </svg>
-                                                </span>
                                             </span>
                                         </div>
                                     </div>
@@ -525,7 +514,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             const recentButton = document.querySelector('[data-filter="recent"]');
             if (recentButton) {
                 console.log('Setting Most Recent as default active'); // Debug log
-                
+
                 // Set initial active state
                 recentButton.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
                 recentButton.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
@@ -534,15 +523,34 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 filterJobs('recent', recentButton);
             }
 
-            // Auto-load first job on desktop only
+            // FIXED: Auto-load first job on desktop - with better error handling
             if (window.innerWidth >= 1024) {
                 setTimeout(() => {
                     const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
                     if (firstJobCard) {
                         const latestJobId = firstJobCard.getAttribute('data-job-id');
+                        console.log('Auto-loading first job:', latestJobId);
+
+                        // Mark the first card as active immediately
+                        firstJobCard.classList.remove('border-gray-200');
+                        firstJobCard.classList.add('border-primary', 'bg-primary/5');
+
+                        // Load the job details
                         loadJobDetails(latestJobId, firstJobCard, true);
+                    } else {
+                        // If no job cards found, show a friendly message
+                        const container = document.getElementById('job-details-container');
+                        if (container) {
+                            container.innerHTML = `
+                                <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                                    <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
+                                    <h3 class="mt-4 text-lg font-medium text-gray-900">No Jobs Available</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Check back later for new job opportunities</p>
+                                </div>
+                            `;
+                        }
                     }
-                }, 200);
+                }, 500); // Increased timeout to ensure DOM is fully ready
             }
 
             // Initialize other functionality
@@ -552,7 +560,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             const visibleJobs = document.querySelectorAll('.left-job-card[data-job-id]').length;
             updateJobCount(visibleJobs);
         });
-        
+
         // Update window resize handler to handle orientation changes
         window.addEventListener('resize', function() {
             // Clear any existing timeouts to prevent multiple calls
@@ -722,7 +730,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             // Apply filter logic
             if (filterType === 'recent') {
                 // Sort by most recent (this is a simple example - you might want to implement server-side sorting)
-                const jobContainer = document.querySelector('.space-y-6');
+                const jobContainer = document.querySelector('.space-y-4');
                 const cards = Array.from(jobCards);
 
                 // For demo purposes, we'll just reverse the order
@@ -1047,25 +1055,37 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 .catch(error => {
                     console.error('Fetch error:', error);
 
-                    // For auto-load errors, show a more user-friendly message
-                    const errorMessage = isAutoLoad ? 'Welcome! Select a job to view details' : 'Connection Error';
-                    const errorIcon = isAutoLoad ? 'fas fa-briefcase' : 'fas fa-exclamation-triangle';
-                    const errorDescription = isAutoLoad ? 'Click on any job from the list to see its full details' : 'Please check your connection and try again';
+                    // For auto-load errors, show the latest job as default content instead of error
+                    if (isAutoLoad) {
+                            // Try to show basic job info from the card data
+                            const jobTitle = cardElement ? cardElement.querySelector('h3')?.textContent || 'Job Details' : 'Latest Job';
 
-                    container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
-                        <i class="text-5xl ${isAutoLoad ? 'text-gray-300' : 'text-red-300'} ${errorIcon}"></i>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">${errorMessage}</h3>
-                        <p class="mt-1 text-xs text-gray-500">${errorDescription}</p>
-                        ${!isAutoLoad ? `
+                                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                            <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">${jobTitle}</h3>
+                            <p class="mt-1 text-sm text-gray-500">Click on the job card to view full details</p>
+                            <button onclick="location.reload()" 
+                                    class="px-4 py-2 mt-3 text-sm text-white rounded bg-primary hover:bg-primary/90">
+                                Refresh Page
+                            </button>
+                        </div>
+                    `;
+                    } else {
+                                    // Show error for manual clicks
+                                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
+                            <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Connection Error</h3>
+                            <p class="mt-1 text-sm text-gray-500">Please check your connection and try again</p>
                             <p class="mt-2 text-xs text-red-500">Error: ${error.message}</p>
-                            <button onclick="loadJobDetails(${jobId}, this.closest('.left-job-card') || cardElement)" 
-                                    class="px-4 py-2 mt-3 text-xs text-white rounded bg-primary hover:bg-primary/90">
+                            <button onclick="loadJobDetails(${jobId}, cardElement)" 
+                                    class="px-4 py-2 mt-3 text-sm text-white rounded bg-primary hover:bg-primary/90">
                                 Retry
                             </button>
-                        ` : ''}
-                    </div>
-                `;
+                        </div>
+                    `;
+                    }
                 });
         }
 
@@ -1083,23 +1103,24 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 applyFilterBtn.addEventListener('click', applyAllFilters);
             }
         }
+
         function shareJob(jobTitle, jobUrl) {
-    if (navigator.share) {
-        navigator.share({
-            title: jobTitle,
-            text: `Check out this job opportunity: ${jobTitle}`,
-            url: jobUrl
-        }).then(() => {
-            console.log('Job shared successfully');
-        }).catch((error) => {
-            console.error('Error sharing job:', error);
-            // Fallback to alert if share fails
-            alert('Share feature not supported');
-        });
-    } else {
-        alert('Share feature not supported');
-    }
-}
+            if (navigator.share) {
+                navigator.share({
+                    title: jobTitle,
+                    text: `Check out this job opportunity: ${jobTitle}`,
+                    url: jobUrl
+                }).then(() => {
+                    console.log('Job shared successfully');
+                }).catch((error) => {
+                    console.error('Error sharing job:', error);
+                    // Fallback to alert if share fails
+                    alert('Share feature not supported');
+                });
+            } else {
+                alert('Share feature not supported');
+            }
+        }
 
         // ...rest of your existing JavaScript code...
     </script>
@@ -1107,8 +1128,3 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 </div>
 
 <div class="pb-20"></div> <!-- This creates space before the footer -->
-
-
-
-<script src="/public/assets/js/firebase-config.js"></script>
-<script type="module" src="/public/assets/js/firebase-init.js"></script>
