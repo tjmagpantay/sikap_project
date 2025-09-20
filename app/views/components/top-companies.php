@@ -192,7 +192,7 @@ $companies = $landingController->getTopCompanies(4);
 
 <script>
   function viewCompany(employerId) {
-    window.location.href = '?page=view-company&employer_id=' + employerId;
+      window.location.href = '?page=login-jobseeker';
   }
 
   function saveJob(employerId) {
