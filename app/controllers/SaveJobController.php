@@ -16,97 +16,112 @@ class SaveJobController
 
     public function saveJob()
     {
+        // Clear any output buffers and set headers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        ob_start(); // Start fresh buffer
         header('Content-Type: application/json');
 
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
-            exit;
-        }
-
-        $job_id = $_POST['job_id'] ?? null;
-
-        if (!$job_id) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Job ID is required']);
-            exit;
-        }
-
-        // Get jobseeker
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        if (!$jobseeker) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
-            exit;
-        }
-
         try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+                http_response_code(401);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Unauthorized']);
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Method not allowed']);
+            }
+
+            $job_id = $_POST['job_id'] ?? null;
+
+            if (!$job_id) {
+                http_response_code(400);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Job ID is required']);
+            }
+
+            // Get jobseeker
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                http_response_code(400);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Jobseeker profile not found']);
+            }
+
             $result = $this->savedJobsModel->saveJob($jobseeker['jobseeker_id'], $job_id);
 
             if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Job saved successfully']);
+                $this->sendJsonAndExit(['success' => true, 'message' => 'Job saved successfully']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Job is already saved or could not be saved']);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Job is already saved or could not be saved']);
             }
         } catch (Exception $e) {
             error_log('Save job error: ' . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Internal server error']);
+            $this->sendJsonAndExit(['success' => false, 'message' => 'Internal server error']);
         }
-        exit;
     }
 
     public function unsaveJob()
     {
+        // Clear any output buffers and set headers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        ob_start(); // Start fresh buffer
         header('Content-Type: application/json');
 
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
-            exit;
-        }
-
-        $job_id = $_POST['job_id'] ?? null;
-
-        if (!$job_id) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Job ID is required']);
-            exit;
-        }
-
-        // Get jobseeker
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        if (!$jobseeker) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
-            exit;
-        }
-
         try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+                http_response_code(401);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Unauthorized']);
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Method not allowed']);
+            }
+
+            $job_id = $_POST['job_id'] ?? null;
+
+            if (!$job_id) {
+                http_response_code(400);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Job ID is required']);
+            }
+
+            // Get jobseeker
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                http_response_code(400);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Jobseeker profile not found']);
+            }
+
             $result = $this->savedJobsModel->unsaveJob($jobseeker['jobseeker_id'], $job_id);
 
             if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Job removed from saved jobs']);
+                $this->sendJsonAndExit(['success' => true, 'message' => 'Job removed from saved jobs']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Job was not saved or could not be removed']);
+                $this->sendJsonAndExit(['success' => false, 'message' => 'Job was not saved or could not be removed']);
             }
         } catch (Exception $e) {
             error_log('Unsave job error: ' . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Internal server error']);
+            $this->sendJsonAndExit(['success' => false, 'message' => 'Internal server error']);
         }
+    }
+
+    private function sendJsonAndExit($data)
+    {
+        // Clear any previous output
+        ob_clean();
+
+        // Encode and output JSON
+        echo json_encode($data);
+
+        // Flush and exit
+        ob_end_flush();
         exit;
     }
 

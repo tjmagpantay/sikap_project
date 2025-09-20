@@ -673,7 +673,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
             const toast = document.createElement('div');
             toast.className = `toast-notification fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
-                type === 'success' ? 'bg-green-500 text-primary' : 'bg-red-500 text-primary'
+                type === 'success' ? 'bg-green-500 text-primary text-sm' : 'bg-red-500 text-primary text-sm'
             }`;
             toast.textContent = message;
 

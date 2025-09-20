@@ -648,16 +648,19 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new SaveJobController();
             $controller->showSavedJobs();
             break;
+            
         case 'save-job':
             require_once __DIR__ . '/../app/controllers/SaveJobController.php';
             $controller = new SaveJobController();
             $controller->saveJob();
+            // No exit needed here since controller handles it
             break;
 
         case 'unsave-job':
             require_once __DIR__ . '/../app/controllers/SaveJobController.php';
             $controller = new SaveJobController();
             $controller->unsaveJob();
+            // No exit needed here since controller handles it
             break;
 
         case 'setting-employer':

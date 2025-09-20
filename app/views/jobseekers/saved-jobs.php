@@ -220,8 +220,8 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
         existingToasts.forEach(toast => toast.remove());
 
         const toast = document.createElement('div');
-        toast.className = `toast-notification fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 transition-all duration-300 transform translate-x-0 ${
-        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        toast.className = `toast-notification fixed top-4 right-4 px-4 py-4 rounded-md shadow-lg z-50 transition-all duration-300 transform translate-x-0 ${
+        type === 'success' ? 'bg-green-500 text-primary text-sm' : 'bg-red-500 text-primary text-sm'
     }`;
         toast.textContent = message;
 
