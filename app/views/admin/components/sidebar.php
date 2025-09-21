@@ -3,15 +3,29 @@
 ?>
 
 <!-- Desktop Sidebar (Fixed/Sticky) -->
-<div id="sidebar" class="fixed left-0 top-16 flex flex-col bg-white border-r border-gray-200 w-80 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0">
+<div id="sidebar" class="fixed left-0 top-16 flex flex-col bg-white border-r border-gray-200  h-[calc(100vh)] transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 p-8">
 
+    <!-- Logo Section -->
+    <div class="flex items-center justify-between flex-shrink-0 gap-6 ">
+        <!-- Left: Logos -->
+        <div class="flex items-center">
+            <div class="flex items-center gap-2">
+                <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-8">
+                <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-8 shadow-sm">
+                <a href="?page=admin-dashboard" class="text-xl font-medium text-primary">
+                    Sikap <span class="text-secondary">Admin</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <!-- Search Bar -->
     <div class="flex-shrink-0 px-8 py-8 ">
-        <div class="relative">
+        <div class="relative ">
             <input
                 type="text"
                 placeholder="Search"
-                class="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
+                class="w-full px-6 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
                 id="sidebar-search"
                 onkeyup="filterNavigation()">
             <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none left-3 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,11 +35,11 @@
     </div>
 
     <!-- Navigation (Scrollable) -->
-    <nav class="flex-1 px-6 mb-2 overflow-y-auto">
+    <nav class="flex-1 mb-2 overflow-y-auto">
         <ul class="space-y-1">
             <!-- Dashboard -->
             <li>
-                <a href="?page=admin-dashboard" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
+                <a href="?page=admin-dashboard" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2" />
                         <rect x="13" y="3" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="2" />
@@ -39,7 +53,7 @@
             <!-- User Management -->
             <li>
                 <button type="button"
-                    class="flex items-center w-full px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
+                    class="flex items-center w-full py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
                     onclick="toggleDropdown('userDropdown', 'userDropdownArrow')">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="2" />
@@ -77,7 +91,7 @@
             <!-- Job Management -->
             <li>
                 <button type="button"
-                    class="flex items-center w-full px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
+                    class="flex items-center w-full py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
                     onclick="toggleDropdown('jobDropdown', 'jobDropdownArrow')">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,7 +129,7 @@
 
             <!-- Accreditation -->
             <li>
-                <a href="?page=admin-accreditations" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
+                <a href="?page=admin-accreditations" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
@@ -125,7 +139,7 @@
 
             <!-- Reports -->
             <li>
-                <a href="?page=admin-reports" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
+                <a href="?page=admin-reports" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -135,7 +149,7 @@
 
             <!-- Applications -->
             <li>
-                <a href="?page=admin-applications" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
+                <a href="?page=admin-applications" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -145,7 +159,7 @@
 
             <!-- Chatbot -->
             <li>
-                <a href="?page=admin-chatbot" class="flex items-center px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
+                <a href="?page=admin-chatbot" class="flex items-center py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
@@ -156,7 +170,7 @@
             <!-- Events & Programs -->
             <li>
                 <button type="button"
-                    class="flex items-center w-full px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
+                    class="flex items-center w-full py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none"
                     onclick="toggleDropdown('eventDropdown', 'eventDropdownArrow')">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -195,8 +209,8 @@
 
     <!-- Bottom Section (Fixed at bottom) -->
     <div class="flex-shrink-0 px-6 py-6 border-t border-gray-200">
-        <div class="flex items-center gap-2 mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-blue-200 rounded-full">
+        <div class="flex items-center gap-2 mb-4 ">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full">
                 <span class="text-sm font-bold text-white">
                     <?php echo isset($_SESSION['admin_name']) ? strtoupper(substr($_SESSION['admin_name'], 0, 2)) : 'AD'; ?>
                 </span>

@@ -4,11 +4,11 @@ include_once __DIR__ . '/../components/navbar.php';
 ?>
 
 <?php if (!$event): ?>
-    <div class="min-h-screen py-8 bg-gray-50">
+    <div class="min-h-screen py-8">
         <div class="mx-auto max-w-7xl">
             <!-- Event Not Found -->
-            <div class="flex items-center justify-center min-h-screen bg-gray-50">
-                <div class="max-w-md p-8 text-center bg-white rounded-lg shadow-lg">
+            <div class="flex items-center justify-center min-h-screen ">
+                <div class="max-w-md p-8 text-center rounded-lg shadow-lg">
                     <div class="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full">
                         <i class="text-3xl text-gray-400 fas fa-exclamation-triangle"></i>
                     </div>

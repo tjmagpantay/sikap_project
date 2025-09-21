@@ -255,6 +255,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         // Admin Routes
+
         case 'admin-login':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
@@ -266,13 +267,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->dashboard();
             break;
 
-        case 'admin-reports':
-            if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-                header('Location: ?page=admin-login');
-                exit;
-            }
-            include __DIR__ . '/../app/views/admin/reports-dashboard.php';
-            break;
+
 
         case 'all-reports':
             if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -284,67 +279,91 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         // Event Management Routes
         case 'admin-events':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $controller = new EventProgramController();
-            $controller->index();
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->events(); // Use dashboard layout
             break;
 
         case 'admin-event-create':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $controller = new EventProgramController();
-            $controller->create();
-            break;
-
-        case 'admin-event-store':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $controller = new EventProgramController();
-            $controller->store();
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->eventCreate(); // Use dashboard layout
             break;
 
         case 'admin-event-edit':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->eventEdit(); // Use dashboard layout
+            break;
+
+        // Event Operations Routes - Use existing EventProgramController
+        case 'admin-event-store':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
+            $controller->store(); // Create event
+            break;
+
+        case 'admin-event-update':
             if (isset($_GET['id'])) {
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    // Fix: ensure $_FILES is available and not empty
-                    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK && !empty($_FILES['image']['name'])) {
-                        $controller->update($_GET['id']);
-                    } else {
-                        $controller->update($_GET['id']);
-                    }
-                } else {
-                    $controller->edit($_GET['id']);
-                }
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->update($_GET['id']); // Update event
             } else {
-                header('Location: index.php?page=admin-events&error=No event specified');
-                exit;
+                header('Location: ?page=admin-events&error=Invalid request');
             }
             break;
 
         case 'admin-event-delete':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $controller = new EventProgramController();
             if (isset($_GET['id'])) {
-                $controller->delete($_GET['id']);
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->delete($_GET['id']); // Delete event
             } else {
-                header('Location: index.php?page=admin-events&error=No event specified');
+                header('Location: ?page=admin-events&error=Invalid request');
             }
             break;
 
+        case 'admin-event-toggle-status':
+            if (isset($_GET['id'])) {
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->toggleEventStatus($_GET['id']); // Toggle status
+            } else {
+                header('Location: ?page=admin-events&error=Invalid request');
+            }
+            break;
 
-        //NEWWWWWWWWWWWWWWW
+        case 'admin-event-toggle-pin':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->togglePin(); // Toggle pin status
+            break;
 
-        // User Management Routes
+
+
+        // Replace the User Management Routes section in index.php
         case 'admin-jobseekers':
-            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-            $controller = new UserManagementController();
-            $controller->index('jobseekers');
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->jobseekerManagement(); // ✅ This will use dashboard.php layout
             break;
 
         case 'admin-employers':
-            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-            $controller = new UserManagementController();
-            $controller->index('employers');
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->employerManagement(); // ✅ This will use dashboard.php layout
+            break;
+
+        case 'admin-jobpost-management':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->jobpostManagement();
+            break;
+
+        case 'admin-accreditations':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->accreditations();
             break;
 
 
@@ -384,16 +403,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     $controller->reports();
         //     break;
 
-        case 'admin-applications':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->applicationManagement();
-            break;
-
         case 'admin-view-application':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
             $controller->viewApplication();
+            break;
+
+        case 'admin-reports':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->reports();
+            break;
+
+        case 'admin-applications':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->applications();
             break;
 
         // case 'admin-announcements':
@@ -451,7 +476,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerController();
             $controller->showProfile();
             break;
-            
+
         case 'view-employer-document':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
@@ -648,7 +673,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new SaveJobController();
             $controller->showSavedJobs();
             break;
-            
+
         case 'save-job':
             require_once __DIR__ . '/../app/controllers/SaveJobController.php';
             $controller = new SaveJobController();

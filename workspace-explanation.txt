@@ -156,3 +156,5 @@ style: update spacing and font style on profile page
 chore: update package dependencies
 docs: update README with profile setup instructions
 test: add unit tests for profile completion checker
+
+/* ICON STYLES */ npx tailwindcss -i ./input.css -o ../public/assets/css/output.css --watch

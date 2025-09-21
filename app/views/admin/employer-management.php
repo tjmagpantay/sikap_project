@@ -1,62 +1,26 @@
 <?php
 include_once __DIR__ . '/components/admin_auth_check.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <title>SIKAP Admin - Employer Management</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { 
-                        primary: '#092C4C',
-                        secondary: '#F3AF0E'
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        /* Ensure proper height and overflow for layout */
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-        }
+<!-- Topbar (Sticky) -->
+<?php include __DIR__ . '/components/topbar.php'; ?>
 
-        .main-content {
-            height: calc(100vh - 4rem);
-            /* Subtract topbar height */
-            overflow-y: auto;
-        }
-    </style>
-</head>
+<div class="flex h-screen">
+    <!-- Sidebar (Fixed/Sticky) -->
+    <?php include __DIR__ . '/components/sidebar.php'; ?>
 
-<body class="bg-gray-50">
-    <!-- Topbar (Sticky) -->
-    <?php include __DIR__ . '/components/topbar.php'; ?>
-
-    <div class="flex h-screen">
-        <!-- Sidebar (Fixed/Sticky) -->
-        <?php include __DIR__ . '/components/sidebar.php'; ?>
-
-        <!-- Main Content Area (Scrollable) -->
-        <div class="flex-1 lg:ml-80 main-content">
-            <div class="p-6">
+    <!-- Main Content Area (Scrollable) -->
+    <div class="flex-1 lg:ml-80 main-content">
+        <div class="p-6">
+            <!-- Your existing content here -->
+            <div class="space-y-6">
                 <!-- Page Header -->
                 <div class="mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-900">Employers</h1>
+                    <h1 class="text-2xl font-semibold text-gray-900">Employer Management</h1>
                     <p class="mt-1 text-gray-600">Manage employer accounts</p>
                 </div>
 
-                <!-- Improved Employer Stats Cards -->
+                <!-- Employer Stats Cards -->
                 <div class="mb-6">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                         <!-- Card 1: Total Employers -->
@@ -350,7 +314,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                             </div>
 
                             <!-- Filter/Clear Buttons -->
-                           <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
+                            <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
                                 <button onclick="clearAllFilters()" class="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                     <i class="mr-1 fas fa-times"></i>Clear Filters
                                 </button>
@@ -388,51 +352,51 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                         <div class="relative overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="employersTable">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 table-auto">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Company</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Business Address</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Representative</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Registered</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="employersTableBody">
-                                    <?php foreach ($users as $user): ?>
-                                        <tr class="hover:bg-gray-50"
-                                            data-status="<?php echo htmlspecialchars(strtolower($user['status'])); ?>"
-                                            data-company="<?php echo htmlspecialchars(strtolower($user['company_name'])); ?>"
-                                            data-representative="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['last_name'])); ?>"
-                                            data-date="<?php echo $user['created_at']; ?>">
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    <?php echo htmlspecialchars($user['company_name']); ?>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">
-                                                    <?php echo htmlspecialchars($user['business_address'] ?? '-'); ?>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                <?php echo htmlspecialchars($user['contact_no']); ?>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
-                                                        <span class="text-xs font-medium text-gray-600">
-                                                            <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
-                                                        </span>
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Company</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Business Address</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Representative</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Registered</th>
+                                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="employersTableBody">
+                                        <?php foreach ($users as $user): ?>
+                                            <tr class="hover:bg-gray-50"
+                                                data-status="<?php echo htmlspecialchars(strtolower($user['status'])); ?>"
+                                                data-company="<?php echo htmlspecialchars(strtolower($user['company_name'])); ?>"
+                                                data-representative="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['last_name'])); ?>"
+                                                data-date="<?php echo $user['created_at']; ?>">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($user['company_name']); ?>
                                                     </div>
-                                                    <div class="text-xs font-medium text-gray-600">
-                                                        <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm text-gray-900">
+                                                        <?php echo htmlspecialchars($user['business_address'] ?? '-'); ?>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex px-2 py-1 text-xs font-normal rounded-sm 
+                                                </td>
+                                                <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                                    <?php echo htmlspecialchars($user['contact_no']); ?>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
+                                                            <span class="text-xs font-medium text-gray-600">
+                                                                <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
+                                                            </span>
+                                                        </div>
+                                                        <div class="text-xs font-medium text-gray-600">
+                                                            <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-normal rounded-sm 
                                                         <?php
                                                         $statusClass = [
                                                             'incomplete' => 'bg-gray-100 text-gray-800',
@@ -443,29 +407,29 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                                                         ];
                                                         echo $statusClass[strtolower($user['status'])] ?? 'bg-gray-100 text-gray-800';
                                                         ?>">
-                                                    <?php echo ucfirst($user['status']); ?>
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
-                                            </td>
-                                            <td class="px-6 py-4 text-xs font-medium whitespace-nowrap">
-                                                <div class="flex space-x-2">
-                                                    <?php if (strtolower($user['status']) === 'suspended'): ?>
-                                                        <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                            <i class="mr-1 fas fa-unlock"></i>Unsuspend
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <button class="px-2 py-2 text-xs text-gray-600 bg-gray-100 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                            <i class="mr-1 fas fa-ban"></i>Suspend
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                                        <?php echo ucfirst($user['status']); ?>
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                                    <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
+                                                </td>
+                                                <td class="px-6 py-4 text-xs font-medium whitespace-nowrap">
+                                                    <div class="flex space-x-2">
+                                                        <?php if (strtolower($user['status']) === 'suspended'): ?>
+                                                            <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                                <i class="mr-1 fas fa-unlock"></i>Unsuspend
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <button class="px-2 py-2 text-xs text-gray-600 bg-gray-100 hover:text-red-900 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                                <i class="mr-1 fas fa-ban"></i>Suspend
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -501,28 +465,27 @@ include_once __DIR__ . '/components/admin_auth_check.php';
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
+<!-- Keep your existing JavaScript -->
+<script>
+    // Function to handle employer status updates
+    function updateEmployerStatus(userId, action) {
+        if (!confirm('Are you sure you want to ' + action + ' this employer\'s account?')) {
+            return;
+        }
 
-    <script>
-        // Function to handle employer status updates
-        function updateEmployerStatus(userId, action) {
-            if (!confirm('Are you sure you want to ' + action + ' this employer\'s account?')) {
-                return;
-            }
+        // Create form data
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('action', action);
+        formData.append('user_type', 'employer');
 
-            // Create form data
-            const formData = new FormData();
-            formData.append('user_id', userId);
-            formData.append('action', action);
-            formData.append('user_type', 'employer');
+        // Get the base URL from the current path
+        const baseUrl = window.location.pathname.split('index.php')[0];
+        const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
 
-            // Get the base URL from the current path
-            const baseUrl = window.location.pathname.split('index.php')[0];
-            const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
-
-            fetch(url, {
+        fetch(url, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -543,7 +506,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                     // Find all buttons with onclick containing the userId
                     const buttons = document.querySelectorAll(`button[onclick*="${userId}"]`);
                     const row = buttons[0]?.closest('tr');
-                    
+
                     if (row) {
                         // Update status cell
                         const statusCell = row.querySelector('td:nth-child(6) span');
@@ -551,8 +514,8 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                         if (statusCell) {
                             statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
                             statusCell.className = `inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${
-                                newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
-                            }`;
+                            newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
+                        }`;
                         }
 
                         // Update action button
@@ -589,510 +552,507 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
                 errorMessage.innerHTML = error.message;
                 document.body.appendChild(errorMessage);
-                
+
                 setTimeout(() => {
                     errorMessage.remove();
                 }, 3000);
             });
+    }
+
+    let allRows = [];
+    let filteredRows = [];
+    let currentFilters = {
+        status: '',
+        date: ''
+    };
+
+    // Pagination variables
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalPages = 1;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        allRows = Array.from(document.querySelectorAll('#employersTableBody tr'));
+        filteredRows = [...allRows];
+        updateCounts();
+        initializePagination();
+        attachButtonListeners();
+    });
+
+    // Mobile menu toggle
+    function toggleSidebar() {
+        const sidebarMobile = document.getElementById('sidebar-mobile');
+        const overlay = document.getElementById('mobile-menu-overlay');
+
+        if (sidebarMobile) {
+            sidebarMobile.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+    }
+
+    // Close sidebar when clicking overlay
+    document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        applyFilters();
+    });
+
+    // New Alpine.js dropdown filter functions
+    function filterByStatus(status) {
+        currentFilters.status = status;
+        applyFilters();
+    }
+
+    function filterByDate(dateRange) {
+        currentFilters.date = dateRange;
+        applyFilters();
+    }
+
+    function filterByLocation(location) {
+        currentFilters.location = location;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+
+        filteredRows = allRows.filter(row => {
+            const text = row.textContent.toLowerCase();
+            const status = row.getAttribute('data-status').toLowerCase();
+            const company = row.getAttribute('data-company').toLowerCase();
+            const representative = row.getAttribute('data-representative').toLowerCase();
+
+            // Search filter
+            const searchMatch = !searchValue || text.includes(searchValue) || company.includes(searchValue) || representative.includes(searchValue);
+
+            // Status filter
+            const statusMatch = !currentFilters.status || status === currentFilters.status.toLowerCase();
+
+            // Date filter
+            const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
+
+            // Location filter
+            const locationMatch = !currentFilters.location || row.getAttribute('data-location') === currentFilters.location;
+
+            return searchMatch && statusMatch && dateMatch && locationMatch;
+        });
+
+        // Reset to first page when filters change
+        currentPage = 1;
+        updatePagination();
+        updateCounts();
+        updateResultsMessage();
+        updateStatusCounts();
+    }
+
+    function matchesDateFilter(dateString, filter) {
+        const rowDate = new Date(dateString);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        switch (filter) {
+            case 'today':
+                const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+                return rowToday.getTime() === today.getTime();
+
+            case 'week':
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return rowDate >= weekAgo;
+
+            case 'month':
+                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+                return rowDate >= monthAgo;
+
+            case 'year':
+                const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+                return rowDate >= yearAgo;
+
+            default:
+                return true;
+        }
+    }
+
+    function updateCounts() {
+        const visibleCount = filteredRows.length;
+        const totalCount = allRows.length;
+
+        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+
+        // Update total results for pagination
+        document.getElementById('totalResults').textContent = visibleCount;
+    }
+
+    // Pagination Functions
+    function initializePagination() {
+        updatePagination();
+    }
+
+    function updatePagination() {
+        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+        // Hide/show pagination container based on whether pagination is needed
+        const paginationContainer = document.getElementById('paginationContainer');
+        if (filteredRows.length <= itemsPerPage) {
+            paginationContainer.style.display = 'none';
+        } else {
+            paginationContainer.style.display = 'block';
         }
 
-        let allRows = [];
-        let filteredRows = [];
-        let currentFilters = {
+        // Show/hide rows based on current page
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            if (filteredRows[i]) {
+                filteredRows[i].style.display = '';
+            }
+        }
+
+        updatePaginationInfo();
+        updatePaginationControls();
+    }
+
+    function updatePaginationInfo() {
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+
+        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
+        document.getElementById('showingEnd').textContent = endIndex;
+    }
+
+    function updatePaginationControls() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        // Update Previous/Next button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Clear existing page numbers
+        pageNumbers.innerHTML = '';
+
+        // Add page number buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust startPage if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            pageNumbers.appendChild(createPageButton(1));
+            if (startPage > 2) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+        }
+
+        // Add visible page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.appendChild(createPageButton(i));
+        }
+
+        // Add ellipsis and last page if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pageNumbers.appendChild(createEllipsis());
+            }
+            pageNumbers.appendChild(createPageButton(totalPages));
+        }
+    }
+
+    function createPageButton(pageNum) {
+        const button = document.createElement('button');
+        button.textContent = pageNum;
+        button.onclick = () => changePage(pageNum);
+
+        if (pageNum === currentPage) {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
+        } else {
+            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
+        }
+
+        return button;
+    }
+
+    function createEllipsis() {
+        const span = document.createElement('span');
+        span.textContent = '...';
+        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
+        return span;
+    }
+
+    function changePage(direction) {
+        if (typeof direction === 'number') {
+            currentPage = direction;
+        } else if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (direction === 'next' && currentPage < totalPages) {
+            currentPage++;
+        }
+
+        updatePagination();
+    }
+
+    function updateResultsMessage() {
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const employersTable = document.getElementById('employersTable');
+
+        if (filteredRows.length === 0) {
+            noResultsMessage.classList.remove('hidden');
+            employersTable.classList.add('hidden');
+        } else {
+            noResultsMessage.classList.add('hidden');
+            employersTable.classList.remove('hidden');
+        }
+    }
+
+    function clearAllFilters() {
+        // Clear search input
+        document.getElementById('searchInput').value = '';
+
+        // Reset current filters
+        currentFilters = {
             status: '',
-            date: ''
+            date: '',
+            location: ''
         };
 
-        // Pagination variables
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let totalPages = 1;
+        // Reset pagination
+        currentPage = 1;
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            allRows = Array.from(document.querySelectorAll('#employersTableBody tr'));
-            filteredRows = [...allRows];
-            updateCounts();
-            initializePagination();
-            attachButtonListeners();
+        // Reset Alpine.js dropdown selections
+        const statusDropdown = document.querySelector('[x-data*="Status"]');
+        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
+        const locationDropdown = document.querySelector('[x-data*="Location"]');
+
+        if (statusDropdown && statusDropdown._x_dataStack) {
+            statusDropdown._x_dataStack[0].selected = 'Status';
+        }
+        if (dateDropdown && dateDropdown._x_dataStack) {
+            dateDropdown._x_dataStack[0].selected = 'Date Range';
+        }
+        if (locationDropdown && locationDropdown._x_dataStack) {
+            locationDropdown._x_dataStack[0].selected = 'Location';
+        }
+
+        applyFilters();
+    }
+
+    // Export functionality
+    function exportToPDF() {
+        // Get visible rows
+        const visibleRows = Array.from(document.querySelectorAll('#employersTableBody tr'))
+            .filter(row => row.style.display !== 'none');
+
+        // Create print window
+        const printWindow = window.open('', '', 'height=600,width=800');
+
+        // Build HTML content
+        printWindow.document.write('<html><head><title>Employers Report</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write(`
+            table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f8f9fa; }
+            .header { margin-bottom: 20px; text-align: center; }
+            .header h1 { margin: 0; color: #092C4C; }
+            .status-enabled { color: #059669; }
+            .status-disabled { color: #DC2626; }
+            .date { color: #666; font-size: 12px; }
+        `);
+        printWindow.document.write('</style></head><body>');
+
+        // Add header
+        printWindow.document.write(`
+            <div class="header">
+                <h1>SIKAP - Employers Report</h1>
+                <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+        `);
+
+        // Create table
+        printWindow.document.write('<table><thead><tr>');
+        const headers = ['Company Name', 'Business Address', 'Contact', 'Representative', 'Status', 'Registration Date'];
+        headers.forEach(header => {
+            printWindow.document.write(`<th>${header}</th>`);
+        });
+        printWindow.document.write('</tr></thead><tbody>');
+
+        // Add rows
+        visibleRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            printWindow.document.write('<tr>');
+            // Only include the first 6 cells (excluding the actions column)
+            for (let i = 0; i < 6; i++) {
+                if (i === 4) { // Status column
+                    const status = cells[i].textContent.trim();
+                    printWindow.document.write(`
+                        <td class="status-${status.toLowerCase()}">
+                            ${status}
+                        </td>
+                    `);
+                } else {
+                    printWindow.document.write(`<td>${cells[i].textContent.trim()}</td>`);
+                }
+            }
+            printWindow.document.write('</tr>');
         });
 
-        // Mobile menu toggle
-        function toggleSidebar() {
-            const sidebarMobile = document.getElementById('sidebar-mobile');
-            const overlay = document.getElementById('mobile-menu-overlay');
+        printWindow.document.write('</tbody></table>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
 
-            if (sidebarMobile) {
-                sidebarMobile.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
-            }
-        }
+        // Wait for content to load then print
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+        };
+    }
 
-        // Close sidebar when clicking overlay
-        document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
+    // Enhanced suspend/unsuspend functionality with proper API endpoint
+    function handleStatusChange(action, userId, button) {
+        // Already confirmed through native confirm dialog
+        // Disable button and show loading state
+        button.disabled = true;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i>Processing...';
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function() {
-            applyFilters();
+        // Create form data 
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('action', action);
+        formData.append('user_type', 'employer');
+
+        fetch('index.php?page=update-employer-status', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update the row status without reloading
+                    const row = button.closest('tr');
+                    const statusCell = row.querySelector('td:nth-child(4) span');
+                    const actionCell = row.querySelector('td:last-child div');
+
+                    // Update data-status attribute
+                    row.setAttribute('data-status', action === 'suspend' ? 'suspended' : 'verified');
+
+                    // Update status badge
+                    statusCell.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        action === 'suspend' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                    }`;
+                    statusCell.textContent = action === 'suspend' ? 'Suspended' : 'Verified';
+
+                    // Update action button
+                    if (action === 'suspend') {
+                        actionCell.innerHTML = `
+                            <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="${userId}">
+                                <i class="mr-1 fas fa-unlock"></i>Unsuspend
+                        </button>
+                    `;
+                    } else {
+                        actionCell.innerHTML = `
+                            <button class="text-red-600 hover:text-red-900 suspend-btn" data-id="${userId}">
+                                <i class="mr-1 fas fa-ban"></i>Suspend
+                        </button>
+                    `;
+                    }
+
+                    // Update status filter counts
+                    updateStatusCounts();
+
+                    // Reattach event listeners
+                    attachButtonListeners();
+                } else {
+                    throw new Error(data.error || `Failed to ${action} employer`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`An error occurred while updating status. Please try again.`);
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+    }
+
+    // Add this function to update status counts
+    function updateStatusCounts() {
+        const rows = document.querySelectorAll('#employersTableBody tr');
+        const counts = {
+            total: rows.length,
+            incomplete: 0,
+            pending: 0,
+            verified: 0,
+            rejected: 0,
+            suspended: 0
+        };
+
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            if (status === 'incomplete') counts.incomplete++;
+            if (status === 'pending_verification') counts.pending++;
+            if (status === 'verified') counts.verified++;
+            if (status === 'rejected') counts.rejected++;
+            if (status === 'suspended') counts.suspended++;
         });
 
-        // New Alpine.js dropdown filter functions
-        function filterByStatus(status) {
-            currentFilters.status = status;
-            applyFilters();
-        }
+        // Update the stats cards
+        document.querySelector('[data-stat="total"]').textContent = counts.total;
+        document.querySelector('[data-stat="incomplete"]').textContent = counts.incomplete;
+        document.querySelector('[data-stat="pending"]').textContent = counts.pending;
+        document.querySelector('[data-stat="verified"]').textContent = counts.verified;
+        document.querySelector('[data-stat="rejected"]').textContent = counts.rejected;
+        document.querySelector('[data-stat="suspended"]').textContent = counts.suspended;
+    }
 
-        function filterByDate(dateRange) {
-            currentFilters.date = dateRange;
-            applyFilters();
-        }
-
-        function filterByLocation(location) {
-            currentFilters.location = location;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const searchValue = document.getElementById('searchInput').value.toLowerCase();
-
-            filteredRows = allRows.filter(row => {
-                const text = row.textContent.toLowerCase();
-                const status = row.getAttribute('data-status').toLowerCase();
-                const company = row.getAttribute('data-company').toLowerCase();
-                const representative = row.getAttribute('data-representative').toLowerCase();
-
-                // Search filter
-                const searchMatch = !searchValue || text.includes(searchValue) || company.includes(searchValue) || representative.includes(searchValue);
-
-                // Status filter
-                const statusMatch = !currentFilters.status || status === currentFilters.status.toLowerCase();
-
-                // Date filter
-                const dateMatch = !currentFilters.date || matchesDateFilter(row.getAttribute('data-date'), currentFilters.date);
-
-                // Location filter
-                const locationMatch = !currentFilters.location || row.getAttribute('data-location') === currentFilters.location;
-
-                return searchMatch && statusMatch && dateMatch && locationMatch;
-            });
-
-            // Reset to first page when filters change
-            currentPage = 1;
-            updatePagination();
-            updateCounts();
-            updateResultsMessage();
-            updateStatusCounts();
-        }
-
-        function matchesDateFilter(dateString, filter) {
-            const rowDate = new Date(dateString);
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-            switch (filter) {
-                case 'today':
-                    const rowToday = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
-                    return rowToday.getTime() === today.getTime();
-
-                case 'week':
-                    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    return rowDate >= weekAgo;
-
-                case 'month':
-                    const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-                    return rowDate >= monthAgo;
-
-                case 'year':
-                    const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-                    return rowDate >= yearAgo;
-
-                default:
-                    return true;
-            }
-        }
-
-        function updateCounts() {
-            const visibleCount = filteredRows.length;
-            const totalCount = allRows.length;
-
-            document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-
-            // Update total results for pagination
-            document.getElementById('totalResults').textContent = visibleCount;
-        }
-
-        // Pagination Functions
-        function initializePagination() {
-            updatePagination();
-        }
-
-        function updatePagination() {
-            totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-            // Hide/show pagination container based on whether pagination is needed
-            const paginationContainer = document.getElementById('paginationContainer');
-            if (filteredRows.length <= itemsPerPage) {
-                paginationContainer.style.display = 'none';
-            } else {
-                paginationContainer.style.display = 'block';
-            }
-
-            // Show/hide rows based on current page
-            allRows.forEach(row => {
-                row.style.display = 'none';
-            });
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-            for (let i = startIndex; i < endIndex; i++) {
-                if (filteredRows[i]) {
-                    filteredRows[i].style.display = '';
+    // Add this function to reattach event listeners
+    function attachButtonListeners() {
+        document.querySelectorAll('.suspend-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to suspend this employer?')) {
+                    const userId = this.getAttribute('data-id');
+                    handleStatusChange('suspend', userId, this);
                 }
-            }
+            });
+        });
 
-            updatePaginationInfo();
-            updatePaginationControls();
-        }
-
-        function updatePaginationInfo() {
-            const startIndex = (currentPage - 1) * itemsPerPage + 1;
-            const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
-
-            document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-            document.getElementById('showingEnd').textContent = endIndex;
-        }
-
-        function updatePaginationControls() {
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const pageNumbers = document.getElementById('pageNumbers');
-
-            // Update Previous/Next button states
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-            // Clear existing page numbers
-            pageNumbers.innerHTML = '';
-
-            // Add page number buttons
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-            // Adjust startPage if we're near the end
-            if (endPage - startPage + 1 < maxVisiblePages) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-
-            // Add first page and ellipsis if needed
-            if (startPage > 1) {
-                pageNumbers.appendChild(createPageButton(1));
-                if (startPage > 2) {
-                    pageNumbers.appendChild(createEllipsis());
+        document.querySelectorAll('.unsuspend-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to unsuspend this employer?')) {
+                    const userId = this.getAttribute('data-id');
+                    handleStatusChange('unsuspend', userId, this);
                 }
-            }
-
-            // Add visible page numbers
-            for (let i = startPage; i <= endPage; i++) {
-                pageNumbers.appendChild(createPageButton(i));
-            }
-
-            // Add ellipsis and last page if needed
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    pageNumbers.appendChild(createEllipsis());
-                }
-                pageNumbers.appendChild(createPageButton(totalPages));
-            }
-        }
-
-        function createPageButton(pageNum) {
-            const button = document.createElement('button');
-            button.textContent = pageNum;
-            button.onclick = () => changePage(pageNum);
-
-            if (pageNum === currentPage) {
-                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-            } else {
-                button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
-            }
-
-            return button;
-        }
-
-        function createEllipsis() {
-            const span = document.createElement('span');
-            span.textContent = '...';
-            span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-            return span;
-        }
-
-        function changePage(direction) {
-            if (typeof direction === 'number') {
-                currentPage = direction;
-            } else if (direction === 'prev' && currentPage > 1) {
-                currentPage--;
-            } else if (direction === 'next' && currentPage < totalPages) {
-                currentPage++;
-            }
-
-            updatePagination();
-        }
-
-        function updateResultsMessage() {
-            const noResultsMessage = document.getElementById('noResultsMessage');
-            const employersTable = document.getElementById('employersTable');
-
-            if (filteredRows.length === 0) {
-                noResultsMessage.classList.remove('hidden');
-                employersTable.classList.add('hidden');
-            } else {
-                noResultsMessage.classList.add('hidden');
-                employersTable.classList.remove('hidden');
-            }
-        }
-
-        function clearAllFilters() {
-            // Clear search input
-            document.getElementById('searchInput').value = '';
-
-            // Reset current filters
-            currentFilters = {
-                status: '',
-                date: '',
-                location: ''
-            };
-
-            // Reset pagination
-            currentPage = 1;
-
-            // Reset Alpine.js dropdown selections
-            const statusDropdown = document.querySelector('[x-data*="Status"]');
-            const dateDropdown = document.querySelector('[x-data*="Date Range"]');
-            const locationDropdown = document.querySelector('[x-data*="Location"]');
-
-            if (statusDropdown && statusDropdown._x_dataStack) {
-                statusDropdown._x_dataStack[0].selected = 'Status';
-            }
-            if (dateDropdown && dateDropdown._x_dataStack) {
-                dateDropdown._x_dataStack[0].selected = 'Date Range';
-            }
-            if (locationDropdown && locationDropdown._x_dataStack) {
-                locationDropdown._x_dataStack[0].selected = 'Location';
-            }
-
-            applyFilters();
-        }
-
-        // Export functionality
-        function exportToPDF() {
-            // Get visible rows
-            const visibleRows = Array.from(document.querySelectorAll('#employersTableBody tr'))
-                .filter(row => row.style.display !== 'none');
-            
-            // Create print window
-            const printWindow = window.open('', '', 'height=600,width=800');
-            
-            // Build HTML content
-            printWindow.document.write('<html><head><title>Employers Report</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write(`
-                table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f8f9fa; }
-                .header { margin-bottom: 20px; text-align: center; }
-                .header h1 { margin: 0; color: #092C4C; }
-                .status-enabled { color: #059669; }
-                .status-disabled { color: #DC2626; }
-                .date { color: #666; font-size: 12px; }
-            `);
-            printWindow.document.write('</style></head><body>');
-            
-            // Add header
-            printWindow.document.write(`
-                <div class="header">
-                    <h1>SIKAP - Employers Report</h1>
-                    <p class="date">Generated on: ${new Date().toLocaleString()}</p>
-                </div>
-            `);
-            
-            // Create table
-            printWindow.document.write('<table><thead><tr>');
-            const headers = ['Company Name', 'Business Address', 'Contact', 'Representative', 'Status', 'Registration Date'];
-            headers.forEach(header => {
-                printWindow.document.write(`<th>${header}</th>`);
             });
-            printWindow.document.write('</tr></thead><tbody>');
-            
-            // Add rows
-            visibleRows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                printWindow.document.write('<tr>');
-                // Only include the first 6 cells (excluding the actions column)
-                for (let i = 0; i < 6; i++) {
-                    if (i === 4) { // Status column
-                        const status = cells[i].textContent.trim();
-                        printWindow.document.write(`
-                            <td class="status-${status.toLowerCase()}">
-                                ${status}
-                            </td>
-                        `);
-                    } else {
-                        printWindow.document.write(`<td>${cells[i].textContent.trim()}</td>`);
-                    }
-                }
-                printWindow.document.write('</tr>');
-            });
-            
-            printWindow.document.write('</tbody></table>');
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            
-            // Wait for content to load then print
-            printWindow.onload = function() {
-                printWindow.focus();
-                printWindow.print();
-            };
+        });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
         }
 
-        // Enhanced suspend/unsuspend functionality with proper API endpoint
-        function handleStatusChange(action, userId, button) {
-            // Already confirmed through native confirm dialog
-            // Disable button and show loading state
-            button.disabled = true;
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i>Processing...';
-
-            // Create form data 
-            const formData = new FormData();
-            formData.append('user_id', userId);
-            formData.append('action', action);
-            formData.append('user_type', 'employer');
-
-            fetch('index.php?page=update-employer-status', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update the row status without reloading
-                        const row = button.closest('tr');
-                        const statusCell = row.querySelector('td:nth-child(4) span');
-                        const actionCell = row.querySelector('td:last-child div');
-
-                        // Update data-status attribute
-                        row.setAttribute('data-status', action === 'suspend' ? 'suspended' : 'verified');
-
-                        // Update status badge
-                        statusCell.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            action === 'suspend' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                        }`;
-                        statusCell.textContent = action === 'suspend' ? 'Suspended' : 'Verified';
-
-                        // Update action button
-                        if (action === 'suspend') {
-                            actionCell.innerHTML = `
-                                <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="${userId}">
-                                    <i class="mr-1 fas fa-unlock"></i>Unsuspend
-                            </button>
-                        `;
-                        } else {
-                            actionCell.innerHTML = `
-                                <button class="text-red-600 hover:text-red-900 suspend-btn" data-id="${userId}">
-                                    <i class="mr-1 fas fa-ban"></i>Suspend
-                            </button>
-                        `;
-                        }
-
-                        // Update status filter counts
-                        updateStatusCounts();
-
-                        // Reattach event listeners
-                        attachButtonListeners();
-                    } else {
-                        throw new Error(data.error || `Failed to ${action} employer`);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(`An error occurred while updating status. Please try again.`);
-                    button.disabled = false;
-                    button.innerHTML = originalText;
-                });
+        // Escape to clear filters
+        if (e.key === 'Escape') {
+            clearAllFilters();
         }
-
-        // Add this function to update status counts
-        function updateStatusCounts() {
-            const rows = document.querySelectorAll('#employersTableBody tr');
-            const counts = {
-                total: rows.length,
-                incomplete: 0,
-                pending: 0,
-                verified: 0,
-                rejected: 0,
-                suspended: 0
-            };
-
-            rows.forEach(row => {
-                const status = row.getAttribute('data-status');
-                if (status === 'incomplete') counts.incomplete++;
-                if (status === 'pending_verification') counts.pending++;
-                if (status === 'verified') counts.verified++;
-                if (status === 'rejected') counts.rejected++;
-                if (status === 'suspended') counts.suspended++;
-            });
-
-            // Update the stats cards
-            document.querySelector('[data-stat="total"]').textContent = counts.total;
-            document.querySelector('[data-stat="incomplete"]').textContent = counts.incomplete;
-            document.querySelector('[data-stat="pending"]').textContent = counts.pending;
-            document.querySelector('[data-stat="verified"]').textContent = counts.verified;
-            document.querySelector('[data-stat="rejected"]').textContent = counts.rejected;
-            document.querySelector('[data-stat="suspended"]').textContent = counts.suspended;
-        }
-
-        // Add this function to reattach event listeners
-        function attachButtonListeners() {
-            document.querySelectorAll('.suspend-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to suspend this employer?')) {
-                        const userId = this.getAttribute('data-id');
-                        handleStatusChange('suspend', userId, this);
-                    }
-                });
-            });
-
-            document.querySelectorAll('.unsuspend-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to unsuspend this employer?')) {
-                        const userId = this.getAttribute('data-id');
-                        handleStatusChange('unsuspend', userId, this);
-                    }
-                });
-            });
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + F to focus search
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                e.preventDefault();
-                document.getElementById('searchInput').focus();
-            }
-
-            // Escape to clear filters
-            if (e.key === 'Escape') {
-                clearAllFilters();
-            }
-        }); 
-    </script>
-</body>
-
-</html>
+    });
+</script>

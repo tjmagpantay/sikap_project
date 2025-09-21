@@ -1,8 +1,10 @@
 <?php
-include_once __DIR__ . '/components/admin_auth_check.php';
+// Remove the auth check since dashboard.php already handles it
+// include_once __DIR__ . '/components/admin_auth_check.php'; 
 ?>
 
-<div class="p-6">
+<!-- Remove ALL HTML structure - make it content-only like main-board.php -->
+<div class="space-y-6">
     <!-- Page Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Jobseeker Management</h1>
@@ -17,7 +19,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Total Jobseekers</h3>
                 <div class="flex items-baseline">
                     <span class="text-2xl font-bold text-blue-600 sm:text-2xl" id="totalCount">
-                        <?php echo count($users); ?>
+                        <?php echo count($users ?? []); ?>
                     </span>
                     <svg class="ml-1" width="12px" height="12px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -35,7 +37,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Active</h3>
                 <div class="flex items-baseline">
                     <span class="text-2xl font-bold text-green-600 sm:text-2xl" id="activeCount">
-                        <?php echo count(array_filter($users, function ($user) {
+                        <?php echo count(array_filter($users ?? [], function ($user) {
                             return ($user['acc_status'] ?? 'enabled') === 'enabled';
                         })); ?>
                     </span>
@@ -56,7 +58,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">From Rosario</h3>
                 <div class="flex items-baseline">
                     <span class="text-2xl font-bold text-secondary sm:text-2xl" id="rosarioCount">
-                        <?php echo count(array_filter($users, function ($user) {
+                        <?php echo count(array_filter($users ?? [], function ($user) {
                             return stripos($user['address'] ?? '', 'rosario') !== false;
                         })); ?>
                     </span>
@@ -77,7 +79,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Other Areas</h3>
                 <div class="flex items-baseline">
                     <span class="text-2xl font-bold text-blue-600 sm:text-2xl" id="otherAreasCount">
-                        <?php echo count(array_filter($users, function ($user) {
+                        <?php echo count(array_filter($users ?? [], function ($user) {
                             return stripos($user['address'] ?? '', 'rosario') === false;
                         })); ?>
                     </span>
@@ -195,63 +197,71 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
-                <?php foreach ($users as $user): ?>
+                <?php if (isset($users) && is_array($users)): ?>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $user['first_name'] . ' ' .
+                                            ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
+                                            $user['last_name'] .
+                                            ($user['suffix'] ? ' ' . $user['suffix'] : '')
+                                    );
+                                    ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <?php echo $user['date_of_birth'] ? date('M d, Y', strtotime($user['date_of_birth'])) : '-'; ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <?php echo htmlspecialchars($user['sex'] ?? '-'); ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">
+                                    <?php echo htmlspecialchars($user['address'] ?? '-'); ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <?php echo htmlspecialchars($user['contact_no'] ?? '-'); ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md <?php
+                                                                                                            echo $user['acc_status'] === 'enabled' ?
+                                                                                                                'text-green-800 bg-green-100' :
+                                                                                                                'text-red-800 bg-red-100'; ?>">
+                                    <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                <?php if ($user['acc_status'] !== 'disabled'): ?>
+                                    <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
+                                        class="px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200">
+                                        <i class="mr-1 fas fa-ban"></i> Disable
+                                    </button>
+                                <?php else: ?>
+                                    <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
+                                        class="px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200">
+                                        <i class="mr-1 fas fa-check"></i> Enable
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">
-                                <?php
-                                echo htmlspecialchars(
-                                    $user['first_name'] . ' ' .
-                                        ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
-                                        $user['last_name'] .
-                                        ($user['suffix'] ? ' ' . $user['suffix'] : '')
-                                );
-                                ?>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">
-                                <?php echo $user['date_of_birth'] ? date('M d, Y', strtotime($user['date_of_birth'])) : '-'; ?>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">
-                                <?php echo htmlspecialchars($user['sex'] ?? '-'); ?>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900">
-                                <?php echo htmlspecialchars($user['address'] ?? '-'); ?>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">
-                                <?php echo htmlspecialchars($user['contact_no'] ?? '-'); ?>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md <?php
-                                                                                                        echo $user['acc_status'] === 'enabled' ?
-                                                                                                            'text-green-800 bg-green-100' :
-                                                                                                            'text-red-800 bg-red-100'; ?>">
-                                <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <?php if ($user['acc_status'] !== 'disabled'): ?>
-                                <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
-                                    class="px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200">
-                                    <i class="mr-1 fas fa-ban"></i> Disable
-                                </button>
-                            <?php else: ?>
-                                <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
-                                    class="px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200">
-                                    <i class="mr-1 fas fa-check"></i> Enable
-                                </button>
-                            <?php endif; ?>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            No jobseekers found
                         </td>
                     </tr>
-                <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
 
@@ -281,7 +291,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
     </div>
 </div>
 
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Keep your existing JavaScript -->
 <script>
     // Pagination variables
     let currentPage = 1;

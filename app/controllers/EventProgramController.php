@@ -17,22 +17,28 @@ class EventProgramController
         }
     }
 
-    public function index()
+    private function checkAdminAuth()
     {
-        if (!isset($_SESSION['admin_id'])) {
+        // Support both session variable names
+        $isAdminLoggedIn = (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) ||
+            (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin');
+
+        if (!$isAdminLoggedIn) {
             header('Location: index.php?page=admin-login');
             exit;
         }
+    }
+
+    public function index()
+    {
+        $this->checkAdminAuth(); // Replace the old auth check
         $events = $this->model->getAllEvents();
         include __DIR__ . '/../views/admin/events/event.php';
     }
 
     public function create()
     {
-        if (!isset($_SESSION['admin_id'])) {
-            header('Location: index.php?page=admin-login');
-            exit;
-        }
+        $this->checkAdminAuth(); // Replace the old auth check
         include __DIR__ . '/../views/admin/events/create.php';
     }
 
@@ -209,7 +215,7 @@ class EventProgramController
         );
 
         if ($success) {
-            // Trigger notifications if event status changed to 'show' 
+            // Trigger notifications if event status changed to 'show'
             if ($_POST['status'] === 'show') {
                 try {
                     // Notify jobseekers

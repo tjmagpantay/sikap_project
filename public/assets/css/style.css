@@ -622,3 +622,269 @@ video {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+
+/*-------ADMIN DASHBOARD LAYOUT V2 - FIXED-------*/
+/* Clean admin layout with proper sidebar/topbar positioning */
+
+/* Admin Body */
+.admin-body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Admin Sidebar */
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    transform: translateX(0);
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Collapsed Sidebar */
+.admin-sidebar.collapsed {
+    width: 70px;
+}
+
+.admin-sidebar.collapsed .nav-item span,
+.admin-sidebar.collapsed .nav-subitem span,
+.admin-sidebar.collapsed details summary span,
+.admin-sidebar.collapsed .sidebar-header span {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar.collapsed details {
+    pointer-events: none;
+}
+
+.admin-sidebar.collapsed details[open] {
+    display: none;
+}
+
+/* Mobile Sidebar */
+@media (max-width: 1023px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    .admin-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+}
+
+/* Admin Wrapper - FIXED */
+.admin-wrapper {
+    margin-left: 280px; /* Match sidebar width */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.admin-wrapper.sidebar-collapsed {
+    margin-left: 70px; /* Match collapsed sidebar width */
+}
+
+@media (max-width: 1023px) {
+    .admin-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Admin Topbar */
+.admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Main Content Area - FIXED */
+.admin-main-content {
+    padding: 24px;
+    min-height: calc(100vh - 80px);
+    background-color: #f9fafb;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.mobile-overlay.active {
+    display: block;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 64px;
+    box-sizing: border-box;
+}
+
+.sidebar-header .logo-section {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.sidebar-header .logo-section span {
+    transition: all 0.3s ease;
+}
+
+/* Navigation Styles */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #6b7280;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    margin: 2px 0;
+}
+
+.nav-item:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.nav-item.active {
+    background-color: #092C4C;
+    color: white;
+}
+
+.nav-item i {
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-subitem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: #6b7280;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    margin: 2px 0;
+}
+
+.nav-subitem:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.nav-subitem.active {
+    background-color: #e0f2fe;
+    color: #092C4C;
+}
+
+.nav-subitem i {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+}
+
+/* Details/Summary Styling */
+details summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary svg {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+details[open] summary svg {
+    transform: rotate(90deg);
+}
+
+/* Scrollbar Styling */
+.admin-sidebar nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-sidebar nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-sidebar nav::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+}
+
+.admin-sidebar nav::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+}
+
+/* Toggle Button */
+.sidebar-toggle-btn {
+    padding: 8px;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-main-content {
+        padding: 16px;
+    }
+}
+
+/* Ensure content doesn't get cut off */
+.admin-main-content * {
+    max-width: 100%;
+    box-sizing: border-box;
+}

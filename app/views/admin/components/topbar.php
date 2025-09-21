@@ -10,21 +10,7 @@
             </button>
             <span class="text-lg font-semibold text-gray-900">
 
-                <!-- Logo Section -->
-                <div class="flex items-center justify-between flex-shrink-0 gap-6 px-3">
-                    <!-- Left: Logos -->
-                    <div class="flex items-center">
-                        <div class="flex items-center gap-2">
-                            <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-8">
-                            <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-8 shadow-sm">
-                            <a href="?page=admin-dashboard" class="text-xl font-bold text-primary">
-                                Sikap <span class="text-secondary">Admin</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    
-                </div>
+                
             </span>
         </div>
 
