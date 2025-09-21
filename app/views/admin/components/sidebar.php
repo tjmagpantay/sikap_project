@@ -51,7 +51,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <ul id="userDropdown" class="hidden mt-2 ml-8 space-y-1">
+                <ul id="userDropdown" class="hidden mt-2 ml-4 space-y-1">
                     <li>
                         <a href="?page=admin-jobseekers" class="flex items-center px-4 py-2 text-sm font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -164,7 +164,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <ul id="eventDropdown" class="hidden mt-2 ml-8 space-y-1">
+                <ul id="eventDropdown" class="hidden mt-2 ml-4 space-y-1">
                     <li>
                         <a href="?page=admin-events" class="flex items-center px-4 py-2 text-sm font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
                             <svg class="w-4 h-4 mr-2" viewBox="0 0 100 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -192,8 +192,8 @@
 
     <!-- Bottom Section (Fixed at bottom) -->
     <div class="flex-shrink-0 px-4 py-4 border-t border-gray-200">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full py-4">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 p-3 bg-blue-100 rounded-full">
                 <span class="text-sm font-bold text-white">
                     <?php echo isset($_SESSION['admin_name']) ? strtoupper(substr($_SESSION['admin_name'], 0, 2)) : 'AD'; ?>
                 </span>

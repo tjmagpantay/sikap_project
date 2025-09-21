@@ -17,7 +17,7 @@ if (!isset($jobseeker) || empty($jobseeker)) {
     <div class="flex items-center gap-3">
       <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
       <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto shadow-sm h-11">
-      <a href="?page=jobseeker-dashboard" class="font-medium nav-brand">Sikap <span class="text-secondary">Jobseeker</span></a>
+      <a href="?page=jobseeker-dashboard" class="font-medium ">Sikap <span class="text-secondary">Jobseeker</span></a>
     </div>
 
     <!-- Desktop Menu -->

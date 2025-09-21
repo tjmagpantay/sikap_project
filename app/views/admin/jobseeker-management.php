@@ -8,13 +8,13 @@
     <!-- Page Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Jobseeker Management</h1>
-        <p class="mt-1 text-gray-600">Manage jobseeker accounts and view statistics</p>
+        <p class="mt-1 text-sm text-gray-600">Manage jobseeker accounts and view statistics</p>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-4">
         <!-- Card 1: Total Jobseekers -->
-        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
+        <div class="p-5 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
             <div class="mb-3 sm:mb-4">
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Total Jobseekers</h3>
                 <div class="flex items-baseline">
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Card 2: Active Jobseekers -->
-        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
+        <div class="p-5 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
             <div class="mb-3 sm:mb-4">
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Active</h3>
                 <div class="flex items-baseline">
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Card 3: From Rosario -->
-        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
+        <div class="p-5 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
             <div class="mb-3 sm:mb-4">
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">From Rosario</h3>
                 <div class="flex items-baseline">
@@ -74,7 +74,7 @@
         </div>
 
         <!-- Card 4: Other Areas -->
-        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
+        <div class="p-5 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-4 md:p-5">
             <div class="mb-3 sm:mb-4">
                 <h3 class="mb-2 text-sm font-medium text-gray-700 sm:mb-3">Other Areas</h3>
                 <div class="flex items-baseline">
@@ -99,183 +99,180 @@
     </div>
 
     <!-- Search and Filter Controls -->
-    <div class="flex flex-col w-full gap-4 mb-6 sm:flex-row">
-        <!-- Search Input (Takes more space) -->
+    <div class="flex items-stretch w-full gap-3 mb-6">
+        <!-- Search Input (Expanded width) -->
         <div class="flex-1">
             <div class="relative">
                 <input type="text" id="searchInput"
                     class="w-full px-4 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     placeholder="Search jobseekers...">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="text-gray-400 fas fa-search"></i>
+
+            </div>
+        </div>
+
+        <!-- Status Filter (Expanded width) -->
+        <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Status' }">
+            <button @click="open = !open"
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <span x-text="selected" class="truncate"></span>
+                <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div x-show="open" @click.away="open = false"
+                class="absolute right-0 z-50 w-full mt-1 bg-white rounded-md shadow-lg min-w-40 ring-1 ring-black ring-opacity-5">
+                <div class="py-1">
+                    <a href="#" @click.prevent="selected = 'All Status'; filterByStatus(''); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</a>
+                    <a href="#" @click.prevent="selected = 'Enabled'; filterByStatus('enabled'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Enabled</a>
+                    <a href="#" @click.prevent="selected = 'Disabled'; filterByStatus('disabled'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Disabled</a>
                 </div>
             </div>
         </div>
 
-        <!-- Filters Row -->
-        <div class="flex items-center gap-3">
-            <!-- Status Filter -->
-            <div class="relative" x-data="{ open: false, selected: 'All Status' }">
-                <button @click="open = !open"
-                    class="flex items-center px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <span x-text="selected" class="mr-2"></span>
-                    <i class="text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
-                </button>
-                <div x-show="open" @click.away="open = false"
-                    class="absolute right-0 z-50 w-40 mt-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div class="py-1">
-                        <a href="#" @click.prevent="selected = 'All Status'; filterByStatus(''); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</a>
-                        <a href="#" @click.prevent="selected = 'Enabled'; filterByStatus('enabled'); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Enabled</a>
-                        <a href="#" @click.prevent="selected = 'Disabled'; filterByStatus('disabled'); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Disabled</a>
-                    </div>
+        <!-- Location Filter (Expanded width) -->
+        <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Locations' }">
+            <button @click="open = !open"
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <span x-text="selected" class="truncate"></span>
+                <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div x-show="open" @click.away="open = false"
+                class="absolute right-0 z-50 w-full mt-1 bg-white rounded-md shadow-lg min-w-48 ring-1 ring-black ring-opacity-5">
+                <div class="py-1">
+                    <a href="#" @click.prevent="selected = 'All Locations'; filterByLocation('all'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Locations</a>
+                    <a href="#" @click.prevent="selected = 'Rosario'; filterByLocation('rosario'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Rosario</a>
+                    <a href="#" @click.prevent="selected = 'Others'; filterByLocation('others'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Others</a>
                 </div>
             </div>
+        </div>
 
-            <!-- Location Filter -->
-            <div class="relative" x-data="{ open: false, selected: 'All Locations' }">
-                <button @click="open = !open"
-                    class="flex items-center px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <span x-text="selected" class="mr-2"></span>
-                    <i class="text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
-                </button>
-                <div x-show="open" @click.away="open = false"
-                    class="absolute right-0 z-50 w-48 mt-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div class="py-1">
-                        <a href="#" @click.prevent="selected = 'All Locations'; filterByLocation('all'); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Locations</a>
-                        <a href="#" @click.prevent="selected = 'Rosario'; filterByLocation('rosario'); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Rosario</a>
-                        <a href="#" @click.prevent="selected = 'Others'; filterByLocation('others'); open = false"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Others</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex space-x-2">
-                <button onclick="clearAllFilters()"
-                    class="px-4 py-3 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <i class="mr-1 fas fa-times"></i> Clear
-                </button>
-                <button onclick="exportToPDF()"
-                    class="px-4 py-3 text-sm text-white rounded-lg bg-primary hover:bg-primary/90">
-                    <i class="mr-1 fas fa-file-pdf"></i> Export
-                </button>
-            </div>
+        <!-- Action Buttons (Fixed width) -->
+        <div class="flex flex-shrink-0 gap-2">
+            <button onclick="clearAllFilters()"
+                class="px-4 py-3 text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-400 whitespace-nowrap">
+                <i class="mr-1 fas fa-times"></i> Clear
+            </button>
+            <button onclick="exportToPDF()"
+                class="px-4 py-3 text-sm text-white rounded-lg bg-primary hover:bg-primary/90 whitespace-nowrap">
+                <i class="mr-1 fas fa-file-pdf"></i> Export
+            </button>
         </div>
     </div>
 
     <!-- Jobseekers Table -->
-    <div class="overflow-hidden bg-white rounded-lg shadow">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Name
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Birth Date
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Sex
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Address
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Contact
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Status
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
-                <?php if (isset($users) && is_array($users)): ?>
-                    <?php foreach ($users as $user): ?>
+    <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
+        <div class="overflow-x-auto">
+            <table class="w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="w-1/4 px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                            Name
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-1/8">
+                            Birth Date
+                        </th>
+                        <th scope="col" class="w-1/12 px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                            Sex
+                        </th>
+                        <th scope="col" class="w-1/4 px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                            Address
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-1/8">
+                            Contact
+                        </th>
+                        <th scope="col" class="w-1/12 px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-1/8">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="jobseekersTableBody">
+                    <?php if (isset($users) && is_array($users)): ?>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-gray-900 break-words">
+                                        <?php
+                                        echo htmlspecialchars(
+                                            $user['first_name'] . ' ' .
+                                                ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
+                                                $user['last_name'] .
+                                                ($user['suffix'] ? ' ' . $user['suffix'] : '')
+                                        );
+                                        ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <?php echo $user['date_of_birth'] ? date('M d, Y', strtotime($user['date_of_birth'])) : '-'; ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <?php echo htmlspecialchars($user['sex'] ?? '-'); ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900 break-words">
+                                        <?php echo htmlspecialchars($user['address'] ?? '-'); ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <?php echo htmlspecialchars($user['contact_no'] ?? '-'); ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md <?php
+                                                                                                                echo $user['acc_status'] === 'enabled' ?
+                                                                                                                    'text-secondary bg-yellow-100' :
+                                                                                                                    'text-red-800 bg-red-100'; ?>">
+                                        <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                    <?php if ($user['acc_status'] !== 'disabled'): ?>
+                                        <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
+                                            class="px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200">
+                                            <i class="mr-1 fas fa-ban"></i> Disable
+                                        </button>
+                                    <?php else: ?>
+                                        <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
+                                            class="px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200">
+                                            <i class="mr-1 fas fa-check"></i> Enable
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $user['first_name'] . ' ' .
-                                            ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
-                                            $user['last_name'] .
-                                            ($user['suffix'] ? ' ' . $user['suffix'] : '')
-                                    );
-                                    ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    <?php echo $user['date_of_birth'] ? date('M d, Y', strtotime($user['date_of_birth'])) : '-'; ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    <?php echo htmlspecialchars($user['sex'] ?? '-'); ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900">
-                                    <?php echo htmlspecialchars($user['address'] ?? '-'); ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    <?php echo htmlspecialchars($user['contact_no'] ?? '-'); ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md <?php
-                                                                                                            echo $user['acc_status'] === 'enabled' ?
-                                                                                                                'text-green-800 bg-green-100' :
-                                                                                                                'text-red-800 bg-red-100'; ?>">
-                                    <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                <?php if ($user['acc_status'] !== 'disabled'): ?>
-                                    <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
-                                        class="px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200">
-                                        <i class="mr-1 fas fa-ban"></i> Disable
-                                    </button>
-                                <?php else: ?>
-                                    <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
-                                        class="px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200">
-                                        <i class="mr-1 fas fa-check"></i> Enable
-                                    </button>
-                                <?php endif; ?>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No jobseekers found
                             </td>
                         </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                            No jobseekers found
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
         <!-- Pagination -->
         <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
-            <div class="flex items-center text-sm text-gray-700">
-                <span>Showing</span>
-                <span class="mx-1 font-medium" id="startItem">1</span>
-                <span>to</span>
-                <span class="mx-1 font-medium" id="endItem">10</span>
-                <span>of</span>
-                <span class="mx-1 font-medium" id="totalItems">0</span>
-                <span>results</span>
+            <div class="flex items-center gap-1 text-sm text-gray-700">
+                <span>
+                    Showing <span class="font-semibold" id="startItem">1</span>
+                    to <span class="font-semibold" id="endItem">10</span>
+                    of <span class="font-medium" id="totalItems">0</span> results
+                </span>
             </div>
+
+
             <div class="flex space-x-2">
                 <button id="prevBtn" onclick="previousPage()"
                     class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -283,7 +280,7 @@
                 </button>
                 <div id="pageNumbers" class="flex space-x-1"></div>
                 <button id="nextBtn" onclick="nextPage()"
-                    class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-3 py-1 text-sm text-white border border-gray-300 rounded bg-primary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                     Next <i class="ml-1 fas fa-chevron-right"></i>
                 </button>
             </div>

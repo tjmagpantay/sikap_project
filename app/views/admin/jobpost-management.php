@@ -128,87 +128,81 @@
     </div>
 
     <!-- Search and Filter Section -->
-    <div class="relative w-full py-4 rounded-xl">
-        <div class="flex flex-col w-full gap-6 mx-auto">
-            <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
-                <!-- Search Jobs -->
-                <div class="flex-1 min-w-[200px] max-w-xs">
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="Search by title, company, category..."
-                            class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                            value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
-                        <svg class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 pointer-events-none right-4 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                </div>
+    <div class="flex items-stretch w-full gap-3 mb-6">
+        <!-- Search Input (Expanded width) -->
+        <div class="flex-1">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search by title, company, category..."
+                    class="w-full px-4 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
 
-                <!-- Status Filter -->
-                <div class="flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter ?? 'Status'); ?>' }">
-                    <button @click="open = !open" @click.away="open = false"
-                        class="flex items-center justify-between w-full px-4 py-3 pr-6 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                        <span x-text="selected"></span>
-                        <svg class="w-4 h-4 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div x-show="open" x-transition class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5" x-cloak>
-                        <div class="py-1">
-                            <button @click="selected = 'Status'; open = false; filterByStatus('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</button>
-                            <button @click="selected = 'Open'; open = false; filterByStatus('open')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Open</button>
-                            <button @click="selected = 'Paused'; open = false; filterByStatus('paused')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Paused</button>
-                            <button @click="selected = 'Closed'; open = false; filterByStatus('closed')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Closed</button>
-                            <button @click="selected = 'Draft'; open = false; filterByStatus('draft')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Draft</button>
-                        </div>
-                    </div>
-                </div>
+            </div>
+        </div>
 
-                <!-- Date Filter -->
-                <div class="flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Date Range' }">
-                    <button @click="open = !open" @click.away="open = false"
-                        class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                        <span x-text="selected"></span>
-                        <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div x-show="open" x-transition class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5" x-cloak>
-                        <div class="py-1">
-                            <button @click="selected = 'Date Range'; open = false; filterByDate('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Dates</button>
-                            <button @click="selected = 'Today'; open = false; filterByDate('today')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Today</button>
-                            <button @click="selected = 'This Week'; open = false; filterByDate('week')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Week</button>
-                            <button @click="selected = 'This Month'; open = false; filterByDate('month')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Month</button>
-                            <button @click="selected = 'This Year'; open = false; filterByDate('year')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Year</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filter/Clear Buttons -->
-                <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
-                    <button onclick="clearAllFilters()"
-                        class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                        Clear
-                    </button>
-                    <button onclick="exportResults('csv')"
-                        class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Export
-                    </button>
+        <!-- Status Filter (Expanded width) -->
+        <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter ?? 'All Status'); ?>' }">
+            <button @click="open = !open"
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <span x-text="selected || 'Filter by status'" class="text-gray-700 truncate"></span>
+                <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div x-show="open" @click.away="open = false"
+                class="absolute right-0 z-50 w-full mt-1 bg-white rounded-md shadow-lg min-w-40 ring-1 ring-black ring-opacity-5">
+                <div class="py-1">
+                    <a href="#" @click.prevent="selected = 'All Status'; filterByStatus(''); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</a>
+                    <a href="#" @click.prevent="selected = 'Open'; filterByStatus('open'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Open</a>
+                    <a href="#" @click.prevent="selected = 'Paused'; filterByStatus('paused'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Paused</a>
+                    <a href="#" @click.prevent="selected = 'Closed'; filterByStatus('closed'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Closed</a>
+                    <a href="#" @click.prevent="selected = 'Draft'; filterByStatus('draft'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Draft</a>
                 </div>
             </div>
+        </div>
+
+        <!-- Date Filter (Expanded width) -->
+        <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Dates' }">
+            <button @click="open = !open"
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <span x-text="selected" class="truncate"></span>
+                <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div x-show="open" @click.away="open = false"
+                class="absolute right-0 z-50 w-full mt-1 bg-white rounded-md shadow-lg min-w-48 ring-1 ring-black ring-opacity-5">
+                <div class="py-1">
+                    <a href="#" @click.prevent="selected = 'All Dates'; filterByDate(''); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Dates</a>
+                    <a href="#" @click.prevent="selected = 'Today'; filterByDate('today'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Today</a>
+                    <a href="#" @click.prevent="selected = 'This Week'; filterByDate('week'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Week</a>
+                    <a href="#" @click.prevent="selected = 'This Month'; filterByDate('month'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Month</a>
+                    <a href="#" @click.prevent="selected = 'This Year'; filterByDate('year'); open = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">This Year</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Fixed width) -->
+        <div class="flex flex-shrink-0 gap-2">
+            <button onclick="clearAllFilters()"
+                class="px-4 py-3 text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 whitespace-nowrap">
+                <i class="mr-1 fas fa-times"></i> Clear
+            </button>
+            <button onclick="exportResults('csv')"
+                class="px-4 py-3 text-sm text-white rounded-lg bg-primary hover:bg-primary/90 whitespace-nowrap">
+                <i class="mr-1 fas fa-file-download"></i> Export
+            </button>
         </div>
     </div>
 
     <!-- All Jobs -->
     <div>
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">All Jobs</h2>
-            <div class="flex items-center space-x-2">
-                <span class="px-3 py-1 text-sm bg-blue-100 rounded-sm text-primary" id="visibleCount">
-                    <?php echo count($jobs ?? []); ?> visible
-                </span>
-            </div>
-        </div>
+
 
         <?php if (empty($jobs ?? [])): ?>
             <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noJobsMessage">
@@ -220,12 +214,13 @@
             <div class="hidden p-8 text-center bg-white border border-gray-200 rounded-lg" id="noResultsMessage">
                 <i class="mb-4 text-4xl text-gray-400 fas fa-search"></i>
                 <p class="text-gray-500">No jobs match your search criteria</p>
+                <button onclick="clearAllFilters()" class="mt-2 text-blue-600 hover:text-blue-900">Clear filters</button>
             </div>
 
             <!-- Jobs Table -->
             <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="jobsTable">
                 <div class="overflow-x-auto">
-                    <table class="w-full divide-y divide-gray-200 table-auto">
+                    <table class="w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
@@ -252,8 +247,8 @@
                                 <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Deadline
                                 </th>
-                                <th scope="col" class="relative px-6 py-3">
-                                    <span class="sr-only">Actions</span>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -303,13 +298,13 @@
 
                                         <!-- Category -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-2 text-xs font-semibold bg-blue-100 text-primary">
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 rounded-md text-primary">
                                                 <?php echo htmlspecialchars($job['category_name'] ?? 'Uncategorized'); ?>
                                             </span>
                                         </td>
 
                                         <!-- Location -->
-                                        <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                        <td class="px-6 py-4 text-xs text-gray-900 whitespace-nowrap">
                                             <?php echo htmlspecialchars($job['location'] ?? 'Not specified'); ?>
                                         </td>
 
@@ -324,18 +319,16 @@
                                             ];
                                             $statusClass = $statusClasses[$job['job_status'] ?? 'draft'] ?? 'bg-gray-100 text-gray-800';
                                             ?>
-                                            <span class="inline-flex px-2 py-2 text-xs font-semibold  <?php echo $statusClass; ?>">
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md <?php echo $statusClass; ?>">
                                                 <?php echo ucfirst($job['job_status'] ?? 'Draft'); ?>
                                             </span>
                                         </td>
 
                                         <!-- Created Date -->
-                                        <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                        <td class="px-6 py-4 text-xs text-gray-800 whitespace-nowrap">
                                             <?php if (!empty($job['created_at'])): ?>
                                                 <div class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                    </svg>
+
                                                     <?php echo date('M j, Y', strtotime($job['created_at'])); ?>
                                                 </div>
                                             <?php else: ?>
@@ -347,9 +340,7 @@
                                         <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                             <?php if (!empty($job['application_deadline'])): ?>
                                                 <div class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
+
                                                     <?php
                                                     $deadline = strtotime($job['application_deadline']);
                                                     $isExpired = $deadline < time();
@@ -365,20 +356,19 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                            <div class="flex items-center space-x-2">
-                                                <!-- View Job -->
+                                        <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                            <div class="flex items-center justify-end space-x-2">
                                                 <a href="?page=admin-view-job&id=<?php echo $job['job_id']; ?>"
-                                                    class="text-primary hover:text-primary-dark" title="View Details">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                    </svg>
+                                                    class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 rounded-md text-primary hover:bg-blue-200"
+                                                    title="View Details">
+                                                    View
                                                 </a>
 
                                                 <!-- Status Toggle -->
                                                 <div class="relative" x-data="{ open: false }">
-                                                    <button @click="open = !open" class="text-gray-400 hover:text-gray-600" title="Change Status">
+                                                    <button @click="open = !open"
+                                                        class="text-gray-400 hover:text-gray-600"
+                                                        title="Change Status">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                                                         </svg>
@@ -391,8 +381,8 @@
                                                         x-transition:leave="transition ease-in duration-75"
                                                         x-transition:leave-start="transform opacity-100 scale-100"
                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                        class="absolute right-0 z-50 w-32 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                                        x-cloak>
+                                                        class="absolute right-0 z-50 w-40 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                                        style="top: 100%; right: 0;">
                                                         <div class="py-1">
                                                             <?php if ($job['job_status'] !== 'open'): ?>
                                                                 <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'open')"
@@ -429,31 +419,27 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <div class="py-4 border-t border-gray-200" id="paginationContainer">
-                    <div class="flex items-center justify-between">
-                        <!-- Left side: Results info -->
-                        <div class="text-sm text-gray-700" id="paginationInfo">
-                            Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults"><?php echo count($jobs); ?></span> jobs
-                        </div>
-
-                        <!-- Right side: Pagination controls -->
-                        <nav class="flex space-x-1" aria-label="Pagination" id="paginationControls">
-                            <!-- Previous button -->
-                            <button id="prevBtn" onclick="changePage('prev')"
-                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Previous
-                            </button>
-
-                            <!-- Page numbers will be inserted here by JavaScript -->
-                            <div id="pageNumbers" class="flex space-x-1"></div>
-
-                            <!-- Next button -->
-                            <button id="nextBtn" onclick="changePage('next')"
-                                class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Next
-                            </button>
-                        </nav>
+                <!-- Pagination - Same as jobseeker management -->
+                <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
+                    <div class="flex items-center text-sm text-gray-700">
+                        <span>Showing</span>
+                        <span class="mx-1 font-medium" id="startItem">1</span>
+                        <span>to</span>
+                        <span class="mx-1 font-medium" id="endItem">10</span>
+                        <span>of</span>
+                        <span class="mx-1 font-medium" id="totalItems">0</span>
+                        <span>results</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevBtn" onclick="previousPage()"
+                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="mr-1 fas fa-chevron-left"></i> Previous
+                        </button>
+                        <div id="pageNumbers" class="flex space-x-1"></div>
+                        <button id="nextBtn" onclick="nextPage()"
+                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next <i class="ml-1 fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -482,29 +468,120 @@
         filteredRows = [...allRows];
         updateCounts();
         initializePagination();
+
+        // Add search event listener
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                currentFilters.search = this.value;
+                applyFilters();
+            });
+        }
     });
 
-    // Mobile menu toggle
-    function toggleSidebar() {
-        const sidebarMobile = document.getElementById('sidebar-mobile');
-        const overlay = document.getElementById('mobile-menu-overlay');
+    // Pagination Functions
+    function initializePagination() {
+        updatePagination();
+    }
 
-        if (sidebarMobile) {
-            sidebarMobile.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+    function updatePagination() {
+        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+        // Show/hide rows based on current page
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            if (filteredRows[i]) {
+                filteredRows[i].style.display = '';
+            }
+        }
+
+        updatePaginationInfo();
+        updatePaginationControls(totalPages);
+    }
+
+    function updatePaginationInfo() {
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+
+        const totalItemsEl = document.getElementById('totalItems');
+        const startItemEl = document.getElementById('startItem');
+        const endItemEl = document.getElementById('endItem');
+
+        if (totalItemsEl) totalItemsEl.textContent = filteredRows.length;
+        if (startItemEl) startItemEl.textContent = startIndex;
+        if (endItemEl) endItemEl.textContent = endIndex;
+    }
+
+    function updatePaginationControls(totalPages) {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        if (!prevBtn || !nextBtn || !pageNumbers) return;
+
+        // Update Previous/Next button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Clear existing page numbers
+        pageNumbers.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        // Add page number buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust startPage if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add visible page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.onclick = () => goToPage(i);
+
+            if (i === currentPage) {
+                button.className = 'px-3 py-1 text-sm text-white border rounded bg-primary border-primary';
+            } else {
+                button.className = 'px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50';
+            }
+
+            pageNumbers.appendChild(button);
         }
     }
 
-    // Close sidebar when clicking overlay
-    document.getElementById('mobile-menu-overlay').addEventListener('click', toggleSidebar);
+    // Navigation functions
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            updatePagination();
+        }
+    }
 
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        currentFilters.search = this.value;
-        applyFilters();
-    });
+    function nextPage() {
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            updatePagination();
+        }
+    }
 
-    // Filter functions
+    function goToPage(page) {
+        currentPage = page;
+        updatePagination();
+    }
+
+    // Filter functions - ADD THESE
     function filterByStatus(status) {
         currentFilters.status = status;
         applyFilters();
@@ -522,15 +599,26 @@
 
         filteredRows = allRows.filter(row => {
             // Skip empty rows (like "no data" message)
-            if (!row.dataset.status) return false;
+            if (!row.dataset || !row.dataset.status) return false;
 
+            const jobTitle = row.querySelector('td:nth-child(1)')?.textContent?.toLowerCase() || '';
+            const companyName = row.querySelector('td:nth-child(2)')?.textContent?.toLowerCase() || '';
+            const category = row.querySelector('td:nth-child(3)')?.textContent?.toLowerCase() || '';
+            const location = row.querySelector('td:nth-child(4)')?.textContent?.toLowerCase() || '';
+
+            // Search filter - check multiple fields
             const searchMatch = !searchValue || (
-                row.textContent.toLowerCase().includes(searchValue)
+                jobTitle.includes(searchValue) ||
+                companyName.includes(searchValue) ||
+                category.includes(searchValue) ||
+                location.includes(searchValue)
             );
 
+            // Status filter
             const statusMatch = !statusValue || statusValue === 'all' ||
                 row.dataset.status === statusValue;
 
+            // Date filter
             const dateMatch = !dateValue || matchesDateFilter(row.dataset.created, dateValue);
 
             return searchMatch && statusMatch && dateMatch;
@@ -574,6 +662,8 @@
         const noResultsMessage = document.getElementById('noResultsMessage');
         const jobsTable = document.getElementById('jobsTable');
 
+        if (!noResultsMessage || !jobsTable) return;
+
         if (filteredRows.length === 0) {
             noResultsMessage.classList.remove('hidden');
             jobsTable.classList.add('hidden');
@@ -587,131 +677,11 @@
         const visibleCount = filteredRows.length;
         const totalCount = allRows.filter(row => row.dataset.status).length; // Exclude empty rows
 
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-        document.getElementById('totalResults').textContent = visibleCount;
-    }
+        const visibleCountEl = document.getElementById('visibleCount');
+        if (visibleCountEl) visibleCountEl.textContent = `${visibleCount} visible`;
 
-    // Pagination Functions
-    function initializePagination() {
-        updatePagination();
-    }
-
-    function updatePagination() {
-        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-        // Hide/show pagination container based on whether pagination is needed
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (filteredRows.length <= itemsPerPage) {
-            paginationContainer.style.display = 'none';
-        } else {
-            paginationContainer.style.display = 'block';
-        }
-
-        // Show/hide rows based on current page
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-        for (let i = startIndex; i < endIndex; i++) {
-            if (filteredRows[i]) {
-                filteredRows[i].style.display = '';
-            }
-        }
-
-        updatePaginationInfo();
-        updatePaginationControls();
-    }
-
-    function updatePaginationInfo() {
-        const startIndex = (currentPage - 1) * itemsPerPage + 1;
-        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
-
-        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-        document.getElementById('showingEnd').textContent = endIndex;
-    }
-
-    function updatePaginationControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtnMobile = document.getElementById('prevBtnMobile');
-        const nextBtnMobile = document.getElementById('nextBtnMobile');
-        const pageNumbers = document.getElementById('pageNumbers');
-
-        // Update Previous/Next button states
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-        if (prevBtnMobile) prevBtnMobile.disabled = currentPage === 1;
-        if (nextBtnMobile) nextBtnMobile.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-
-        // Add page number buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            pageNumbers.appendChild(createPageButton(1));
-            if (startPage > 2) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-        }
-
-        // Add visible page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.appendChild(createPageButton(i));
-        }
-
-        // Add ellipsis and last page if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-            pageNumbers.appendChild(createPageButton(totalPages));
-        }
-    }
-
-    function createPageButton(pageNum) {
-        const button = document.createElement('button');
-        button.textContent = pageNum;
-        button.onclick = () => changePage(pageNum);
-
-        if (pageNum === currentPage) {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-        } else {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
-        }
-
-        return button;
-    }
-
-    function createEllipsis() {
-        const span = document.createElement('span');
-        span.textContent = '...';
-        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-        return span;
-    }
-
-    function changePage(direction) {
-        if (typeof direction === 'number') {
-            currentPage = direction;
-        } else if (direction === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            currentPage++;
-        }
-
-        updatePagination();
+        const totalResultsEl = document.getElementById('totalResults') || document.getElementById('totalItems');
+        if (totalResultsEl) totalResultsEl.textContent = visibleCount;
     }
 
     function clearAllFilters() {
@@ -721,18 +691,27 @@
             date: ''
         };
 
-        document.getElementById('searchInput').value = '';
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+
+        // Reset pagination
+        currentPage = 1;
 
         // Reset Alpine.js dropdown selections
-        const statusDropdown = document.querySelector('[x-data*="Status"]');
-        const dateDropdown = document.querySelector('[x-data*="Date Range"]');
-
-        if (statusDropdown && statusDropdown._x_dataStack) {
-            statusDropdown._x_dataStack[0].selected = 'Status';
-        }
-        if (dateDropdown && dateDropdown._x_dataStack) {
-            dateDropdown._x_dataStack[0].selected = 'Date Range';
-        }
+        setTimeout(() => {
+            const dropdowns = document.querySelectorAll('[x-data]');
+            dropdowns.forEach(dropdown => {
+                if (dropdown._x_dataStack && dropdown._x_dataStack[0]) {
+                    const data = dropdown._x_dataStack[0];
+                    if (data.selected && data.selected.includes('Status')) {
+                        data.selected = 'All Status';
+                    }
+                    if (data.selected && data.selected.includes('Date')) {
+                        data.selected = 'All Dates';
+                    }
+                }
+            });
+        }, 100);
 
         applyFilters();
     }

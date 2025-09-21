@@ -44,7 +44,7 @@
 
   /* NAVBAR TEXT */
   .nav-brand {
-    @apply mr-4 block cursor-pointer py-1.5 text-2xl font-semibold text-primary;
+    @apply mr-4 block cursor-pointer py-1.5 text-xl font-semibold text-primary;
   }
 
   .nav-link-top {
@@ -78,7 +78,7 @@
   }
 
   .notification-badge-large {
-    @apply text-3xs px-1;
+    @apply px-1 text-3xs;
   }
 
   .notification-card {

@@ -379,7 +379,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                     <div class="flex items-center gap-2 text-right">
                                         <!-- Show Percentage Only If >= 20 -->
                                         <?php if (!$isLowMatch): ?>
-                                            <div class="text-sm font-bold <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">
+                                            <div class="text-sm font-bold <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-primary' : 'text-primary') ?>">
                                                 <?= number_format($matchPercentage, 1) ?>%
                                             </div>
                                         <?php endif; ?>

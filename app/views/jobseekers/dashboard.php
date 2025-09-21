@@ -355,7 +355,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                                 <?php if (!$isLowMatch): ?>
                                                     Best Matches:
                                                     <!-- UPDATED: Real Match Percentage with Color Coding -->
-                                                    <span class="text-sm font-medium transition-colors duration-300 hover:text-primary/80 <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">
+                                                    <span class="text-sm font-medium transition-colors duration-300 hover:text-primary/80 <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-primary') ?>">
                                                         <?= number_format($matchPercentage, 1) ?>%
                                                     </span>
 
