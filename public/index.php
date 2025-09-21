@@ -95,9 +95,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         case 'update-employer-status':
-            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
-            $controller = new UserManagementController();
-            $controller->updateStatus();
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->updateUserStatus();
             break;
 
         case 'admin-jobseeker-update-status':
@@ -366,6 +366,18 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->accreditations();
             break;
 
+        case 'admin-review-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->reviewAccreditation();
+            break;
+
+        case 'admin-process-accreditation':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->processAccreditation();
+            break;
+
 
         // case 'admin-users':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
@@ -384,11 +396,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new AdminController();
             $controller->viewJob();
             break;
-
+            
         case 'admin-toggle-job-status':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->toggleJobStatus();
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->updateJobStatus();
             break;
 
         case 'admin-delete-job':
@@ -646,23 +658,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         // Admin Accreditation Routes
-        case 'admin-accreditations':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->accreditations();
-            break;
-
-        case 'admin-review-accreditation':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->reviewAccreditation();
-            break;
-
-        case 'admin-process-accreditation':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->processAccreditation();
-            break;
+        
         case 'upload-business-logo':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();

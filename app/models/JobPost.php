@@ -1051,4 +1051,63 @@ class JobPost
             return false;
         }
     }
+
+    public function getAllJobsForAdmin()
+    {
+        try {
+            $query = "
+                SELECT 
+                    j.job_id,
+                    j.job_title,
+                    j.job_type,
+                    j.job_status,
+                    j.location,
+                    j.created_at,
+                    j.application_deadline,
+                    j.employer_id,
+                    
+                    -- Employer information
+                    COALESCE(e.company_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                    e.first_name as employer_first_name,
+                    e.last_name as employer_last_name,
+                    
+                    -- Business information (if available)
+                    eb.business_name,
+                    
+                    -- Category information  
+                    jc.category_name,
+                    
+                    -- Application count
+                    (SELECT COUNT(*) FROM job_application ja WHERE ja.job_id = j.job_id) as application_count
+                    
+                FROM job_post j
+                LEFT JOIN employer e ON j.employer_id = e.employer_id
+                LEFT JOIN users u ON e.user_id = u.user_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                LEFT JOIN job_category jc ON j.job_category_id = jc.job_category_id
+                ORDER BY j.created_at DESC
+            ";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Process results to set proper company name display
+            foreach ($results as &$result) {
+                // Priority: business_name > company_name > first_name + last_name
+                if (!empty($result['business_name'])) {
+                    $result['company_name'] = $result['business_name'];
+                } elseif (empty($result['company_name'])) {
+                    $result['company_name'] = trim($result['employer_first_name'] . ' ' . $result['employer_last_name']);
+                }
+            }
+            
+            return $results;
+            
+        } catch (PDOException $e) {
+            error_log("Error fetching jobs for admin: " . $e->getMessage());
+            throw new Exception("Failed to fetch jobs for admin management");
+        }
+    }
 }

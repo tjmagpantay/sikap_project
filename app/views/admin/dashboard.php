@@ -9,27 +9,27 @@ include_once __DIR__ . '/components/admin_auth_check.php';
     <title>SIKAP Admin Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <!-- Use your local Tailwind CSS and custom styles -->
-    <link href="/sikap/public/assets/css/style.css" rel="stylesheet">
+    <!-- Force reload CSS -->
+    <link href="/sikap/public/assets/css/style.css?v=<?php echo time(); ?>" rel="stylesheet">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 admin-body">
     <!-- Topbar (Fixed) -->
     <div class="admin-topbar">
         <?php include __DIR__ . '/components/topbar.php'; ?>
     </div>
 
     <!-- Sidebar (Fixed) -->
-    <div id="admin-sidebar" class="bg-white admin-sidebar">
+    <div id="admin-sidebar" class="admin-sidebar">
         <?php include __DIR__ . '/components/sidebar.php'; ?>
     </div>
 
     <!-- Mobile Overlay -->
     <div id="mobile-overlay" class="mobile-overlay" onclick="toggleMobileSidebar()"></div>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Area (Properly positioned) -->
     <div class="admin-main">
         <div class="admin-content">
             <?php
@@ -57,22 +57,22 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                     include __DIR__ . '/accreditations.php';
                     break;
                 case 'admin-reports':
-                    include __DIR__ . '/all-reports.php'; // Content-only version
+                    include __DIR__ . '/all-reports.php';
                     break;
                 case 'admin-applications':
-                    include __DIR__ . '/application.php'; // Create content-only version
+                    include __DIR__ . '/application.php';
                     break;
                 case 'admin-chatbot':
                     include __DIR__ . '/chatbot.php';
                     break;
                 case 'admin-events':
-                    include __DIR__ . '/events/event.php'; // Your content-only file
+                    include __DIR__ . '/events/event.php';
                     break;
                 case 'admin-event-create':
-                    include __DIR__ . '/events/create.php'; // Your content-only file
+                    include __DIR__ . '/events/create.php';
                     break;
                 case 'admin-event-edit':
-                    include __DIR__ . '/events/edit.php'; // Your content-only file
+                    include __DIR__ . '/events/edit.php';
                     break;
                 case 'admin-settings':
                     include __DIR__ . '/settings.php';

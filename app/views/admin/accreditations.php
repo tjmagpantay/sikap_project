@@ -83,66 +83,107 @@
         </div>
     </div>
 
-    <!-- Pending Accreditations Section -->
+    <!-- Pending Accreditations Table -->
     <?php
     $pendingAccreditations = array_filter($accreditations ?? [], function ($a) {
         return $a['status'] === 'pending';
     });
     ?>
 
-    <?php if (!empty($pendingAccreditations)): ?>
-        <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-900">Pending Accreditations</h2>
-                <span class="px-3 py-1 text-sm text-yellow-800 bg-yellow-100 rounded-full">
-                    <?php echo count($pendingAccreditations); ?> pending
-                </span>
-            </div>
-
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <?php foreach ($pendingAccreditations as $accreditation): ?>
-                    <div class="p-6 transition-shadow bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">
-                                <?php echo htmlspecialchars($accreditation['business_name'] ?? 'N/A'); ?>
-                            </h3>
-                            <span class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full">
-                                Pending
-                            </span>
-                        </div>
-
-                        <div class="space-y-2 text-sm text-gray-600">
-                            <div class="flex items-center">
-                                <i class="mr-2 fas fa-user"></i>
-                                <?php echo htmlspecialchars(($accreditation['first_name'] ?? '') . ' ' . ($accreditation['last_name'] ?? '')); ?>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="mr-2 fas fa-envelope"></i>
-                                <?php echo htmlspecialchars($accreditation['email'] ?? 'N/A'); ?>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="mr-2 fas fa-calendar"></i>
-                                <?php echo $accreditation['created_at'] ? date('M d, Y', strtotime($accreditation['created_at'])) : 'N/A'; ?>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2 mt-4">
-                            <button onclick="quickVerify(<?php echo $accreditation['accreditation_id']; ?>)"
-                                class="flex-1 px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <i class="mr-1 fas fa-check"></i> Approve
-                            </button>
-                            <a href="?page=admin-review-accreditation&id=<?php echo $accreditation['accreditation_id']; ?>"
-                                class="flex-1 px-3 py-2 text-sm font-medium text-center text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                                <i class="mr-1 fas fa-eye"></i> Review
-                            </a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Pending Accreditations</h2>
+            <span class="px-3 py-1 text-sm text-yellow-800 bg-yellow-100 rounded-full">
+                <?php echo count($pendingAccreditations); ?> pending
+            </span>
         </div>
-    <?php endif; ?>
 
-    <!-- All Accreditations Section -->
+        <?php if (!empty($pendingAccreditations)): ?>
+            <div class="overflow-hidden bg-white border border-yellow-200 rounded-lg shadow-sm">
+                <div class="px-6 py-3 bg-yellow-50">
+                    <h3 class="text-sm font-medium text-yellow-800">
+                        <i class="mr-2 fas fa-clock"></i>
+                        Requires Immediate Review
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Business Name</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Owner</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Contact</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Submitted</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($pendingAccreditations as $accreditation): ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            <?php echo htmlspecialchars($accreditation['business_name'] ?? $accreditation['company_name'] ?? 'N/A'); ?>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            <?php echo htmlspecialchars($accreditation['business_type'] ?? 'N/A'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo htmlspecialchars(($accreditation['first_name'] ?? '') . ' ' . ($accreditation['last_name'] ?? '')); ?>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            <?php echo htmlspecialchars($accreditation['position'] ?? 'N/A'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo htmlspecialchars($accreditation['email'] ?? 'N/A'); ?>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            <?php echo htmlspecialchars($accreditation['contact_no'] ?? 'N/A'); ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo $accreditation['created_at'] ? date('M d, Y', strtotime($accreditation['created_at'])) : 'N/A'; ?>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            <?php echo $accreditation['created_at'] ? date('g:i A', strtotime($accreditation['created_at'])) : ''; ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                        <div class="flex items-center space-x-2">
+                                            <a href="?page=admin-review-accreditation&id=<?php echo $accreditation['accreditation_id']; ?>"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200">
+                                                <i class="mr-1 fas fa-eye"></i> Review
+                                            </a>
+                                            <button onclick="quickApprove(<?php echo $accreditation['accreditation_id']; ?>)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200">
+                                                <i class="mr-1 fas fa-check"></i> Approve
+                                            </button>
+                                            <button onclick="quickReject(<?php echo $accreditation['accreditation_id']; ?>)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200">
+                                                <i class="mr-1 fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="p-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                <i class="mx-auto mb-4 text-4xl text-gray-400 fas fa-check-circle"></i>
+                <p class="text-gray-500">No pending accreditations at the moment.</p>
+                <p class="text-sm text-gray-400">All employers are up to date!</p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- All Accreditations Table -->
     <div>
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-900">All Accreditations</h2>
@@ -194,7 +235,7 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($accreditation['business_name'] ?? 'N/A'); ?>
+                                            <?php echo htmlspecialchars($accreditation['business_name'] ?? $accreditation['company_name'] ?? 'N/A'); ?>
                                         </div>
                                         <div class="text-sm text-gray-500">
                                             <?php echo htmlspecialchars($accreditation['business_type'] ?? 'N/A'); ?>
@@ -210,7 +251,7 @@
                                             <?php echo htmlspecialchars($accreditation['email'] ?? 'N/A'); ?>
                                         </div>
                                         <div class="text-sm text-gray-500">
-                                            <?php echo htmlspecialchars($accreditation['contact_person'] ?? 'N/A'); ?>
+                                            <?php echo htmlspecialchars($accreditation['contact_no'] ?? 'N/A'); ?>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -238,7 +279,7 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <?php if ($accreditation['status'] === 'pending'): ?>
-                                                <button onclick="quickVerify(<?php echo $accreditation['accreditation_id']; ?>)"
+                                                <button onclick="quickApprove(<?php echo $accreditation['accreditation_id']; ?>)"
                                                     class="text-green-600 hover:text-green-900" title="Quick Approve">
                                                     <i class="fas fa-check"></i>
                                                 </button>
@@ -272,55 +313,28 @@
     <input type="hidden" name="notes" id="accreditationNotes">
 </form>
 
-<!-- Keep your existing scripts -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Quick verify function
-    function quickVerify(accreditationId) {
-        Swal.fire({
-            title: 'Approve Accreditation?',
-            text: 'Are you sure you want to approve this accreditation?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#059669',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, approve it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('accreditationId').value = accreditationId;
-                document.getElementById('accreditationStatus').value = 'approved';
-                document.getElementById('accreditationNotes').value = 'Quick approval by admin';
-                document.getElementById('accreditationForm').submit();
-            }
-        });
+    // Quick approve function with native JavaScript confirm
+    function quickApprove(accreditationId) {
+        if (confirm('Are you sure you want to approve this accreditation?')) {
+            document.getElementById('accreditationId').value = accreditationId;
+            document.getElementById('accreditationStatus').value = 'approved';
+            document.getElementById('accreditationNotes').value = 'Quick approval by admin';
+            document.getElementById('accreditationForm').submit();
+        }
     }
 
-    // Quick reject function
+    // Quick reject function with native JavaScript prompt
     function quickReject(accreditationId) {
-        Swal.fire({
-            title: 'Reject Accreditation?',
-            input: 'textarea',
-            inputPlaceholder: 'Please provide a reason for rejection...',
-            inputAttributes: {
-                'aria-label': 'Rejection reason'
-            },
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, reject it!',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to provide a reason for rejection!'
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('accreditationId').value = accreditationId;
-                document.getElementById('accreditationStatus').value = 'rejected';
-                document.getElementById('accreditationNotes').value = result.value;
-                document.getElementById('accreditationForm').submit();
-            }
-        });
+        const reason = prompt('Please provide a reason for rejection:');
+        if (reason !== null && reason.trim() !== '') {
+            document.getElementById('accreditationId').value = accreditationId;
+            document.getElementById('accreditationStatus').value = 'rejected';
+            document.getElementById('accreditationNotes').value = reason.trim();
+            document.getElementById('accreditationForm').submit();
+        } else if (reason !== null) {
+            alert('You need to provide a reason for rejection!');
+        }
     }
 
     // Search and filter functions

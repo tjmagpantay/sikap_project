@@ -461,16 +461,6 @@
     </div>
 </div>
 
-<!-- Hidden forms for status changes -->
-<form id="statusChangeForm" method="POST" action="?page=admin-toggle-job-status" style="display: none;">
-    <input type="hidden" name="job_id" id="statusJobId">
-    <input type="hidden" name="status" id="statusValue">
-</form>
-
-<form id="deleteJobForm" method="POST" action="?page=admin-delete-job" style="display: none;">
-    <input type="hidden" name="job_id" id="deleteJobId">
-</form>
-
 <!-- Keep all your existing JavaScript -->
 <script>
     let allRows = [];
@@ -822,19 +812,81 @@
         updatePagination();
     }
 
-    // Job status management
+    // Job status management - FIXED for admin
     function changeJobStatus(jobId, status) {
         if (confirm(`Are you sure you want to ${status} this job?`)) {
-            document.getElementById('statusJobId').value = jobId;
-            document.getElementById('statusValue').value = status;
-            document.getElementById('statusChangeForm').submit();
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+            formData.append('status', status);
+
+            const baseUrl = window.location.pathname.split('index.php')[0];
+            const url = baseUrl + 'index.php?page=admin-toggle-job-status';
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async response => {
+                    const text = await response.text();
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Reload page to show updated status
+                        location.reload();
+                    } else {
+                        throw new Error(data.error || 'Failed to update status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                });
         }
     }
 
     function deleteJob(jobId) {
         if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
-            document.getElementById('deleteJobId').value = jobId;
-            document.getElementById('deleteJobForm').submit();
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+
+            const baseUrl = window.location.pathname.split('index.php')[0];
+            const url = baseUrl + 'index.php?page=admin-delete-job';
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async response => {
+                    const text = await response.text();
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Reload page to show updated list
+                        location.reload();
+                    } else {
+                        throw new Error(data.error || 'Failed to delete job');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                });
         }
     }
 </script>

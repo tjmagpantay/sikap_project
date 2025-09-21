@@ -109,7 +109,7 @@ class AdminController
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
-
+    
     public function accreditations()
     {
         // Change from User::ROLE_ADMIN to 'admin' to match your login method
@@ -121,6 +121,13 @@ class AdminController
         // Use adminModel instead of employerModel for accreditation methods
         $pendingAccreditations = $this->adminModel->getPendingAccreditations();
         $allAccreditations = $this->adminModel->getAllAccreditations();
+
+        // Fix: Set $accreditations for the view (this is what the view expects)
+        $accreditations = $allAccreditations;
+
+        // Set error/success messages
+        $error = $_GET['error'] ?? '';
+        $success = $_GET['success'] ?? '';
 
         // Debug logging
         error_log('=== ACCREDITATIONS DEBUG ===');

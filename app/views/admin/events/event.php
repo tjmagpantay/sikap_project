@@ -163,7 +163,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <!-- Your existing dropdown content here -->
                     <div x-show="open" x-transition class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5" x-cloak>
                         <div class="py-1">
                             <button @click="selected = 'Event Type'; open = false; filterByEventType('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Events</button>
@@ -174,8 +173,8 @@
                     </div>
                 </div>
 
-                <!-- Event Status Filter -->
-                <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Event Status' }">
+                <!-- Status Filter (Show/Hide) -->
+                <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Status' }">
                     <button @click="open = !open" @click.away="open = false"
                         class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                         <span x-text="selected"></span>
@@ -183,33 +182,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <!-- Dropdown Menu -->
-                    <div x-show="open"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                        x-cloak>
+                    <div x-show="open" x-transition class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5" x-cloak>
                         <div class="py-1">
-                            <button @click="selected = 'Event Status'; open = false; filterByEventStatus('')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                All Events
-                            </button>
-                            <button @click="selected = 'Upcoming'; open = false; filterByEventStatus('upcoming')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Upcoming
-                            </button>
-                            <button @click="selected = 'Ongoing'; open = false; filterByEventStatus('ongoing')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Ongoing
-                            </button>
-                            <button @click="selected = 'Completed'; open = false; filterByEventStatus('completed')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Completed
-                            </button>
+                            <button @click="selected = 'Status'; open = false; filterByStatus('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</button>
+                            <button @click="selected = 'Visible'; open = false; filterByStatus('show')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Visible (Show)</button>
+                            <button @click="selected = 'Hidden'; open = false; filterByStatus('hide')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hidden (Hide)</button>
                         </div>
                     </div>
                 </div>
@@ -223,29 +200,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <!-- Dropdown Menu -->
-                    <div x-show="open"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                        x-cloak>
+                    <div x-show="open" x-transition class="absolute left-0 z-50 w-full mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5" x-cloak>
                         <div class="py-1">
-                            <button @click="selected = 'Pin Status'; open = false; filterByPinStatus('')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                All Events
-                            </button>
-                            <button @click="selected = 'Pinned'; open = false; filterByPinStatus('1')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Pinned Only
-                            </button>
-                            <button @click="selected = 'Not Pinned'; open = false; filterByPinStatus('0')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Not Pinned
-                            </button>
+                            <button @click="selected = 'Pin Status'; open = false; filterByPinStatus('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Events</button>
+                            <button @click="selected = 'Pinned'; open = false; filterByPinStatus('1')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pinned Only</button>
+                            <button @click="selected = 'Not Pinned'; open = false; filterByPinStatus('0')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Not Pinned</button>
                         </div>
                     </div>
                 </div>
@@ -266,7 +225,6 @@
     </div>
 
     <!-- Events Table Section -->
-    <!-- Copy all your existing table content here -->
     <div>
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-900">All Events</h2>
@@ -283,66 +241,172 @@
                 <p class="text-gray-500">No events found</p>
             </div>
         <?php else: ?>
-            <!-- Copy your entire events table here -->
-            <!-- ... all your existing table content ... -->
-            <?php foreach ($events as $event): ?>
-                <div class="event-row" data-title="<?php echo htmlspecialchars($event['title']); ?>"
-                    data-type="<?php echo htmlspecialchars($event['type']); ?>"
-                    data-admin-status="<?php echo htmlspecialchars($event['admin_status']); ?>"
-                    data-event-status="<?php echo htmlspecialchars($event['event_status']); ?>"
-                    data-pin-status="<?php echo htmlspecialchars($event['pinned']); ?>">
-                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div class="flex-1 min-w-0 mr-4">
-                            <p class="text-sm font-medium text-gray-900 truncate">
-                                <?php echo htmlspecialchars($event['title']); ?>
-                            </p>
-                            <p class="mt-1 text-xs text-gray-500 truncate">
-                                <?php echo htmlspecialchars($event['description']); ?>
-                            </p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <!-- Edit Button -->
-                            <a href="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
-                                class="text-blue-600 hover:text-blue-900">
-                                <i class="fas fa-edit"></i>
-                            </a>
+            <!-- Events Table -->
+            <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm" id="eventsTable">
+                <div class="overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Event</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Type</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Schedule</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Pin</th>
+                                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="eventsTableBody">
+                            <?php foreach ($events as $event): ?>
+                                <?php
+                                // Calculate event time status
+                                $now = new DateTime();
+                                $start = new DateTime($event['time_start']);
+                                $end = new DateTime($event['time_end']);
 
-                            <!-- Delete Button -->
-                            <a href="index.php?page=admin-event-delete&id=<?php echo $event['event_id']; ?>"
-                                onclick="return confirm('Are you sure you want to delete this event?')"
-                                class="text-red-600 hover:text-red-900">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                                $timeStatus = 'upcoming';
+                                if ($now >= $start && $now <= $end) {
+                                    $timeStatus = 'ongoing';
+                                } elseif ($now > $end) {
+                                    $timeStatus = 'completed';
+                                }
+                                ?>
+                                <tr class="event-row hover:bg-gray-50"
+                                    data-title="<?php echo htmlspecialchars(strtolower($event['title'])); ?>"
+                                    data-type="<?php echo htmlspecialchars($event['type']); ?>"
+                                    data-status="<?php echo htmlspecialchars($event['status']); ?>"
+                                    data-time-status="<?php echo htmlspecialchars($timeStatus); ?>"
+                                    data-pin-status="<?php echo htmlspecialchars($event['pinned'] ?? '0'); ?>">
 
-                            <!-- Toggle Status Button -->
-                            <a href="index.php?page=admin-event-toggle-status&id=<?php echo $event['event_id']; ?>"
-                                class="text-yellow-600 hover:text-yellow-900">
-                                <i class="fas fa-eye<?php echo $event['status'] === 'show' ? '-slash' : ''; ?>"></i>
-                            </a>
-                        </div>
-                    </div>
+                                    <!-- Event Info -->
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <?php if (!empty($event['image'])): ?>
+                                                <div class="flex-shrink-0 w-10 h-10">
+                                                    <img class="object-cover w-10 h-10 rounded-full"
+                                                        src="<?php echo htmlspecialchars($event['image']); ?>"
+                                                        alt="Event image">
+                                                </div>
+                                                <div class="ml-4">
+                                                <?php else: ?>
+                                                    <div>
+                                                    <?php endif; ?>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($event['title']); ?>
+                                                    </div>
+                                                    <div class="text-sm text-gray-500 line-clamp-2">
+                                                        <?php echo htmlspecialchars(substr($event['description'], 0, 100)) . (strlen($event['description']) > 100 ? '...' : ''); ?>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                    </td>
+
+                                    <!-- Type -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            <?php
+                                            echo $event['type'] === 'program' ? 'bg-blue-100 text-blue-800' : ($event['type'] === 'jobfair' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800');
+                                            ?>">
+                                            <?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $event['type']))); ?>
+                                        </span>
+                                    </td>
+
+                                    <!-- Schedule -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo date('M d, Y', strtotime($event['time_start'])); ?>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            <?php echo date('g:i A', strtotime($event['time_start'])) . ' - ' . date('g:i A', strtotime($event['time_end'])); ?>
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            <span class="inline-flex px-2 py-1 rounded-full 
+                                                <?php
+                                                echo $timeStatus === 'upcoming' ? 'bg-yellow-100 text-yellow-800' : ($timeStatus === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800');
+                                                ?>">
+                                                <?php echo ucfirst($timeStatus); ?>
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            <?php echo $event['status'] === 'show' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                            <?php echo $event['status'] === 'show' ? 'Visible' : 'Hidden'; ?>
+                                        </span>
+                                    </td>
+
+                                    <!-- Pin Status -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <?php if (($event['pinned'] ?? 0) == 1): ?>
+                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full text-amber-800 bg-amber-100">
+                                                <i class="mr-1 fas fa-thumbtack"></i>
+                                                Pinned
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
+                                                Not Pinned
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Edit Button -->
+                                            <a href="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
+                                                class="text-blue-600 hover:text-blue-900" title="Edit Event">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <!-- Toggle Visibility -->
+                                            <a href="index.php?page=admin-event-toggle-status&id=<?php echo $event['event_id']; ?>"
+                                                class="text-yellow-600 hover:text-yellow-900"
+                                                title="<?php echo $event['status'] === 'show' ? 'Hide Event' : 'Show Event'; ?>">
+                                                <i class="fas fa-eye<?php echo $event['status'] === 'show' ? '-slash' : ''; ?>"></i>
+                                            </a>
+
+                                            <!-- Toggle Pin -->
+                                            <button onclick="togglePin(<?php echo $event['event_id']; ?>, <?php echo ($event['pinned'] ?? 0) ? 'false' : 'true'; ?>)"
+                                                class="text-amber-600 hover:text-amber-900"
+                                                title="<?php echo ($event['pinned'] ?? 0) ? 'Unpin Event' : 'Pin Event'; ?>">
+                                                <i class="fas fa-thumbtack<?php echo ($event['pinned'] ?? 0) ? '' : ' opacity-50'; ?>"></i>
+                                            </button>
+
+                                            <!-- Delete Button -->
+                                            <button onclick="confirmDelete(<?php echo $event['event_id']; ?>)"
+                                                class="text-red-600 hover:text-red-900" title="Delete Event">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-            <?php endforeach; ?>
+            </div>
+
+            <!-- No Results Message (hidden by default) -->
+            <div class="hidden p-8 text-center bg-white border border-gray-200 rounded-lg" id="noResultsMessage">
+                <i class="mb-4 text-4xl text-gray-400 fas fa-search"></i>
+                <p class="text-gray-500">No events match your current filters</p>
+                <button onclick="clearAllFilters()" class="mt-2 text-blue-600 hover:text-blue-900">Clear filters</button>
+            </div>
         <?php endif; ?>
     </div>
 </div>
 
-<!-- Keep all your existing JavaScript -->
 <script>
-    // All your existing JavaScript code stays exactly the same
+    // Fixed JavaScript with proper data attributes
     let allRows = [];
     let filteredRows = [];
     let currentFilters = {
         type: '',
-        adminStatus: '',
-        eventStatus: '',
+        status: '',
+        timeStatus: '',
         pinStatus: ''
     };
-
-    // Pagination variables
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let totalPages = 1;
 
     function confirmDelete(eventId) {
         if (confirm('Are you sure you want to delete this event?')) {
@@ -352,10 +416,9 @@
 
     function togglePin(eventId, pinStatus) {
         if (confirm(`Are you sure you want to ${pinStatus ? 'pin' : 'unpin'} this event?`)) {
-            // Create a form to submit the pin action
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = 'index.php?page=admin-event-pin';
+            form.action = 'index.php?page=admin-event-toggle-pin';
 
             const eventIdInput = document.createElement('input');
             eventIdInput.type = 'hidden';
@@ -375,40 +438,30 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
         const eventRows = document.querySelectorAll('.event-row');
-        const visibleCount = document.getElementById('visibleCount');
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const eventsTable = document.getElementById('eventsTable');
-
         allRows = Array.from(eventRows);
         filteredRows = [...allRows];
-
-        // Initialize pagination
-        initializePagination();
-
-        // Apply initial filter
-        filterEvents();
+        updateCounts();
     });
 
-    // New Alpine.js dropdown filter functions
+    // Filter functions matching the corrected data attributes
     function filterByEventType(type) {
         currentFilters.type = type;
         applyFilters();
     }
 
-    function filterByAdminStatus(status) {
-        currentFilters.adminStatus = status;
+    function filterByStatus(status) {
+        currentFilters.status = status;
         applyFilters();
     }
 
-    function filterByEventStatus(status) {
-        currentFilters.eventStatus = status;
+    function filterByTimeStatus(timeStatus) {
+        currentFilters.timeStatus = timeStatus;
         applyFilters();
     }
 
-    function filterByPinStatus(status) {
-        currentFilters.pinStatus = status;
+    function filterByPinStatus(pinStatus) {
+        currentFilters.pinStatus = pinStatus;
         applyFilters();
     }
 
@@ -416,162 +469,48 @@
         const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
         filteredRows = allRows.filter(row => {
-            const title = row.getAttribute('data-title');
-            const type = row.getAttribute('data-type');
-            const adminStatus = row.getAttribute('data-admin-status');
-            const eventStatus = row.getAttribute('data-event-status');
-            const pinStatus = row.getAttribute('data-pin-status');
+            const title = row.getAttribute('data-title') || '';
+            const type = row.getAttribute('data-type') || '';
+            const status = row.getAttribute('data-status') || '';
+            const timeStatus = row.getAttribute('data-time-status') || '';
+            const pinStatus = row.getAttribute('data-pin-status') || '';
 
             const matchesSearch = searchTerm === '' || title.includes(searchTerm);
             const matchesType = currentFilters.type === '' || type === currentFilters.type;
-            const matchesAdminStatus = currentFilters.adminStatus === '' || adminStatus === currentFilters.adminStatus;
-            const matchesEventStatus = currentFilters.eventStatus === '' || eventStatus === currentFilters.eventStatus;
+            const matchesStatus = currentFilters.status === '' || status === currentFilters.status;
+            const matchesTimeStatus = currentFilters.timeStatus === '' || timeStatus === currentFilters.timeStatus;
             const matchesPinStatus = currentFilters.pinStatus === '' || pinStatus === currentFilters.pinStatus;
 
-            return matchesSearch && matchesType && matchesAdminStatus && matchesEventStatus && matchesPinStatus;
+            return matchesSearch && matchesType && matchesStatus && matchesTimeStatus && matchesPinStatus;
         });
 
-        // Reset to first page when filters change
-        currentPage = 1;
-        updatePagination();
+        updateDisplay();
         updateCounts();
         updateResultsMessage();
     }
 
-    function filterEvents() {
-        applyFilters();
+    function updateDisplay() {
+        // Hide all rows first
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        // Show filtered rows
+        filteredRows.forEach(row => {
+            row.style.display = '';
+        });
     }
 
     function updateCounts() {
         const visibleCount = filteredRows.length;
         document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-        document.getElementById('totalResults').textContent = visibleCount;
-    }
-
-    // Pagination Functions
-    function initializePagination() {
-        updatePagination();
-    }
-
-    function updatePagination() {
-        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
-        // Hide/show pagination container based on whether pagination is needed
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (filteredRows.length <= itemsPerPage) {
-            paginationContainer.style.display = 'none';
-        } else {
-            paginationContainer.style.display = 'block';
-        }
-
-        // Show/hide rows based on current page
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-
-        for (let i = startIndex; i < endIndex; i++) {
-            if (filteredRows[i]) {
-                filteredRows[i].style.display = '';
-            }
-        }
-
-        updatePaginationInfo();
-        updatePaginationControls();
-    }
-
-    function updatePaginationInfo() {
-        const startIndex = (currentPage - 1) * itemsPerPage + 1;
-        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
-
-        document.getElementById('showingStart').textContent = filteredRows.length > 0 ? startIndex : 0;
-        document.getElementById('showingEnd').textContent = endIndex;
-    }
-
-    function updatePaginationControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const pageNumbers = document.getElementById('pageNumbers');
-
-        // Update Previous/Next button states
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-
-        // Add page number buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            pageNumbers.appendChild(createPageButton(1));
-            if (startPage > 2) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-        }
-
-        // Add visible page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.appendChild(createPageButton(i));
-        }
-
-        // Add ellipsis and last page if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pageNumbers.appendChild(createEllipsis());
-            }
-            pageNumbers.appendChild(createPageButton(totalPages));
-        }
-    }
-
-    function createPageButton(pageNum) {
-        const button = document.createElement('button');
-        button.textContent = pageNum;
-        button.onclick = () => changePage(pageNum);
-
-        if (pageNum === currentPage) {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary';
-        } else {
-            button.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50';
-        }
-
-        return button;
-    }
-
-    function createEllipsis() {
-        const span = document.createElement('span');
-        span.textContent = '...';
-        span.className = 'relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300';
-        return span;
-    }
-
-    function changePage(direction) {
-        if (typeof direction === 'number') {
-            currentPage = direction;
-        } else if (direction === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            currentPage++;
-        }
-
-        updatePagination();
     }
 
     function updateResultsMessage() {
         const noResultsMessage = document.getElementById('noResultsMessage');
         const eventsTable = document.getElementById('eventsTable');
 
-        if (filteredRows.length === 0) {
+        if (filteredRows.length === 0 && allRows.length > 0) {
             noResultsMessage.classList.remove('hidden');
             eventsTable.classList.add('hidden');
         } else {
@@ -586,67 +525,54 @@
 
         // Reset current filters
         currentFilters.type = '';
-        currentFilters.adminStatus = '';
-        currentFilters.eventStatus = '';
+        currentFilters.status = '';
+        currentFilters.timeStatus = '';
         currentFilters.pinStatus = '';
 
-        // Reset pagination
-        currentPage = 1;
-
-        // Reset Alpine.js dropdown selections
-        const eventTypeDropdown = document.querySelector('[x-data*="Event Type"]');
-        const adminStatusDropdown = document.querySelector('[x-data*="Admin Status"]');
-        const eventStatusDropdown = document.querySelector('[x-data*="Event Status"]');
-        const pinStatusDropdown = document.querySelector('[x-data*="Pin Status"]');
-
-        if (eventTypeDropdown && eventTypeDropdown._x_dataStack) {
-            eventTypeDropdown._x_dataStack[0].selected = 'Event Type';
-        }
-        if (adminStatusDropdown && adminStatusDropdown._x_dataStack) {
-            adminStatusDropdown._x_dataStack[0].selected = 'Admin Status';
-        }
-        if (eventStatusDropdown && eventStatusDropdown._x_dataStack) {
-            eventStatusDropdown._x_dataStack[0].selected = 'Event Status';
-        }
-        if (pinStatusDropdown && pinStatusDropdown._x_dataStack) {
-            pinStatusDropdown._x_dataStack[0].selected = 'Pin Status';
-        }
-
         applyFilters();
+
+        // Reset Alpine.js dropdowns (if available)
+        setTimeout(() => {
+            const dropdowns = document.querySelectorAll('[x-data]');
+            dropdowns.forEach(dropdown => {
+                if (dropdown._x_dataStack && dropdown._x_dataStack[0].selected) {
+                    const originalSelected = dropdown._x_dataStack[0].selected;
+                    if (originalSelected.includes('Type')) dropdown._x_dataStack[0].selected = 'Event Type';
+                    if (originalSelected.includes('Status') && !originalSelected.includes('Pin')) dropdown._x_dataStack[0].selected = 'Status';
+                    if (originalSelected.includes('Pin')) dropdown._x_dataStack[0].selected = 'Pin Status';
+                }
+            });
+        }, 100);
     }
 
     // Export functionality
     function exportResults(format) {
-        // Export all filtered results, not just current page
         const visibleData = filteredRows.map(row => {
             const cells = row.querySelectorAll('td');
             return {
                 title: row.getAttribute('data-title'),
                 type: row.getAttribute('data-type'),
-                date: cells[1].textContent.trim(),
-                eventStatus: cells[2].textContent.trim(),
-                adminStatus: cells[3].textContent.trim()
+                status: row.getAttribute('data-status'),
+                timeStatus: row.getAttribute('data-time-status'),
+                pinStatus: row.getAttribute('data-pin-status') === '1' ? 'Pinned' : 'Not Pinned'
             };
         });
 
         if (format === 'csv') {
             exportToCSV(visibleData);
-        } else if (format === 'pdf') {
-            // PDF export would require a library like jsPDF
-            alert('PDF export functionality would require additional implementation');
         }
     }
 
     function exportToCSV(data) {
-        const headers = ['Title', 'Type', 'Date', 'Event Status', 'Admin Status'];
+        const headers = ['Title', 'Type', 'Status', 'Time Status', 'Pin Status'];
         const csvContent = [
             headers.join(','),
             ...data.map(row => [
                 `"${row.title}"`,
                 `"${row.type}"`,
-                `"${row.date}"`,
-                `"${row.eventStatus}"`,
-                `"${row.adminStatus}"`
+                `"${row.status}"`,
+                `"${row.timeStatus}"`,
+                `"${row.pinStatus}"`
             ].join(','))
         ].join('\n');
 
@@ -668,13 +594,11 @@
 
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + F to focus search
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
             e.preventDefault();
             document.getElementById('searchInput').focus();
         }
 
-        // Escape to clear filters
         if (e.key === 'Escape') {
             clearAllFilters();
         }
