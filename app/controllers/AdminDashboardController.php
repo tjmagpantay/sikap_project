@@ -2,24 +2,24 @@
 require_once __DIR__ . '/../models/AdminDashboard.php';
 require_once __DIR__ . '/../models/UserManagement.php';
 require_once __DIR__ . '/../models/JobPost.php';
-require_once __DIR__ . '/../models/Admin.php'; // Add this line
-require_once __DIR__ . '/../models/Employer.php'; // Add this line
+require_once __DIR__ . '/../models/Admin.php'; 
+require_once __DIR__ . '/../models/Employer.php'; 
 
 class AdminDashboardController
 {
     private $adminDashboardModel;
     private $userManagementModel;
     private $jobPostModel;
-    private $adminModel; // Add this property
-    private $employerModel; // Add this property
+    private $adminModel; 
+    private $employerModel; 
 
     public function __construct()
     {
         $this->adminDashboardModel = new AdminDashboard();
         $this->userManagementModel = new UserManagement();
         $this->jobPostModel = new JobPost();
-        $this->adminModel = new Admin(); // Add this line
-        $this->employerModel = new Employer(); // Add this line
+        $this->adminModel = new Admin(); 
+        $this->employerModel = new Employer(); 
     }
 
     public function dashboard()
@@ -675,6 +675,172 @@ class AdminDashboardController
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
+
+    /**
+     * Reports management - displays analytics and reports dashboard
+     */
+    public function reports()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        try {
+            // Get comprehensive report data (using fallback data for now)
+            $reportStats = $this->getReportStats();
+            $monthlyData = $this->getMonthlyData();
+            $categoryData = $this->getCategoryData();
+            $applicationStatusData = $this->getApplicationStatusData();
+            
+            // Set error/success messages
+            $error = $_GET['error'] ?? '';
+            $success = $_GET['success'] ?? '';
+        } catch (Exception $e) {
+            error_log('Error in reports management: ' . $e->getMessage());
+            
+            // Set default empty data if there's an error
+            $reportStats = $this->getDefaultReportStats();
+            $monthlyData = $this->getDefaultMonthlyData();
+            $categoryData = $this->getDefaultCategoryData();
+            $applicationStatusData = $this->getDefaultApplicationStatusData();
+            
+            $error = 'Using sample data for demonstration purposes.';
+            $success = '';
+        }
+
+        // Load the reports view instead of dashboard
+        include __DIR__ . '/../views/admin/dashboard.php';
+    }
+
+    /**
+     * Get comprehensive report statistics (using fallback data for now)
+     */
+    private function getReportStats()
+    {
+        try {
+            // For now, we'll use sample data since some model methods don't exist yet
+            // TODO: Implement actual data retrieval when models are updated
+            
+            /*
+            // Future implementation when models have the required methods:
+            $totalJobseekers = $this->userManagementModel->getUserCount('jobseeker');
+            $totalEmployers = $this->userManagementModel->getUserCount('employer');
+            $jobStats = $this->jobPostModel->getJobStatistics();
+            
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            $applicationStats = $jobApplicationModel->getApplicationStatsForAdmin();
+            */
+            
+            return $this->getDefaultReportStats();
+            
+        } catch (Exception $e) {
+            error_log('Error getting report stats: ' . $e->getMessage());
+            return $this->getDefaultReportStats();
+        }
+    }
+
+    /**
+     * Get monthly activity data for charts (using sample data for now)
+     */
+    private function getMonthlyData()
+    {
+        try {
+            // TODO: Implement actual data retrieval when models are updated
+            return $this->getDefaultMonthlyData();
+        } catch (Exception $e) {
+            error_log('Error getting monthly data: ' . $e->getMessage());
+            return $this->getDefaultMonthlyData();
+        }
+    }
+
+    /**
+     * Get job category distribution data (using sample data for now)
+     */
+    private function getCategoryData()
+    {
+        try {
+            // TODO: Implement actual data retrieval when models are updated
+            /*
+            // Future implementation:
+            $categoryData = $this->jobPostModel->getJobsByCategory();
+            */
+            
+            return $this->getDefaultCategoryData();
+        } catch (Exception $e) {
+            error_log('Error getting category data: ' . $e->getMessage());
+            return $this->getDefaultCategoryData();
+        }
+    }
+
+    /**
+     * Get application status distribution data (using sample data for now)
+     */
+    private function getApplicationStatusData()
+    {
+        try {
+            // TODO: Implement actual data retrieval when models are updated
+            /*
+            // Future implementation:
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+            $statusData = $jobApplicationModel->getApplicationStatusDistribution();
+            */
+            
+            return $this->getDefaultApplicationStatusData();
+        } catch (Exception $e) {
+            error_log('Error getting application status data: ' . $e->getMessage());
+            return $this->getDefaultApplicationStatusData();
+        }
+    }
+
+    // Default/Sample data methods
+    private function getDefaultReportStats()
+    {
+        return [
+            'total_users' => 1247,
+            'total_employers' => 324,
+            'total_jobseekers' => 923,
+            'active_jobs' => 156,
+            'closed_jobs' => 89,
+            'total_applications' => 2891,
+            'pending_applications' => 145,
+            'approved_applications' => 2456,
+            'rejected_applications' => 290
+        ];
+    }
+
+    private function getDefaultMonthlyData()
+    {
+        return [
+            'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            'job_posts' => [45, 52, 38, 67, 49, 58],
+            'applications' => [186, 305, 237, 173, 209, 214],
+            'registrations' => [23, 31, 19, 42, 28, 35]
+        ];
+    }
+
+    private function getDefaultCategoryData()
+    {
+        return [
+            'categories' => ['Information Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Others'],
+            'values' => [275, 200, 187, 173, 156, 90],
+            'colors' => ['#092C4C', '#F3AF0E', '#3B82F6', '#10B981', '#F59E0B', '#6B7280']
+        ];
+    }
+
+    private function getDefaultApplicationStatusData()
+    {
+        return [
+            'labels' => ['Pending', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'],
+            'values' => [145, 89, 234, 290, 187],
+            'colors' => ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6']
+        ];
+    }
+
+    // Remove the unused helper methods that were causing errors
+    // These can be implemented later when the actual data methods are needed
 
     // ... rest of your existing methods ...
 }

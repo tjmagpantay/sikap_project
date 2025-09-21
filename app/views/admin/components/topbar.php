@@ -26,14 +26,10 @@
                 <i class="w-5 h-5 fas fa-bell"></i>
                 <span class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            
-            <!-- Profile dropdown (static for now) -->
-            <div class="flex items-center gap-2">
-                <div class="flex items-center justify-center w-8 h-8 bg-gray-300 rounded-full">
-                    <i class="text-sm text-gray-600 fas fa-user"></i>
-                </div>
-                <span class="hidden text-sm font-medium text-gray-700 md:block">Admin</span>
-            </div>
+             <button type="submit" id="submit-btn"
+                    class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-primary">
+                    Logs
+                </button>
         </div>
     </div>
 </header>

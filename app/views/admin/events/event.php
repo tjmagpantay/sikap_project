@@ -9,11 +9,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-semibold text-gray-900">Events & Programs</h1>
-            <p class="mt-1 text-gray-600">Manage all events and programs</p>
+            <p class="mt-1 text-sm text-gray-600">Manage all events and programs</p>
         </div>
         <div>
             <a href="index.php?page=admin-event-create"
-                class="inline-flex items-center px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                class="inline-flex items-center px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-lg bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <i class="mr-2 fas fa-plus"></i>
                 Create New Event
             </a>
@@ -144,20 +144,21 @@
     <!-- Search and Filter Section -->
     <div class="relative mb-6">
         <div class="flex flex-col w-full gap-6 mx-auto">
-            <div class="flex flex-wrap items-center w-full gap-x-4 gap-y-2">
+            <div class="flex flex-wrap items-stretch w-full gap-3">
                 <!-- Search Events (Wider) -->
                 <div class="flex-1 min-w-[200px] max-w-xs">
                     <div class="relative">
                         <input type="text" id="searchInput"
-                            class="w-full px-4 py-3 pr-12 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            class="w-full px-4 py-3 pl-10 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                             placeholder="Search by event title...">
+
                     </div>
                 </div>
 
                 <!-- Event Type Filter -->
                 <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Event Type' }">
                     <button @click="open = !open" @click.away="open = false"
-                        class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                        class="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                         <span x-text="selected"></span>
                         <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -176,7 +177,7 @@
                 <!-- Status Filter (Show/Hide) -->
                 <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Status' }">
                     <button @click="open = !open" @click.away="open = false"
-                        class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                        class="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                         <span x-text="selected"></span>
                         <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -194,7 +195,7 @@
                 <!-- Pin Status Filter -->
                 <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: 'Pin Status' }">
                     <button @click="open = !open" @click.away="open = false"
-                        class="flex items-center justify-between w-full px-4 py-3 pr-12 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                        class="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                         <span x-text="selected"></span>
                         <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -210,13 +211,13 @@
                 </div>
 
                 <!-- Filter/Clear Buttons -->
-                <div class="flex flex-shrink-0 gap-2 mt-2 lg:mt-0">
+                <div class="flex flex-shrink-0 gap-2">
                     <button onclick="clearAllFilters()"
-                        class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         Clear
                     </button>
                     <button onclick="exportResults('csv')"
-                        class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-sm bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-md bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Export
                     </button>
                 </div>
@@ -226,14 +227,6 @@
 
     <!-- Events Table Section -->
     <div>
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">All Events</h2>
-            <div class="flex items-center space-x-2">
-                <span class="px-3 py-1 text-sm bg-blue-100 rounded-sm text-primary" id="visibleCount">
-                    <?php echo count($events ?? []); ?> visible
-                </span>
-            </div>
-        </div>
 
         <?php if (empty($events ?? [])): ?>
             <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noEventsMessage">
@@ -282,7 +275,7 @@
                                         <div class="flex items-center">
                                             <?php if (!empty($event['image'])): ?>
                                                 <div class="flex-shrink-0 w-10 h-10">
-                                                    <img class="object-cover w-10 h-10 rounded-full"
+                                                    <img class="object-cover w-12 h-12 rounded-full"
                                                         src="<?php echo htmlspecialchars($event['image']); ?>"
                                                         alt="Event image">
                                                 </div>
@@ -290,10 +283,10 @@
                                                 <?php else: ?>
                                                     <div>
                                                     <?php endif; ?>
-                                                    <div class="text-sm font-medium text-gray-900">
+                                                    <div class="text-sm font-medium text-gray-900 line-clamp-2">
                                                         <?php echo htmlspecialchars($event['title']); ?>
                                                     </div>
-                                                    <div class="text-sm text-gray-500 line-clamp-2">
+                                                    <div class="text-xs text-gray-500 line-clamp-2">
                                                         <?php echo htmlspecialchars(substr($event['description'], 0, 100)) . (strlen($event['description']) > 100 ? '...' : ''); ?>
                                                     </div>
                                                     </div>
@@ -302,9 +295,9 @@
 
                                     <!-- Type -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md 
                                             <?php
-                                            echo $event['type'] === 'program' ? 'bg-blue-100 text-blue-800' : ($event['type'] === 'jobfair' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800');
+                                            echo $event['type'] === 'program' ? 'bg-gray-100 text-primary' : ($event['type'] === 'jobfair' ? 'bg-gray-100 text-primary' : 'bg-gray-100 text-primary');
                                             ?>">
                                             <?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $event['type']))); ?>
                                         </span>
@@ -315,22 +308,15 @@
                                         <div class="text-sm text-gray-900">
                                             <?php echo date('M d, Y', strtotime($event['time_start'])); ?>
                                         </div>
-                                        <div class="text-sm text-gray-500">
+                                        <div class="text-xs text-gray-500">
                                             <?php echo date('g:i A', strtotime($event['time_start'])) . ' - ' . date('g:i A', strtotime($event['time_end'])); ?>
                                         </div>
-                                        <div class="text-xs text-gray-400">
-                                            <span class="inline-flex px-2 py-1 rounded-full 
-                                                <?php
-                                                echo $timeStatus === 'upcoming' ? 'bg-yellow-100 text-yellow-800' : ($timeStatus === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800');
-                                                ?>">
-                                                <?php echo ucfirst($timeStatus); ?>
-                                            </span>
-                                        </div>
+
                                     </td>
 
                                     <!-- Status -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md 
                                             <?php echo $event['status'] === 'show' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                                             <?php echo $event['status'] === 'show' ? 'Visible' : 'Hidden'; ?>
                                         </span>
@@ -339,12 +325,12 @@
                                     <!-- Pin Status -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <?php if (($event['pinned'] ?? 0) == 1): ?>
-                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full text-amber-800 bg-amber-100">
-                                                <i class="mr-1 fas fa-thumbtack"></i>
+                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-md text-primary bg-amber-100">
+                                                </i>
                                                 Pinned
                                             </span>
                                         <?php else: ?>
-                                            <span class="inline-flex px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
+                                            <span class="inline-flex px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-md">
                                                 Not Pinned
                                             </span>
                                         <?php endif; ?>
@@ -352,38 +338,87 @@
 
                                     <!-- Actions -->
                                     <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                        <div class="flex items-center space-x-2">
-                                            <!-- Edit Button -->
-                                            <a href="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
-                                                class="text-blue-600 hover:text-blue-900" title="Edit Event">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+                                        <div class="flex items-center justify-end">
+                                            <!-- Actions Dropdown -->
+                                            <div class="relative" x-data="{ open: false }">
+                                                <button @click="open = !open"
+                                                    class="text-gray-400 hover:text-gray-600"
+                                                    title="Actions">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                                    </svg>
+                                                </button>
 
-                                            <!-- Toggle Visibility -->
-                                            <a href="index.php?page=admin-event-toggle-status&id=<?php echo $event['event_id']; ?>"
-                                                class="text-yellow-600 hover:text-yellow-900"
-                                                title="<?php echo $event['status'] === 'show' ? 'Hide Event' : 'Show Event'; ?>">
-                                                <i class="fas fa-eye<?php echo $event['status'] === 'show' ? '-slash' : ''; ?>"></i>
-                                            </a>
+                                                <div x-show="open" @click.away="open = false"
+                                                    x-transition:enter="transition ease-out duration-100"
+                                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                                    x-transition:leave="transition ease-in duration-75"
+                                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                                    class="absolute right-0 z-50 w-40 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                                    x-cloak>
+                                                    <div class="py-1">
+                                                        <!-- Edit Button -->
+                                                        <a href="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
+                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            Edit Event
+                                                        </a>
 
-                                            <!-- Toggle Pin -->
-                                            <button onclick="togglePin(<?php echo $event['event_id']; ?>, <?php echo ($event['pinned'] ?? 0) ? 'false' : 'true'; ?>)"
-                                                class="text-amber-600 hover:text-amber-900"
-                                                title="<?php echo ($event['pinned'] ?? 0) ? 'Unpin Event' : 'Pin Event'; ?>">
-                                                <i class="fas fa-thumbtack<?php echo ($event['pinned'] ?? 0) ? '' : ' opacity-50'; ?>"></i>
-                                            </button>
+                                                        <!-- Toggle Visibility -->
+                                                        <a href="index.php?page=admin-event-toggle-status&id=<?php echo $event['event_id']; ?>"
+                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            <i class="mr-2 fas fa-eye<?php echo $event['status'] === 'show' ? '-slash' : ''; ?>"></i>
+                                                            <?php echo $event['status'] === 'show' ? 'Hide Event' : 'Show Event'; ?>
+                                                        </a>
 
-                                            <!-- Delete Button -->
-                                            <button onclick="confirmDelete(<?php echo $event['event_id']; ?>)"
-                                                class="text-red-600 hover:text-red-900" title="Delete Event">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                                        <!-- Toggle Pin -->
+                                                        <button onclick="togglePin(<?php echo $event['event_id']; ?>, <?php echo ($event['pinned'] ?? 0) ? 'false' : 'true'; ?>)"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                            <i class="mr-2 fas fa-thumbtack<?php echo ($event['pinned'] ?? 0) ? '' : ' opacity-50'; ?>"></i>
+                                                            <?php echo ($event['pinned'] ?? 0) ? 'Unpin Event' : 'Pin Event'; ?>
+                                                        </button>
+
+                                                        <hr class="my-1">
+
+                                                        <!-- Delete Button -->
+                                                        <button onclick="confirmDelete(<?php echo $event['event_id']; ?>)"
+                                                            class="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                                                            <i class="mr-2 fas fa-trash"></i>Delete Event
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
+                    <div class="flex items-center text-sm text-gray-700">
+                        <span>Showing</span>
+                        <span class="mx-1 font-medium" id="startItem">1</span>
+                        <span>to</span>
+                        <span class="mx-1 font-medium" id="endItem">10</span>
+                        <span>of</span>
+                        <span class="mx-1 font-medium" id="totalItems">0</span>
+                        <span>results</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevBtn" onclick="previousPage()"
+                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="mr-1 fas fa-chevron-left"></i> Previous
+                        </button>
+                        <div id="pageNumbers" class="flex space-x-1"></div>
+                        <button id="nextBtn" onclick="nextPage()"
+                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next <i class="ml-1 fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -398,7 +433,7 @@
 </div>
 
 <script>
-    // Fixed JavaScript with proper data attributes
+    // Fixed JavaScript with proper data attributes and pagination
     let allRows = [];
     let filteredRows = [];
     let currentFilters = {
@@ -407,6 +442,11 @@
         timeStatus: '',
         pinStatus: ''
     };
+
+    // Pagination variables
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalPages = 1;
 
     function confirmDelete(eventId) {
         if (confirm('Are you sure you want to delete this event?')) {
@@ -442,7 +482,121 @@
         allRows = Array.from(eventRows);
         filteredRows = [...allRows];
         updateCounts();
+        initializePagination();
     });
+
+    // Pagination Functions
+    function initializePagination() {
+        updatePagination();
+    }
+
+    function updatePagination() {
+        totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+        // Hide all rows first
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        // If no filtered results, don't show any rows
+        if (filteredRows.length === 0) {
+            updatePaginationInfo();
+            updatePaginationControls(0);
+            return;
+        }
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            if (filteredRows[i]) {
+                filteredRows[i].style.display = '';
+            }
+        }
+
+        updatePaginationInfo();
+        updatePaginationControls(totalPages);
+    }
+
+    function updatePaginationInfo() {
+        const totalItemsEl = document.getElementById('totalItems');
+        const startItemEl = document.getElementById('startItem');
+        const endItemEl = document.getElementById('endItem');
+
+        if (filteredRows.length === 0) {
+            if (totalItemsEl) totalItemsEl.textContent = '0';
+            if (startItemEl) startItemEl.textContent = '0';
+            if (endItemEl) endItemEl.textContent = '0';
+            return;
+        }
+
+        const startIndex = (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, filteredRows.length);
+
+        if (totalItemsEl) totalItemsEl.textContent = filteredRows.length;
+        if (startItemEl) startItemEl.textContent = filteredRows.length > 0 ? startIndex : 0;
+        if (endItemEl) endItemEl.textContent = endIndex;
+    }
+
+    function updatePaginationControls(totalPages) {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumbers = document.getElementById('pageNumbers');
+
+        // Update Previous/Next button states
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Clear existing page numbers
+        if (pageNumbers) pageNumbers.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        // Add page number buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust startPage if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add visible page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.onclick = () => goToPage(i);
+
+            if (i === currentPage) {
+                button.className = 'px-3 py-1 text-sm text-white border rounded bg-primary border-primary';
+            } else {
+                button.className = 'px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50';
+            }
+
+            pageNumbers.appendChild(button);
+        }
+    }
+
+    // Navigation functions
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            updatePagination();
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            updatePagination();
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        updatePagination();
+    }
 
     // Filter functions matching the corrected data attributes
     function filterByEventType(type) {
@@ -484,26 +638,18 @@
             return matchesSearch && matchesType && matchesStatus && matchesTimeStatus && matchesPinStatus;
         });
 
-        updateDisplay();
+        // Reset to first page when filters change
+        currentPage = 1;
+        updatePagination();
         updateCounts();
         updateResultsMessage();
     }
 
-    function updateDisplay() {
-        // Hide all rows first
-        allRows.forEach(row => {
-            row.style.display = 'none';
-        });
-
-        // Show filtered rows
-        filteredRows.forEach(row => {
-            row.style.display = '';
-        });
-    }
-
     function updateCounts() {
-        const visibleCount = filteredRows.length;
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
+        const totalItemsEl = document.getElementById('totalItems');
+        if (totalItemsEl) {
+            totalItemsEl.textContent = filteredRows.length;
+        }
     }
 
     function updateResultsMessage() {
@@ -511,23 +657,27 @@
         const eventsTable = document.getElementById('eventsTable');
 
         if (filteredRows.length === 0 && allRows.length > 0) {
-            noResultsMessage.classList.remove('hidden');
-            eventsTable.classList.add('hidden');
+            if (noResultsMessage) noResultsMessage.classList.remove('hidden');
+            if (eventsTable) eventsTable.classList.add('hidden');
         } else {
-            noResultsMessage.classList.add('hidden');
-            eventsTable.classList.remove('hidden');
+            if (noResultsMessage) noResultsMessage.classList.add('hidden');
+            if (eventsTable) eventsTable.classList.remove('hidden');
         }
     }
 
     function clearAllFilters() {
         // Clear search input
-        document.getElementById('searchInput').value = '';
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
 
         // Reset current filters
         currentFilters.type = '';
         currentFilters.status = '';
         currentFilters.timeStatus = '';
         currentFilters.pinStatus = '';
+
+        // Reset to first page
+        currentPage = 1;
 
         applyFilters();
 
@@ -590,13 +740,17 @@
     }
 
     // Event listeners
-    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
             e.preventDefault();
-            document.getElementById('searchInput').focus();
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.focus();
         }
 
         if (e.key === 'Escape') {
