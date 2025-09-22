@@ -126,15 +126,23 @@
 
     <!-- Search and Filter Controls - Same as jobseeker -->
     <div class="flex items-stretch w-full gap-3 mb-6">
-        <!-- Search Input (Expanded width) -->
+        <!-- Search Input (Expanded width with right-side icon) -->
         <div class="flex-1">
             <div class="relative">
-                <input type="text" id="searchInput"
-                    class="w-full px-4 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="Search employers by name, company, or representative...">
-               
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search"
+                    class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    onkeyup="filterNavigation()">
+                <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
         </div>
+
 
         <!-- Status Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Status' }">
@@ -197,7 +205,7 @@
 
     <!-- All Employers -->
     <div>
-        
+
 
         <?php if (empty($users)): ?>
             <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noUsersMessage">
@@ -230,64 +238,155 @@
                             <?php foreach ($users as $user): ?>
                                 <tr class="hover:bg-gray-50"
                                     data-status="<?php echo htmlspecialchars(strtolower($user['status'])); ?>"
-                                    data-company="<?php echo htmlspecialchars(strtolower($user['company_name'])); ?>"
-                                    data-representative="<?php echo htmlspecialchars(strtolower($user['first_name'] . ' ' . $user['last_name'])); ?>"
+                                    data-company="<?php echo htmlspecialchars(strtolower($user['company_name'] ?? '')); ?>"
+                                    data-representative="<?php echo htmlspecialchars(strtolower(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?>"
                                     data-location="<?php echo stripos($user['business_address'] ?? '', 'rosario') !== false ? 'rosario' : 'other'; ?>"
                                     data-date="<?php echo $user['created_at']; ?>">
+
+                                    <!-- Company Name Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($user['company_name']); ?>
+                                        <div class="text-xs text-gray-900">
+                                            <?php
+                                            $companyName = trim($user['company_name'] ?? '');
+                                            if (empty($companyName)) {
+                                                echo '<span class="italic text-gray-400">Not stated yet</span>';
+                                            } else {
+                                                echo htmlspecialchars($companyName);
+                                            }
+                                            ?>
                                         </div>
                                     </td>
+
+                                    <!-- Business Address Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-xs text-gray-800">
-                                            <?php echo htmlspecialchars($user['business_address'] ?? '-'); ?>
+                                            <?php
+                                            $businessAddress = trim($user['business_address'] ?? '');
+                                            if (empty($businessAddress)) {
+                                                echo '<span class="italic text-gray-400">Not stated yet</span>';
+                                            } else {
+                                                echo htmlspecialchars($businessAddress);
+                                            }
+                                            ?>
                                         </div>
                                     </td>
+
+                                    <!-- Contact Column -->
                                     <td class="px-6 py-4 text-xs text-gray-800 whitespace-nowrap">
-                                        <?php echo htmlspecialchars($user['contact_no']); ?>
+                                        <?php
+                                        $contactNo = trim($user['contact_no'] ?? '');
+                                        if (empty($contactNo)) {
+                                            echo '<span class="italic text-gray-400">Not stated yet</span>';
+                                        } else {
+                                            echo htmlspecialchars($contactNo);
+                                        }
+                                        ?>
                                     </td>
+
+                                    <!-- Representative Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
-                                                <span class="text-xs font-medium text-gray-800">
-                                                    <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
-                                                </span>
-                                            </div>
-                                            <div class="text-xs text-gray-800">
-                                                <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
-                                            </div>
+                                            <?php
+                                            $firstName = trim($user['first_name'] ?? '');
+                                            $lastName = trim($user['last_name'] ?? '');
+                                            $fullName = trim($firstName . ' ' . $lastName);
+
+                                            if (empty($fullName) || $fullName === ' ') {
+                                            ?>
+                                                <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
+                                                    <span class="text-xs font-medium text-gray-400">?</span>
+                                                </div>
+                                                <div class="text-xs italic text-gray-400">
+                                                    Representative not assigned
+                                                </div>
+                                            <?php
+                                            } else {
+                                            ?>
+                                                <div class="flex items-center justify-center w-8 h-8 mr-3 bg-gray-100 rounded-full">
+                                                    <span class="text-xs font-medium text-gray-800">
+                                                        <?php echo strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1)); ?>
+                                                    </span>
+                                                </div>
+                                                <div class="text-xs text-gray-800">
+                                                    <?php echo htmlspecialchars($fullName); ?>
+                                                </div>
+                                            <?php
+                                            }
+                                            ?>
                                         </div>
                                     </td>
+
+                                    <!-- Status Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md 
-                                                        <?php
-                                                        $statusClass = [
-                                                            'incomplete' => 'bg-gray-100 text-gray-500',
-                                                            'pending_verification' => 'bg-yellow-100 text-secondary',
-                                                            'verified' => 'bg-blue-100 text-primary',
-                                                            'rejected' => 'bg-red-100 text-red-800',
-                                                            'suspended' => 'bg-blue-100 text-primary'
-                                                        ];
-                                                        echo $statusClass[strtolower($user['status'])] ?? 'bg-gray-100 text-gray-800';
-                                                        ?>">
-                                            <?php echo ucfirst(str_replace('_', ' ', $user['status'])); ?>
-                                        </span>
+                                        <?php
+                                        $status = $user['status'] ?? 'unknown';
+                                        $displayStatus = ucfirst(str_replace('_', ' ', $status));
+
+                                        if (empty($status) || $status === 'unknown') {
+                                        ?>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-md">
+                                                Status pending
+                                            </span>
+                                        <?php
+                                        } else {
+                                            $statusClass = [
+                                                'incomplete' => 'bg-gray-100 text-gray-500',
+                                                'pending_verification' => 'bg-yellow-100 text-secondary',
+                                                'verified' => 'bg-blue-100 text-primary',
+                                                'rejected' => 'bg-red-100 text-red-800',
+                                                'suspended' => 'bg-red-100 text-red-800'
+                                            ];
+                                            $cssClass = $statusClass[strtolower($status)] ?? 'bg-gray-100 text-gray-800';
+                                        ?>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md <?php echo $cssClass; ?>">
+                                                <?php echo $displayStatus; ?>
+                                            </span>
+                                        <?php
+                                        }
+                                        ?>
                                     </td>
+
+                                    <!-- Registration Date Column -->
                                     <td class="px-6 py-4 text-xs text-gray-800 whitespace-nowrap">
-                                        <?php echo date('M j, Y', strtotime($user['created_at'])); ?>
+                                        <?php
+                                        $createdAt = $user['created_at'] ?? '';
+                                        if (empty($createdAt) || $createdAt === '0000-00-00 00:00:00') {
+                                            echo '<span class="italic text-gray-400">Date not recorded</span>';
+                                        } else {
+                                            try {
+                                                echo date('M j, Y', strtotime($createdAt));
+                                            } catch (Exception $e) {
+                                                echo '<span class="italic text-gray-400">Invalid date</span>';
+                                            }
+                                        }
+                                        ?>
                                     </td>
+
+                                    <!-- Actions Column -->
                                     <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                         <div class="flex space-x-2">
-                                            <?php if (strtolower($user['status']) === 'suspended'): ?>
-                                                <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                    Unsuspend
-                                                </button>
-                                            <?php else: ?>
-                                                <button class="px-2 py-2 text-xs text-red-600 bg-red-100 border border-red-600 rounded-md hover:bg-red-400 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                    Suspend
-                                                </button>
-                                            <?php endif; ?>
+                                            <?php
+                                            // Only show action buttons if user has a valid ID and status
+                                            if (isset($user['user_id']) && !empty($user['user_id']) && isset($user['status'])) {
+                                                if (strtolower($user['status']) === 'suspended') {
+                                            ?>
+                                                    <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                        Unsuspend
+                                                    </button>
+                                                <?php
+                                                } else {
+                                                ?>
+                                                    <button class="px-2 py-2 text-xs text-red-600 bg-red-100 border border-red-600 rounded-md hover:bg-red-400 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
+                                                        Suspend
+                                                    </button>
+                                                <?php
+                                                }
+                                            } else {
+                                                ?>
+                                                <span class="text-xs italic text-gray-400">No actions available</span>
+                                            <?php
+                                            }
+                                            ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -344,26 +443,57 @@
         initializePagination();
         attachButtonListeners();
 
-        // Add search event listener
+        // Add search event listener with debouncing
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
-            searchInput.addEventListener('input', applyFilters);
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    applyFilters();
+                }, 300); // 300ms debounce
+            });
+
+            // Also search on Enter key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeout);
+                    applyFilters();
+                }
+            });
         }
     });
 
-    // Apply all filters
+    // Enhanced apply filters function
     function applyFilters() {
-        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
 
         filteredRows = allRows.filter(row => {
-            const text = row.textContent.toLowerCase();
-            const status = row.getAttribute('data-status').toLowerCase();
-            const company = row.getAttribute('data-company').toLowerCase();
-            const representative = row.getAttribute('data-representative').toLowerCase();
-            const location = row.getAttribute('data-location').toLowerCase();
+            // Get all searchable data
+            const company = row.getAttribute('data-company') || '';
+            const representative = row.getAttribute('data-representative') || '';
+            const status = row.getAttribute('data-status') || '';
+            const location = row.getAttribute('data-location') || '';
 
-            // Search filter
-            const searchMatch = !searchValue || text.includes(searchValue) || company.includes(searchValue) || representative.includes(searchValue);
+            // Get cell text content for additional searching
+            const cells = row.querySelectorAll('td');
+            const companyText = cells[0]?.textContent.toLowerCase() || '';
+            const addressText = cells[1]?.textContent.toLowerCase() || '';
+            const contactText = cells[2]?.textContent.toLowerCase() || '';
+            const representativeText = cells[3]?.textContent.toLowerCase() || '';
+            const statusText = cells[4]?.textContent.toLowerCase() || '';
+            const dateText = cells[5]?.textContent.toLowerCase() || '';
+
+            // Enhanced search matching
+            const searchMatch = !searchValue ||
+                company.includes(searchValue) ||
+                representative.includes(searchValue) ||
+                companyText.includes(searchValue) ||
+                addressText.includes(searchValue) ||
+                contactText.includes(searchValue) ||
+                representativeText.includes(searchValue) ||
+                statusText.includes(searchValue) ||
+                dateText.includes(searchValue);
 
             // Status filter
             const statusMatch = !currentFilters.status || status === currentFilters.status.toLowerCase();
@@ -383,7 +513,165 @@
         updateCounts();
         updateResultsMessage();
         updateStatusCounts();
+
+        // Highlight search terms
+        highlightSearchTerms(searchValue);
     }
+
+    // Function to highlight search terms in results
+    function highlightSearchTerms(searchValue) {
+        // Remove existing highlights first
+        document.querySelectorAll('.search-highlight').forEach(el => {
+            const parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+            parent.normalize();
+        });
+
+        if (!searchValue) return;
+
+        filteredRows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    highlightTextInElement(cell, searchValue);
+                });
+            }
+        });
+    }
+
+    function highlightTextInElement(element, searchValue) {
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+
+        const textNodes = [];
+        let node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+
+        textNodes.forEach(textNode => {
+            const text = textNode.textContent;
+            const regex = new RegExp(`(${escapeRegExp(searchValue)})`, 'gi');
+
+            if (regex.test(text)) {
+                const highlightedText = text.replace(regex, '<span class="search-highlight" style="background-color: #fef08a; font-weight: 600;">$1</span>');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = highlightedText;
+
+                while (tempDiv.firstChild) {
+                    textNode.parentNode.insertBefore(tempDiv.firstChild, textNode);
+                }
+                textNode.parentNode.removeChild(textNode);
+            }
+        });
+    }
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Enhanced updateCounts function
+    function updateCounts() {
+        const totalCount = allRows.length;
+        const visibleCount = filteredRows.length;
+
+        // Update total items in pagination info
+        const totalItemsElement = document.getElementById('totalItems');
+        if (totalItemsElement) {
+            totalItemsElement.textContent = visibleCount;
+        }
+
+        // Show search results info
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput && searchInput.value.trim()) {
+            console.log(`Search "${searchInput.value.trim()}" found ${visibleCount} of ${totalCount} employers`);
+        }
+    }
+
+    // Enhanced updateResultsMessage function
+    function updateResultsMessage() {
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const employersTable = document.getElementById('employersTable');
+        const searchInput = document.getElementById('searchInput');
+
+        if (filteredRows.length === 0 && allRows.length > 0) {
+            noResultsMessage.classList.remove('hidden');
+            employersTable.classList.add('hidden');
+
+            // Update no results message based on search or filters
+            const noResultsText = noResultsMessage.querySelector('p');
+            if (searchInput && searchInput.value.trim()) {
+                noResultsText.textContent = `No employers found for "${searchInput.value.trim()}"`;
+            } else {
+                noResultsText.textContent = "No employers match your search criteria";
+            }
+        } else {
+            noResultsMessage.classList.add('hidden');
+            employersTable.classList.remove('hidden');
+        }
+    }
+
+    // Enhanced clearAllFilters function
+    function clearAllFilters() {
+        // Clear search input
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+
+        // Reset current filters
+        currentFilters = {
+            status: '',
+            location: '',
+            date: ''
+        };
+
+        // Reset pagination
+        currentPage = 1;
+
+        // Reset Alpine.js dropdown selections
+        setTimeout(() => {
+            const dropdowns = document.querySelectorAll('[x-data]');
+            dropdowns.forEach(dropdown => {
+                if (dropdown._x_dataStack && dropdown._x_dataStack[0].selected) {
+                    const originalSelected = dropdown._x_dataStack[0].selected;
+                    if (originalSelected.includes('Status')) dropdown._x_dataStack[0].selected = 'All Status';
+                    if (originalSelected.includes('Location')) dropdown._x_dataStack[0].selected = 'All Locations';
+                }
+            });
+        }, 100);
+
+        applyFilters();
+    }
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Focus search input when Ctrl+F is pressed
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+
+        // Clear filters when Escape is pressed
+        if (e.key === 'Escape') {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && document.activeElement === searchInput) {
+                clearAllFilters();
+                searchInput.blur();
+            }
+        }
+    });
+
+    // Rest of your existing functions remain the same...
+    // (matchesDateFilter, initializePagination, updatePagination, etc.)
 
     function matchesDateFilter(dateString, filter) {
         const rowDate = new Date(dateString);
@@ -508,24 +796,6 @@
         updatePagination();
     }
 
-    function updateCounts() {
-        const visibleCount = filteredRows.length;
-        document.getElementById('visibleCount').textContent = `${visibleCount} visible`;
-    }
-
-    function updateResultsMessage() {
-        const noResultsMessage = document.getElementById('noResultsMessage');
-        const employersTable = document.getElementById('employersTable');
-
-        if (filteredRows.length === 0) {
-            noResultsMessage.classList.remove('hidden');
-            employersTable.classList.add('hidden');
-        } else {
-            noResultsMessage.classList.add('hidden');
-            employersTable.classList.remove('hidden');
-        }
-    }
-
     // Filter functions
     function filterByStatus(status) {
         currentFilters.status = status;
@@ -539,35 +809,6 @@
 
     function filterByDate(dateRange) {
         currentFilters.date = dateRange;
-        applyFilters();
-    }
-
-    function clearAllFilters() {
-        // Clear search input
-        document.getElementById('searchInput').value = '';
-
-        // Reset current filters
-        currentFilters = {
-            status: '',
-            location: '',
-            date: ''
-        };
-
-        // Reset pagination
-        currentPage = 1;
-
-        // Reset Alpine.js dropdown selections (if available)
-        setTimeout(() => {
-            const dropdowns = document.querySelectorAll('[x-data]');
-            dropdowns.forEach(dropdown => {
-                if (dropdown._x_dataStack && dropdown._x_dataStack[0].selected) {
-                    const originalSelected = dropdown._x_dataStack[0].selected;
-                    if (originalSelected.includes('Status')) dropdown._x_dataStack[0].selected = 'All Status';
-                    if (originalSelected.includes('Location')) dropdown._x_dataStack[0].selected = 'All Locations';
-                }
-            });
-        }, 100);
-
         applyFilters();
     }
 
@@ -621,6 +862,7 @@
             <div class="header">
                 <h1>SIKAP - Employers Report</h1>
                 <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+                <p class="date">Total Results: ${filteredRows.length} employers</p>
             </div>
         `);
 
@@ -694,13 +936,13 @@
                     if (action === 'suspend') {
                         actionCell.innerHTML = `
                             <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="${userId}">
-                                <i class="mr-1 fas fa-unlock"></i>Unsuspend
+                                Unsuspend
                             </button>
                         `;
                     } else {
                         actionCell.innerHTML = `
-                            <button class="px-2 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200 suspend-btn" data-id="${userId}">
-                                <i class="mr-1 fas fa-ban"></i>Suspend
+                            <button class="px-2 py-2 text-xs text-red-600 bg-red-100 border border-red-600 rounded-md hover:bg-red-400 suspend-btn" data-id="${userId}">
+                                Suspend
                             </button>
                         `;
                     }

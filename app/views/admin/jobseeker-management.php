@@ -246,12 +246,12 @@
                                 <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                     <?php if ($user['acc_status'] !== 'disabled'): ?>
                                         <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
-                                            class="px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200">
+                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-blue-200 hover:text-white">
                                             <i class="mr-1 fas fa-ban"></i> Disable
                                         </button>
                                     <?php else: ?>
                                         <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
-                                            class="px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200">
+                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-blue-200 hover:text-white">
                                             <i class="mr-1 fas fa-check"></i> Enable
                                         </button>
                                     <?php endif; ?>

@@ -87,7 +87,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <ul id="jobDropdown" class="hidden mt-2 ml-8 space-y-1">
+                <ul id="jobDropdown" class="hidden mt-2 ml-4 space-y-1">
                     <li>
                         <a href="?page=admin-jobpost-management" class="flex items-center px-4 py-2 text-sm font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
                             <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -98,15 +98,6 @@
                                 <path d="M17 12V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             <span>All Jobs</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="?page=admin-job-categories" class="flex items-center px-4 py-2 text-sm font-normal text-gray-500 transition-colors rounded-lg hover:bg-gray-50">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                            <span>Categories</span>
                         </a>
                     </li>
                 </ul>
