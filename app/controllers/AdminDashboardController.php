@@ -87,14 +87,14 @@ class AdminDashboardController
                 $job['employer_name'] = $company['employer_name'];
             }
 
-            // Get application statistics
+            // ✅ FIXED: Get application statistics with proper column names
             $statsQuery = "SELECT 
                         COUNT(*) as total_applications,
-                        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                        SUM(CASE WHEN status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
-                        SUM(CASE WHEN status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
-                        SUM(CASE WHEN status = 'hired' THEN 1 ELSE 0 END) as hired,
-                        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+                        SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
+                        SUM(CASE WHEN application_status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
+                        SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
+                        SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired,
+                        SUM(CASE WHEN application_status = 'rejected' THEN 1 ELSE 0 END) as rejected
                        FROM job_application 
                        WHERE job_id = ?";
 
@@ -123,13 +123,17 @@ class AdminDashboardController
                     $job['category_name'] = $category['name'];
                 }
             }
+
+            // ✅ Set error/success messages
+            $error = $_GET['error'] ?? '';
+            $success = $_GET['success'] ?? '';
         } catch (Exception $e) {
             error_log('Error loading job details: ' . $e->getMessage());
             header('Location: ?page=admin-jobpost-management&error=' . urlencode('Failed to load job details.'));
             exit;
         }
 
-        // ✅ Use dashboard.php layout (same as other admin pages)
+        // ✅ FIXED: Use dashboard.php layout (same as other admin pages)
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 

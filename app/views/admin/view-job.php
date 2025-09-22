@@ -1,6 +1,21 @@
 <?php
 // Remove the auth check since dashboard.php already handles it
 // include_once __DIR__ . '/components/admin_auth_check.php';
+
+// ✅ Add check for job data
+if (!isset($job) || empty($job)) {
+    echo '<div class="p-8 text-center bg-white border border-gray-200 rounded-lg">';
+    echo '<i class="mb-4 text-4xl text-gray-400 fas fa-exclamation-triangle"></i>';
+    echo '<p class="text-gray-500">Job details could not be loaded.</p>';
+    echo '<a href="?page=admin-jobpost-management" class="inline-flex items-center mt-4 text-sm text-blue-600 hover:text-blue-900">';
+    echo '<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+    echo '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>';
+    echo '</svg>';
+    echo 'Back to Job Management';
+    echo '</a>';
+    echo '</div>';
+    return;
+}
 ?>
 
 <!-- Remove ALL HTML structure - make it content-only like main-board.php -->
@@ -17,7 +32,7 @@
                     Back to Job Management
                 </a>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center gap-3">
                 <!-- Job Status Badge -->
                 <?php
                 $statusClasses = [
@@ -95,6 +110,25 @@
         </div>
     </div>
 
+    <!-- ✅ Messages Section -->
+    <?php if (!empty($error)): ?>
+        <div class="p-4 mb-4 text-red-700 border border-red-200 rounded-lg bg-red-50">
+            <div class="flex items-center">
+                <i class="mr-2 fas fa-exclamation-circle"></i>
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($success)): ?>
+        <div class="p-4 mb-4 text-green-700 border border-green-200 rounded-lg bg-green-50">
+            <div class="flex items-center">
+                <i class="mr-2 fas fa-check-circle"></i>
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Main Content Layout -->
     <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
         <!-- Left Section - Main Content (8/12) -->
@@ -103,10 +137,10 @@
             <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
                 <!-- Job Header -->
                 <div class="p-4 border-b border-gray-200 sm:p-6 bg-gray-50">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-start gap-3 sm:gap-4">
+                    <div class="flex items-end justify-between mb-4">
+                        <div class="flex items-center gap-3 sm:gap-4">
                             <!-- Company Logo -->
-                            <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 overflow-hidden border-2 border-gray-200 rounded-lg sm:w-16 sm:h-16">
+                            <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg sm:w-12 sm:h-12">
                                 <?php if (!empty($job['business_logo'])): ?>
                                     <img src="<?php echo htmlspecialchars($job['business_logo']); ?>" alt="Company Logo"
                                         class="object-cover w-full h-full">
@@ -117,43 +151,22 @@
                                 <?php endif; ?>
                             </div>
 
-                            <div class="flex-1">
-                                <h1 class="mb-2 text-lg font-semibold text-gray-900 sm:text-xl">
+                            <!-- Text Section -->
+                            <div class="flex flex-col justify-center flex-1">
+                                <h1 class="text-lg font-semibold text-gray-900 sm:text-xl">
                                     <?php echo htmlspecialchars($job['job_title'] ?? 'Untitled Job'); ?>
                                 </h1>
 
                                 <!-- Company Name -->
-                                <div class="mt-1 text-sm transition-colors text-primary hover:text-secondary">
+                                <div class="text-sm transition-colors text-primary hover:text-secondary">
                                     <?php echo htmlspecialchars($job['company_name'] ?? 'Unknown Company'); ?>
-                                </div>
-
-                                <!-- Job Meta Info -->
-                                <div class="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        </svg>
-                                        <?php echo htmlspecialchars($job['location'] ?? 'Not specified'); ?>
-                                    </span>
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6.5"></path>
-                                        </svg>
-                                        <?php echo htmlspecialchars($job['job_type'] ?? 'Not specified'); ?>
-                                    </span>
-                                    <?php if (!empty($job['category_name'])): ?>
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                                            <?php echo htmlspecialchars($job['category_name']); ?>
-                                        </span>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
 
+
                         <!-- Job Info -->
-                        <div class="text-sm text-right text-gray-500">
-                            <div class="font-medium">Job ID: <?php echo htmlspecialchars($job['job_id']); ?></div>
+                        <div class="text-xs text-right text-gray-500">
                             <div>Posted: <?php echo date('M j, Y', strtotime($job['created_at'])); ?></div>
                         </div>
                     </div>
@@ -381,33 +394,46 @@
                 <!-- Application Statistics -->
                 <div class="mb-6 sm:mb-8">
                     <h3 class="mb-4 text-lg font-semibold text-gray-900">Application Statistics</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
+                    <div class="p-4 border divide-y divide-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between p-3">
                             <span class="text-sm font-medium text-gray-600">Total Applications</span>
-                            <span class="text-sm font-bold text-gray-900"><?php echo $applicationStats['total_applications'] ?? 0; ?></span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['total_applications'] ?? 0; ?>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-yellow-50">
-                            <span class="text-sm font-medium text-yellow-700">Pending Review</span>
-                            <span class="text-sm font-bold text-yellow-800"><?php echo $applicationStats['pending'] ?? 0; ?></span>
+                        <div class="flex items-center justify-between p-3">
+                            <span class="text-sm font-medium text-gray-600">Pending Review</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['pending'] ?? 0; ?>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-blue-50">
-                            <span class="text-sm font-medium text-blue-700">Reviewed</span>
-                            <span class="text-sm font-bold text-blue-800"><?php echo $applicationStats['reviewed'] ?? 0; ?></span>
+                        <div class="flex items-center justify-between p-3">
+                            <span class="text-sm font-medium text-gray-600">Reviewed</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['reviewed'] ?? 0; ?>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-purple-50">
-                            <span class="text-sm font-medium text-purple-700">Shortlisted</span>
-                            <span class="text-sm font-bold text-purple-800"><?php echo $applicationStats['shortlisted'] ?? 0; ?></span>
+                        <div class="flex items-center justify-between p-3">
+                            <span class="text-sm font-medium text-gray-600">Shortlisted</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['shortlisted'] ?? 0; ?>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-green-50">
-                            <span class="text-sm font-medium text-green-700">Hired</span>
-                            <span class="text-sm font-bold text-green-800"><?php echo $applicationStats['hired'] ?? 0; ?></span>
+                        <div class="flex items-center justify-between p-3">
+                            <span class="text-sm font-medium text-gray-600">Hired</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['hired'] ?? 0; ?>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between p-3 rounded-md bg-red-50">
-                            <span class="text-sm font-medium text-red-700">Rejected</span>
-                            <span class="text-sm font-bold text-red-800"><?php echo $applicationStats['rejected'] ?? 0; ?></span>
+                        <div class="flex items-center justify-between p-3">
+                            <span class="text-sm font-medium text-gray-600">Rejected</span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <?php echo $applicationStats['rejected'] ?? 0; ?>
+                            </span>
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Job Information -->
                 <div class="mb-6 sm:mb-8">
@@ -436,42 +462,30 @@
                                 <span class="text-sm font-medium text-primary"><?php echo date('M j, Y g:i A', strtotime($job['updated_at'])); ?></span>
                             </div>
                         <?php endif; ?>
-
-                        <?php if (!empty($job['pay_range']) && $job['show_pay'] == 1): ?>
-                            <div class="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                                <span class="text-sm font-medium text-gray-600">Salary Range:</span>
-                                <span class="text-sm font-medium text-primary">₱<?php echo htmlspecialchars($job['pay_range']); ?></span>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="space-y-3">
-                    <button onclick="window.print()"
-                        class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                        </svg>
-                        Print Job Details
-                    </button>
+            <!-- Quick Actions -->
+            <div class="flex gap-3">
+                <button onclick="window.print()"
+                    class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Job Details
+                </button>
 
-                    <button onclick="shareJob('<?php echo htmlspecialchars($job['job_title'], ENT_QUOTES); ?>', window.location.href)"
-                        class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-                        </svg>
-                        Share Job
-                    </button>
+                <button onclick="shareJob('<?php echo htmlspecialchars($job['job_title'], ENT_QUOTES); ?>', window.location.href)"
+                    class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    Share Job
+                </button>
+            </div>
 
-                    <a href="?page=admin-jobpost-management"
-                        class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                        Back to Job Management
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -605,12 +619,12 @@
                         throw new Error(data.error || data.message || 'Failed to delete job');
                     }
                 })
-        .catch(error => {
-            hideLoadingMessage();
-            console.error('Error:', error);
-            showErrorMessage('Error: ' + error.message);
-        });
-    }
+                .catch(error => {
+                    hideLoadingMessage();
+                    console.error('Error:', error);
+                    showErrorMessage('Error: ' + error.message);
+                });
+        }
     }
 
     // Share job function
