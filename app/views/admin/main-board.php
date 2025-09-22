@@ -18,18 +18,19 @@
                 </p>
             </div>
 
-            <!-- Right side: Date Range Selector -->
+            <!-- Right side: Current Date (Philippine Time) -->
             <div class="flex items-center">
                 <button class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
-                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    <?php echo date('M j', strtotime('-7 days')); ?> - <?php echo date('M j'); ?>
-                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <?php
+                    date_default_timezone_set('Asia/Manila');
+                    echo date('M j, Y'); // Example: Sep 22, 2025
+                    ?>
                 </button>
             </div>
+
         </div>
     </div>
 
@@ -42,14 +43,33 @@
                 <div class="mb-4">
                     <h3 class="mb-2 text-sm font-medium text-gray-700">Total Users</h3>
                     <div class="flex items-baseline">
-                        <span class="text-2xl font-bold text-gray-900"><?php echo number_format($dashboardStats['total_users'] ?? 1247); ?></span>
+                        <span class="text-2xl font-bold text-gray-900">
+                            <?php echo number_format($dashboardStats['total_users'] ?? 1247); ?>
+                        </span>
                         <?php $user_change = $dashboardStats['user_change'] ?? 12; ?>
                         <?php if ($user_change >= 0): ?>
-                            <span class="ml-2 text-sm text-green-600">+<?php echo $user_change; ?>%</span>
+                            <span class="flex items-center ml-2 text-green-600">
+                                <!-- Green Upward Check Icon -->
+                                <svg viewBox="0 0 24 24" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                    <polyline points="1.5 18.68 9.14 11.04 12.96 14.86 22.5 5.32"
+                                        stroke="currentColor" stroke-width="2" fill="none"></polyline>
+                                    <polyline points="17.73 5.32 22.5 5.32 22.5 10.09"
+                                        stroke="currentColor" stroke-width="2" fill="none"></polyline>
+                                </svg>
+                            </span>
                         <?php else: ?>
-                            <span class="ml-2 text-sm text-red-600"><?php echo $user_change; ?>%</span>
+                            <span class="flex items-center ml-2 text-red-600">
+                                <!-- Red Downward Arrow (same SVG rotated) -->
+                                <svg viewBox="0 0 24 24" class="w-4 h-4 transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                    <polyline points="1.5 18.68 9.14 11.04 12.96 14.86 22.5 5.32"
+                                        stroke="currentColor" stroke-width="2" fill="none"></polyline>
+                                    <polyline points="17.73 5.32 22.5 5.32 22.5 10.09"
+                                        stroke="currentColor" stroke-width="2" fill="none"></polyline>
+                                </svg>
+                            </span>
                         <?php endif; ?>
                     </div>
+
                     <p class="mt-1 text-xs text-gray-500">
                         Active users on the platform
                     </p>
@@ -69,14 +89,17 @@
                 <div class="mb-4">
                     <h3 class="mb-2 text-sm font-medium text-gray-700">Active Job Posts</h3>
                     <div class="flex items-baseline">
-                        <span class="text-2xl font-bold text-gray-900"><?php echo number_format($dashboardStats['active_jobs'] ?? 156); ?></span>
-                        <?php $job_change = $dashboardStats['job_change'] ?? 8; ?>
-                        <?php if ($job_change >= 0): ?>
-                            <span class="ml-2 text-sm text-blue-600">+<?php echo $job_change; ?>%</span>
-                        <?php else: ?>
-                            <span class="ml-2 text-sm text-red-600"><?php echo $job_change; ?>%</span>
-                        <?php endif; ?>
+                        <span class="text-2xl font-bold text-gray-900">
+                            <?php echo number_format($dashboardStats['active_jobs'] ?? 156); ?>
+                        </span>
+                        <span class="flex items-center ml-2 text-green-600">
+                            <!-- Blue Check Icon -->
+                            <svg viewBox="0 0 24 24" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                <path d="M8.6,20.1l-7.8-8l1.4-1.4l6.4,6.5L21.8,3.9l1.4,1.4L8.6,20.1z"></path>
+                            </svg>
+                        </span>
                     </div>
+
                     <p class="mt-1 text-xs text-gray-500">
                         Currently available positions
                     </p>
@@ -95,13 +118,19 @@
             <div class="p-6 transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md" onclick="window.location.href='?page=admin-accreditations'">
                 <div class="mb-4">
                     <h3 class="mb-2 text-sm font-medium text-gray-700">Pending Accreditations</h3>
-                    <div class="flex items-baseline">
-                        <span class="text-2xl font-bold text-gray-900"><?php echo number_format($dashboardStats['pending_accreditations'] ?? 23); ?></span>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold text-gray-900">
+                            <?php echo number_format($dashboardStats['pending_accreditations'] ?? 23); ?>
+                        </span>
                         <?php $pending_accreditations = $dashboardStats['pending_accreditations'] ?? 23; ?>
                         <?php if ($pending_accreditations > 0): ?>
-                            <span class="ml-2 text-sm text-orange-600">Needs Review</span>
+                            <span class="flex items-center ml-2 text-xs font-medium text-red-600">
+                                Needs Review
+                            </span>
                         <?php else: ?>
-                            <span class="ml-2 text-sm text-green-600">All Clear</span>
+                            <span class="flex items-center ml-2 text-xs font-medium text-green-600">
+                                All Clear
+                            </span>
                         <?php endif; ?>
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
@@ -118,18 +147,23 @@
                 </div>
             </div>
 
+
             <!-- Card 4: Total Applications -->
             <div class="p-6 transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md" onclick="window.location.href='?page=admin-applications'">
                 <div class="mb-4">
                     <h3 class="mb-2 text-sm font-medium text-gray-700">Total Applications</h3>
                     <div class="flex items-baseline">
-                        <span class="text-2xl font-bold text-gray-900"><?php echo number_format($dashboardStats['total_applications'] ?? 2891); ?></span>
-                        <?php $application_change = $dashboardStats['application_change'] ?? 15; ?>
-                        <?php if ($application_change >= 0): ?>
-                            <span class="ml-2 text-sm text-green-600">+<?php echo $application_change; ?>%</span>
-                        <?php else: ?>
-                            <span class="ml-2 text-sm text-red-600"><?php echo $application_change; ?>%</span>
-                        <?php endif; ?>
+                        <span class="text-2xl font-bold text-gray-900">
+                            <?php echo number_format($dashboardStats['total_applications'] ?? 2891); ?>
+                        </span>
+                        <span class="flex items-center ml-2 text-green-600">
+                            <!-- Plus Icon -->
+                            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 6L12 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                                <path d="M18 12L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                            </svg>
+                        </span>
+
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
                         Job applications submitted
