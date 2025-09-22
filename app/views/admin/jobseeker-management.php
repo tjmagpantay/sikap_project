@@ -100,15 +100,22 @@
 
     <!-- Search and Filter Controls -->
     <div class="flex items-stretch w-full gap-3 mb-6">
-        <!-- Search Input (Expanded width) -->
+        <!-- Search Input (Expanded width with icon inside) -->
         <div class="flex-1">
             <div class="relative">
-                <input type="text" id="searchInput"
-                    class="w-full px-4 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="Search jobseekers...">
-
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search"
+                    class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
+                    onkeyup="filterNavigation()">
+                <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
         </div>
+
+
 
         <!-- Status Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Status' }">
@@ -231,7 +238,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md <?php
                                                                                                                 echo $user['acc_status'] === 'enabled' ?
-                                                                                                                    'text-secondary bg-yellow-100' :
+                                                                                                                    'text-primary bg-gray-100' :
                                                                                                                     'text-red-800 bg-red-100'; ?>">
                                         <?php echo ucfirst($user['acc_status'] ?? 'enabled'); ?>
                                     </span>
