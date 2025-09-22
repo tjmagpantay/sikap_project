@@ -130,12 +130,18 @@
                 <div class="flex-1 min-w-[200px] max-w-xs">
                     <div class="relative">
                         <input type="text" id="searchInput"
-                            class="w-full px-4 py-3 pl-10 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                            placeholder="Search by applicant, job title, company..."
+                            class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
+                            placeholder="Search."
                             value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
 
+                        <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                 </div>
+
 
                 <!-- Status Filter -->
                 <div class="relative flex-1 min-w-[120px] max-w-xs" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter === 'all' ? 'All Status' : $statusFilter); ?>' }">
@@ -208,13 +214,13 @@
                         x-cloak>
                         <div class="py-1">
                             <button @click="selected = 'All Jobs'; open = false; filterByJob('')"
-                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                class="flex items-start w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 All Jobs
                             </button>
                             <?php if (!empty($jobs)): ?>
                                 <?php foreach ($jobs as $job): ?>
                                     <button @click="selected = '<?php echo htmlspecialchars($job['job_title']); ?>'; open = false; filterByJob('<?php echo $job['job_id']; ?>')"
-                                        class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        class="flex items-start w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         <?php echo htmlspecialchars($job['job_title']); ?> - <?php echo htmlspecialchars($job['company_name']); ?>
                                     </button>
                                 <?php endforeach; ?>
@@ -319,9 +325,6 @@
                             <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(4)">
                                 Applied Date <i class="ml-1 text-gray-400 fas fa-sort"></i>
                             </th>
-                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                Actions
-                            </th>
                         </tr>
                     </thead>
                     <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
@@ -393,19 +396,7 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Actions -->
-                                <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                    <div class="flex items-center space-x-2">
-                                        <!-- View Application Summary -->
-                                        <button onclick="viewApplicationSummary(<?php echo $application['application_id']; ?>)"
-                                            class="text-primary hover:text-primary-dark" title="View Summary">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
+                                
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -439,35 +430,7 @@
     </div>
 </div>
 
-<!-- Application Summary Modal -->
-<div id="applicationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
-        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="closeModal()"></div>
 
-        <!-- Modal content -->
-        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="w-full">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">
-                            Application Summary
-                        </h3>
-                        <div class="mt-4" id="modal-content">
-                            <!-- Content will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="closeModal()"
-                    class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     let allRows = [];

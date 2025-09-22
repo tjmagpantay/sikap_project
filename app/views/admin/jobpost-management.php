@@ -408,17 +408,7 @@
                                                             <hr class="my-1">
 
                                                             <!-- Status Actions -->
-                                                            <?php if ($job['job_status'] !== 'open'): ?>
-                                                                <button type="button"
-                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'open'); this.closest('[x-data]').__x.$data.open = false;"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50"
-                                                                    role="menuitem">
-                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                                    </svg>
-                                                                    Set Open
-                                                                </button>
-                                                            <?php endif; ?>
+    
 
                                                             <?php if ($job['job_status'] !== 'paused'): ?>
                                                                 <button type="button"

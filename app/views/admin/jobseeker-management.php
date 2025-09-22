@@ -203,17 +203,29 @@
                     <?php if (isset($users) && is_array($users)): ?>
                         <?php foreach ($users as $user): ?>
                             <tr>
+
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900 break-words">
-                                        <?php
-                                        echo htmlspecialchars(
-                                            $user['first_name'] . ' ' .
-                                                ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
-                                                $user['last_name'] .
-                                                ($user['suffix'] ? ' ' . $user['suffix'] : '')
-                                        );
-                                        ?>
+
+                                    <div class="flex items-center">
+                                        <div class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-primary">
+                                            <span class="text-xs font-medium text-white">
+                                                <?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?>
+                                            </span>
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900 break-words">
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $user['first_name'] . ' ' .
+                                                    ($user['middle_name'] ? $user['middle_name'] . ' ' : '') .
+                                                    $user['last_name'] .
+                                                    ($user['suffix'] ? ' ' . $user['suffix'] : '')
+                                            );
+                                            ?>
+                                        </div>
                                     </div>
+
+
+
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">
