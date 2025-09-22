@@ -68,9 +68,6 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 case 'admin-applications':
                     include __DIR__ . '/application.php';
                     break;
-                case 'admin-chatbot':
-                    include __DIR__ . '/chatbot.php';
-                    break;
                 case 'admin-events':
                     include __DIR__ . '/events/event.php';
                     break;

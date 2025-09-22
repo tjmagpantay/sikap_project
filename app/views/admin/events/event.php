@@ -149,12 +149,16 @@
                 <div class="flex-1 min-w-[200px] max-w-xs">
                     <div class="relative">
                         <input type="text" id="searchInput"
-                            class="w-full px-4 py-3 pl-10 text-sm transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
                             placeholder="Search by event title...">
 
+                        <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                 </div>
-
                 <!-- Event Type Filter -->
                 <div class="relative flex-1 min-w-[140px] max-w-xs" x-data="{ open: false, selected: 'Event Type' }">
                     <button @click="open = !open" @click.away="open = false"
@@ -317,7 +321,7 @@
                                     <!-- Status -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md 
-                                            <?php echo $event['status'] === 'show' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                            <?php echo $event['status'] === 'show' ? 'bg-gray-100 text-primary' : 'bg-red-100 text-red-800'; ?>">
                                             <?php echo $event['status'] === 'show' ? 'Visible' : 'Hidden'; ?>
                                         </span>
                                     </td>
@@ -340,66 +344,97 @@
                                     <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                         <div class="flex items-center justify-end">
                                             <!-- Actions Dropdown -->
-                                            <div class="relative" x-data="{ open: false }">
+                                            <div class="relative" x-data="{ open: false }" x-init="$refs.button" @click.away="open = false">
+
+                                                <!-- Dropdown Trigger Button -->
                                                 <button @click="open = !open"
-                                                    class="text-gray-400 hover:text-gray-600"
-                                                    title="Actions">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                                    x-ref="button"
+                                                    class="inline-flex items-center px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                                    :class="{ 'bg-gray-100': open }"
+                                                    type="button">
+                                                    <span>Actions</span>
+                                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200 transform" :class="{ 'rotate-180': open }"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                                     </svg>
                                                 </button>
 
-                                                <div x-show="open" @click.away="open = false"
+                                                <!-- Dropdown Menu -->
+                                                <div x-show="open"
                                                     x-transition:enter="transition ease-out duration-100"
                                                     x-transition:enter-start="transform opacity-0 scale-95"
                                                     x-transition:enter-end="transform opacity-100 scale-100"
                                                     x-transition:leave="transition ease-in duration-75"
                                                     x-transition:leave-start="transform opacity-100 scale-100"
                                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="absolute right-0 z-50 w-40 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                                    x-cloak>
-                                                    <div class="py-1">
-                                                        <!-- Edit Button -->
+                                                    class="absolute right-0 z-50 w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                    style="top: 100%; min-width: 180px;"
+                                                    @keydown.escape.prevent.stop="open = false">
+
+                                                    <div class="py-1" role="menu" aria-orientation="vertical">
+                                                        <!-- Edit Event -->
                                                         <a href="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
-                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                                            role="menuitem">
+                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                            </svg>
                                                             Edit Event
                                                         </a>
 
+                                                        <hr class="my-1">
+
                                                         <!-- Toggle Visibility -->
                                                         <a href="index.php?page=admin-event-toggle-status&id=<?php echo $event['event_id']; ?>"
-                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                            <i class="mr-2 fas fa-eye<?php echo $event['status'] === 'show' ? '-slash' : ''; ?>"></i>
+                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                                                            role="menuitem">
+                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <?php if ($event['status'] === 'show'): ?>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                                                                <?php else: ?>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                                <?php endif; ?>
+                                                            </svg>
                                                             <?php echo $event['status'] === 'show' ? 'Hide Event' : 'Show Event'; ?>
                                                         </a>
 
                                                         <!-- Toggle Pin -->
-                                                        <button onclick="togglePin(<?php echo $event['event_id']; ?>, <?php echo ($event['pinned'] ?? 0) ? 'false' : 'true'; ?>)"
-                                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                                            <i class="mr-2 fas fa-thumbtack<?php echo ($event['pinned'] ?? 0) ? '' : ' opacity-50'; ?>"></i>
+                                                        <button type="button"
+                                                            onclick="togglePin(<?php echo $event['event_id']; ?>, <?php echo ($event['pinned'] ?? 0) ? 'false' : 'true'; ?>); this.closest('[x-data]').__x.$data.open = false;"
+                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                                                            role="menuitem">
+                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                                            </svg>
                                                             <?php echo ($event['pinned'] ?? 0) ? 'Unpin Event' : 'Pin Event'; ?>
                                                         </button>
 
                                                         <hr class="my-1">
 
-                                                        <!-- Delete Button -->
-                                                        <button onclick="confirmDelete(<?php echo $event['event_id']; ?>)"
-                                                            class="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
-                                                            <i class="mr-2 fas fa-trash"></i>Delete Event
+                                                        <!-- Delete Event -->
+                                                        <button type="button"
+                                                            onclick="confirmDelete(<?php echo $event['event_id']; ?>); this.closest('[x-data]').__x.$data.open = false;"
+                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+                                                            role="menuitem">
+                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                            Delete Event
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                </tr>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
-                    <div class="flex items-center text-sm text-gray-700">
+                    <div class="flex items-center gap-1 text-sm text-gray-700">
                         <span>Showing</span>
                         <span class="mx-1 font-medium" id="startItem">1</span>
                         <span>to</span>
@@ -415,7 +450,7 @@
                         </button>
                         <div id="pageNumbers" class="flex space-x-1"></div>
                         <button id="nextBtn" onclick="nextPage()"
-                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-3 py-1 text-sm text-white border border-gray-300 rounded bg-primary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                             Next <i class="ml-1 fas fa-chevron-right"></i>
                         </button>
                     </div>
