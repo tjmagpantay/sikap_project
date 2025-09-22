@@ -129,20 +129,29 @@
 
     <!-- Search and Filter Section -->
     <div class="flex items-stretch w-full gap-3 mb-6">
-        <!-- Search Input (Expanded width) -->
+        <!-- Search Input (Expanded width with right-side icon) -->
         <div class="flex-1">
             <div class="relative">
-                <input type="text" id="searchInput" placeholder="Search by title, company, category..."
-                    class="w-full px-4 py-3 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search"
+                    class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary"
                     value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>">
 
+                <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
         </div>
+
 
         <!-- Status Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: '<?php echo ucfirst($statusFilter ?? 'All Status'); ?>' }">
             <button @click="open = !open"
-                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-primary/20">
                 <span x-text="selected || 'Filter by status'" class="text-gray-700 truncate"></span>
                 <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
             </button>
@@ -166,7 +175,7 @@
         <!-- Date Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Dates' }">
             <button @click="open = !open"
-                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-primary/20">
                 <span x-text="selected" class="truncate"></span>
                 <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
             </button>
@@ -202,8 +211,6 @@
 
     <!-- All Jobs -->
     <div>
-
-
         <?php if (empty($jobs ?? [])): ?>
             <div class="p-8 text-center bg-white border border-gray-200 rounded-lg" id="noJobsMessage">
                 <i class="mb-4 text-4xl text-gray-400 fas fa-briefcase"></i>
@@ -357,54 +364,96 @@
 
                                         <!-- Actions -->
                                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                                            <div class="flex items-center justify-end space-x-2">
-                                                <a href="?page=admin-view-job&id=<?php echo $job['job_id']; ?>"
-                                                    class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 rounded-md text-primary hover:bg-blue-200"
-                                                    title="View Details">
-                                                    View
-                                                </a>
+                                            <div class="flex items-center justify-end">
+                                                <!-- Actions Dropdown -->
+                                                <div class="relative" x-data="{ open: false }" x-init="$refs.button" @click.away="open = false">
 
-                                                <!-- Status Toggle -->
-                                                <div class="relative" x-data="{ open: false }">
+                                                    <!-- Dropdown Trigger Button -->
                                                     <button @click="open = !open"
-                                                        class="text-gray-400 hover:text-gray-600"
-                                                        title="Change Status">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                                        x-ref="button"
+                                                        class="inline-flex items-center px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                                        :class="{ 'bg-gray-100': open }"
+                                                        type="button">
+                                                        <span>Actions</span>
+                                                        <svg class="w-4 h-4 ml-1 transition-transform duration-200 transform" :class="{ 'rotate-180': open }"
+                                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                                         </svg>
                                                     </button>
 
-                                                    <div x-show="open" @click.away="open = false"
+                                                    <!-- Dropdown Menu -->
+                                                    <div x-show="open"
                                                         x-transition:enter="transition ease-out duration-100"
                                                         x-transition:enter-start="transform opacity-0 scale-95"
                                                         x-transition:enter-end="transform opacity-100 scale-100"
                                                         x-transition:leave="transition ease-in duration-75"
                                                         x-transition:leave-start="transform opacity-100 scale-100"
                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                        class="absolute right-0 z-50 w-40 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                                        style="top: 100%; right: 0;">
-                                                        <div class="py-1">
+                                                        class="absolute right-0 z-50 w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                        style="top: 100%; min-width: 180px;"
+                                                        @keydown.escape.prevent.stop="open = false">
+
+                                                        <div class="py-1" role="menu" aria-orientation="vertical">
+                                                            <!-- View Job -->
+                                                            <a href="?page=admin-view-job&id=<?php echo $job['job_id']; ?>"
+                                                                class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                                                role="menuitem">
+                                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                                </svg>
+                                                                View Details
+                                                            </a>
+
+                                                            <hr class="my-1">
+
+                                                            <!-- Status Actions -->
                                                             <?php if ($job['job_status'] !== 'open'): ?>
-                                                                <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'open')"
-                                                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                                <button type="button"
+                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'open'); this.closest('[x-data]').__x.$data.open = false;"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                    </svg>
                                                                     Set Open
                                                                 </button>
                                                             <?php endif; ?>
+
                                                             <?php if ($job['job_status'] !== 'paused'): ?>
-                                                                <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'paused')"
-                                                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                                <button type="button"
+                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'paused'); this.closest('[x-data]').__x.$data.open = false;"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-yellow-700 hover:bg-yellow-50"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                    </svg>
                                                                     Pause
                                                                 </button>
                                                             <?php endif; ?>
+
                                                             <?php if ($job['job_status'] !== 'closed'): ?>
-                                                                <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'closed')"
-                                                                    class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                                <button type="button"
+                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'closed'); this.closest('[x-data]').__x.$data.open = false;"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-50"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                    </svg>
                                                                     Close
                                                                 </button>
                                                             <?php endif; ?>
+
                                                             <hr class="my-1">
-                                                            <button onclick="deleteJob(<?php echo $job['job_id']; ?>)"
-                                                                class="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+
+                                                            <!-- Delete Action -->
+                                                            <button type="button"
+                                                                onclick="deleteJob(<?php echo $job['job_id']; ?>); this.closest('[x-data]').__x.$data.open = false;"
+                                                                class="flex items-center w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+                                                                role="menuitem">
+                                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                </svg>
                                                                 Delete
                                                             </button>
                                                         </div>
@@ -421,7 +470,7 @@
 
                 <!-- Pagination - Same as jobseeker management -->
                 <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
-                    <div class="flex items-center text-sm text-gray-700">
+                    <div class="flex items-center gap-1 text-sm text-gray-70">
                         <span>Showing</span>
                         <span class="mx-1 font-medium" id="startItem">1</span>
                         <span>to</span>
@@ -437,7 +486,7 @@
                         </button>
                         <div id="pageNumbers" class="flex space-x-1"></div>
                         <button id="nextBtn" onclick="nextPage()"
-                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-3 py-1 text-sm text-white border border-gray-300 rounded bg-primary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                             Next <i class="ml-1 fas fa-chevron-right"></i>
                         </button>
                     </div>

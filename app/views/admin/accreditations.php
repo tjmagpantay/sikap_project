@@ -7,7 +7,7 @@
 <div class="space-y-6">
     <!-- Messages -->
     <?php if ($error ?? false): ?>
-        <div class="p-4 mb-6 text-red-700 bg-red-100 border border-red-200 rounded-lg">
+        <div class="p-4 mb-6 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg">
             <div class="flex items-center">
                 <i class="mr-2 fas fa-exclamation-circle"></i>
                 <?php echo htmlspecialchars($error); ?>
@@ -16,14 +16,13 @@
     <?php endif; ?>
 
     <?php if ($success ?? false): ?>
-        <div class="p-4 mb-6 text-green-700 bg-green-100 border border-green-200 rounded-lg">
+        <div class="p-4 mb-6 text-sm border border-blue-100 rounded-lg text-primary bg-blue-50">
             <div class="flex items-center">
                 <i class="mr-2 fas fa-check-circle"></i>
                 <?php echo htmlspecialchars($success); ?>
             </div>
         </div>
     <?php endif; ?>
-
     <!-- Page Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Accreditation Management</h1>
@@ -93,7 +92,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-900">Pending Accreditations</h2>
-            <span class="px-3 py-1 text-sm text-yellow-800 bg-yellow-100 rounded-full">
+            <span class="px-3 py-1 text-sm bg-gray-100 rounded-md text-primary">
                 <?php echo count($pendingAccreditations); ?> pending
             </span>
         </div>
@@ -159,11 +158,11 @@
                                                 <i class="mr-1 fas fa-eye"></i> Review
                                             </a>
                                             <button onclick="quickApprove(<?php echo $accreditation['accreditation_id']; ?>)"
-                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200">
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-white rounded-md bg-primary hover:bg-primary/90">
                                                 <i class="mr-1 fas fa-check"></i> Approve
                                             </button>
                                             <button onclick="quickReject(<?php echo $accreditation['accreditation_id']; ?>)"
-                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200">
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-white rounded-md bg-primary hover:bg-primary/90">
                                                 <i class="mr-1 fas fa-times"></i> Reject
                                             </button>
                                         </div>
@@ -273,43 +272,12 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                         <div class="flex items-center justify-end">
-                                            <!-- Actions Dropdown -->
-                                            <div class="relative" x-data="{ open: false }">
-                                                <button @click="open = !open"
-                                                    class="text-gray-400 hover:text-gray-600"
-                                                    title="Actions">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-                                                    </svg>
-                                                </button>
-
-                                                <div x-show="open" @click.away="open = false"
-                                                    x-transition:enter="transition ease-out duration-100"
-                                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                                    x-transition:leave="transition ease-in duration-75"
-                                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="absolute right-0 z-50 w-40 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                                    x-cloak>
-                                                    <div class="py-1">
-                                                        <a href="?page=admin-review-accreditation&id=<?php echo $accreditation['accreditation_id']; ?>"
-                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                            Review Details
-                                                        </a>
-                                                        <?php if ($accreditation['status'] === 'pending'): ?>
-                                                            <button onclick="quickApprove(<?php echo $accreditation['accreditation_id']; ?>)"
-                                                                class="block w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50">
-                                                                Quick Approve
-                                                            </button>
-                                                            <button onclick="quickReject(<?php echo $accreditation['accreditation_id']; ?>)"
-                                                                class="block w-full px-4 py-2 text-sm text-left text-red-700 hover:bg-red-50">
-                                                                Quick Reject
-                                                            </button>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <!-- Simple Review Details Button -->
+                                            <a href="?page=admin-review-accreditation&id=<?php echo $accreditation['accreditation_id']; ?>"
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
+                                                <i class="mr-2 fas fa-eye"></i>
+                                                Review Details
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -327,7 +295,7 @@
 
             <!-- Pagination -->
             <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
-                <div class="flex items-center text-sm text-gray-700">
+                <div class="flex items-center gap-1 text-sm text-gray-700">
                     <span>Showing</span>
                     <span class="mx-1 font-medium" id="startItem">1</span>
                     <span>to</span>
@@ -343,7 +311,7 @@
                     </button>
                     <div id="pageNumbers" class="flex space-x-1"></div>
                     <button id="nextBtn" onclick="nextPage()"
-                        class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-3 py-1 text-sm text-white border border-gray-300 rounded bg-primary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                         Next <i class="ml-1 fas fa-chevron-right"></i>
                     </button>
                 </div>

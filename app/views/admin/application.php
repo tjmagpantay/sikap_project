@@ -413,7 +413,7 @@
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50" id="paginationContainer">
-                    <div class="flex items-center text-sm text-gray-700">
+                    <div class="flex items-center gap-1 text-sm text-gray-700">
                         <span>Showing</span>
                         <span class="mx-1 font-medium" id="showingStart">1</span>
                         <span>to</span>
@@ -429,7 +429,7 @@
                         </button>
                         <div id="pageNumbers" class="flex space-x-1"></div>
                         <button id="nextBtn" onclick="nextPage()"
-                            class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-3 py-1 text-sm text-white border border-gray-300 rounded bg-primary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                             Next <i class="ml-1 fas fa-chevron-right"></i>
                         </button>
                     </div>

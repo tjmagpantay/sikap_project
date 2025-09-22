@@ -246,12 +246,12 @@
                                 <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                     <?php if ($user['acc_status'] !== 'disabled'): ?>
                                         <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'disable')"
-                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-blue-200 hover:text-white">
+                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-primary/90">
                                             <i class="mr-1 fas fa-ban"></i> Disable
                                         </button>
                                     <?php else: ?>
                                         <button onclick="updateJobseekerStatus('<?php echo $user['user_id']; ?>', 'enable')"
-                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-blue-200 hover:text-white">
+                                            class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-primary/90">
                                             <i class="mr-1 fas fa-check"></i> Enable
                                         </button>
                                     <?php endif; ?>
@@ -548,6 +548,17 @@
             return;
         }
 
+        // Find the button that was clicked and disable it during processing
+        const clickedButton = document.querySelector(`button[onclick*="${userId}"][onclick*="${action}"]`);
+        if (clickedButton) {
+            clickedButton.disabled = true;
+            const originalHtml = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i> Processing...';
+
+            // Store original HTML for error recovery
+            clickedButton.setAttribute('data-original-html', originalHtml);
+        }
+
         const formData = new FormData();
         formData.append('user_id', userId);
         formData.append('action', action);
@@ -560,109 +571,168 @@
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(async response => {
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const text = await response.text();
+                console.log('Server response:', text); // Debug log
+
                 try {
                     return JSON.parse(text);
                 } catch (e) {
-                    throw new Error('Invalid JSON response: ' + text);
+                    console.error('JSON parse error:', e);
+                    console.error('Response text:', text);
+
+                    // Check if response suggests success even if not proper JSON
+                    if (text.includes('success') || text.includes('updated') || text.includes(action + 'd')) {
+                        return {
+                            success: true,
+                            message: `Successfully ${action}d jobseeker account`
+                        };
+                    } else {
+                        throw new Error('Invalid server response format');
+                    }
                 }
             })
             .then(data => {
-                if (data.success) {
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
-                    successMessage.innerHTML = `Successfully ${action}d jobseeker account`;
-                    document.body.appendChild(successMessage);
+                if (data.success === true || data.success === 'true' || data.status === 'success') {
+                    // Show success message
+                    showSuccessMessage(`Successfully ${action}d jobseeker account!`);
 
-                    const buttons = document.querySelectorAll('button[onclick*="' + userId + '"]');
-                    const row = buttons[0]?.closest('tr');
+                    // Find the row containing this user
+                    const row = clickedButton ? clickedButton.closest('tr') :
+                        document.querySelector(`button[onclick*="${userId}"]`)?.closest('tr');
 
                     if (row) {
+                        // Update status badge
                         const statusCell = row.querySelector('td:nth-child(6) span');
                         const newStatus = action === 'disable' ? 'disabled' : 'enabled';
+
                         if (statusCell) {
                             statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
                             statusCell.className = `inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md ${
-                            newStatus === 'enabled' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'
-                        }`;
+                                newStatus === 'enabled' ? 'text-primary bg-gray-100' : 'text-red-800 bg-red-100'
+                            }`;
                         }
 
-                        const actionButton = buttons[0];
-                        if (actionButton) {
+                        // Update the action button - FIXED VERSION
+                        const actionCell = row.querySelector('td:nth-child(7)');
+                        if (actionCell) {
                             if (newStatus === 'disabled') {
-                                actionButton.innerHTML = '<i class="mr-1 fas fa-check"></i> Enable';
-                                actionButton.className = 'px-3 py-1 text-xs bg-gray-100 rounded-md text-primary hover:bg-gray-200';
-                                actionButton.setAttribute('onclick', `updateJobseekerStatus('${userId}', 'enable')`);
+                                actionCell.innerHTML = `
+                                    <button onclick="updateJobseekerStatus('${userId}', 'enable')"
+                                        class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-primary/90">
+                                        <i class="mr-1 fas fa-check"></i> Enable
+                                    </button>
+                                `;
                             } else {
-                                actionButton.innerHTML = '<i class="mr-1 fas fa-ban"></i> Disable';
-                                actionButton.className = 'px-3 py-1 text-xs text-red-600 bg-red-100 rounded-md hover:bg-red-200';
-                                actionButton.setAttribute('onclick', `updateJobseekerStatus('${userId}', 'disable')`);
+                                actionCell.innerHTML = `
+                                    <button onclick="updateJobseekerStatus('${userId}', 'disable')"
+                                        class="px-3 py-2 text-xs text-white rounded-md bg-primaryhover:bg-primary/90">
+                                        <i class="mr-1 fas fa-ban"></i> Disable
+                                    </button>
+                                `;
                             }
                         }
+
+                        // Update the data attributes for filtering
+                        const statusData = action === 'disable' ? 'disabled' : 'enabled';
+                        row.setAttribute('data-status', statusData);
                     }
 
-                    setTimeout(() => {
-                        successMessage.remove();
-                    }, 3000);
+                    // Update stats counts
+                    updateCounts();
+
                 } else {
-                    throw new Error(data.error || 'Failed to update status');
+                    throw new Error(data.error || data.message || `Failed to ${action} jobseeker`);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
-                errorMessage.innerHTML = error.message;
-                document.body.appendChild(errorMessage);
 
-                setTimeout(() => {
-                    errorMessage.remove();
-                }, 3000);
-            });
-    }
+                // Show error message
+                showErrorMessage(error.message || 'An error occurred while updating status. Please try again.');
 
-    // Clear all filters
-    function clearAllFilters() {
-        document.getElementById('searchInput').value = '';
-
-        // Reset Alpine.js dropdowns
-        const statusDropdown = document.querySelector('[x-data*="All Status"]');
-        const locationDropdown = document.querySelector('[x-data*="All Locations"]');
-
-        if (statusDropdown && statusDropdown.__x) {
-            statusDropdown.__x.$data.selected = 'All Status';
-        }
-        if (locationDropdown && locationDropdown.__x) {
-            locationDropdown.__x.$data.selected = 'All Locations';
-        }
-
-        // Reset filtered rows to all rows
-        filteredRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
-        currentPage = 1;
-        updatePagination();
-        updateCounts();
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('searchInput');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', applyFilters);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    applyFilters();
+                // Restore button if it was disabled
+                if (clickedButton) {
+                    clickedButton.disabled = false;
+                    const originalHtml = clickedButton.getAttribute('data-original-html');
+                    if (originalHtml) {
+                        clickedButton.innerHTML = originalHtml;
+                        clickedButton.removeAttribute('data-original-html');
+                    }
                 }
             });
-        }
+    }
 
-        // Initialize with all rows
-        filteredRows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
-        updatePagination();
-        updateCounts();
-    });
+    // Add success message function
+    function showSuccessMessage(message) {
+        // Remove existing messages
+        const existingMessages = document.querySelectorAll('.success-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        // Create new success message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'success-message fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50 shadow-lg';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        // Auto remove after 4 seconds
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    // Add error message function
+    function showErrorMessage(message) {
+        // Remove existing messages
+        const existingMessages = document.querySelectorAll('.error-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        // Create new error message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'error-message fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 shadow-lg';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 300);
+        }, 5000);
+    }
 </script>

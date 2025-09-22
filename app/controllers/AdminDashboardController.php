@@ -2,24 +2,24 @@
 require_once __DIR__ . '/../models/AdminDashboard.php';
 require_once __DIR__ . '/../models/UserManagement.php';
 require_once __DIR__ . '/../models/JobPost.php';
-require_once __DIR__ . '/../models/Admin.php'; 
-require_once __DIR__ . '/../models/Employer.php'; 
+require_once __DIR__ . '/../models/Admin.php';
+require_once __DIR__ . '/../models/Employer.php';
 
 class AdminDashboardController
 {
     private $adminDashboardModel;
     private $userManagementModel;
     private $jobPostModel;
-    private $adminModel; 
-    private $employerModel; 
+    private $adminModel;
+    private $employerModel;
 
     public function __construct()
     {
         $this->adminDashboardModel = new AdminDashboard();
         $this->userManagementModel = new UserManagement();
         $this->jobPostModel = new JobPost();
-        $this->adminModel = new Admin(); 
-        $this->employerModel = new Employer(); 
+        $this->adminModel = new Admin();
+        $this->employerModel = new Employer();
     }
 
     public function dashboard()
@@ -35,6 +35,101 @@ class AdminDashboardController
         $jobStatsChart = $this->adminDashboardModel->getJobStatsForChart();
         $jobCategoryChart = $this->adminDashboardModel->getJobCategoryStatsForChart();
 
+        include __DIR__ . '/../views/admin/dashboard.php';
+    }
+    public function viewJob()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        $job_id = $_GET['id'] ?? null;
+        if (!$job_id) {
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Job not found.'));
+            exit;
+        }
+
+        // Load job data
+        try {
+            require_once __DIR__ . '/../models/JobPost.php';
+            $jobPostModel = new JobPost();
+
+            // Get job details
+            $job = $jobPostModel->getJobById($job_id);
+            if (!$job) {
+                header('Location: ?page=admin-jobpost-management&error=' . urlencode('Job not found.'));
+                exit;
+            }
+
+            // Get additional job data
+            $job['skills'] = $jobPostModel->getJobSkills($job_id) ?? [];
+            $job['attachments'] = $jobPostModel->getJobAttachments($job_id) ?? [];
+            $job['screening_questions'] = $jobPostModel->getScreeningQuestions($job_id) ?? [];
+
+            // Get employer/company info
+            $sql = "SELECT 
+                    COALESCE(eb.business_name, e.company_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                    eb.business_logo,
+                    CONCAT(e.first_name, ' ', e.last_name) as employer_name
+                FROM job_post jp
+                JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE jp.job_id = ?";
+
+            $stmt = $jobPostModel->getDatabase()->prepare($sql);
+            $stmt->execute([$job_id]);
+            $company = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($company) {
+                $job['company_name'] = $company['company_name'];
+                $job['business_logo'] = $company['business_logo'];
+                $job['employer_name'] = $company['employer_name'];
+            }
+
+            // Get application statistics
+            $statsQuery = "SELECT 
+                        COUNT(*) as total_applications,
+                        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                        SUM(CASE WHEN status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
+                        SUM(CASE WHEN status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
+                        SUM(CASE WHEN status = 'hired' THEN 1 ELSE 0 END) as hired,
+                        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+                       FROM job_application 
+                       WHERE job_id = ?";
+
+            $stmt = $jobPostModel->getDatabase()->prepare($statsQuery);
+            $stmt->execute([$job_id]);
+            $applicationStats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$applicationStats) {
+                $applicationStats = [
+                    'total_applications' => 0,
+                    'pending' => 0,
+                    'reviewed' => 0,
+                    'shortlisted' => 0,
+                    'hired' => 0,
+                    'rejected' => 0
+                ];
+            }
+
+            // Get job category name if not already included
+            if (empty($job['category_name']) && !empty($job['job_category_id'])) {
+                $catQuery = "SELECT name FROM job_categories WHERE category_id = ?";
+                $stmt = $jobPostModel->getDatabase()->prepare($catQuery);
+                $stmt->execute([$job['job_category_id']]);
+                $category = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($category) {
+                    $job['category_name'] = $category['name'];
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Error loading job details: ' . $e->getMessage());
+            header('Location: ?page=admin-jobpost-management&error=' . urlencode('Failed to load job details.'));
+            exit;
+        }
+
+        // ✅ Use dashboard.php layout (same as other admin pages)
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
@@ -574,65 +669,136 @@ class AdminDashboardController
         }
 
         $accreditationId = $_GET['id'] ?? null;
-        if (!$accreditationId) {
+        if (!$accreditationId || !is_numeric($accreditationId)) {
             header('Location: ?page=admin-accreditations&error=' . urlencode('Invalid accreditation ID'));
             exit;
         }
 
-        // Use adminModel for accreditation details
-        $accreditation = $this->adminModel->getAccreditationDetails($accreditationId);
-        if (!$accreditation) {
-            header('Location: ?page=admin-accreditations&error=' . urlencode('Accreditation not found'));
+        try {
+            // Use adminModel for accreditation details
+            $accreditation = $this->adminModel->getAccreditationDetails($accreditationId);
+            if (!$accreditation) {
+                header('Location: ?page=admin-accreditations&error=' . urlencode('Accreditation not found'));
+                exit;
+            }
+
+            // Get employer's documents using employerModel
+            $documents = $this->employerModel->getDocuments($accreditation['employer_id']);
+            if (!$documents) {
+                $documents = []; // Ensure it's an array
+            }
+
+            // Set error/success messages
+            $error = $_GET['error'] ?? '';
+            $success = $_GET['success'] ?? '';
+
+            // ✅ FIXED: Use dashboard layout instead of standalone page
+            include __DIR__ . '/../views/admin/dashboard.php';
+        } catch (Exception $e) {
+            error_log('Error loading accreditation details: ' . $e->getMessage());
+            header('Location: ?page=admin-accreditations&error=' . urlencode('Failed to load accreditation details'));
             exit;
         }
-
-        // Get employer's documents using employerModel
-        $documents = $this->employerModel->getDocuments($accreditation['employer_id']);
-
-        include __DIR__ . '/../views/admin/dashboard.php';
     }
 
     /**
      * Process accreditation approval/rejection
      */
+
     public function processAccreditation()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-            header('Location: ?page=admin-login');
-            exit;
-        }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ?page=admin-accreditations');
             exit;
         }
 
-        $accreditationId = $_POST['accreditation_id'] ?? null;
-        $status = $_POST['status'] ?? null;
+        $accreditation_id = $_POST['accreditation_id'] ?? '';
+        $status = $_POST['status'] ?? '';
         $notes = $_POST['notes'] ?? '';
+        $admin_id = $_SESSION['admin_id'] ?? null;
 
-        if (!$accreditationId || !in_array($status, ['approved', 'rejected', 'pending'])) {
-            header('Location: ?page=admin-accreditations&error=' . urlencode('Invalid request'));
+        if (empty($accreditation_id) || empty($status)) {
+            $_SESSION['error'] = 'Missing required information';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
             exit;
         }
 
-        // Use adminModel for updating accreditation status
-        $result = $this->adminModel->updateAccreditationStatus(
-            $accreditationId,
-            $status,
-            $_SESSION['admin_id'], // Use admin_id from session
-            $notes
-        );
-
-        if ($result) {
-            $message = $status === 'approved' ? 'Employer verified successfully!' : ($status === 'rejected' ? 'Application rejected.' : 'Status updated.');
-            header('Location: ?page=admin-accreditations&success=' . urlencode($message));
-        } else {
-            header('Location: ?page=admin-accreditations&error=' . urlencode('Failed to update status'));
+        // Validate status
+        $validStatuses = ['pending', 'approved', 'rejected'];
+        if (!in_array($status, $validStatuses)) {
+            $_SESSION['error'] = 'Invalid status';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+            exit;
         }
+
+        try {
+            // ✅ FIXED: Update both accreditation and employer status
+            $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
+
+            if ($result) {
+                // ✅ NEW: Also update the employer status to match
+                $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
+
+                $statusText = ucfirst($status);
+
+                if ($syncResult) {
+                    $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized.";
+                } else {
+                    $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed.";
+                }
+            } else {
+                $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
+            }
+        } catch (Exception $e) {
+            error_log("Error updating accreditation status: " . $e->getMessage());
+            $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
+        }
+
+        // ✅ FIXED: Redirect back to the same review page instead of accreditations list
+        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
         exit;
     }
 
+    // ✅ NEW METHOD: Sync employer status with accreditation status
+    private function syncEmployerStatus($accreditation_id, $accreditation_status)
+    {
+        try {
+            // Get the employer_id from accreditation
+            $accreditation = $this->adminModel->getAccreditationDetails($accreditation_id);
+            if (!$accreditation) {
+                return false;
+            }
+
+            $employer_id = $accreditation['employer_id'];
+
+            // Map accreditation status to employer status
+            $employerStatus = $this->mapAccreditationToEmployerStatus($accreditation_status);
+
+            // Update employer status
+            return $this->employerModel->updateEmployerStatus($employer_id, $employerStatus);
+        } catch (Exception $e) {
+            error_log("Error syncing employer status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ✅ NEW METHOD: Map statuses between the two systems
+    private function mapAccreditationToEmployerStatus($accreditation_status)
+    {
+        switch ($accreditation_status) {
+            case 'approved':
+                return 'verified';  // approved accreditation = verified employer
+            case 'rejected':
+                return 'rejected';  // same as accreditation
+            case 'pending':
+                return 'pending_verification'; // pending accreditation = pending verification
+            default:
+                return 'incomplete';
+        }
+    }
+
+    // ...rest of existing code...
     /**
      * Applications management
      */
@@ -692,19 +858,19 @@ class AdminDashboardController
             $monthlyData = $this->getMonthlyData();
             $categoryData = $this->getCategoryData();
             $applicationStatusData = $this->getApplicationStatusData();
-            
+
             // Set error/success messages
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
         } catch (Exception $e) {
             error_log('Error in reports management: ' . $e->getMessage());
-            
+
             // Set default empty data if there's an error
             $reportStats = $this->getDefaultReportStats();
             $monthlyData = $this->getDefaultMonthlyData();
             $categoryData = $this->getDefaultCategoryData();
             $applicationStatusData = $this->getDefaultApplicationStatusData();
-            
+
             $error = 'Using sample data for demonstration purposes.';
             $success = '';
         }
@@ -721,7 +887,7 @@ class AdminDashboardController
         try {
             // For now, we'll use sample data since some model methods don't exist yet
             // TODO: Implement actual data retrieval when models are updated
-            
+
             /*
             // Future implementation when models have the required methods:
             $totalJobseekers = $this->userManagementModel->getUserCount('jobseeker');
@@ -732,9 +898,8 @@ class AdminDashboardController
             $jobApplicationModel = new JobApplication();
             $applicationStats = $jobApplicationModel->getApplicationStatsForAdmin();
             */
-            
+
             return $this->getDefaultReportStats();
-            
         } catch (Exception $e) {
             error_log('Error getting report stats: ' . $e->getMessage());
             return $this->getDefaultReportStats();
@@ -766,7 +931,7 @@ class AdminDashboardController
             // Future implementation:
             $categoryData = $this->jobPostModel->getJobsByCategory();
             */
-            
+
             return $this->getDefaultCategoryData();
         } catch (Exception $e) {
             error_log('Error getting category data: ' . $e->getMessage());
@@ -787,7 +952,7 @@ class AdminDashboardController
             $jobApplicationModel = new JobApplication();
             $statusData = $jobApplicationModel->getApplicationStatusDistribution();
             */
-            
+
             return $this->getDefaultApplicationStatusData();
         } catch (Exception $e) {
             error_log('Error getting application status data: ' . $e->getMessage());

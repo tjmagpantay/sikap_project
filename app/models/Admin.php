@@ -235,10 +235,10 @@ class Admin
         }
     }
 
-public function getAllAccreditations()
-{
-    try {
-        $sql = "SELECT 
+    public function getAllAccreditations()
+    {
+        try {
+            $sql = "SELECT 
                     a.accreditation_id,
                     a.employer_id,
                     a.status,
@@ -262,15 +262,46 @@ public function getAllAccreditations()
                 LEFT JOIN admin admin ON a.reviewed_by = admin.admin_id
                 ORDER BY a.created_at DESC";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        error_log("DEBUG: Found " . count($results) . " total accreditations");
-        return $results;
-    } catch (PDOException $e) {
-        error_log('Error getting all accreditations: ' . $e->getMessage());
-        return [];
+            error_log("DEBUG: Found " . count($results) . " total accreditations");
+            return $results;
+        } catch (PDOException $e) {
+            error_log('Error getting all accreditations: ' . $e->getMessage());
+            return [];
+        }
     }
-}
+
+
+    public function syncEmployerStatus($accreditation_id, $accreditation_status)
+    {
+        try {
+            // Get employer_id from accreditation
+            $stmt = $this->db->prepare("SELECT employer_id FROM accreditation WHERE accreditation_id = ?");
+            $stmt->execute([$accreditation_id]);
+            $accreditation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$accreditation) {
+                return false;
+            }
+
+            // Map accreditation status to employer status
+            $employerStatusMap = [
+                'approved' => 'verified',
+                'rejected' => 'rejected',
+                'pending' => 'pending_verification'
+            ];
+
+            $employerStatus = $employerStatusMap[$accreditation_status] ?? 'incomplete';
+
+            // Update employer status
+            $stmt = $this->db->prepare("UPDATE employer SET status = ?, updated_at = NOW() WHERE employer_id = ?");
+            return $stmt->execute([$employerStatus, $accreditation['employer_id']]);
+        } catch (PDOException $e) {
+            error_log("Error syncing employer status: " . $e->getMessage());
+            return false;
+        }
+    }
 }

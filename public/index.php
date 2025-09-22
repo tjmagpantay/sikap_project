@@ -391,12 +391,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->jobPostManagement();
             break;
 
-        case 'admin-view-job':
-            require_once __DIR__ . '/../app/controllers/AdminController.php';
-            $controller = new AdminController();
-            $controller->viewJob();
-            break;
-            
         case 'admin-toggle-job-status':
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
             $controller = new AdminDashboardController();
@@ -409,6 +403,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->deleteJob();
             break;
 
+        // case 'admin-toggle-job-status':
+        //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        //         require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+        //         $controller = new AdminDashboardController();
+        //         $controller->updateJobStatus();
+        //     }
+        //     break;
+
+        // case 'admin-delete-job':
+        //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        //         require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+        //         $controller = new AdminDashboardController();
+        //         $controller->deleteJob();
+        //     }
+        //     break;
+
         // case 'admin-reports':
         //     require_once __DIR__ . '/../app/controllers/AdminController.php';
         //     $controller = new AdminController();
@@ -419,6 +429,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
             $controller->viewApplication();
+            break;
+
+        case 'admin-view-job':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->viewJob();
             break;
 
         case 'admin-reports':
@@ -489,10 +505,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->showProfile();
             break;
 
-        case 'view-employer-document':
+        case 'download-employer-document':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
-            $controller->viewDocument();
+            if ($_GET['page'] === 'view-employer-document') {
+                $controller->viewDocument();
+            } else {
+                $controller->downloadDocument();
+            }
             break;
 
         case 'download-employer-document':
@@ -658,7 +678,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             break;
 
         // Admin Accreditation Routes
-        
+
         case 'upload-business-logo':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();

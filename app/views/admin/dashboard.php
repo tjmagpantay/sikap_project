@@ -50,11 +50,17 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 case 'admin-jobpost-management':
                     include __DIR__ . '/jobpost-management.php';
                     break;
+                case 'admin-view-job':
+                    include __DIR__ . '/view-job.php';
+                    break;
                 case 'admin-job-categories':
                     include __DIR__ . '/job-categories.php';
                     break;
                 case 'admin-accreditations':
                     include __DIR__ . '/accreditations.php';
+                    break;
+                case 'admin-review-accreditation':
+                    include __DIR__ . '/review-accreditation.php';
                     break;
                 case 'admin-reports':
                     include __DIR__ . '/all-reports.php';
@@ -121,6 +127,34 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 if (sidebar && overlay) {
                     sidebar.classList.remove('show');
                     overlay.classList.remove('show');
+                }
+            }
+        });
+
+        // Add active state management for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = new URLSearchParams(window.location.search).get('page') || 'admin-dashboard';
+
+            // Remove existing active classes
+            document.querySelectorAll('#admin-sidebar a').forEach(link => {
+                link.classList.remove('bg-primary', 'text-white');
+                link.classList.add('text-gray-600');
+            });
+
+            // Add active class to current page
+            const activeLink = document.querySelector(`#admin-sidebar a[href*="${currentPage}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-600', 'hover:bg-primary', 'hover:text-white');
+                activeLink.classList.add('bg-primary', 'text-white');
+
+                // If it's in a dropdown, open the dropdown
+                const parentDropdown = activeLink.closest('ul[id*="Dropdown"]');
+                if (parentDropdown) {
+                    parentDropdown.classList.remove('hidden');
+                    const arrow = document.querySelector(`#${parentDropdown.id.replace('Dropdown', 'DropdownArrow')}`);
+                    if (arrow) {
+                        arrow.classList.add('rotate-180');
+                    }
                 }
             }
         });

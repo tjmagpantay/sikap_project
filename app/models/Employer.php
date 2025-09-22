@@ -180,52 +180,52 @@ class Employer
     //     $stmt->execute([$employer_id]);
     //     return $stmt->fetch(PDO::FETCH_ASSOC);
     // }
-public function getDocuments($employer_id)
-{
-    try {
-        error_log("DEBUG: Getting documents for employer_id: $employer_id");
+    public function getDocuments($employer_id)
+    {
+        try {
+            error_log("DEBUG: Getting documents for employer_id: $employer_id");
 
-        // Get the document record for this employer
-        $stmt = $this->db->prepare("SELECT * FROM employer_documents WHERE employer_id = ? LIMIT 1");
-        $stmt->execute([$employer_id]);
-        $record = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Get the document record for this employer
+            $stmt = $this->db->prepare("SELECT * FROM employer_documents WHERE employer_id = ? LIMIT 1");
+            $stmt->execute([$employer_id]);
+            $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$record) {
-            error_log("DEBUG: No document record found for employer_id: $employer_id");
+            if (!$record) {
+                error_log("DEBUG: No document record found for employer_id: $employer_id");
+                return [];
+            }
+
+            error_log("DEBUG: Found document record: " . print_r($record, true));
+
+            // Extract document paths from the columns
+            $documents = [];
+            $documentColumns = [
+                'letter_of_intent',
+                'company_profile',
+                'business_permit',
+                'cert_of_no_pending_case',
+                'dole_registration',
+                'cert_no_objection',
+                'poea_reg',
+                'job_vaccancies_qual',
+                'phil_jobnet_reg'
+            ];
+
+            foreach ($documentColumns as $column) {
+                if (isset($record[$column]) && !empty($record[$column])) {
+                    $documents[$column] = $record[$column];
+                    error_log("DEBUG: Found document $column: " . $record[$column]);
+                }
+            }
+
+            error_log("DEBUG: Final documents array: " . print_r($documents, true));
+            return $documents;
+        } catch (PDOException $e) {
+            error_log('Error getting documents: ' . $e->getMessage());
+            error_log('PDO Error Info: ' . print_r($e->errorInfo ?? [], true));
             return [];
         }
-
-        error_log("DEBUG: Found document record: " . print_r($record, true));
-
-        // Extract document paths from the columns
-        $documents = [];
-        $documentColumns = [
-            'letter_of_intent',
-            'company_profile',
-            'business_permit',
-            'cert_of_no_pending_case',
-            'dole_registration',
-            'cert_no_objection',
-            'poea_reg',
-            'job_vaccancies_qual',
-            'phil_jobnet_reg'
-        ];
-
-        foreach ($documentColumns as $column) {
-            if (isset($record[$column]) && !empty($record[$column])) {
-                $documents[$column] = $record[$column];
-                error_log("DEBUG: Found document $column: " . $record[$column]);
-            }
-        }
-
-        error_log("DEBUG: Final documents array: " . print_r($documents, true));
-        return $documents;
-    } catch (PDOException $e) {
-        error_log('Error getting documents: ' . $e->getMessage());
-        error_log('PDO Error Info: ' . print_r($e->errorInfo ?? [], true));
-        return [];
     }
-}
 
     public function calculateProfileCompletion($user_id)
     {
@@ -439,62 +439,62 @@ public function getDocuments($employer_id)
         return $stmt->execute($values);
     }
 
-public function saveDocument($employer_id, $document_type, $file_path, $original_filename = null, $file_size = null)
-{
-    try {
-        error_log("DEBUG: saveDocument called with employer_id=$employer_id, type=$document_type, path=$file_path");
+    public function saveDocument($employer_id, $document_type, $file_path, $original_filename = null, $file_size = null)
+    {
+        try {
+            error_log("DEBUG: saveDocument called with employer_id=$employer_id, type=$document_type, path=$file_path");
 
-        // Define allowed document types for security (match your table columns)
-        $allowedTypes = [
-            'letter_of_intent',
-            'company_profile',
-            'business_permit',
-            'cert_of_no_pending_case',
-            'dole_registration',
-            'cert_no_objection',
-            'poea_reg',
-            'job_vaccancies_qual',
-            'phil_jobnet_reg'
-        ];
+            // Define allowed document types for security (match your table columns)
+            $allowedTypes = [
+                'letter_of_intent',
+                'company_profile',
+                'business_permit',
+                'cert_of_no_pending_case',
+                'dole_registration',
+                'cert_no_objection',
+                'poea_reg',
+                'job_vaccancies_qual',
+                'phil_jobnet_reg'
+            ];
 
-        if (!in_array($document_type, $allowedTypes)) {
-            error_log("DEBUG: Invalid document type: $document_type");
+            if (!in_array($document_type, $allowedTypes)) {
+                error_log("DEBUG: Invalid document type: $document_type");
+                return false;
+            }
+
+            // Check if a record exists for this employer
+            $sql = "SELECT req_doc_id FROM employer_documents WHERE employer_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$employer_id]);
+            $existing = $stmt->fetch();
+
+            if ($existing) {
+                // Update existing record - use backticks for column names
+                $sql = "UPDATE employer_documents SET `{$document_type}` = ?, upload_date = NOW() WHERE employer_id = ?";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute([$file_path, $employer_id]);
+                error_log("DEBUG: Updating existing record for document type: $document_type");
+            } else {
+                // Insert new record - create new row with this document
+                $sql = "INSERT INTO employer_documents (employer_id, `{$document_type}`, upload_date) VALUES (?, ?, NOW())";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute([$employer_id, $file_path]);
+                error_log("DEBUG: Inserting new record for document type: $document_type");
+            }
+
+            if (!$result) {
+                error_log("DEBUG: SQL execution failed: " . print_r($stmt->errorInfo(), true));
+                return false;
+            } else {
+                error_log("DEBUG: Document saved successfully: $document_type for employer $employer_id");
+                return true;
+            }
+        } catch (PDOException $e) {
+            error_log('Error saving document: ' . $e->getMessage());
+            error_log('SQL Error Info: ' . print_r($e->errorInfo ?? [], true));
             return false;
         }
-
-        // Check if a record exists for this employer
-        $sql = "SELECT req_doc_id FROM employer_documents WHERE employer_id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$employer_id]);
-        $existing = $stmt->fetch();
-
-        if ($existing) {
-            // Update existing record - use backticks for column names
-            $sql = "UPDATE employer_documents SET `{$document_type}` = ?, upload_date = NOW() WHERE employer_id = ?";
-            $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute([$file_path, $employer_id]);
-            error_log("DEBUG: Updating existing record for document type: $document_type");
-        } else {
-            // Insert new record - create new row with this document
-            $sql = "INSERT INTO employer_documents (employer_id, `{$document_type}`, upload_date) VALUES (?, ?, NOW())";
-            $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute([$employer_id, $file_path]);
-            error_log("DEBUG: Inserting new record for document type: $document_type");
-        }
-
-        if (!$result) {
-            error_log("DEBUG: SQL execution failed: " . print_r($stmt->errorInfo(), true));
-            return false;
-        } else {
-            error_log("DEBUG: Document saved successfully: $document_type for employer $employer_id");
-            return true;
-        }
-    } catch (PDOException $e) {
-        error_log('Error saving document: ' . $e->getMessage());
-        error_log('SQL Error Info: ' . print_r($e->errorInfo ?? [], true));
-        return false;
     }
-}
 
     public function createProfile($data)
     {
@@ -934,6 +934,17 @@ ORDER BY e.created_at DESC";
         } catch (Exception $e) {
             error_log("❌ Error getting company name: " . $e->getMessage());
             return 'Unknown Company';
+        }
+    }
+    public function updateEmployerStatus($employer_id, $status)
+    {
+        try {
+            $sql = "UPDATE employer SET status = ?, updated_at = NOW() WHERE employer_id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$status, $employer_id]);
+        } catch (PDOException $e) {
+            error_log("Error updating employer status: " . $e->getMessage());
+            return false;
         }
     }
 }

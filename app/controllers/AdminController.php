@@ -109,7 +109,7 @@ class AdminController
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
-    
+
     public function accreditations()
     {
         // Change from User::ROLE_ADMIN to 'admin' to match your login method
@@ -169,8 +169,7 @@ class AdminController
 
     public function processAccreditation()
     {
-        // Change from User::ROLE_ADMIN to 'admin'
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!$this->isAdminLoggedIn()) {
             header('Location: ?page=admin-login');
             exit;
         }
@@ -180,30 +179,89 @@ class AdminController
             exit;
         }
 
-        $accreditationId = $_POST['accreditation_id'] ?? null;
-        $status = $_POST['status'] ?? null;
+        $accreditation_id = $_POST['accreditation_id'] ?? '';
+        $status = $_POST['status'] ?? '';
         $notes = $_POST['notes'] ?? '';
+        $admin_id = $_SESSION['admin_id'] ?? null;
 
-        if (!$accreditationId || !in_array($status, ['approved', 'rejected', 'pending'])) {
-            header('Location: ?page=admin-accreditations&error=' . urlencode('Invalid request'));
+        if (empty($accreditation_id) || empty($status)) {
+            $_SESSION['error'] = 'Missing required information';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
             exit;
         }
 
-        // Use adminModel for updating accreditation status
-        $result = $this->adminModel->updateAccreditationStatus(
-            $accreditationId,
-            $status,
-            $_SESSION['admin_id'], // Use admin_id instead of user_id
-            $notes
-        );
-
-        if ($result) {
-            $message = $status === 'approved' ? 'Employer verified successfully!' : ($status === 'rejected' ? 'Application rejected.' : 'Status updated.');
-            header('Location: ?page=admin-accreditations&success=' . urlencode($message));
-        } else {
-            header('Location: ?page=admin-accreditations&error=' . urlencode('Failed to update status'));
+        // Validate status
+        $validStatuses = ['pending', 'approved', 'rejected'];
+        if (!in_array($status, $validStatuses)) {
+            $_SESSION['error'] = 'Invalid status';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+            exit;
         }
+
+        try {
+            // ✅ FIXED: Update both accreditation and employer status
+            $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
+
+            if ($result) {
+                // ✅ NEW: Also update the employer status to match
+                $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
+
+                $statusText = ucfirst($status);
+
+                if ($syncResult) {
+                    $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized.";
+                } else {
+                    $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed.";
+                }
+            } else {
+                $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
+            }
+        } catch (Exception $e) {
+            error_log("Error updating accreditation status: " . $e->getMessage());
+            $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
+        }
+
+        // ✅ FIXED: Redirect back to the same review page instead of accreditations list
+        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
         exit;
+    }
+
+    // ✅ NEW METHOD: Sync employer status with accreditation status
+    private function syncEmployerStatus($accreditation_id, $accreditation_status)
+    {
+        try {
+            // Get the employer_id from accreditation
+            $accreditation = $this->adminModel->getAccreditationDetails($accreditation_id);
+            if (!$accreditation) {
+                return false;
+            }
+
+            $employer_id = $accreditation['employer_id'];
+
+            // Map accreditation status to employer status
+            $employerStatus = $this->mapAccreditationToEmployerStatus($accreditation_status);
+
+            // Update employer status
+            return $this->employerModel->updateEmployerStatus($employer_id, $employerStatus);
+        } catch (Exception $e) {
+            error_log("Error syncing employer status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ✅ NEW METHOD: Map statuses between the two systems
+    private function mapAccreditationToEmployerStatus($accreditation_status)
+    {
+        switch ($accreditation_status) {
+            case 'approved':
+                return 'verified';  // approved accreditation = verified employer
+            case 'rejected':
+                return 'rejected';  // same as accreditation
+            case 'pending':
+                return 'pending_verification'; // pending accreditation = pending verification
+            default:
+                return 'incomplete';
+        }
     }
 
     public function jobPostManagement()

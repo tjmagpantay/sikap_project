@@ -371,7 +371,7 @@
                                                 if (strtolower($user['status']) === 'suspended') {
                                             ?>
                                                     <button
-                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary unsuspend-btn"
+                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary hover:bg-primary/90 unsuspend-btn"
                                                         data-id="<?php echo $user['user_id']; ?>">
                                                         <i class="mr-1 fas fa-ban"></i>
                                                         <span>Unsuspend</span>
@@ -380,7 +380,7 @@
                                                 } else {
                                                 ?>
                                                     <button
-                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary suspend-btn"
+                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary suspend-btn hover:bg-primary/90"
                                                         data-id="<?php echo $user['user_id']; ?>">
                                                         <i class="mr-1 fas fa-ban"></i>
                                                         <span>Suspend</span>

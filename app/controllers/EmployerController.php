@@ -1066,10 +1066,19 @@ class EmployerController
 
     private function handleDocumentRequest($forceDownload = false)
     {
-        // Check if user is logged in and is an employer
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) { // 2 = ROLE_EMPLOYER
+        // ✅ FIXED: Allow admin access to employer documents
+        if (!isset($_SESSION['user_id'])) {
             http_response_code(403);
-            die('Access denied');
+            die('Access denied - Please log in');
+        }
+
+        // Check if user is admin or the document owner
+        $isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+        $isEmployer = ($_SESSION['role'] ?? '') == 2; // 2 = ROLE_EMPLOYER
+
+        if (!$isAdmin && !$isEmployer) {
+            http_response_code(403);
+            die('Access denied - Insufficient permissions');
         }
 
         // Get parameters
@@ -1082,11 +1091,13 @@ class EmployerController
             die('Missing parameters');
         }
 
-        // Check if the logged-in user owns this employer profile
-        $currentEmployer = $this->employerModel->findByUserId($_SESSION['user_id']);
-        if (!$currentEmployer || $currentEmployer['employer_id'] != $employer_id) {
-            http_response_code(403);
-            die('Access denied - You can only access your own documents');
+        // ✅ FIXED: If not admin, check if the logged-in user owns this employer profile
+        if (!$isAdmin) {
+            $currentEmployer = $this->employerModel->findByUserId($_SESSION['user_id']);
+            if (!$currentEmployer || $currentEmployer['employer_id'] != $employer_id) {
+                http_response_code(403);
+                die('Access denied - You can only access your own documents');
+            }
         }
 
         // Get the document from database
@@ -1101,22 +1112,32 @@ class EmployerController
         // Debug the file path
         error_log("DEBUG: File path from database: $filePath");
 
-        // Build full path - similar to jobseeker document handling
-        if (strpos($filePath, 'uploads/documents/') === 0) {
-            // Path already includes uploads/documents/
-            $fullPath = __DIR__ . '/../../' . $filePath;
-        } else {
-            // Just filename, add full path
-            $fullPath = __DIR__ . '/../../uploads/documents/' . $filePath;
+        // ✅ FIXED: Build full path - handle different path formats
+        $possiblePaths = [
+            // Try the path as stored
+            __DIR__ . '/../../' . $filePath,
+            // Try with uploads/ prefix if not present
+            __DIR__ . '/../../uploads/documents/' . basename($filePath),
+            // Try the sikap/uploads/documents path
+            __DIR__ . '/../../uploads/documents/' . $filePath
+        ];
+
+        $fullPath = null;
+        foreach ($possiblePaths as $path) {
+            error_log("DEBUG: Checking path: $path");
+            if (file_exists($path)) {
+                $fullPath = $path;
+                break;
+            }
         }
 
-        error_log("DEBUG: Full file path: $fullPath");
+        error_log("DEBUG: Final file path: " . ($fullPath ?? 'NOT FOUND'));
 
         // Check if file exists
-        if (!file_exists($fullPath)) {
-            error_log("Document file not found: $fullPath");
+        if (!$fullPath || !file_exists($fullPath)) {
+            error_log("Document file not found. Tried paths: " . print_r($possiblePaths, true));
             http_response_code(404);
-            die('Document file not found on server');
+            die('Document file not found on server. File may have been moved or deleted.');
         }
 
         // Get file info
@@ -1139,6 +1160,13 @@ class EmployerController
             case 'docx':
                 $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
                 break;
+            case 'jpg':
+            case 'jpeg':
+                $mimeType = 'image/jpeg';
+                break;
+            case 'png':
+                $mimeType = 'image/png';
+                break;
             default:
                 $mimeType = 'application/octet-stream';
         }
@@ -1158,7 +1186,7 @@ class EmployerController
             // Force download
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
         } else {
-            // Try to display in browser (works well for PDFs)
+            // Try to display in browser (works well for PDFs and images)
             header('Content-Disposition: inline; filename="' . $fileName . '"');
         }
 
