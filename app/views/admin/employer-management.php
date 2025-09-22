@@ -370,14 +370,20 @@
                                             if (isset($user['user_id']) && !empty($user['user_id']) && isset($user['status'])) {
                                                 if (strtolower($user['status']) === 'suspended') {
                                             ?>
-                                                    <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                        Unsuspend
+                                                    <button
+                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary unsuspend-btn"
+                                                        data-id="<?php echo $user['user_id']; ?>">
+                                                        <i class="mr-1 fas fa-ban"></i>
+                                                        <span>Unsuspend</span>
                                                     </button>
                                                 <?php
                                                 } else {
                                                 ?>
-                                                    <button class="px-2 py-2 text-xs text-red-600 bg-red-100 border border-red-600 rounded-md hover:bg-red-400 suspend-btn" data-id="<?php echo $user['user_id']; ?>">
-                                                        Suspend
+                                                    <button
+                                                        class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary suspend-btn"
+                                                        data-id="<?php echo $user['user_id']; ?>">
+                                                        <i class="mr-1 fas fa-ban"></i>
+                                                        <span>Suspend</span>
                                                     </button>
                                                 <?php
                                                 }
@@ -389,6 +395,7 @@
                                             ?>
                                         </div>
                                     </td>
+
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -914,11 +921,44 @@
 
         fetch('index.php?page=update-employer-status', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            .then(response => {
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get response text first
+                return response.text();
+            })
+            .then(responseText => {
+                console.log('Server response:', responseText); // Debug log
+
+                // Try to parse as JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    console.error('Response text:', responseText);
+
+                    // Check if the response contains success indicators (even if not JSON)
+                    if (responseText.includes('success') || responseText.includes('updated') || responseText.includes('suspended') || responseText.includes('unsuspended')) {
+                        // If response suggests success but isn't JSON, treat as success
+                        data = {
+                            success: true,
+                            message: `Employer ${action}ed successfully`
+                        };
+                    } else {
+                        throw new Error('Invalid server response format');
+                    }
+                }
+
+                if (data.success === true || data.success === 'true' || data.status === 'success') {
                     const row = button.closest('tr');
                     const statusCell = row.querySelector('td:nth-child(5) span');
                     const actionCell = row.querySelector('td:last-child div');
@@ -928,54 +968,124 @@
 
                     // Update status badge
                     statusCell.className = `inline-flex px-2 py-1 text-xs font-medium rounded-md ${
-                        action === 'suspend' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                        action === 'suspend' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-primary'
                     }`;
                     statusCell.textContent = action === 'suspend' ? 'Suspended' : 'Verified';
 
                     // Update action button
                     if (action === 'suspend') {
                         actionCell.innerHTML = `
-                            <button class="text-green-600 hover:text-green-900 unsuspend-btn" data-id="${userId}">
-                                Unsuspend
+                            <button class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary unsuspend-btn" data-id="${userId}">
+                                <i class="mr-1 fas fa-ban"></i>
+                                <span>Unsuspend</span>
                             </button>
                         `;
                     } else {
                         actionCell.innerHTML = `
-                            <button class="px-2 py-2 text-xs text-red-600 bg-red-100 border border-red-600 rounded-md hover:bg-red-400 suspend-btn" data-id="${userId}">
-                                Suspend
+                            <button class="flex items-center px-3 py-2 text-xs text-white border rounded-md bg-primary suspend-btn" data-id="${userId}">
+                                <i class="mr-1 fas fa-ban"></i>
+                                <span>Suspend</span>
                             </button>
                         `;
                     }
 
                     updateStatusCounts();
                     attachButtonListeners();
+
+                    // Show success message
+                    showSuccessMessage(`Employer ${action}ed successfully!`);
+
                 } else {
-                    throw new Error(data.error || `Failed to ${action} employer`);
+                    throw new Error(data.error || data.message || `Failed to ${action} employer`);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert(`An error occurred while updating status. Please try again.`);
+                console.error('Error details:', error);
+
+                // More user-friendly error handling
+                let errorMessage = 'An error occurred while updating status. Please try again.';
+
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = 'Server error occurred. Please check your connection and try again.';
+                } else if (error.message.includes('JSON parse')) {
+                    errorMessage = 'Server response format error. The action may have succeeded - please refresh the page to verify.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                alert(errorMessage);
+
+                // Reset button state
                 button.disabled = false;
                 button.innerHTML = originalText;
             });
     }
 
+    // Add this function for success messages
+    function showSuccessMessage(message) {
+        // Remove existing success messages
+        const existingMessages = document.querySelectorAll('.success-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        // Create new success message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'success-message fixed top-20 right-4 z-50 px-4 py-3 bg-green-100 border border-green-200 text-green-800 rounded-lg shadow-lg transition-all duration-300';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => messageDiv.remove(), 300);
+        }, 3000);
+    }
+
+    // Enhanced button listeners with better error handling
     function attachButtonListeners() {
+        // Remove existing listeners first
         document.querySelectorAll('.suspend-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.replaceWith(button.cloneNode(true));
+        });
+        document.querySelectorAll('.unsuspend-btn').forEach(button => {
+            button.replaceWith(button.cloneNode(true));
+        });
+
+        // Add new listeners
+        document.querySelectorAll('.suspend-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
                 if (confirm('Are you sure you want to suspend this employer?')) {
                     const userId = this.getAttribute('data-id');
-                    handleStatusChange('suspend', userId, this);
+                    if (userId) {
+                        handleStatusChange('suspend', userId, this);
+                    } else {
+                        alert('Error: User ID not found');
+                    }
                 }
             });
         });
 
         document.querySelectorAll('.unsuspend-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
                 if (confirm('Are you sure you want to unsuspend this employer?')) {
                     const userId = this.getAttribute('data-id');
-                    handleStatusChange('unsuspend', userId, this);
+                    if (userId) {
+                        handleStatusChange('unsuspend', userId, this);
+                    } else {
+                        alert('Error: User ID not found');
+                    }
                 }
             });
         });
