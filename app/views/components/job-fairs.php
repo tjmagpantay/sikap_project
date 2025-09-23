@@ -4,7 +4,10 @@ require_once __DIR__ . '/../../controllers/EventProgramController.php';
 $eventController = new EventProgramController();
 $allEvents = $eventController->getActiveEvents();
 
-// Separate events by type for filtering
+// Limit to 3 events for landing page display
+$allEvents = array_slice($allEvents, 0, 3);
+
+// Separate events by type for filtering (after limiting)
 $programs = array_filter($allEvents, function ($event) {
   return $event['type'] === 'program';
 });
@@ -43,8 +46,8 @@ $localRecruitment = array_filter($allEvents, function ($event) {
       </button>
     </div>
 
-    <!-- Events Grid -->
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" id="eventsGrid">
+    <!-- Events Grid - Adjusted for max 3 items -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="eventsGrid">
       <?php foreach ($allEvents as $event): ?>
         <div class="overflow-hidden transition-all duration-300 bg-white shadow-lg rounded-xl hover:shadow-xl event-card h-80"
           data-category="<?php echo htmlspecialchars($event['type']); ?>">
@@ -118,8 +121,6 @@ $localRecruitment = array_filter($allEvents, function ($event) {
       </div>
     <?php endif; ?>
 
-
-
   </div>
 </section>
 
@@ -176,7 +177,7 @@ $localRecruitment = array_filter($allEvents, function ($event) {
       }
     });
 
-    // Handle empty state
+    // Handle empty state for filtered categories
     const eventsGrid = document.getElementById('eventsGrid');
     if (visibleCount === 0) {
       // Show empty state message
@@ -192,7 +193,11 @@ $localRecruitment = array_filter($allEvents, function ($event) {
               </svg>
             </div>
             <h3 class="mb-2 text-lg font-medium text-gray-900">No ${category === 'all' ? 'events' : category} found</h3>
-            <p class="max-w-sm text-gray-500">Try selecting a different category or check back later.</p>
+            <p class="max-w-sm text-gray-500">
+              ${category === 'all' ? 'Check back later for upcoming events.' : `No ${category} events in the current preview.`}
+              <br>
+              <a href="?page=programs-events" class="text-blue-600 underline hover:text-blue-700">View all events</a> for more options.
+            </p>
           </div>
         `;
         eventsGrid.appendChild(emptyState);

@@ -23,48 +23,64 @@ include_once __DIR__ . '/../components/alert-modal.php';
                     </div>
 
                     <!-- Form -->
-                    <form class="space-y-6" method="POST" action="?page=signup-jobseeker">
+                    <form class="space-y-6" method="POST" action="?page=signup-jobseeker" id="signupForm">
                         <!-- First Name & Last Name -->
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
                                 <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                                <input id="first_name" name="first_name" type="text" required
+                                <input id="first_name" name="first_name" type="text" required maxlength="50"
                                     value="<?php echo htmlspecialchars($formData['first_name'] ?? ''); ?>"
-                                    class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <div class="flex justify-between text-xs">
+                                    <span id="first-name-error" class="hidden text-red-500"></span>
+                                   
+                                </div>
                             </div>
                             <div class="space-y-2">
                                 <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                                <input id="last_name" name="last_name" type="text" required
+                                <input id="last_name" name="last_name" type="text" required maxlength="50"
                                     value="<?php echo htmlspecialchars($formData['last_name'] ?? ''); ?>"
-                                    class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <div class="flex justify-between text-xs">
+                                    <span id="last-name-error" class="hidden text-red-500"></span>
+                                   
+                                </div>
                             </div>
                         </div>
 
                         <!-- Contact Number -->
                         <div class="space-y-2">
                             <label for="contact_number" class="block text-sm font-medium text-gray-700">Contact Number</label>
-                            <input id="contact_number" name="contact_number" type="tel" required
+                            <input id="contact_number" name="contact_number" type="tel" required maxlength="20"
                                 value="<?php echo htmlspecialchars($formData['contact_number'] ?? ''); ?>"
-                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                 placeholder="e.g., +63 912 345 6789">
+                            <div class="flex justify-between text-xs">
+                                <span id="contact-error" class="hidden text-red-500"></span>
+                                
+                            </div>
                         </div>
 
                         <!-- Email -->
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input id="email" name="email" type="email" required
+                            <input id="email" name="email" type="email" required maxlength="255"
                                 value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
-                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                 placeholder="your.email@example.com">
+                            <div class="flex justify-between text-xs">
+                                <span id="email-error" class="hidden text-red-500"></span>
+                               
+                            </div>
                         </div>
 
                         <!-- Password -->
                         <div class="space-y-2">
                             <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                             <div class="relative">
-                                <input id="password" name="password" type="password" required
+                                <input id="password" name="password" type="password" required maxlength="50"
                                     value="<?php echo htmlspecialchars($formData['password'] ?? ''); ?>"
-                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                     placeholder="Create a strong password">
                                 <button type="button" onclick="togglePassword('password')" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
                                     <svg id="password-icon-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,15 +92,19 @@ include_once __DIR__ . '/../components/alert-modal.php';
                                     </svg>
                                 </button>
                             </div>
+                            <div class="flex justify-between text-xs">
+                                <span id="password-error" class="hidden text-red-500"></span>
+                             
+                            </div>
                         </div>
 
                         <!-- Confirm Password -->
                         <div class="space-y-2">
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
                             <div class="relative">
-                                <input id="confirm_password" name="confirm_password" type="password" required
+                                <input id="confirm_password" name="confirm_password" type="password" required maxlength="50"
                                     value="<?php echo htmlspecialchars($formData['confirm_password'] ?? ''); ?>"
-                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                     placeholder="Confirm your password">
                                 <button type="button" onclick="togglePassword('confirm_password')" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
                                     <svg id="confirm-password-icon-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,6 +115,10 @@ include_once __DIR__ . '/../components/alert-modal.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                                     </svg>
                                 </button>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span id="confirm-password-error" class="hidden text-red-500"></span>
+                             
                             </div>
                         </div>
 
@@ -120,8 +144,8 @@ include_once __DIR__ . '/../components/alert-modal.php';
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit"
-                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        <button type="submit" id="submitBtn"
+                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             Create Account
                         </button>
                     </form>
@@ -179,6 +203,115 @@ include_once __DIR__ . '/../components/alert-modal.php';
             showIcon.classList.remove('hidden');
         }
     }
+
+    // Character limit validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const fields = [{
+                id: 'first_name',
+                limit: 50,
+                errorId: 'first-name-error',
+                countId: 'first-name-count'
+            },
+            {
+                id: 'last_name',
+                limit: 50,
+                errorId: 'last-name-error',
+                countId: 'last-name-count'
+            },
+            {
+                id: 'contact_number',
+                limit: 20,
+                errorId: 'contact-error',
+                countId: 'contact-count'
+            },
+            {
+                id: 'email',
+                limit: 255,
+                errorId: 'email-error',
+                countId: 'email-count'
+            },
+            {
+                id: 'password',
+                limit: 50,
+                errorId: 'password-error',
+                countId: 'password-count'
+            },
+            {
+                id: 'confirm_password',
+                limit: 50,
+                errorId: 'confirm-password-error',
+                countId: 'confirm-password-count'
+            }
+        ];
+
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('signupForm');
+
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errorSpan = document.getElementById(field.errorId);
+            const countSpan = document.getElementById(field.countId);
+
+            input.addEventListener('input', function() {
+                const value = this.value;
+                const length = value.length;
+
+                countSpan.textContent = `${length}/${field.limit}`;
+
+                if (length > field.limit) {
+                    errorSpan.textContent = `Cannot exceed ${field.limit} characters`;
+                    errorSpan.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                } else {
+                    errorSpan.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                }
+
+                validateForm();
+            });
+
+            // Initialize count
+            countSpan.textContent = `${input.value.length}/${field.limit}`;
+        });
+
+        function validateForm() {
+            let isValid = true;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (input.value.length > field.limit || input.value.length === 0) {
+                    isValid = false;
+                }
+            });
+
+            submitBtn.disabled = !isValid;
+        }
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let hasError = false;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const errorSpan = document.getElementById(field.errorId);
+
+                if (input.value.length > field.limit) {
+                    e.preventDefault();
+                    errorSpan.textContent = `Cannot exceed ${field.limit} characters`;
+                    errorSpan.classList.remove('hidden');
+                    input.classList.add('border-red-500');
+                    hasError = true;
+                }
+            });
+
+            if (hasError) {
+                return false;
+            }
+        });
+
+        // Initialize form validation
+        validateForm();
+    });
 </script>
 
 <?php if (!empty($error) && $error === 'Email already exists.'): ?>

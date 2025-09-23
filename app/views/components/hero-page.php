@@ -1,3 +1,4 @@
+
 <section
   class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[650px] flex items-center"
   style="
@@ -17,35 +18,25 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
           <span class="block mb-2">the Smart Way at</span>
           <span class="block">PESO Rosario</span>
         </h2>
-        <h5 class="w-full mb-6 text-sm md:text-md text-primary">
+        <h5 class="w-full mb-4 text-sm md:text-md text-primary">
           Register now and discover job opportunities tailored to your skills with <br> Sikap's AI-powered job matching system.
         </h5>
 
         <!-- Search Component -->
-        <form class="w-full max-w-md mb-4 md:max-w-lg lg:max-w-xl">
+        <form class="w-full max-w-xs mb-2 sm:max-w-md md:max-lg lg:max-w-lg">
           <div class="flex flex-col gap-2 p-3 bg-white rounded-md shadow md:flex-row md:flex-nowrap">
             <!-- Job Title Field -->
             <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
               <img src="assets/icons/search-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Search Icon" />
               <input
                 type="text"
+                id="jobSearchInput"
                 placeholder="Job title"
                 class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
             </div>
-            <!-- Separator -->
-            <div class="hidden w-px h-8 bg-gray-300 md:block"></div>
-            <!-- Location Field -->
-            <div class="flex items-center flex-1 min-w-0 px-2 py-1 mt-2 md:mt-0">
-              <div class="flex items-center flex-1 min-w-0 gap-2 px-2 py-1">
-                <img src="assets/icons/location-information-svgrepo-com.svg" class="w-5 h-5 text-gray-500" alt="Location Icon" />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
-              </div>
-            </div>
+            
             <!-- Search Button -->
-            <button type="submit" class="w-full min-w-0 mt-2 rounded-sm btn-primary md:w-auto md:mt-0 md:ml-2">
+            <button type="submit" class="w-full px-3 py-2 mt-2 text-xs rounded-md btn-primary sm:text-lg md:w-auto md:mt-0 md:ml-2 md:px-4">
               Find Job
             </button>
           </div>
@@ -157,3 +148,55 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 </style>
+
+<script>
+function handleSearchSubmit(event) {
+    event.preventDefault();
+    
+    const searchInput = document.getElementById('jobSearchInput');
+    const searchTerm = searchInput.value.trim();
+    
+    // Find the popular jobs section (adjust selector as needed)
+    const popularJobsSection = document.querySelector('[id*="popular"]') || 
+                              document.querySelector('.popular-jobs') ||
+                              document.querySelector('[class*="popular"]') ||
+                              // Fallback: look for any section after hero
+                              document.querySelector('section:nth-of-type(2)');
+    
+    if (popularJobsSection) {
+        // Smooth scroll to popular jobs section
+        popularJobsSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Optional: If you want to filter jobs based on search term
+        if (searchTerm) {
+            // You can add filtering logic here or pass the search term
+            console.log('Searching for:', searchTerm);
+            
+            // Example: Store search term for filtering
+            sessionStorage.setItem('heroSearchTerm', searchTerm);
+            
+            // Or trigger a custom event for other components to listen to
+            const searchEvent = new CustomEvent('heroSearch', {
+                detail: { searchTerm: searchTerm }
+            });
+            document.dispatchEvent(searchEvent);
+        }
+    } else {
+        console.warn('Popular jobs section not found');
+        // Fallback: scroll to a reasonable position
+        window.scrollTo({
+            top: window.innerHeight,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Optional: Clear search term when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear any stored search term on page load if needed
+    // sessionStorage.removeItem('heroSearchTerm');
+});
+</script>

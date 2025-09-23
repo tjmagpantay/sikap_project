@@ -39,7 +39,7 @@
           <li><a href="#popular-jobs" class="nav-link">Job Search</a></li>
           <li><a href="?page=program-events" class="nav-link">Programs</a></li>
           <li><a href="#top-companies" class="nav-link">Explore Companies</a></li>
-          <li><a href="?page=about-us" class="nav-link">About Us</a></li>
+          <li><a href="?page=about-page" class="nav-link">About Us</a></li>
         </ul>
       </div>
 

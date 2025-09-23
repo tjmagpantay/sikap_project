@@ -130,7 +130,7 @@
 
     <!-- Alert Messages -->
     <?php if (isset($_GET['success'])): ?>
-        <div class="p-4 mb-6 text-green-700 bg-green-100 rounded-lg">
+        <div class="p-4 mb-6 text-sm bg-gray-100 rounded-lg text-primary">
             <?php echo htmlspecialchars($_GET['success']); ?>
         </div>
     <?php endif; ?>

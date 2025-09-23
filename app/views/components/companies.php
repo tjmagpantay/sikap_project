@@ -5,7 +5,7 @@
       <!-- Statistic 1: Active Jobs -->
       <div class="text-center company-stat text-grayMain">
         <div class="mb-2">
-          <span class="text-3xl font-bold lg:text-4xl">1,847</span>
+          <span class="text-3xl font-bold lg:text-4xl">1,000+</span>
         </div>
         <h3 class="mb-3 text-lg font-semibold">Active Jobs</h3>
         <p class="text-sm leading-relaxed text-gray-600">
@@ -16,7 +16,7 @@
       <!-- Statistic 2: Verified Companies -->
       <div class="text-center company-stat text-grayMain">
         <div class="mb-2">
-          <span class="text-3xl font-bold lg:text-4xl">150+</span>
+          <span class="text-3xl font-bold lg:text-4xl">100+</span>
         </div>
         <h3 class="mb-3 text-lg font-semibold">Verified Companies</h3>
         <p class="text-sm leading-relaxed text-gray-600">
@@ -27,11 +27,11 @@
       <!-- Statistic 3: Businesses Listed -->
       <div class="text-center company-stat text-grayMain">
         <div class="mb-2">
-          <span class="text-3xl font-bold lg:text-4xl">500+</span>
+          <span class="text-3xl font-bold lg:text-4xl">100+</span>
         </div>
         <h3 class="mb-3 text-lg font-semibold">Businesses Listed</h3>
         <p class="text-sm leading-relaxed text-gray-600">
-          Explore local and global businesses across diverse industries.
+          Explore local businesses across diverse industries.
         </p>
       </div>
 

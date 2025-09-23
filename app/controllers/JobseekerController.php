@@ -19,6 +19,7 @@ class JobseekerController
     public function signup()
     {
         $error = '';
+        $formData = []; // Add form data for repopulation
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email'] ?? '');
@@ -28,12 +29,21 @@ class JobseekerController
             $last_name = trim($_POST['last_name'] ?? '');
             $contact_number = trim($_POST['contact_number'] ?? '');
 
-            if (empty($email) || empty($password) || empty($first_name) || empty($last_name) || empty($contact_number)) {
-                $error = 'Please fill in all required fields.';
-            } elseif ($password !== $confirm_password) {
-                $error = 'Passwords do not match.';
-            } elseif (strlen($password) < 6) {
-                $error = 'Password must be at least 6 characters long.';
+            // Store form data for repopulation on error
+            $formData = [
+                'email' => $email,
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'contact_number' => $contact_number,
+                'password' => $password,
+                'confirm_password' => $confirm_password
+            ];
+
+            // Enhanced validation with character limits
+            $validationErrors = $this->validateSignupInput($formData);
+
+            if (!empty($validationErrors)) {
+                $error = implode(' ', $validationErrors);
             } elseif ($this->userModel->findByEmail($email)) {
                 $error = 'Email already exists.';
             } else {
@@ -82,18 +92,79 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/signup-jobseeker.php';
     }
 
+    // Add this new validation method
+    private function validateSignupInput($data)
+    {
+        $errors = [];
+
+        // First Name validation
+        if (empty($data['first_name'])) {
+            $errors[] = 'First name is required.';
+        } elseif (strlen($data['first_name']) > 50) {
+            $errors[] = 'First name cannot exceed 50 characters.';
+        }
+
+        // Last Name validation
+        if (empty($data['last_name'])) {
+            $errors[] = 'Last name is required.';
+        } elseif (strlen($data['last_name']) > 50) {
+            $errors[] = 'Last name cannot exceed 50 characters.';
+        }
+
+        // Contact Number validation
+        if (empty($data['contact_number'])) {
+            $errors[] = 'Contact number is required.';
+        } elseif (strlen($data['contact_number']) > 20) {
+            $errors[] = 'Contact number cannot exceed 20 characters.';
+        }
+
+        // Email validation
+        if (empty($data['email'])) {
+            $errors[] = 'Email is required.';
+        } elseif (strlen($data['email']) > 255) {
+            $errors[] = 'Email cannot exceed 255 characters.';
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address.';
+        }
+
+        // Password validation
+        if (empty($data['password'])) {
+            $errors[] = 'Password is required.';
+        } elseif (strlen($data['password']) < 6) {
+            $errors[] = 'Password must be at least 6 characters long.';
+        } elseif (strlen($data['password']) > 50) {
+            $errors[] = 'Password cannot exceed 50 characters.';
+        }
+
+        // Confirm Password validation
+        if (empty($data['confirm_password'])) {
+            $errors[] = 'Please confirm your password.';
+        } elseif (strlen($data['confirm_password']) > 50) {
+            $errors[] = 'Confirm password cannot exceed 50 characters.';
+        } elseif ($data['password'] !== $data['confirm_password']) {
+            $errors[] = 'Passwords do not match.';
+        }
+
+        return $errors;
+    }
+
     //NEWWWWWWWWWWWWW -----------------------------------------------
 
     public function login()
     {
         $error = '';
         $formData = [];
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formData = $_POST;
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
-            if (empty($email) || empty($password)) {
-                $error = 'Please fill in all fields.';
+
+            // Add character limit validation for login
+            $validationErrors = $this->validateLoginInput($email, $password);
+
+            if (!empty($validationErrors)) {
+                $error = implode(' ', $validationErrors);
             } else {
                 $user = $this->userModel->findByEmail($email);
                 if ($user && password_verify($password, $user['password']) && $user['role_id'] == User::ROLE_JOBSEEKER) {
@@ -113,7 +184,32 @@ class JobseekerController
                 }
             }
         }
+
         include __DIR__ . '/../views/jobseekers/login-jobseeker.php';
+    }
+
+    // Add this new validation method for login
+    private function validateLoginInput($email, $password)
+    {
+        $errors = [];
+
+        // Email validation
+        if (empty($email)) {
+            $errors[] = 'Email is required.';
+        } elseif (strlen($email) > 255) {
+            $errors[] = 'Email cannot exceed 255 characters.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address.';
+        }
+
+        // Password validation
+        if (empty($password)) {
+            $errors[] = 'Password is required.';
+        } elseif (strlen($password) > 50) {
+            $errors[] = 'Password cannot exceed 50 characters.';
+        }
+
+        return $errors;
     }
 
     public function sendOtpEmail($to, $otp)
@@ -554,105 +650,150 @@ class JobseekerController
         header('Location: ?page=complete-jobseeker-profile&step=4');
         exit;
     }
-private function handleStep4($data, &$error, &$success)
-{
-    // Work Experience (Combined Current + Previous) - Step 4
-    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-    $jobseeker_id = $jobseeker['jobseeker_id'];
+    private function handleStep4($data, &$error, &$success)
+    {
+        // Work Experience (Combined Current + Previous) - Step 4
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        $jobseeker_id = $jobseeker['jobseeker_id'];
 
-    error_log("DEBUG Step4: Processing data: " . json_encode($data));
+        error_log("DEBUG Step4: Processing data: " . json_encode($data));
 
-    // Check if we are on the current job experience
-    $isCurrentJob = isset($data['currently_working']) && $data['currently_working'] === 'Yes';
-    
-    // Override based on experience_type radio selection
-    if (isset($data['experience_type']) && $data['experience_type'] === 'current') {
-        $isCurrentJob = true;
-        $data['currently_working'] = 'Yes';
-    } elseif (isset($data['experience_type']) && $data['experience_type'] === 'previous') {
-        $isCurrentJob = false;
-        $data['currently_working'] = 'No';
-    }
+        // Check if we are on the current job experience
+        $isCurrentJob = isset($data['currently_working']) && $data['currently_working'] === 'Yes';
 
-    error_log("DEBUG Step4: isCurrentJob = " . ($isCurrentJob ? 'true' : 'false'));
-
-    // Handle delete action
-    if (isset($data['delete_experience'])) {
-        $experience_id = $data['experience_id'];
-        if ($this->jobseekerModel->deleteWorkExperience($jobseeker_id, $experience_id)) {
-            $_SESSION['success_message'] = 'Work experience deleted successfully!';
-        } else {
-            $_SESSION['error_message'] = 'Failed to delete work experience.';
+        // Override based on experience_type radio selection
+        if (isset($data['experience_type']) && $data['experience_type'] === 'current') {
+            $isCurrentJob = true;
+            $data['currently_working'] = 'Yes';
+        } elseif (isset($data['experience_type']) && $data['experience_type'] === 'previous') {
+            $isCurrentJob = false;
+            $data['currently_working'] = 'No';
         }
-        header('Location: ?page=complete-jobseeker-profile&step=4');
-        exit;
-    }
 
-    // Handle update action
-    if (isset($data['update_experience'])) {
-        $experience_id = $data['experience_id'];
-        
-        // Validate required fields for update
-        if (empty($data['job_title']) || empty($data['company_name'])) {
-            $_SESSION['error_message'] = 'Please fill in Job Title and Company Name.';
+        error_log("DEBUG Step4: isCurrentJob = " . ($isCurrentJob ? 'true' : 'false'));
+
+        // Handle delete action
+        if (isset($data['delete_experience'])) {
+            $experience_id = $data['experience_id'];
+            if ($this->jobseekerModel->deleteWorkExperience($jobseeker_id, $experience_id)) {
+                $_SESSION['success_message'] = 'Work experience deleted successfully!';
+            } else {
+                $_SESSION['error_message'] = 'Failed to delete work experience.';
+            }
             header('Location: ?page=complete-jobseeker-profile&step=4');
             exit;
         }
 
-        $workData = [
-            'job_title' => trim($data['job_title']),
-            'company_name' => trim($data['company_name']),
-            'employment_type' => $data['employment_type'] ?? 'full-time',
-            'start_date' => !empty($data['start_date']) ? $data['start_date'] : null,
-            'end_date' => $isCurrentJob ? null : (!empty($data['end_date']) ? $data['end_date'] : null),
-            'currently_working' => $isCurrentJob ? 'Yes' : 'No',
-            'experience_type' => $isCurrentJob ? 'current' : 'previous',
-            'responsibilities' => trim($data['responsibilities'] ?? '')
-        ];
+        // Handle update action
+        if (isset($data['update_experience'])) {
+            $experience_id = $data['experience_id'];
 
-        error_log("DEBUG Step4: Updating with data: " . json_encode($workData));
-
-        // Validate current job limit
-        if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
-            // Check if we're updating a different experience to current
-            $currentJob = $this->jobseekerModel->getCurrentJob($jobseeker_id);
-            if ($currentJob && $currentJob['experience_id'] != $experience_id) {
-                $_SESSION['error_message'] = 'You can only have one current job. Please update your existing current job instead.';
+            // Validate required fields for update
+            if (empty($data['job_title']) || empty($data['company_name'])) {
+                $_SESSION['error_message'] = 'Please fill in Job Title and Company Name.';
                 header('Location: ?page=complete-jobseeker-profile&step=4');
                 exit;
             }
+
+            $workData = [
+                'job_title' => trim($data['job_title']),
+                'company_name' => trim($data['company_name']),
+                'employment_type' => $data['employment_type'] ?? 'full-time',
+                'start_date' => !empty($data['start_date']) ? $data['start_date'] : null,
+                'end_date' => $isCurrentJob ? null : (!empty($data['end_date']) ? $data['end_date'] : null),
+                'currently_working' => $isCurrentJob ? 'Yes' : 'No',
+                'experience_type' => $isCurrentJob ? 'current' : 'previous',
+                'responsibilities' => trim($data['responsibilities'] ?? '')
+            ];
+
+            error_log("DEBUG Step4: Updating with data: " . json_encode($workData));
+
+            // Validate current job limit
+            if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
+                // Check if we're updating a different experience to current
+                $currentJob = $this->jobseekerModel->getCurrentJob($jobseeker_id);
+                if ($currentJob && $currentJob['experience_id'] != $experience_id) {
+                    $_SESSION['error_message'] = 'You can only have one current job. Please update your existing current job instead.';
+                    header('Location: ?page=complete-jobseeker-profile&step=4');
+                    exit;
+                }
+            }
+
+            if ($this->jobseekerModel->updateWorkExperience($jobseeker_id, $workData, $experience_id)) {
+                $_SESSION['success_message'] = 'Work experience updated successfully!';
+            } else {
+                $_SESSION['error_message'] = 'Failed to update work experience.';
+            }
+
+            header('Location: ?page=complete-jobseeker-profile&step=4');
+            exit;
         }
 
-        if ($this->jobseekerModel->updateWorkExperience($jobseeker_id, $workData, $experience_id)) {
-            $_SESSION['success_message'] = 'Work experience updated successfully!';
-        } else {
-            $_SESSION['error_message'] = 'Failed to update work experience.';
-        }
-        
-        header('Location: ?page=complete-jobseeker-profile&step=4');
-        exit;
-    }
+        // Handle "Next Step" button - allow continuing without experience
+        if (isset($data['submit_step4'])) {
+            // Check if user is trying to continue without adding any experience data
+            $hasExistingExperience = !empty($this->jobseekerModel->getWorkExperience($_SESSION['user_id']));
+            $isAddingNewExperience = !empty($data['job_title']) && !empty($data['company_name']);
 
-    // Handle "Next Step" button - allow continuing without experience
-    if (isset($data['submit_step4'])) {
-        // Check if user is trying to continue without adding any experience data
-        $hasExistingExperience = !empty($this->jobseekerModel->getWorkExperience($_SESSION['user_id']));
-        $isAddingNewExperience = !empty($data['job_title']) && !empty($data['company_name']);
+            error_log("DEBUG Step4: hasExistingExperience = " . ($hasExistingExperience ? 'true' : 'false'));
+            error_log("DEBUG Step4: isAddingNewExperience = " . ($isAddingNewExperience ? 'true' : 'false'));
 
-        error_log("DEBUG Step4: hasExistingExperience = " . ($hasExistingExperience ? 'true' : 'false'));
-        error_log("DEBUG Step4: isAddingNewExperience = " . ($isAddingNewExperience ? 'true' : 'false'));
+            // If no existing experience and no new experience being added, just continue
+            if (!$hasExistingExperience && !$isAddingNewExperience) {
+                error_log("DEBUG Step4: No experience, continuing to step 5");
+                header('Location: ?page=complete-jobseeker-profile&step=5');
+                exit;
+            }
 
-        // If no existing experience and no new experience being added, just continue
-        if (!$hasExistingExperience && !$isAddingNewExperience) {
-            error_log("DEBUG Step4: No experience, continuing to step 5");
+            // If adding new experience, validate and save it first
+            if ($isAddingNewExperience) {
+                error_log("DEBUG Step4: Adding new experience before continuing");
+
+                // Validate current job limit for new entries
+                if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
+                    $_SESSION['error_message'] = 'You already have a current job. You can only have one current job at a time.';
+                    header('Location: ?page=complete-jobseeker-profile&step=4');
+                    exit;
+                }
+
+                $workData = [
+                    'job_title' => trim($data['job_title']),
+                    'company_name' => trim($data['company_name']),
+                    'employment_type' => $data['employment_type'] ?? 'full-time',
+                    'start_date' => !empty($data['start_date']) ? $data['start_date'] : null,
+                    'end_date' => $isCurrentJob ? null : (!empty($data['end_date']) ? $data['end_date'] : null),
+                    'currently_working' => $isCurrentJob ? 'Yes' : 'No',
+                    'experience_type' => $isCurrentJob ? 'current' : 'previous',
+                    'responsibilities' => trim($data['responsibilities'] ?? '')
+                ];
+
+                error_log("DEBUG Step4: Saving work data: " . json_encode($workData));
+
+                if (!$this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
+                    $_SESSION['error_message'] = 'Failed to save work experience.';
+                    header('Location: ?page=complete-jobseeker-profile&step=4');
+                    exit;
+                }
+
+                $_SESSION['success_message'] = 'Work experience saved successfully!';
+            }
+
+            // Continue to next step
             header('Location: ?page=complete-jobseeker-profile&step=5');
             exit;
         }
 
-        // If adding new experience, validate and save it first
-        if ($isAddingNewExperience) {
-            error_log("DEBUG Step4: Adding new experience before continuing");
-            
+        // Handle "Add Another" button
+        if (isset($data['add_another'])) {
+            error_log("DEBUG Step4: Add another button clicked");
+
+            // Validate required fields
+            if (empty($data['job_title']) || empty($data['company_name'])) {
+                $_SESSION['error_message'] = 'Please fill in Job Title and Company Name to add experience.';
+                header('Location: ?page=complete-jobseeker-profile&step=4');
+                exit;
+            }
+
             // Validate current job limit for new entries
             if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
                 $_SESSION['error_message'] = 'You already have a current job. You can only have one current job at a time.';
@@ -671,63 +812,18 @@ private function handleStep4($data, &$error, &$success)
                 'responsibilities' => trim($data['responsibilities'] ?? '')
             ];
 
-            error_log("DEBUG Step4: Saving work data: " . json_encode($workData));
+            error_log("DEBUG Step4: Adding work data: " . json_encode($workData));
 
-            if (!$this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
+            if ($this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
+                $_SESSION['success_message'] = 'Work experience added successfully!';
+            } else {
                 $_SESSION['error_message'] = 'Failed to save work experience.';
-                header('Location: ?page=complete-jobseeker-profile&step=4');
-                exit;
             }
-            
-            $_SESSION['success_message'] = 'Work experience saved successfully!';
-        }
 
-        // Continue to next step
-        header('Location: ?page=complete-jobseeker-profile&step=5');
-        exit;
-    }
-
-    // Handle "Add Another" button
-    if (isset($data['add_another'])) {
-        error_log("DEBUG Step4: Add another button clicked");
-        
-        // Validate required fields
-        if (empty($data['job_title']) || empty($data['company_name'])) {
-            $_SESSION['error_message'] = 'Please fill in Job Title and Company Name to add experience.';
             header('Location: ?page=complete-jobseeker-profile&step=4');
             exit;
         }
-
-        // Validate current job limit for new entries
-        if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
-            $_SESSION['error_message'] = 'You already have a current job. You can only have one current job at a time.';
-            header('Location: ?page=complete-jobseeker-profile&step=4');
-            exit;
-        }
-
-        $workData = [
-            'job_title' => trim($data['job_title']),
-            'company_name' => trim($data['company_name']),
-            'employment_type' => $data['employment_type'] ?? 'full-time',
-            'start_date' => !empty($data['start_date']) ? $data['start_date'] : null,
-            'end_date' => $isCurrentJob ? null : (!empty($data['end_date']) ? $data['end_date'] : null),
-            'currently_working' => $isCurrentJob ? 'Yes' : 'No',
-            'experience_type' => $isCurrentJob ? 'current' : 'previous',
-            'responsibilities' => trim($data['responsibilities'] ?? '')
-        ];
-
-        error_log("DEBUG Step4: Adding work data: " . json_encode($workData));
-
-        if ($this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
-            $_SESSION['success_message'] = 'Work experience added successfully!';
-        } else {
-            $_SESSION['error_message'] = 'Failed to save work experience.';
-        }
-        
-        header('Location: ?page=complete-jobseeker-profile&step=4');
-        exit;
     }
-}
     private function handleStep5($data, &$error, &$success)
     {
         // Skills - Step 5

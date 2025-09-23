@@ -12,17 +12,21 @@ include_once __DIR__ . '/../components/navbar.php';
                     <h2 class="mb-2 text-3xl font-bold text-grayMain">Login</h2>
                     <p class="mb-6 text-sm text-gray-600">Sign in to your jobseeker account</p>
                     <?php if (!empty($error)): ?>
-                        <div class="px-4 py-3 mb-6 text-red-600 border border-red-200 rounded-lg bg-red-50">
+                        <div class="px-4 py-3 mb-6 text-xs text-red-600 border border-red-200 rounded-lg ">
                             <?php echo htmlspecialchars($error); ?>
                         </div>
                     <?php endif; ?>
 
-                    <form class="space-y-6" method="POST" action="?page=login-jobseeker">
+                    <form class="space-y-6" method="POST" action="?page=login-jobseeker" id="loginForm">
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input id="email" name="email" type="email" required
+                            <input id="email" name="email" type="email" required maxlength="255"
                                 value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
-                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                            <div class="flex justify-between text-xs">
+                                <span id="email-error" class="hidden text-red-500"></span>
+                                
+                            </div>
                         </div>
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
@@ -32,8 +36,8 @@ include_once __DIR__ . '/../components/navbar.php';
                                 </a>
                             </div>
                             <div class="relative">
-                                <input id="password" name="password" type="password" required
-                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                <input id="password" name="password" type="password" required maxlength="50"
+                                    class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                                 <button type="button" onclick="togglePassword()" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
                                     <svg id="password-icon-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -44,9 +48,14 @@ include_once __DIR__ . '/../components/navbar.php';
                                     </svg>
                                 </button>
                             </div>
+                            <div class="flex justify-between text-xs">
+                                <span id="password-error" class="hidden text-red-500"></span>
+                                
+                            </div>
                         </div>
                         <button type="submit"
-                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            id="submitBtn">
                             Sign In
                         </button>
                     </form>
@@ -136,8 +145,89 @@ include_once __DIR__ . '/../components/navbar.php';
         }
     }
 
-    // Image Carousel
+    // Validation and character counting
     document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailCount = document.getElementById('email-count');
+        const passwordCount = document.getElementById('password-count');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('loginForm');
+
+        // Email validation and character count
+        emailInput.addEventListener('input', function() {
+            const value = this.value;
+            const length = value.length;
+
+            emailCount.textContent = `${length}/255`;
+
+            if (length > 255) {
+                emailError.textContent = 'Email cannot exceed 255 characters';
+                emailError.classList.remove('hidden');
+                this.classList.add('border-red-500');
+            } else {
+                emailError.classList.add('hidden');
+                this.classList.remove('border-red-500');
+            }
+
+            validateForm();
+        });
+
+        // Password validation and character count
+        passwordInput.addEventListener('input', function() {
+            const value = this.value;
+            const length = value.length;
+
+            passwordCount.textContent = `${length}/50`;
+
+            if (length > 50) {
+                passwordError.textContent = 'Password cannot exceed 50 characters';
+                passwordError.classList.remove('hidden');
+                this.classList.add('border-red-500');
+            } else {
+                passwordError.classList.add('hidden');
+                this.classList.remove('border-red-500');
+            }
+
+            validateForm();
+        });
+
+        function validateForm() {
+            const emailValid = emailInput.value.length > 0 && emailInput.value.length <= 255;
+            const passwordValid = passwordInput.value.length > 0 && passwordInput.value.length <= 50;
+
+            if (emailValid && passwordValid) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            if (emailInput.value.length > 255) {
+                e.preventDefault();
+                emailError.textContent = 'Email cannot exceed 255 characters';
+                emailError.classList.remove('hidden');
+                return false;
+            }
+
+            if (passwordInput.value.length > 50) {
+                e.preventDefault();
+                passwordError.textContent = 'Password cannot exceed 50 characters';
+                passwordError.classList.remove('hidden');
+                return false;
+            }
+        });
+
+        // Initialize counts
+        emailCount.textContent = `${emailInput.value.length}/255`;
+        passwordCount.textContent = `${passwordInput.value.length}/50`;
+        validateForm();
+
+        // Image Carousel
         const images = document.querySelectorAll('.carousel-img');
         const dots = document.querySelectorAll('.carousel-dot');
         let currentIndex = 0;
