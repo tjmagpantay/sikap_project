@@ -884,85 +884,9 @@ class AdminDashboardController
     }
 
     /**
-     * Get comprehensive report statistics (using fallback data for now)
-     */
-    private function getReportStats()
-    {
-        try {
-            // For now, we'll use sample data since some model methods don't exist yet
-            // TODO: Implement actual data retrieval when models are updated
-
-            /*
-            // Future implementation when models have the required methods:
-            $totalJobseekers = $this->userManagementModel->getUserCount('jobseeker');
-            $totalEmployers = $this->userManagementModel->getUserCount('employer');
-            $jobStats = $this->jobPostModel->getJobStatistics();
-            
-            require_once __DIR__ . '/../models/JobApplication.php';
-            $jobApplicationModel = new JobApplication();
-            $applicationStats = $jobApplicationModel->getApplicationStatsForAdmin();
-            */
-
-            return $this->getDefaultReportStats();
-        } catch (Exception $e) {
-            error_log('Error getting report stats: ' . $e->getMessage());
-            return $this->getDefaultReportStats();
-        }
-    }
-
-    /**
-     * Get monthly activity data for charts (using sample data for now)
-     */
-    private function getMonthlyData()
-    {
-        try {
-            // TODO: Implement actual data retrieval when models are updated
-            return $this->getDefaultMonthlyData();
-        } catch (Exception $e) {
-            error_log('Error getting monthly data: ' . $e->getMessage());
-            return $this->getDefaultMonthlyData();
-        }
-    }
-
-    /**
-     * Get job category distribution data (using sample data for now)
-     */
-    private function getCategoryData()
-    {
-        try {
-            // TODO: Implement actual data retrieval when models are updated
-            /*
-            // Future implementation:
-            $categoryData = $this->jobPostModel->getJobsByCategory();
-            */
-
-            return $this->getDefaultCategoryData();
-        } catch (Exception $e) {
-            error_log('Error getting category data: ' . $e->getMessage());
-            return $this->getDefaultCategoryData();
-        }
-    }
-
-    /**
      * Get application status distribution data (using sample data for now)
      */
-    private function getApplicationStatusData()
-    {
-        try {
-            // TODO: Implement actual data retrieval when models are updated
-            /*
-            // Future implementation:
-            require_once __DIR__ . '/../models/JobApplication.php';
-            $jobApplicationModel = new JobApplication();
-            $statusData = $jobApplicationModel->getApplicationStatusDistribution();
-            */
 
-            return $this->getDefaultApplicationStatusData();
-        } catch (Exception $e) {
-            error_log('Error getting application status data: ' . $e->getMessage());
-            return $this->getDefaultApplicationStatusData();
-        }
-    }
 
     // Default/Sample data methods
     private function getDefaultReportStats()
@@ -980,16 +904,6 @@ class AdminDashboardController
         ];
     }
 
-    private function getDefaultMonthlyData()
-    {
-        return [
-            'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-            'job_posts' => [45, 52, 38, 67, 49, 58],
-            'applications' => [186, 305, 237, 173, 209, 214],
-            'registrations' => [23, 31, 19, 42, 28, 35]
-        ];
-    }
-
     private function getDefaultCategoryData()
     {
         return [
@@ -999,17 +913,234 @@ class AdminDashboardController
         ];
     }
 
-    private function getDefaultApplicationStatusData()
+
+    private function getReportStats()
     {
+        try {
+            // Get real statistics from the model
+            return $this->adminDashboardModel->getReportStatistics();
+        } catch (Exception $e) {
+            error_log('Error getting report stats: ' . $e->getMessage());
+            return [
+                'total_users' => 0,
+                'total_employers' => 0,
+                'total_jobseekers' => 0,
+                'active_jobs' => 0,
+                'total_applications' => 0,
+                'pending_applications' => 0,
+                'total_events' => 0
+            ];
+        }
+    }
+
+
+private function getCategoryData()
+{
+    try {
+        // Initialize job categories if table is empty
+        $this->adminDashboardModel->initializeJobCategories();
+
+        // ✅ FIXED: Use the new method that gets ALL categories (like main-board approach)
+        $data = $this->adminDashboardModel->getAllJobCategoriesDistribution();
+        
+        // ✅ DEBUG: Log the data being returned
+        error_log('=== CATEGORY DATA DEBUG IN CONTROLLER ===');
+        error_log('Data returned from model: ' . json_encode($data));
+        error_log('Categories count: ' . count($data['categories'] ?? []));
+        error_log('Values count: ' . count($data['values'] ?? []));
+        error_log('Colors count: ' . count($data['colors'] ?? []));
+        error_log('=== END CATEGORY DEBUG ===');
+        
+        return $data;
+    } catch (Exception $e) {
+        error_log('Error getting category data: ' . $e->getMessage());
         return [
-            'labels' => ['Pending', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'],
-            'values' => [145, 89, 234, 290, 187],
-            'colors' => ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6']
+            'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+            'values' => [0, 0, 0, 0, 0, 0, 0, 0],
+            'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#F59E0B']
+        ];
+    }
+}
+
+private function getApplicationStatusData()
+{
+    try {
+        // ✅ Use the new model method to get real data
+        $data = $this->adminDashboardModel->getApplicationStatusDistribution();
+        
+        error_log('=== APPLICATION STATUS DATA DEBUG ===');
+        error_log('Application status data from model: ' . json_encode($data));
+        error_log('Labels: ' . json_encode($data['labels'] ?? []));
+        error_log('Values: ' . json_encode($data['values'] ?? []));
+        error_log('Total applications: ' . ($data['total'] ?? 0));
+        error_log('=== END APPLICATION STATUS DEBUG ===');
+        
+        return $data;
+    } catch (Exception $e) {
+        error_log('Error getting application status data: ' . $e->getMessage());
+        return $this->getDefaultApplicationStatusData();
+    }
+}
+
+/**
+ * ✅ UPDATED: Enhanced default application status data
+ */
+private function getDefaultApplicationStatusData()
+{
+    return [
+        'labels' => ['Pending', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'],
+        'values' => [0, 0, 0, 0, 0],
+        'colors' => ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6'],
+        'total' => 0
+    ];
+}
+
+
+private function getUserGrowthData()
+{
+    error_log('=== getUserGrowthData METHOD CALLED ===');
+    
+    try {
+        // ✅ Use the AdminDashboard model method (same approach as main-board)
+        $realData = $this->adminDashboardModel->getUserGrowthTrends();
+        
+        error_log('=== REAL DATA FROM MODEL ===');
+        error_log('Real user growth data: ' . json_encode($realData));
+        
+        // ✅ Check if we have valid data, otherwise use fallback
+        if (!empty($realData['months']) && !empty($realData['jobseekers']) && !empty($realData['employers'])) {
+            return $realData;
+        }
+        
+        // ✅ Fallback data (same as main-board approach)
+        $fallbackData = [
+            'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            'jobseekers' => [5, 8, 12, 15, 18, 22],
+            'employers' => [2, 3, 4, 5, 6, 7]
+        ];
+        
+        error_log('=== USING FALLBACK DATA ===');
+        error_log('Fallback user growth data: ' . json_encode($fallbackData));
+        
+        return $fallbackData;
+        
+    } catch (Exception $e) {
+        error_log('Error getting user growth data: ' . $e->getMessage());
+        return [
+            'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            'jobseekers' => [0, 0, 0, 0, 0, 0],
+            'employers' => [0, 0, 0, 0, 0, 0]
+        ];
+    }
+}
+
+    private function getMonthlyData()
+    {
+        try {
+            // Get real monthly activity trends from the model
+            return $this->adminDashboardModel->getMonthlyActivityTrends();
+        } catch (Exception $e) {
+            error_log('Error getting monthly data: ' . $e->getMessage());
+
+            // Return fallback data with current months
+            $fallbackMonths = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $fallbackMonths[] = date('M', strtotime("-$i months"));
+            }
+
+            return [
+                'months' => $fallbackMonths,
+                'job_posts' => [0, 0, 0, 0, 0, 0],
+                'applications' => [0, 0, 0, 0, 0, 0],
+                'registrations' => [0, 0, 0, 0, 0, 0]
+            ];
+        }
+    }
+
+    // Also update the getDefaultMonthlyData method to use current months:
+    private function getDefaultMonthlyData()
+    {
+        $months = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $months[] = date('M', strtotime("-$i months"));
+        }
+
+        return [
+            'months' => $months,
+            'job_posts' => [0, 0, 0, 0, 0, 0],
+            'applications' => [0, 0, 0, 0, 0, 0],
+            'registrations' => [0, 0, 0, 0, 0, 0]
         ];
     }
 
-    // Remove the unused helper methods that were causing errors
-    // These can be implemented later when the actual data methods are needed
 
-    // ... rest of your existing methods ...
+/**
+ * ✅ UPDATED: Simplified allReports method using same approach as main-board
+ */
+public function allReports()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        header('Location: ?page=admin-login');
+        exit;
+    }
+
+    try {
+        // ✅ Get report statistics using model methods
+        $reportStats = $this->adminDashboardModel->getReportStatistics();
+        
+        // ✅ Get category data using the SAME approach as main-board
+        $categoryData = $this->getCategoryData();
+        
+        // ✅ Get monthly data using model method
+        $monthlyData = $this->adminDashboardModel->getMonthlyActivityTrends();
+        
+        // ✅ Get user growth data using model method
+        $userGrowthData = $this->getUserGrowthData();
+        
+        // ✅ FIXED: Get real application status data
+        $applicationStatusData = $this->getApplicationStatusData();
+
+        // ✅ OPTIONAL: Get detailed application statistics for additional insights
+        $applicationStats = $this->adminDashboardModel->getApplicationStatistics();
+
+        // Set error/success messages
+        $error = $_GET['error'] ?? '';
+        $success = $_GET['success'] ?? '';
+
+        // ✅ DEBUG: Log final data before view
+        error_log('=== FINAL ALLREPORTS DATA ===');
+        error_log('Report stats: ' . json_encode($reportStats));
+        error_log('Category data: ' . json_encode($categoryData));
+        error_log('Monthly data: ' . json_encode($monthlyData));
+        error_log('User growth data: ' . json_encode($userGrowthData));
+        error_log('Application status data: ' . json_encode($applicationStatusData));
+        error_log('Application statistics: ' . json_encode($applicationStats));
+        error_log('=== END FINAL DATA ===');
+
+    } catch (Exception $e) {
+        error_log('Error in allReports: ' . $e->getMessage());
+        $error = 'Failed to load report data.';
+        
+        // Set fallback data
+        $reportStats = $this->getDefaultReportStats();
+        $categoryData = [
+            'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+            'values' => [0, 0, 0, 0, 0, 0, 0, 0],
+            'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#B0AEAE']
+        ];
+        $monthlyData = $this->getDefaultMonthlyData();
+        $userGrowthData = [
+            'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            'jobseekers' => [5, 8, 12, 15, 18, 22],
+            'employers' => [2, 3, 4, 5, 6, 7]
+        ];
+        $applicationStatusData = $this->getDefaultApplicationStatusData();
+        $applicationStats = ['overall' => ['total_applications' => 0], 'monthly_trends' => []];
+        $success = '';
+    }
+
+    include __DIR__ . '/../views/admin/dashboard.php';
+}
+
+    
 }

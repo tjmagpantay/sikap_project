@@ -196,7 +196,7 @@
                 </svg>
                 <span>Settings</span>
             </a>
-            <a href="?page=logout" class="flex items-center px-4 py-2 text-sm font-normal text-red-600 transition-colors rounded-lg hover:bg-red-50">
+            <a href="?page=admin-login" class="flex items-center px-4 py-2 text-sm font-normal text-red-600 transition-colors rounded-lg hover:bg-red-50">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>

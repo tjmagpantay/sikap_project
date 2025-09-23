@@ -21,7 +21,7 @@
 
         <!-- Action Buttons (Desktop) -->
         <div class="items-center hidden lg:flex lg:block">
-            <a href="?page=login-employer" class="ml-2 btn-primary">
+            <a href="?page=landing" class="ml-2 btn-primary">
                 Home
             </a>
         </div>

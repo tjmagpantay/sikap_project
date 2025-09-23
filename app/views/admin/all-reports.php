@@ -14,19 +14,16 @@
                     Comprehensive analytics and reporting dashboard for SIKAP platform insights
                 </p>
             </div>
-            <div class="flex items-center space-x-3">
-                <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <div class="flex items-center">
+                <button class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
+                    <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    Export Report
+                    <?php
+                    date_default_timezone_set('Asia/Manila');
+                    echo date('M j, Y'); // Example: Sep 22, 2025
+                    ?>
                 </button>
-                <select class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                    <option>Last 30 Days</option>
-                    <option>Last 3 Months</option>
-                    <option>Last 6 Months</option>
-                    <option>Last Year</option>
-                </select>
             </div>
         </div>
     </div>
@@ -50,7 +47,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-primary">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-md bg-primary">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
@@ -58,7 +55,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Total Users</p>
-                    <p class="text-2xl font-semibold text-gray-900"><?php echo number_format($reportStats['total_users'] ?? 0); ?></p>
+                    <p class="text-xl font-semibold text-gray-900"><?php echo number_format($reportStats['total_users'] ?? 0); ?></p>
                 </div>
             </div>
         </div>
@@ -67,7 +64,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-secondary">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-md bg-secondary">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
@@ -84,7 +81,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 bg-green-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-green-600 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
@@ -101,7 +98,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0v2m-8-2v2m0 0v6a2 2 0 002 2h4a2 2 0 002-2V8H8z"></path>
                         </svg>
@@ -118,7 +115,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 bg-purple-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-purple-600 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
@@ -131,19 +128,19 @@
             </div>
         </div>
 
-        <!-- Pending Applications -->
+        <!-- Events Programs -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 bg-yellow-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-yellow-600 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Pending</p>
-                    <p class="text-2xl font-semibold text-gray-900"><?php echo number_format($reportStats['pending_applications'] ?? 0); ?></p>
+                    <p class="text-sm font-medium text-gray-600">Events</p>
+                    <p class="text-2xl font-semibold text-gray-900"><?php echo number_format($reportStats['total_events'] ?? 0); ?></p>
                 </div>
             </div>
         </div>
@@ -177,6 +174,19 @@
             </div>
         </div>
 
+        <!-- User Growth Chart -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div class="p-6 pb-4">
+                <h3 class="text-lg font-semibold text-gray-900">User Growth Analysis</h3>
+                <p class="mt-1 text-sm text-gray-600">Jobseekers vs Employers registration trends</p>
+            </div>
+            <div class="p-6 pt-0">
+                <div class="w-full h-80">
+                    <canvas id="userGrowthChart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Application Status Chart -->
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="p-6 pb-4">
@@ -190,37 +200,39 @@
             </div>
         </div>
 
-        <!-- User Growth Chart -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div class="p-6 pb-4">
-                <h3 class="text-lg font-semibold text-gray-900">User Growth Analysis</h3>
-                <p class="mt-1 text-sm text-gray-600">Jobseekers vs Employers registration trends</p>
-            </div>
-            <div class="p-6 pt-0">
-                <div class="w-full h-80">
-                    <canvas id="userGrowthChart" class="w-full h-full"></canvas>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
 
 <!-- Chart.js Integration -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Define color scheme
+    // Define color scheme - SIKAP Theme Colors
     const colors = {
-        primary: '#092C4C',
-        secondary: '#F3AF0E',
-        success: '#10B981',
-        danger: '#EF4444',
-        warning: '#F59E0B',
-        info: '#3B82F6',
+        primary: '#092C4C', // Dark Blue
+        secondary: '#F3AF0E', // Orange/Yellow
+        success: '#10B981', // Green
+        danger: '#EF4444', // Red
+        info: '#3B82F6', // Blue
+        gray: '#6B7280', // Gray
+        warning: '#F59E0B', // Yellow
         light: '#F8FAFC',
         dark: '#1F2937'
     };
 
-    // Monthly Trends Bar Chart
+    // Job Category Color Palette (all 8 colors)
+    const jobCategoryColors = [
+        '#092C4C', // primary - Dark Blue
+        '#F3AF0E', // secondary - Orange
+        '#10B981', // success - Green
+        '#EF4444', // danger - Red
+        '#3B82F6', // info - Blue
+        '#6B7280', // gray - Gray
+        '#8B5CF6', // purple
+        '#B0AEAE' //Others
+    ];
+
+    // Monthly Trends Bar Chart (working - unchanged)
     const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
     new Chart(monthlyTrendsCtx, {
         type: 'bar',
@@ -267,17 +279,31 @@
         }
     });
 
-    // Job Categories Pie Chart
+    // ✅ FIXED: Job Categories Pie Chart using EXACT same approach as main-board
     const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+
+    // ✅ Use same mock/fallback data approach as main-board
+    const mockCategoryData = {
+        categories: ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+        values: [0, 0, 0, 0, 0, 0, 0, 0],
+        colors: jobCategoryColors
+    };
+
+    // ✅ Use real data if available, otherwise use mock data (EXACT same as main-board)
+    const categoryData = <?php echo isset($categoryData) ? json_encode($categoryData) : 'mockCategoryData'; ?>;
+
+
     new Chart(categoriesCtx, {
         type: 'doughnut',
         data: {
-            labels: <?php echo json_encode($categoryData['categories'] ?? []); ?>,
+            labels: categoryData.categories,
             datasets: [{
-                data: <?php echo json_encode($categoryData['values'] ?? []); ?>,
-                backgroundColor: <?php echo json_encode($categoryData['colors'] ?? []); ?>,
+                data: categoryData.values,
+                backgroundColor: categoryData.colors,
                 borderWidth: 2,
-                borderColor: '#ffffff'
+                borderColor: '#ffffff',
+                hoverOffset: 4,
+                hoverBorderWidth: 3
             }]
         },
         options: {
@@ -288,25 +314,192 @@
                     position: 'right',
                     labels: {
                         usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const dataset = data.datasets[0];
+                                    const value = dataset.data[i] || 0;
+                                    const total = dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: dataset.backgroundColor[i],
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: dataset.borderWidth,
+                                        hidden: isNaN(dataset.data[i]),
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} jobs (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1500
+            }
+        }
+    });
+
+
+    // ...existing code...
+
+    // ✅ FIXED: User Growth Chart with proper debug and fallback data (SAME AS MAIN-BOARD)
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+
+    // ✅ Set up fallback data (SAME AS MAIN-BOARD)
+    const mockUserGrowthData = {
+        months: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+        jobseekers: [5, 8, 12, 15, 18, 22],
+        employers: [2, 3, 4, 5, 6, 7]
+    };
+
+    // ✅ Use real data if available, otherwise use mock data (SAME AS MAIN-BOARD APPROACH)
+    const userGrowthData = <?php echo isset($userGrowthData) && !empty($userGrowthData['months']) ? json_encode($userGrowthData) : 'mockUserGrowthData'; ?>;
+
+    console.log('Final userGrowthData for chart:', userGrowthData);
+
+    new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: userGrowthData.months,
+            datasets: [{
+                label: 'Jobseekers',
+                data: userGrowthData.jobseekers,
+                borderColor: colors.primary,
+                backgroundColor: colors.primary + '20',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: colors.primary,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }, {
+                label: 'Employers',
+                data: userGrowthData.employers,
+                borderColor: colors.secondary,
+                backgroundColor: colors.secondary + '20',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: colors.secondary,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
                         padding: 20
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            return `${label}: ${value} registrations`;
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'New Registrations'
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        color: '#F3F4F6'
                     }
                 }
             }
         }
     });
 
-    // Application Status Chart
+    // ...existing code...
+
+
+    // ✅ FIXED: Application Status Chart with REAL DATA
     const applicationStatusCtx = document.getElementById('applicationStatusChart').getContext('2d');
+
+    // ✅ DEBUG: Check if applicationStatusData is available
+    console.log('=== APPLICATION STATUS CHART DEBUG ===');
+    console.log('applicationStatusData from PHP:', <?php echo json_encode($applicationStatusData ?? []); ?>);
+
+    // ✅ Set up fallback data
+    const mockApplicationStatusData = {
+        labels: ['Pending', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'],
+        values: [0, 0, 0, 0, 0],
+        colors: applicationStatusColors,
+        total: 0
+    };
+
+    // ✅ Use real data if available, otherwise use mock data
+    const applicationStatusData = <?php echo isset($applicationStatusData) && !empty($applicationStatusData['labels']) ? json_encode($applicationStatusData) : 'mockApplicationStatusData'; ?>;
+
+    console.log('Final applicationStatusData for chart:', applicationStatusData);
+    console.log('Labels:', applicationStatusData.labels);
+    console.log('Values:', applicationStatusData.values);
+    console.log('Total applications:', applicationStatusData.total || 0);
+    console.log('=== END APPLICATION STATUS DEBUG ===');
+
     new Chart(applicationStatusCtx, {
         type: 'bar',
         data: {
-            labels: <?php echo json_encode($applicationStatusData['labels'] ?? []); ?>,
+            labels: applicationStatusData.labels,
             datasets: [{
                 label: 'Applications',
-                data: <?php echo json_encode($applicationStatusData['values'] ?? []); ?>,
-                backgroundColor: <?php echo json_encode($applicationStatusData['colors'] ?? []); ?>,
+                data: applicationStatusData.values,
+                backgroundColor: applicationStatusData.colors || applicationStatusColors,
                 borderRadius: 6,
                 borderSkipped: false,
+                borderWidth: 1,
+                borderColor: '#ffffff'
             }]
         },
         options: {
@@ -316,6 +509,17 @@
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed.x;
+                            const total = applicationStatusData.total || context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} applications (${percentage}%)`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -323,59 +527,21 @@
                     beginAtZero: true,
                     grid: {
                         color: '#F3F4F6'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Applications'
                     }
                 },
                 y: {
                     grid: {
                         display: false
                     }
-                }
-            }
-        }
-    });
-
-    // User Growth Chart
-    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
-    new Chart(userGrowthCtx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode($monthlyData['months'] ?? []); ?>,
-            datasets: [{
-                label: 'Jobseekers',
-                data: [18, 25, 15, 32, 21, 28],
-                borderColor: colors.primary,
-                backgroundColor: colors.primary + '20',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'Employers',
-                data: [5, 6, 4, 10, 7, 7],
-                borderColor: colors.secondary,
-                backgroundColor: colors.secondary + '20',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
                 }
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: '#F3F4F6'
-                    }
-                }
+            animation: {
+                duration: 1500,
+                easing: 'easeInOutQuart'
             }
         }
     });
