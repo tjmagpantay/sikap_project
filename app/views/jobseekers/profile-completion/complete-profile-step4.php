@@ -118,9 +118,9 @@ if (!empty($workExperience)) {
             <?php if ($currentWork): ?>
                 <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-medium text-gray-900">Current Employment</h3>
+                        <h3 class="font-medium text-gray-900 text-md">Current Employment</h3>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5  text-xs font-medium bg-blue-100 text-primary">
+                            <span class="inline-flex items-center px-2.5 py-0.5  text-xs font-medium bg-blue-100 text-primary rounded-md">
                                 Currently Working
                             </span>
                             <button onclick="editExperience(<?php echo $currentWork['experience_id']; ?>)" class="text-blue-600 hover:text-blue-800">
@@ -146,22 +146,22 @@ if (!empty($workExperience)) {
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2">
-                        <div class="p-3 rounded-md bg-gray-50">
+                        <div class="p-3 rounded-md ">
                             <p class="text-xs font-medium text-gray-500">Job Title</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['job_title']); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md bg-gray-50">
+                        <div class="p-3 rounded-md ">
                             <p class="text-xs font-medium text-gray-500">Company</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['company_name']); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md bg-gray-50">
+                        <div class="p-3 rounded-md ">
                             <p class="text-xs font-medium text-gray-500">Employment Type</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars(ucfirst($currentWork['employment_type'])); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md bg-gray-50">
+                        <div class="p-3 rounded-md ">
                             <p class="text-xs font-medium text-gray-500">Start Date</p>
                             <p class="mt-1 text-sm font-medium text-gray-900">
                                 <?php echo $currentWork['start_date'] ? date('F Y', strtotime($currentWork['start_date'])) : 'N/A'; ?>
