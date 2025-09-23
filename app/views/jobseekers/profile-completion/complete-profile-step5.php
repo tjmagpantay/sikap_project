@@ -17,6 +17,7 @@ if (isset($_SESSION['error_message'])) {
 $parsedSkills = [];
 if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed_resume_data']['skills'])) {
     $parsedSkills = $_SESSION['parsed_resume_data']['skills'];
+    error_log("🔍 DEBUG: Found " . count($parsedSkills) . " parsed skills: " . json_encode($parsedSkills));
 }
 ?>
 
@@ -134,12 +135,12 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
             <!-- Display existing skills if available -->
             <?php if (!empty($skills) && is_array($skills) && count($skills) > 0): ?>
                 <div class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-                    <h3 class="mb-4 font-medium text-gray-900 text-md">Your Current Skills</h3>
+                    <h3 class="mb-4 text-sm font-medium text-primary">Your Current Skills</h3>
                     <div class="flex flex-wrap gap-2">
                         <?php foreach ($skills as $skill): ?>
-                            <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-primary">
+                            <div class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 border rounded-md">
                                 <?php echo htmlspecialchars($skill['skill_name']); ?>
-                                <span class="ml-2 text-xs font-medium text-blue-600">
+                                <span class="ml-2 text-xs text-gary-400">
                                     (<?php echo htmlspecialchars($skill['proficiency_level']); ?>)
                                 </span>
                             </div>
@@ -150,24 +151,22 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
 
             <!-- Display parsed skills if available -->
             <?php if (!empty($parsedSkills)): ?>
-                <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
-                    <h3 class="mb-2 text-sm font-medium text-green-800">
-                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50">
+                    <h3 class="mb-2 text-sm font-medium text-primary">
+                      
                         Skills extracted from your resume:
                     </h3>
                     <div class="flex flex-wrap gap-2">
                         <?php foreach ($parsedSkills as $skill): ?>
-                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md">
                                 <?php echo htmlspecialchars($skill['skill_name']); ?>
                                 <?php if (isset($skill['esco_uri']) && !empty($skill['esco_uri'])): ?>
-                                    <span class="ml-1 text-xs text-green-600">(ESCO)</span>
+                                    <span class="ml-1 text-xs text-gray-600">(ESCO)</span>
                                 <?php endif; ?>
                             </span>
                         <?php endforeach; ?>
                     </div>
-                    <p class="mt-2 text-xs text-green-600">These skills have been automatically added below. You can edit or add more.</p>
+                    <p class="mt-2 text-xs text-gray-400">These skills have been automatically added to the form below. You can edit or add more.</p>
                 </div>
             <?php endif; ?>
 
@@ -176,18 +175,42 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                     <label class="block mb-3 text-xs font-medium text-gray-500">Skills</label>
                     <div id="skills-container">
                         <?php
+                        // FIXED: Proper merging logic to avoid duplicates and include parsed skills
                         $allSkills = [];
+                        $skillNames = []; // Track skill names to avoid duplicates
 
-                        // First add existing skills from database
-                        if (!empty($skills) && $skills !== false) {
+                        error_log("🔍 DEBUG: Building allSkills array");
+                        error_log("🔍 DEBUG: Existing DB skills count: " . (is_array($skills) ? count($skills) : 0));
+                        error_log("🔍 DEBUG: Parsed skills count: " . count($parsedSkills));
+
+                        // First, add existing skills from database if available
+                        if (!empty($skills) && is_array($skills)) {
                             foreach ($skills as $skill) {
-                                $allSkills[] = $skill;
-                            }
-                        } else {
-                            // Only add parsed skills if no database skills exist
-                            if (!empty($parsedSkills)) {
-                                foreach ($parsedSkills as $skill) {
+                                $skillName = strtolower(trim($skill['skill_name']));
+                                if (!empty($skillName) && !in_array($skillName, $skillNames)) {
                                     $allSkills[] = $skill;
+                                    $skillNames[] = $skillName;
+                                    error_log("✅ DEBUG: Added existing skill: " . $skill['skill_name']);
+                                }
+                            }
+                        }
+
+                        // Then, add parsed skills that aren't already in the database
+                        if (!empty($parsedSkills)) {
+                            foreach ($parsedSkills as $parsedSkill) {
+                                $skillName = strtolower(trim($parsedSkill['skill_name']));
+                                if (!empty($skillName) && !in_array($skillName, $skillNames)) {
+                                    // Add parsed skill without skill_id (new skill)
+                                    $skillToAdd = [
+                                        'skill_name' => $parsedSkill['skill_name'],
+                                        'proficiency_level' => $parsedSkill['proficiency_level'] ?? 'Intermediate',
+                                        'esco_uri' => $parsedSkill['esco_uri'] ?? null
+                                    ];
+                                    $allSkills[] = $skillToAdd;
+                                    $skillNames[] = $skillName;
+                                    error_log("✅ DEBUG: Added parsed skill: " . $parsedSkill['skill_name']);
+                                } else {
+                                    error_log("⚠️ DEBUG: Skipped duplicate parsed skill: " . $parsedSkill['skill_name']);
                                 }
                             }
                         }
@@ -195,13 +218,24 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                         // If no skills at all, add one empty row
                         if (empty($allSkills)) {
                             $allSkills[] = ['skill_name' => '', 'proficiency_level' => 'Intermediate'];
+                            error_log("ℹ️ DEBUG: Added empty skill row");
                         }
+
+                        error_log("🔍 DEBUG: Final allSkills count: " . count($allSkills));
 
                         foreach ($allSkills as $index => $skill): ?>
                             <div class="flex gap-4 mb-4 skill-row" data-index="<?php echo $index; ?>">
                                 <!-- Hidden field for skill ID if it exists -->
                                 <?php if (isset($skill['skill_id'])): ?>
                                     <input type="hidden" name="skills[<?php echo $index; ?>][skill_id]" value="<?php echo $skill['skill_id']; ?>">
+                                    <?php error_log("🔍 DEBUG: Skill {$index} has skill_id: {$skill['skill_id']}"); ?>
+                                <?php else: ?>
+                                    <?php error_log("🔍 DEBUG: Skill {$index} is new (no skill_id)"); ?>
+                                <?php endif; ?>
+
+                                <!-- Hidden field for ESCO URI if it exists -->
+                                <?php if (isset($skill['esco_uri']) && !empty($skill['esco_uri'])): ?>
+                                    <input type="hidden" name="skills[<?php echo $index; ?>][esco_uri]" value="<?php echo htmlspecialchars($skill['esco_uri']); ?>">
                                 <?php endif; ?>
 
                                 <!-- Skill Name Input -->
@@ -211,9 +245,10 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                         value="<?php echo htmlspecialchars($skill['skill_name'] ?? ''); ?>"
                                         placeholder="Enter skill name"
                                         maxlength="50"
-                                        class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                        class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary hover:border-gray-400 <?php echo (!empty($skill['skill_name']) && !isset($skill['skill_id'])) ? 'bg-gray-100 border-gray-400' : ''; ?>"
                                         oninput="validateSkillName(this)"
-                                        data-skill-index="<?php echo $index; ?>">
+                                        data-skill-index="<?php echo $index; ?>"
+                                        <?php echo (!empty($skill['skill_name']) && !isset($skill['skill_id'])) ? 'title="This skill was extracted from your resume"' : ''; ?>>
                                     <div id="skill_name_error_<?php echo $index; ?>" class="hidden mt-1 text-xs text-red-600"></div>
                                 </div>
 
@@ -221,7 +256,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                 <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: '<?php echo htmlspecialchars($skill['proficiency_level'] ?? 'Intermediate'); ?>' }">
                                     <button type="button" @click="open = !open"
                                         @click.away="open = false"
-                                        class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                                        class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary <?php echo (!empty($skill['skill_name']) && !isset($skill['skill_id'])) ? 'bg-gray-100 border-gray-300' : ''; ?>">
                                         <span x-text="selected" class="pr-1 truncate"></span>
                                         <svg class="flex-shrink-0 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -246,7 +281,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                                 @click="selected = 'Beginner'; open = false"
                                                 class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                                                 <div class="flex items-center">
-                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-400 rounded-full"></div>
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 rounded-full bg-primary"></div>
                                                     <span class="truncate">Beginner</span>
                                                 </div>
                                             </button>
@@ -262,7 +297,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                                 @click="selected = 'Advanced'; open = false"
                                                 class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                                                 <div class="flex items-center">
-                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-blue-400 rounded-full"></div>
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-600 rounded-full"></div>
                                                     <span class="truncate">Advanced</span>
                                                 </div>
                                             </button>
@@ -270,7 +305,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                                 @click="selected = 'Expert'; open = false"
                                                 class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                                                 <div class="flex items-center">
-                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-400 rounded-full"></div>
+                                                    <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-600 rounded-full"></div>
                                                     <span class="truncate">Expert</span>
                                                 </div>
                                             </button>
@@ -297,7 +332,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                         <?php endforeach; ?>
                     </div>
 
-                    <button type="button" id="add-skill" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium transition-colors duration-200 border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <button type="button" id="add-skill" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium transition-colors duration-200 border rounded-md text-primary border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -317,7 +352,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                     <button type="submit" name="submit_step5"
                         class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
                         <span>
-                            <?php if (!empty($skills)): ?>
+                            <?php if (!empty($allSkills) && count($allSkills) > 1 || !empty($allSkills[0]['skill_name'])): ?>
                                 Continue
                             <?php else: ?>
                                 Skip & Continue
@@ -333,64 +368,69 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
     </div>
 </div>
 
+<!-- Load Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
-let skillCount = <?php echo count($allSkills); ?>;
+    let skillCount = <?php echo count($allSkills); ?>;
 
-// Skill name validation function
-function validateSkillName(input) {
-    const value = input.value.trim();
-    const skillIndex = input.getAttribute('data-skill-index') || input.closest('.skill-row').getAttribute('data-index');
-    const errorDiv = document.getElementById('skill_name_error_' + skillIndex);
-    const skillRegex = /^[a-zA-Z\s]+$/;
-    
-    // Reset styles
-    input.classList.remove('border-red-500', 'border-green-500');
-    if (errorDiv) {
-        errorDiv.classList.add('hidden');
-    }
-    
-    if (value === '') {
-        return true; // Optional field
-    }
-    
-    if (value.length > 50) {
-        showError(input, errorDiv, 'Must be less than 50 characters');
-        return false;
-    }
-    
-    if (!skillRegex.test(value)) {
-        showError(input, errorDiv, 'Only letters and spaces are allowed');
-        return false;
-    }
-    
-    // Valid
-    input.classList.add('border-green-500');
-    return true;
-}
+    // Skill name validation function
+    function validateSkillName(input) {
+        const value = input.value.trim();
+        const skillIndex = input.getAttribute('data-skill-index') || input.closest('.skill-row').getAttribute('data-index');
+        const errorDiv = document.getElementById('skill_name_error_' + skillIndex);
+        const skillRegex = /^[a-zA-Z\s\+\#\.\-]+$/; // Allow +, #, ., - for tech skills like C#, .NET, etc.
 
-function showError(input, errorDiv, message) {
-    input.classList.add('border-red-500');
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.classList.remove('hidden');
+        // Reset styles
+        input.classList.remove('border-red-500', 'border-green-500');
+        if (errorDiv) {
+            errorDiv.classList.add('hidden');
+        }
+
+        if (value === '') {
+            return true; // Optional field
+        }
+
+        if (value.length > 50) {
+            showError(input, errorDiv, 'Must be less than 50 characters');
+            return false;
+        }
+
+        if (!skillRegex.test(value)) {
+            showError(input, errorDiv, 'Only letters, spaces, and common symbols (+, #, ., -) are allowed');
+            return false;
+        }
+
+        // Valid - add green border only for non-empty fields
+        if (value.length > 0) {
+            input.classList.add('border-green-500');
+        }
+        return true;
     }
-}
 
-// Add new skill row function
-function addEmptySkillRow() {
-    const skillsContainer = document.getElementById('skills-container');
-    const skillRow = document.createElement('div');
-    skillRow.className = 'skill-row flex gap-4 mb-4';
-    skillRow.setAttribute('data-index', skillCount);
+    function showError(input, errorDiv, message) {
+        input.classList.add('border-red-500');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+    }
 
-    skillRow.innerHTML = `
+    // Add new skill row function
+    function addEmptySkillRow() {
+        const skillsContainer = document.getElementById('skills-container');
+        const skillRow = document.createElement('div');
+        skillRow.className = 'skill-row flex gap-4 mb-4';
+        skillRow.setAttribute('data-index', skillCount);
+
+        skillRow.innerHTML = `
         <!-- Skill Name Input -->
         <div class="flex-1 min-w-0">
             <input type="text" 
                    name="skills[${skillCount}][skill_name]" 
                    placeholder="Enter skill name"
                    maxlength="50"
-                   class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                   class="w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary hover:border-gray-400"
                    oninput="validateSkillName(this)"
                    data-skill-index="${skillCount}">
             <div id="skill_name_error_${skillCount}" class="hidden mt-1 text-xs text-red-600"></div>
@@ -400,7 +440,7 @@ function addEmptySkillRow() {
         <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: 'Intermediate' }">
             <button type="button" @click="open = !open"
                 @click.away="open = false"
-                class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                 <span x-text="selected" class="pr-1 truncate"></span>
                 <svg class="flex-shrink-0 w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -465,82 +505,88 @@ function addEmptySkillRow() {
         </button>
     `;
 
-    skillsContainer.appendChild(skillRow);
-    skillCount++;
-}
+        skillsContainer.appendChild(skillRow);
+        skillCount++;
+    }
 
-// Remove skill function
-function removeNewSkill(button) {
-    const skillRows = document.querySelectorAll('.skill-row');
-    if (skillRows.length > 1) {
-        button.closest('.skill-row').remove();
-    } else {
-        // Don't allow removing the last skill row, just clear it
-        const skillRow = button.closest('.skill-row');
-        const input = skillRow.querySelector('input[name*="[skill_name]"]');
-        
-        if (input) {
-            input.value = '';
-            validateSkillName(input);
+    // Remove skill function
+    function removeNewSkill(button) {
+        const skillRows = document.querySelectorAll('.skill-row');
+        if (skillRows.length > 1) {
+            button.closest('.skill-row').remove();
+        } else {
+            // Don't allow removing the last skill row, just clear it
+            const skillRow = button.closest('.skill-row');
+            const input = skillRow.querySelector('input[name*="[skill_name]"]');
+
+            if (input) {
+                input.value = '';
+                validateSkillName(input);
+            }
+
+            // Reset Alpine.js dropdown to Intermediate
+            const dropdown = skillRow.querySelector('[x-data]');
+            if (dropdown && dropdown._x_dataStack && dropdown._x_dataStack[0]) {
+                dropdown._x_dataStack[0].selected = 'Intermediate';
+            }
         }
-        
-        // Reset Alpine.js dropdown to Intermediate
-        const dropdown = skillRow.querySelector('[x-data]');
-        if (dropdown && dropdown._x_dataStack && dropdown._x_dataStack[0]) {
-            dropdown._x_dataStack[0].selected = 'Intermediate';
+    }
+
+    // Delete existing skill function
+    function deleteExistingSkill(skillId) {
+        if (confirm('Are you sure you want to delete this skill?')) {
+            // Create and submit a hidden form for deletion
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '?page=delete-skill-simple';
+            form.style.display = 'none';
+
+            const skillIdInput = document.createElement('input');
+            skillIdInput.type = 'hidden';
+            skillIdInput.name = 'skill_id';
+            skillIdInput.value = skillId;
+
+            form.appendChild(skillIdInput);
+            document.body.appendChild(form);
+            form.submit();
         }
     }
-}
 
-// Delete existing skill function
-function deleteExistingSkill(skillId) {
-    if (confirm('Are you sure you want to delete this skill?')) {
-        // Create and submit a hidden form for deletion
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '?page=delete-skill-simple';
-        form.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        const addSkillBtn = document.getElementById('add-skill');
+        const form = document.getElementById('skillsForm');
 
-        const skillIdInput = document.createElement('input');
-        skillIdInput.type = 'hidden';
-        skillIdInput.name = 'skill_id';
-        skillIdInput.value = skillId;
+        console.log('🔍 DEBUG: DOM loaded, skill count:', skillCount);
 
-        form.appendChild(skillIdInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
+        // Event listener for add button
+        if (addSkillBtn) {
+            addSkillBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                addEmptySkillRow();
+                console.log('✅ DEBUG: Added new skill row');
+            });
+        }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const addSkillBtn = document.getElementById('add-skill');
-    const form = document.getElementById('skillsForm');
+        // Form submission handling with validation
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('🔍 DEBUG: Form submitted');
+                let isValid = true;
 
-    // Event listener for add button
-    if (addSkillBtn) {
-        addSkillBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            addEmptySkillRow();
-        });
-    }
+                // Validate all skill name inputs
+                document.querySelectorAll('input[name*="[skill_name]"]').forEach(function(input) {
+                    if (!validateSkillName(input)) {
+                        isValid = false;
+                    }
+                });
 
-    // Form submission handling with validation
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            
-            // Validate all skill name inputs
-            document.querySelectorAll('input[name*="[skill_name]"]').forEach(function(input) {
-                if (!validateSkillName(input)) {
-                    isValid = false;
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fix the skill validation errors before continuing.');
+                } else {
+                    console.log('✅ DEBUG: Form validation passed');
                 }
             });
-            
-            if (!isValid) {
-                e.preventDefault();
-                alert('Please fix the skill validation errors before continuing.');
-            }
-        });
-    }
-});
+        }
+    });
 </script>
