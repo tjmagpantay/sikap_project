@@ -17,6 +17,7 @@ if (isset($_SESSION['error_message'])) {
 $parsedCertificates = [];
 if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['parsed_resume_data']['certificates'])) {
     $parsedCertificates = $_SESSION['parsed_resume_data']['certificates'];
+    error_log("🔍 DEBUG: Found " . count($parsedCertificates) . " parsed certificates: " . json_encode($parsedCertificates));
 }
 ?>
 
@@ -136,7 +137,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     <h3 class="mb-4 font-medium text-grayMain text-md">Your Current Certificates</h3>
                     <div class="space-y-2">
                         <?php foreach ($certificates as $cert): ?>
-                            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                            <div class="flex items-center justify-between rounded-lg ">
                                 <div>
                                     <h4 class="text-sm font-medium text-primary"><?php echo htmlspecialchars($cert['certificate_title']); ?></h4>
                                     <p class="text-sm text-gray-600"><?php echo htmlspecialchars($cert['issuing_organization']); ?></p>
@@ -161,20 +162,32 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         <?php foreach ($parsedCertificates as $cert): ?>
                             <li class="text-sm text-green-800">
                                 <?php
-                                // Handle different possible key structures
+                                // FIXED: Handle different possible key structures properly
                                 $certTitle = '';
-                                if (isset($cert['certificate_title'])) {
-                                    $certTitle = $cert['certificate_title'];
-                                } elseif (isset($cert['certificate_name'])) {
-                                    $certTitle = $cert['certificate_name'];
-                                } elseif (isset($cert['name'])) {
-                                    $certTitle = $cert['name'];
+
+                                if (is_array($cert)) {
+                                    // Try different key variations from ResumeParser
+                                    if (isset($cert['certificate_title'])) {
+                                        $certTitle = $cert['certificate_title'];
+                                    } elseif (isset($cert['certificate_name'])) {
+                                        $certTitle = $cert['certificate_name'];
+                                    } elseif (isset($cert['name'])) {
+                                        $certTitle = $cert['name'];
+                                    } else {
+                                        // Fallback: use first non-empty value
+                                        $certTitle = array_values(array_filter($cert))[0] ?? 'Certificate';
+                                    }
                                 } elseif (is_string($cert)) {
                                     $certTitle = $cert;
                                 } else {
-                                    $certTitle = 'Certificate'; // Fallback
+                                    $certTitle = 'Certificate'; // Final fallback
                                 }
+
                                 echo htmlspecialchars($certTitle);
+
+                                // Debug output
+                                error_log("🔍 DEBUG: Certificate data structure: " . json_encode($cert));
+                                error_log("🔍 DEBUG: Extracted title: " . $certTitle);
                                 ?>
                             </li>
                         <?php endforeach; ?>
@@ -185,59 +198,76 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=6" id="certificatesForm">
                 <div>
-
                     <div id="certificates-container">
                         <?php
+                        // FIXED: Better merging logic to avoid duplicates and include parsed certificates
                         $allCertificates = [];
+                        $certTitles = []; // Track certificate titles to avoid duplicates
 
-                        // Prioritize existing database certificates over parsed ones to avoid duplication
-                        if (!empty($certificates) && $certificates !== false) {
-                            // Use existing database certificates (user has already been through this step)
+                        error_log("🔍 DEBUG: Building allCertificates array");
+                        error_log("🔍 DEBUG: Existing DB certificates count: " . (is_array($certificates) ? count($certificates) : 0));
+                        error_log("🔍 DEBUG: Parsed certificates count: " . count($parsedCertificates));
+
+                        // First, add existing certificates from database if available
+                        if (!empty($certificates) && is_array($certificates)) {
                             foreach ($certificates as $cert) {
-                                $allCertificates[] = $cert;
+                                $certTitle = strtolower(trim($cert['certificate_title']));
+                                if (!empty($certTitle) && !in_array($certTitle, $certTitles)) {
+                                    $allCertificates[] = $cert;
+                                    $certTitles[] = $certTitle;
+                                    error_log("✅ DEBUG: Added existing certificate: " . $cert['certificate_title']);
+                                }
                             }
-                        } else {
-                            // Only use parsed certificates if no database certificates exist
-                            if (!empty($parsedCertificates)) {
-                                foreach ($parsedCertificates as $cert) {
-                                    // Normalize the certificate data structure
-                                    $normalizedCert = [
-                                        'certificate_title' => '',
-                                        'issuing_organization' => '',
-                                        'date_issued' => ''
-                                    ];
+                        }
 
-                                    // Handle different possible structures
-                                    if (is_array($cert)) {
-                                        if (isset($cert['certificate_title'])) {
-                                            $normalizedCert['certificate_title'] = $cert['certificate_title'];
-                                        } elseif (isset($cert['certificate_name'])) {
-                                            $normalizedCert['certificate_title'] = $cert['certificate_name'];
-                                        } elseif (isset($cert['name'])) {
-                                            $normalizedCert['certificate_title'] = $cert['name'];
-                                        }
+                        // Then, add parsed certificates that aren't already in the database
+                        if (!empty($parsedCertificates)) {
+                            foreach ($parsedCertificates as $parsedCert) {
+                                // Normalize the certificate data structure
+                                $normalizedCert = [
+                                    'certificate_title' => '',
+                                    'issuing_organization' => '',
+                                    'date_issued' => ''
+                                ];
 
-                                        if (isset($cert['issuing_organization'])) {
-                                            $normalizedCert['issuing_organization'] = $cert['issuing_organization'];
-                                        } elseif (isset($cert['organization'])) {
-                                            $normalizedCert['issuing_organization'] = $cert['organization'];
-                                        } elseif (isset($cert['issuer'])) {
-                                            $normalizedCert['issuing_organization'] = $cert['issuer'];
-                                        }
-
-                                        if (isset($cert['date_issued'])) {
-                                            $normalizedCert['date_issued'] = $cert['date_issued'];
-                                        } elseif (isset($cert['issue_date'])) {
-                                            $normalizedCert['date_issued'] = $cert['issue_date'];
-                                        } elseif (isset($cert['date'])) {
-                                            $normalizedCert['date_issued'] = $cert['date'];
-                                        }
-                                    } elseif (is_string($cert)) {
-                                        // If it's just a string, use it as the certificate title
-                                        $normalizedCert['certificate_title'] = $cert;
+                                // Handle different possible structures
+                                if (is_array($parsedCert)) {
+                                    if (isset($parsedCert['certificate_title'])) {
+                                        $normalizedCert['certificate_title'] = $parsedCert['certificate_title'];
+                                    } elseif (isset($parsedCert['certificate_name'])) {
+                                        $normalizedCert['certificate_title'] = $parsedCert['certificate_name'];
+                                    } elseif (isset($parsedCert['name'])) {
+                                        $normalizedCert['certificate_title'] = $parsedCert['name'];
                                     }
 
+                                    if (isset($parsedCert['issuing_organization'])) {
+                                        $normalizedCert['issuing_organization'] = $parsedCert['issuing_organization'];
+                                    } elseif (isset($parsedCert['organization'])) {
+                                        $normalizedCert['issuing_organization'] = $parsedCert['organization'];
+                                    } elseif (isset($parsedCert['issuer'])) {
+                                        $normalizedCert['issuing_organization'] = $parsedCert['issuer'];
+                                    }
+
+                                    if (isset($parsedCert['date_issued'])) {
+                                        $normalizedCert['date_issued'] = $parsedCert['date_issued'];
+                                    } elseif (isset($parsedCert['issue_date'])) {
+                                        $normalizedCert['date_issued'] = $parsedCert['issue_date'];
+                                    } elseif (isset($parsedCert['date'])) {
+                                        $normalizedCert['date_issued'] = $parsedCert['date'];
+                                    }
+                                } elseif (is_string($parsedCert)) {
+                                    // If it's just a string, use it as the certificate title
+                                    $normalizedCert['certificate_title'] = $parsedCert;
+                                }
+
+                                // Check for duplicates
+                                $certTitle = strtolower(trim($normalizedCert['certificate_title']));
+                                if (!empty($certTitle) && !in_array($certTitle, $certTitles)) {
                                     $allCertificates[] = $normalizedCert;
+                                    $certTitles[] = $certTitle;
+                                    error_log("✅ DEBUG: Added parsed certificate: " . $normalizedCert['certificate_title']);
+                                } else {
+                                    error_log("⚠️ DEBUG: Skipped duplicate parsed certificate: " . $normalizedCert['certificate_title']);
                                 }
                             }
                         }
@@ -249,7 +279,10 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 'issuing_organization' => '',
                                 'date_issued' => ''
                             ];
+                            error_log("ℹ️ DEBUG: Added empty certificate row");
                         }
+
+                        error_log("🔍 DEBUG: Final allCertificates count: " . count($allCertificates));
 
                         foreach ($allCertificates as $index => $cert): ?>
                             <div class="mb-4 space-y-4 certificate-row" data-index="<?php echo $index; ?>">
@@ -257,6 +290,9 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 <!-- Add hidden field for existing certificate ID -->
                                 <?php if (isset($cert['certificate_id'])): ?>
                                     <input type="hidden" name="certificates[<?php echo $index; ?>][certificate_id]" value="<?php echo $cert['certificate_id']; ?>">
+                                    <?php error_log("🔍 DEBUG: Certificate {$index} has certificate_id: {$cert['certificate_id']}"); ?>
+                                <?php else: ?>
+                                    <?php error_log("🔍 DEBUG: Certificate {$index} is new (no certificate_id)"); ?>
                                 <?php endif; ?>
 
                                 <!-- Mark for deletion field (hidden) -->
@@ -268,7 +304,8 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                         name="certificates[<?php echo $index; ?>][certificate_title]"
                                         value="<?php echo htmlspecialchars($cert['certificate_title'] ?? ''); ?>"
                                         placeholder="e.g., AWS Certified Solutions Architect"
-                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary <?php echo (!empty($cert['certificate_title']) && !isset($cert['certificate_id'])) ? 'bg-green-50 border-green-300' : ''; ?>"
+                                        <?php echo (!empty($cert['certificate_title']) && !isset($cert['certificate_id'])) ? 'title="This certificate was extracted from your resume"' : ''; ?>>
                                 </div>
 
                                 <div>
@@ -277,22 +314,24 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                         name="certificates[<?php echo $index; ?>][issuing_organization]"
                                         value="<?php echo htmlspecialchars($cert['issuing_organization'] ?? ''); ?>"
                                         placeholder="e.g., Amazon Web Services"
-                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary <?php echo (!empty($cert['issuing_organization']) && !isset($cert['certificate_id'])) ? 'bg-green-50 border-green-300' : ''; ?>">
                                 </div>
 
-                                <div class="flex gap-4">
-                                    <div class="flex-1">
+                                <!-- FIXED: Delete button height alignment -->
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                                    <div class="sm:col-span-3">
                                         <label class="block text-xs font-medium text-gray-500">Date Issued</label>
                                         <input type="date"
                                             name="certificates[<?php echo $index; ?>][date_issued]"
                                             value="<?php echo htmlspecialchars($cert['date_issued'] ?? ''); ?>"
-                                            class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                                            class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary <?php echo (!empty($cert['date_issued']) && !isset($cert['certificate_id'])) ? 'bg-green-50 border-green-300' : ''; ?>">
                                     </div>
 
-                                    <div class="flex items-end">
-                                        <!-- Fixed Delete Button for ALL certificates -->
+                                    <div class="flex flex-col sm:col-span-1">
+                                        <label class="block text-xs font-medium text-gray-500">&nbsp;</label> <!-- Spacer for label alignment -->
+                                        <!-- FIXED: Button now has same height as input field (py-2) -->
                                         <button type="button"
-                                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                            class="flex items-center justify-center w-full px-3 py-2 mt-1 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             onclick="deleteCertificate(this, <?php echo isset($cert['certificate_id']) ? $cert['certificate_id'] : 'null'; ?>)"
                                             title="Remove this certificate">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,7 +379,13 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         <!-- Skip & Continue Button -->
                         <button type="submit" name="submit_step6"
                             class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                            <span>Skip & Continue</span>
+                            <span>
+                                <?php if (!empty($allCertificates) && count($allCertificates) > 1 || !empty($allCertificates[0]['certificate_title'])): ?>
+                                    Continue
+                                <?php else: ?>
+                                    Skip & Continue
+                                <?php endif; ?>
+                            </span>
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
@@ -358,6 +403,8 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
         let certificateCount = <?php echo count($allCertificates); ?>;
         const addCertificateBtn = document.getElementById('add-certificate');
         const certificatesContainer = document.getElementById('certificates-container');
+
+        console.log('🔍 DEBUG: DOM loaded, certificate count:', certificateCount);
 
         function updateIndices() {
             const certificateRows = document.querySelectorAll('.certificate-row:not(.deleted)');
@@ -378,14 +425,14 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
 
         function addEmptyCertificateRow() {
             const certificateRow = document.createElement('div');
-            certificateRow.className = 'certificate-row space-y-4 p-4 border border-gray-200 rounded-lg mb-4';
+            certificateRow.className = 'certificate-row mb-4 space-y-4';
             certificateRow.setAttribute('data-index', certificateCount);
 
             certificateRow.innerHTML = `
             <input type="hidden" name="certificates[${certificateCount}][delete]" value="0" class="delete-flag">
             
             <div>
-                <label class="block text-sm font-medium text-gray-700">Certificate/License Name</label>
+                <label class="block text-xs font-medium text-gray-500">Certificate/License Name</label>
                 <input type="text" 
                        name="certificates[${certificateCount}][certificate_title]" 
                        placeholder="e.g., AWS Certified Solutions Architect" 
@@ -393,24 +440,25 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                <label class="block text-xs font-medium text-gray-500">Issuing Organization</label>
                 <input type="text" 
                        name="certificates[${certificateCount}][issuing_organization]" 
                        placeholder="e.g., Amazon Web Services" 
                        class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
             </div>
             
-            <div class="flex gap-4">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-medium text-gray-500">Date Issued</label>
                     <input type="date" 
                            name="certificates[${certificateCount}][date_issued]" 
                            class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
                 
-                <div class="flex items-end">
+                <div class="flex flex-col sm:col-span-1">
+                    <label class="block text-xs font-medium text-gray-500">&nbsp;</label>
                     <button type="button" 
-                            class="flex items-center justify-center px-3 py-2 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" 
+                            class="flex items-center justify-center w-full px-3 py-2 mt-1 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" 
                             onclick="deleteCertificate(this, null)"
                             title="Remove this certificate">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -430,6 +478,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
             addCertificateBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 addEmptyCertificateRow();
+                console.log('✅ DEBUG: Added new certificate row');
             });
         }
 
@@ -490,6 +539,8 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         alert('Please fill in at least one certificate title to save.');
                         return false;
                     }
+                } else {
+                    console.log('✅ DEBUG: Form validation passed');
                 }
             });
         }

@@ -237,7 +237,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                 <div class="pb-3 mb-3 border-b">
                                     <div class="flex items-center justify-between mb-2">
                                         <h4 class="text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($currentWork['job_title']); ?></h4>
-                                        <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-primary">Current</span>
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium border border-gray-200 rounded-md text-primary">Current</span>
                                     </div>
                                     <p class="text-sm text-gray-600"><?php echo htmlspecialchars($currentWork['company_name']); ?></p>
                                 </div>
@@ -280,7 +280,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                             <div class="flex flex-wrap gap-2">
                                 <?php foreach ($skills as $skill): ?>
                                     <?php if (!empty($skill['skill_name']) && $skill['skill_name'] !== 'N/A'): ?>
-                                        <div class="inline-flex items-center px-3 py-1 text-sm bg-gray-100 ">
+                                        <div class="inline-flex items-center px-3 py-1 text-sm border border-gray-100 rounded-md">
                                             <span class="text-sm text-grayMain"><?php echo htmlspecialchars($skill['skill_name']); ?></span>
                                             <span class="ml-2 text-xs
                                 <?php
