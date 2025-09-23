@@ -362,12 +362,29 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                 </div>
             </div>
 
-            <form method="POST" action="?page=complete-jobseeker-profile&step=7" class="mt-8 ">
-                <div class="flex items-end justify-end">
-                    <button type="submit"
-                        class="inline-flex px-6 py-3 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Complete Profile Setup
-                    </button>
+            <form method="POST" action="?page=complete-jobseeker-profile&step=7" class="mt-8">
+                <div class="flex items-center justify-between">
+                    <!-- Left Side - Previous Button -->
+                    <div>
+                        <a href="?page=complete-jobseeker-profile&step=6"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Previous Step
+                        </a>
+                    </div>
+
+                    <!-- Right Side - Complete Profile Button -->
+                    <div>
+                        <button type="submit"
+                            class="inline-flex items-center px-6 py-3 text-sm font-medium text-white transition-colors border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Complete Profile Setup
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
