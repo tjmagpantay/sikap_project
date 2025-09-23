@@ -53,7 +53,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     <!-- Filter Dropdowns Container - Takes remaining 2/3 space -->
                     <div class="flex flex-col w-full gap-4 lg:flex-row lg:w-2/3 lg:min-w-0">
 
-                        <!-- Location Filter - Hidden on screens below 640px (sm) -->
+                        <!-- Location Filter - Updated for Rosario priority with real-time filtering -->
                         <div class="flex-1 hidden sm:block">
                             <div class="relative w-full" x-data="{ open: false, selected: 'Location' }">
                                 <button @click="open = !open"
@@ -75,37 +75,20 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                     x-transition:leave-end="transform opacity-0 scale-95"
                                     class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                     <div class="py-1">
-                                        <button @click="selected = 'Location'; open = false; filterByLocation('')"
+                                        <button @click="selected = 'Location'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             All Locations
                                         </button>
-                                        <button @click="selected = 'Manila'; open = false; filterByLocation('manila')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Manila
+                                        <button @click="selected = 'Rosario'; open = false; applyAllFilters()"
+                                            class="block w-full px-4 py-2 text-sm font-medium text-left border-l-2 text-primary hover:bg-primary/10 border-primary">
+                                            <div class="flex items-center justify-between">
+                                                <span>Rosario</span>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">Priority</span>
+                                            </div>
                                         </button>
-                                        <button @click="selected = 'Quezon City'; open = false; filterByLocation('quezon-city')"
+                                        <button @click="selected = 'Others'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Quezon City
-                                        </button>
-                                        <button @click="selected = 'Makati'; open = false; filterByLocation('makati')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Makati
-                                        </button>
-                                        <button @click="selected = 'Taguig'; open = false; filterByLocation('taguig')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Taguig
-                                        </button>
-                                        <button @click="selected = 'Pasig'; open = false; filterByLocation('pasig')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Pasig
-                                        </button>
-                                        <button @click="selected = 'Cebu'; open = false; filterByLocation('cebu')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Cebu
-                                        </button>
-                                        <button @click="selected = 'Davao'; open = false; filterByLocation('davao')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Davao
+                                            Others (Outside Rosario)
                                         </button>
                                     </div>
                                 </div>
@@ -865,37 +848,234 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             return '';
         }
 
-        // Clear all filters
+        function filterByLocation(location) {
+            console.log('Filtering by location:', location);
+            applyAllFilters();
+        }
+
+        // Updated applyAllFilters function with Rosario priority
+        function applyAllFilters() {
+            const searchTerm = document.getElementById('jobSearch').value.toLowerCase().trim();
+
+            // Get selected values from dropdowns (only on desktop where dropdowns are visible)
+            const selectedLocation = window.innerWidth >= 640 ? getDropdownValue('Location') : '';
+            const selectedIndustry = window.innerWidth >= 640 ? getDropdownValue('Industry') : '';
+            const selectedWorkplace = window.innerWidth >= 640 ? getDropdownValue('Workplace') : '';
+
+            console.log('Applying filters:', {
+                searchTerm,
+                selectedLocation,
+                selectedIndustry,
+                selectedWorkplace
+            });
+
+            const jobCards = document.querySelectorAll('.left-job-card');
+            let visibleCount = 0;
+            let firstVisibleCard = null;
+            let rosarioJobs = [];
+            let otherJobs = [];
+
+            jobCards.forEach(card => {
+                let shouldShow = true;
+
+                // Search filter (job title, company name)
+                if (searchTerm) {
+                    const jobTitle = card.querySelector('h3').textContent.toLowerCase();
+                    const companyName = card.querySelector('p').textContent.toLowerCase();
+                    if (!jobTitle.includes(searchTerm) && !companyName.includes(searchTerm)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Location filter with Rosario priority
+                if (selectedLocation && selectedLocation !== 'Location' && shouldShow && window.innerWidth >= 640) {
+                    const locationElement = card.querySelector('.text-gray-600');
+                    const locationText = locationElement ? locationElement.textContent.toLowerCase() : '';
+
+                    if (selectedLocation.toLowerCase() === 'rosario') {
+                        // Only show Rosario jobs
+                        if (!locationText.includes('rosario')) {
+                            shouldShow = false;
+                        }
+                    } else if (selectedLocation.toLowerCase() === 'others') {
+                        // Only show non-Rosario jobs - FIXED: This was the problem
+                        if (!locationText.includes('rosario')) {
+                            shouldShow = false;
+                        }
+                    }
+                }
+
+                // Industry filter (only on desktop)
+                if (selectedIndustry && selectedIndustry !== 'Industry' && shouldShow && window.innerWidth >= 640) {
+                    const categoryElements = card.querySelectorAll('.bg-gray-100.text-primary');
+                    let hasMatchingCategory = false;
+                    categoryElements.forEach(element => {
+                        if (element.textContent.toLowerCase().includes(selectedIndustry.toLowerCase())) {
+                            hasMatchingCategory = true;
+                        }
+                    });
+                    if (!hasMatchingCategory) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Workplace filter (only on desktop)
+                if (selectedWorkplace && selectedWorkplace !== 'Workplace' && shouldShow && window.innerWidth >= 640) {
+                    const workplaceElements = card.querySelectorAll('.bg-gray-100.text-primary');
+                    let hasMatchingWorkplace = false;
+                    workplaceElements.forEach(element => {
+                        const elementText = element.textContent.toLowerCase();
+                        if (elementText.includes(selectedWorkplace.toLowerCase()) ||
+                            (selectedWorkplace.toLowerCase() === 'on-site' && elementText.includes('onsite'))) {
+                            hasMatchingWorkplace = true;
+                        }
+                    });
+                    if (!hasMatchingWorkplace) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Categorize jobs by location for priority display
+                if (shouldShow) {
+                    const locationElement = card.querySelector('.text-gray-600');
+                    const locationText = locationElement ? locationElement.textContent.toLowerCase() : '';
+
+                    if (locationText.includes('rosario')) {
+                        rosarioJobs.push(card);
+                    } else {
+                        otherJobs.push(card);
+                    }
+
+                    visibleCount++;
+                }
+            });
+
+            // Hide all cards first
+            jobCards.forEach(card => {
+                card.style.display = 'none';
+            });
+
+            // Display jobs with Rosario priority
+            const jobContainer = document.querySelector('.space-y-4');
+
+            // Show Rosario jobs first
+            rosarioJobs.forEach((card, index) => {
+                card.style.display = 'block';
+                card.style.order = index;
+                if (index === 0) firstVisibleCard = card;
+
+                // Add priority indicator for Rosario jobs
+                const priorityIndicator = card.querySelector('.rosario-priority');
+                if (!priorityIndicator) {
+                    const locationRow = card.querySelector('.flex.items-center.py-2');
+                    if (locationRow) {
+                        const badge = document.createElement('span');
+                        badge.className = 'rosario-priority ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded-full';
+                        badge.textContent = 'Priority';
+                        locationRow.appendChild(badge);
+                    }
+                }
+            });
+
+            // Then show other jobs
+            otherJobs.forEach((card, index) => {
+                card.style.display = 'block';
+                card.style.order = rosarioJobs.length + index;
+                if (!firstVisibleCard) firstVisibleCard = card;
+
+                // Remove any priority indicators from non-Rosario jobs
+                const priorityIndicator = card.querySelector('.rosario-priority');
+                if (priorityIndicator) {
+                    priorityIndicator.remove();
+                }
+            });
+
+            // Update job count
+            updateJobCount(visibleCount);
+
+            // Show message if no results
+            showNoResultsMessage(visibleCount === 0);
+
+            // Auto-load first visible job after filtering (only on desktop)
+            if (firstVisibleCard && window.innerWidth >= 1024) {
+                const jobId = firstVisibleCard.getAttribute('data-job-id');
+                loadJobDetails(jobId, firstVisibleCard, true);
+            }
+
+            console.log(`Filtered results: ${visibleCount} jobs (${rosarioJobs.length} in Rosario, ${otherJobs.length} others)`);
+        }
+
+        // Update the clearAllFilters function to handle Rosario priority
         function clearAllFilters() {
             // Reset search input
             document.getElementById('jobSearch').value = '';
 
             // Reset all dropdown texts to default
             const locationBtn = document.querySelector('[x-data*="Location"] button span');
-            const jobTypeBtn = document.querySelector('[x-data*="Job Type"] button span');
             const industryBtn = document.querySelector('[x-data*="Industry"] button span');
             const workplaceBtn = document.querySelector('[x-data*="Workplace"] button span');
 
             if (locationBtn) locationBtn.textContent = 'Location';
-            if (jobTypeBtn) jobTypeBtn.textContent = 'Job Type';
             if (industryBtn) industryBtn.textContent = 'Industry';
             if (workplaceBtn) workplaceBtn.textContent = 'Workplace';
 
-            // Show all job cards
+            // Show all job cards with Rosario priority
             const jobCards = document.querySelectorAll('.left-job-card');
+            const jobContainer = document.querySelector('.space-y-4');
+            let rosarioJobs = [];
+            let otherJobs = [];
+
             jobCards.forEach(card => {
+                const locationElement = card.querySelector('.text-gray-600');
+                const locationText = locationElement ? locationElement.textContent.toLowerCase() : '';
+
+                if (locationText.includes('rosario')) {
+                    rosarioJobs.push(card);
+                } else {
+                    otherJobs.push(card);
+                }
+            });
+
+            // Reorder with Rosario priority
+            rosarioJobs.forEach((card, index) => {
                 card.style.display = 'block';
+                card.style.order = index;
+
+                // Add priority indicator for Rosario jobs
+                const priorityIndicator = card.querySelector('.rosario-priority');
+                if (!priorityIndicator) {
+                    const locationRow = card.querySelector('.flex.items-center.py-2');
+                    if (locationRow) {
+                        const badge = document.createElement('span');
+                        badge.className = 'rosario-priority ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded-full';
+                        badge.textContent = 'Priority';
+                        locationRow.appendChild(badge);
+                    }
+                }
+            });
+
+            otherJobs.forEach((card, index) => {
+                card.style.display = 'block';
+                card.style.order = rosarioJobs.length + index;
+
+                // Remove priority indicators from non-Rosario jobs
+                const priorityIndicator = card.querySelector('.rosario-priority');
+                if (priorityIndicator) {
+                    priorityIndicator.remove();
+                }
             });
 
             updateJobCount(jobCards.length);
             showNoResultsMessage(false);
 
-            // Auto-load first job after clearing filters
-            const firstJob = document.querySelector('.left-job-card[data-job-id]');
+            // Auto-load first job after clearing filters (prioritize Rosario)
+            const firstJob = rosarioJobs.length > 0 ? rosarioJobs[0] : otherJobs[0];
             if (firstJob) {
                 const jobId = firstJob.getAttribute('data-job-id');
                 loadJobDetails(jobId, firstJob, true);
             }
+
+            console.log(`Cleared filters: ${rosarioJobs.length} Rosario jobs, ${otherJobs.length} other jobs`);
         }
 
         // Update job count display
@@ -1057,10 +1237,10 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
                     // For auto-load errors, show the latest job as default content instead of error
                     if (isAutoLoad) {
-                            // Try to show basic job info from the card data
-                            const jobTitle = cardElement ? cardElement.querySelector('h3')?.textContent || 'Job Details' : 'Latest Job';
+                        // Try to show basic job info from the card data
+                        const jobTitle = cardElement ? cardElement.querySelector('h3')?.textContent || 'Job Details' : 'Latest Job';
 
-                                    container.innerHTML = `
+                        container.innerHTML = `
                         <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
                             <i class="text-5xl text-gray-300 fas fa-briefcase"></i>
                             <h3 class="mt-4 text-lg font-medium text-gray-900">${jobTitle}</h3>
@@ -1072,8 +1252,8 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                         </div>
                     `;
                     } else {
-                                    // Show error for manual clicks
-                                    container.innerHTML = `
+                        // Show error for manual clicks
+                        container.innerHTML = `
                         <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white border border-gray-200 shadow-sm rounded-xl">
                             <i class="text-5xl text-red-300 fas fa-exclamation-triangle"></i>
                             <h3 class="mt-4 text-lg font-medium text-gray-900">Connection Error</h3>

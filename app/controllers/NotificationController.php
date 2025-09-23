@@ -51,12 +51,14 @@ class NotificationController
         header('Expires: 0');
 
         try {
-            // UPDATED: Handle both user_id and employer_id session variables
+            // UPDATED: Handle user_id, employer_id, and admin_id session variables
             $userId = null;
             if (isset($_SESSION['user_id'])) {
                 $userId = (int)$_SESSION['user_id'];
             } elseif (isset($_SESSION['employer_id'])) {
                 $userId = (int)$_SESSION['employer_id'];
+            } elseif (isset($_SESSION['admin_id'])) {
+                $userId = (int)$_SESSION['admin_id'];
             }
 
             if (!$userId) {
@@ -241,6 +243,56 @@ class NotificationController
     }
 
     /**
+     * Display all notifications for admins
+     */
+    public function viewAllAdminNotifications()
+    {
+        // UPDATED: Handle admin session variable
+        $userId = null;
+        if (isset($_SESSION['admin_id'])) {
+            $userId = $_SESSION['admin_id'];
+        } elseif (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] == 1) {
+            $userId = $_SESSION['user_id'];
+        }
+
+        // Check if admin is logged in
+        if (!$userId) {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        // Handle POST requests for marking as read
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+            $this->handleNotificationActions($userId, 'admin');
+            return;
+        }
+
+        // Handle pagination
+        $currentPage = isset($_GET['p']) ? max(1, (int)$_GET['p']) : 1;
+        $limit = 15;
+        $offset = ($currentPage - 1) * $limit;
+
+        // Get notifications data
+        $notifications = $this->notificationService->getUserNotifications($userId, $limit, $offset);
+        $unreadCount = $this->notificationService->getUnreadCount($userId);
+
+        // Check if there are more pages
+        $hasNextPage = count($notifications) === $limit;
+
+        // Pass data to the view
+        $data = [
+            'notifications' => $notifications,
+            'unreadCount' => $unreadCount,
+            'currentPage' => $currentPage,
+            'hasNextPage' => $hasNextPage,
+            'limit' => $limit
+        ];
+
+        // Include the view
+        include __DIR__ . '/../views/admin/notifications.php';
+    }
+
+    /**
      * Handle notification actions from web forms (mark as read, mark all as read)
      */
     private function handleNotificationActions($userId, $userType = null)
@@ -253,6 +305,8 @@ class NotificationController
             $redirectPage = 'notifications-jobseeker'; // default
             if ($userType === 'employer' || (isset($_SESSION['role']) && $_SESSION['role'] == 2)) {
                 $redirectPage = 'notifications-employer';
+            } elseif ($userType === 'admin' || (isset($_SESSION['role']) && $_SESSION['role'] == 1)) {
+                $redirectPage = 'notifications-admin';
             }
 
             if ($success) {
@@ -267,6 +321,8 @@ class NotificationController
             $redirectPage = 'notifications-jobseeker'; // default
             if ($userType === 'employer' || (isset($_SESSION['role']) && $_SESSION['role'] == 2)) {
                 $redirectPage = 'notifications-employer';
+            } elseif ($userType === 'admin' || (isset($_SESSION['role']) && $_SESSION['role'] == 1)) {
+                $redirectPage = 'notifications-admin';
             }
 
             if ($success) {

@@ -163,6 +163,15 @@ class Notification
     public function determineUserType($userId)
     {
         try {
+            // Check if user is an admin first
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM admin WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $adminCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+            if ($adminCount > 0) {
+                return 'admin';
+            }
+
             // Check if user is a jobseeker
             $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM jobseeker WHERE user_id = ?");
             $stmt->execute([$userId]);
@@ -181,21 +190,12 @@ class Notification
                 return 'employer';
             }
 
-            // Check if user is an admin
-            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM admin WHERE user_id = ?");
-            $stmt->execute([$userId]);
-            $adminCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-
-            if ($adminCount > 0) {
-                return 'admin';
-            }
-
-            // Default to jobseeker if none found
-            error_log("⚠️ Could not determine user type for user_id: $userId, defaulting to jobseeker");
-            return 'jobseeker';
+            // Default to admin if none found (fallback for admin session)
+            error_log("⚠️ Could not determine user type for user_id: $userId, defaulting to admin");
+            return 'admin';
         } catch (Exception $e) {
             error_log("❌ Error determining user type: " . $e->getMessage());
-            return 'jobseeker';
+            return 'admin';
         }
     }
 
@@ -247,6 +247,36 @@ class Notification
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log("Error getting active employers: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all active admins for notifications
+     */
+    public function getActiveAdmins()
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT a.user_id, a.admin_id, a.admin_name, u.email
+                FROM admin a
+                INNER JOIN users u ON a.user_id = u.user_id 
+                WHERE u.status = 'active'
+                ORDER BY a.user_id
+            ");
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // DEBUG: Log the admins we found
+            error_log("🔍 DEBUG getActiveAdmins: Found " . count($results) . " active admins:");
+            foreach ($results as $admin) {
+                error_log("   - Admin ID: {$admin['admin_id']}, User ID: {$admin['user_id']}, Name: {$admin['admin_name']}, Email: {$admin['email']}");
+            }
+
+            return $results;
+        } catch (Exception $e) {
+            error_log("❌ Error getting active admins: " . $e->getMessage());
+            error_log("❌ SQL Error: " . print_r($this->db->errorInfo(), true));
             return [];
         }
     }

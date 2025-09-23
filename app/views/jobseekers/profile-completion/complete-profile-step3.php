@@ -214,7 +214,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                             oninput="validateInstitutionName(this)">
                         <div id="school_name_error" class="hidden mt-1 text-xs text-red-600"></div>
-                        
+
                     </div>
                 </div>
 
@@ -435,11 +435,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
     function validateInstitutionName(input) {
         const value = input.value.trim();
         const errorDiv = document.getElementById('school_name_error');
-        const countSpan = document.getElementById('school_name_count');
-        const institutionRegex = /^[a-zA-Z\s.,&]+$/;
-
-        // Update character count
-        countSpan.textContent = value.length;
+        const institutionRegex = /^[a-zA-Z\s.,&'-]+$/;
 
         // Reset styles
         input.classList.remove('border-red-500', 'border-green-500');
@@ -461,9 +457,16 @@ error_log("Existing education data: " . json_encode($education ?? []));
         }
 
         if (!institutionRegex.test(value)) {
-            showError(input, errorDiv, 'Only letters, spaces, periods, commas, and "&" are allowed');
+            showError(input, errorDiv, 'Only letters, spaces, periods, commas, apostrophes, hyphens, and "&" are allowed');
             return false;
         }
+
+        // Capitalize each word
+        const capitalizedValue = value.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+
+        input.value = capitalizedValue;
 
         // Valid
         input.classList.add('border-green-500');
@@ -473,11 +476,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
     function validateFieldOfStudy(input) {
         const value = input.value.trim();
         const errorDiv = document.getElementById('field_of_study_error');
-        const countSpan = document.getElementById('field_of_study_count');
-        const fieldRegex = /^[a-zA-Z\s]*$/;
-
-        // Update character count
-        countSpan.textContent = value.length;
+        const fieldRegex = /^[a-zA-Z\s&.-]*$/;
 
         // Reset styles
         input.classList.remove('border-red-500', 'border-green-500');
@@ -493,8 +492,17 @@ error_log("Existing education data: " . json_encode($education ?? []));
         }
 
         if (!fieldRegex.test(value)) {
-            showError(input, errorDiv, 'Only letters and spaces are allowed');
+            showError(input, errorDiv, 'Only letters, spaces, periods, hyphens, and "&" are allowed');
             return false;
+        }
+
+        // Capitalize each word if value is not empty
+        if (value.length > 0) {
+            const capitalizedValue = value.split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+
+            input.value = capitalizedValue;
         }
 
         // Valid
@@ -522,7 +530,10 @@ error_log("Existing education data: " . json_encode($education ?? []));
             const startYear = parseInt(startYearInput.value);
             const currentYear = new Date().getFullYear();
 
-            if (startYear > currentYear) {
+            if (startYear < 1950) {
+                showError(null, startYearError, 'Start year must be 1950 or later');
+                isValid = false;
+            } else if (startYear > currentYear) {
                 showError(null, startYearError, 'Start year cannot be in the future');
                 isValid = false;
             }
@@ -537,8 +548,8 @@ error_log("Existing education data: " . json_encode($education ?? []));
             const startYear = parseInt(startYearInput.value);
             const currentYear = new Date().getFullYear();
 
-            if (endYear > currentYear) {
-                showError(null, endYearError, 'End year cannot be in the future');
+            if (endYear > currentYear + 10) {
+                showError(null, endYearError, 'End year is too far in the future');
                 isValid = false;
             } else if (startYear && endYear < startYear) {
                 showError(null, endYearError, 'End year must be greater than or equal to start year');
@@ -552,9 +563,29 @@ error_log("Existing education data: " . json_encode($education ?? []));
     function showError(input, errorDiv, message) {
         if (input) {
             input.classList.add('border-red-500');
+            // Add shake animation
+            input.style.animation = 'none';
+            input.offsetHeight; // Trigger reflow
+            input.style.animation = 'shake 0.5s';
         }
+
         errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
+        errorDiv.classList.add('text-red-600', 'font-medium');
+
+        // Add animation keyframes if they don't exist
+        if (!document.getElementById('shakeAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'shakeAnimation';
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 
     // Form submission validation
@@ -569,25 +600,44 @@ error_log("Existing education data: " . json_encode($education ?? []));
         if (!validateFieldOfStudy(fieldOfStudy)) isValid = false;
         if (!validateYears()) isValid = false;
 
+        // Check dropdowns
+        const educationLevelInput = document.querySelector('input[name="education_level"]');
+        if (!educationLevelInput.value || educationLevelInput.value === 'Select Degree/Program') {
+            document.getElementById('education_level_error').textContent = 'Please select an education level';
+            document.getElementById('education_level_error').classList.remove('hidden');
+            isValid = false;
+        }
+
         if (!isValid) {
             e.preventDefault();
             alert('Please fix the errors before continuing.');
         }
     });
 
-    // Initialize character counts
+    // Initialize Alpine.js dropdowns and ensure they work properly
     document.addEventListener('DOMContentLoaded', function() {
-        const institutionField = document.getElementById('school_name');
-        const fieldOfStudyField = document.getElementById('field_of_study');
-        const institutionCount = document.getElementById('school_name_count');
-        const fieldCount = document.getElementById('field_of_study_count');
-
-        if (institutionField && institutionCount) {
-            institutionCount.textContent = institutionField.value.length;
+        // Make sure Alpine.js is working
+        if (typeof Alpine !== 'undefined') {
+            console.log('Alpine.js is loaded');
+        } else {
+            console.error('Alpine.js is not loaded - dropdowns may not work');
         }
 
-        if (fieldOfStudyField && fieldCount) {
-            fieldCount.textContent = fieldOfStudyField.value.length;
-        }
+        // Add click handlers as fallback
+        document.querySelectorAll('[x-data]').forEach(dropdown => {
+            const button = dropdown.querySelector('button');
+            const menu = dropdown.querySelector('div[x-show="open"]');
+
+            if (button && menu) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Dropdown button clicked');
+                });
+            }
+        });
     });
 </script>
+
+<!-- Make sure Alpine.js is loaded -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

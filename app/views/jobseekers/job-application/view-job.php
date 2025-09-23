@@ -37,7 +37,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                             <div class="flex items-start justify-between mb-2">
                                 <div class="flex items-start gap-3 sm:gap-3">
                                     <!-- Business Logo -->
-                                    <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 overflow-hidden border-2 border-gray-200 rounded-lg sm:w-16 sm:h-16">
+                                    <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg sm:w-16 sm:h-16">
                                         <?php if (!empty($job['business_logo'])): ?>
                                             <img src="<?php echo htmlspecialchars($job['business_logo']); ?>" alt="Company Logo"
                                                 class="object-cover w-full h-full">
@@ -62,9 +62,17 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                         }
                                         ?>
                                         <a href="?page=view-employer-profile&employer_id=<?php echo $job['employer_id']; ?>&job_id=<?php echo $job['job_id']; ?>&job_title=<?php echo urlencode($job['job_title']); ?>"
-                                            class="mt-1 text-sm transition-colors text-primary hover:text-secondary hover:underline">
+                                            class="text-sm transition-colors  text-primary hover:text-secondary hover:underline">
                                             <?php echo htmlspecialchars($companyName); ?>
                                         </a>
+                                        <!-- Company Stats -->
+                                        
+                                            <?php if (!empty($employer['business_address'])): ?>
+                                                <div class="flex items-center text-xs text-gray-600">
+                                                    <i class="mr-1 fas fa-map-marker-alt"></i>
+                                                    <?php echo htmlspecialchars($employer['business_address']); ?>
+                                                </div>
+                                            <?php endif; ?>
                                     </div>
                                 </div>
 
@@ -78,9 +86,9 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                     </button>
 
                                     <!-- Share Button -->
-                                    <button 
+                                    <button
                                         onclick="shareJob('<?php echo htmlspecialchars($job['job_title'], ENT_QUOTES); ?>', window.location.href)"
-                                        class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" 
+                                        class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100"
                                         title="Share">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#828282" stroke-width="1.5" />
@@ -360,7 +368,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                                         <a href="?page=view-job-attachment&file_path=<?php echo urlencode($attachment['file_path']); ?><?php echo isset($attachment['attachment_id']) ? '&attachment_id=' . $attachment['attachment_id'] : ''; ?>"
                                                             target="_blank"
                                                             class="flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
-                                
+
                                                             View
                                                         </a>
                                                     <?php endif; ?>
@@ -721,35 +729,35 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                         <?php if ($applicationStatus === 'pending'): ?>
                                             <div class="p-3 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
                                                 <p class="text-xs text-yellow-800">
-                                                   
+
                                                     Your application is being reviewed by the employer. You'll be notified when there's an update.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'reviewed'): ?>
                                             <div class="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                                                 <p class="text-xs text-blue-800">
-                                                  
+
                                                     Your application is currently under detailed review. The employer is evaluating your qualifications.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'shortlisted'): ?>
                                             <div class="p-3 mb-4 border border-purple-200 rounded-lg bg-purple-50">
                                                 <p class="text-xs text-blue-800">
-                                                   
+
                                                     Congratulations! You've been shortlisted for this position. The employer may contact you soon for the next steps.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'hired'): ?>
                                             <div class="p-3 mb-4 border border-green-200 rounded-lg bg-green-50">
                                                 <p class="text-xs text-green-800">
-                                                   
+
                                                     Congratulations! You've been hired for this position. The employer will contact you with further details.
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'rejected'): ?>
                                             <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
                                                 <p class="text-xs text-red-800">
-                                                    
+
                                                     Thank you for your interest. Unfortunately, you were not selected for this position. Keep applying to other opportunities!
                                                 </p>
                                             </div>
@@ -901,26 +909,26 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
 </div>
 
 <script>
-// Add the shareJob function that's referenced in the share button
-function shareJob(jobTitle, url) {
-    if (navigator.share) {
-        navigator.share({
-            title: jobTitle,
-            url: url
-        }).catch(console.error);
-    } else {
-        // Fallback for browsers that don't support Web Share API
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(() => {
-                alert('Job link copied to clipboard!');
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
-                alert('Failed to copy job link. Please try manually sharing the link.');
-            });
+    // Add the shareJob function that's referenced in the share button
+    function shareJob(jobTitle, url) {
+        if (navigator.share) {
+            navigator.share({
+                title: jobTitle,
+                url: url
+            }).catch(console.error);
         } else {
-            // If clipboard API is not available, just show the URL in an alert
-            alert('Job URL: ' + url);
+            // Fallback for browsers that don't support Web Share API
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Job link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                    alert('Failed to copy job link. Please try manually sharing the link.');
+                });
+            } else {
+                // If clipboard API is not available, just show the URL in an alert
+                alert('Job URL: ' + url);
+            }
         }
     }
-}
 </script>

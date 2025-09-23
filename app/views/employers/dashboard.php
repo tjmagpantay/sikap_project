@@ -34,21 +34,21 @@ $endDate = date('M j');
 
                 <!-- Right side: Date Range Selector -->
                 <div class="relative flex items-center mt-4 lg:mt-0" x-data="{ 
-    open: false, 
-    startDate: '<?php echo $startDate; ?>', 
-    endDate: '<?php echo $endDate; ?>',
-    updateDateRange(days) {
-        const end = new Date();
-        const start = new Date();
-        start.setDate(end.getDate() - days);
-        
-        this.startDate = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        this.endDate = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        
-        // Update the page with new date range
-        window.location.href = `?page=dashboard&date_range=${days}`;
-    }
-}">
+                        open: false, 
+                        startDate: '<?php echo $startDate; ?>', 
+                        endDate: '<?php echo $endDate; ?>',
+                        updateDateRange(days) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setDate(end.getDate() - days);
+                            
+                            this.startDate = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            this.endDate = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            
+                            // Update the page with new date range
+                            window.location.href = `?page=dashboard&date_range=${days}`;
+                        }
+                    }">
                     <button @click="open = !open" @click.away="open = false"
                         class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-sm shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
