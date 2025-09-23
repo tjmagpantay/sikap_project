@@ -19,6 +19,7 @@ class JobApplicationController
     }
 
     // Main entry point for job application
+
     public function applyForJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
@@ -27,9 +28,11 @@ class JobApplicationController
         }
 
         $job_id = $_GET['job_id'] ?? null;
-        $step = $_GET['step'] ?? 1;
+        $step = (int)($_GET['step'] ?? 1);
         $application_id = $_GET['application_id'] ?? null;
         $restart = $_GET['restart'] ?? false;
+
+        error_log("🔍 DEBUG applyForJob: job_id=$job_id, step=$step, application_id=$application_id, restart=" . ($restart ? 'true' : 'false'));
 
         if (!$job_id) {
             header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
@@ -40,32 +43,6 @@ class JobApplicationController
         if ($restart && $application_id) {
             $this->jobApplicationModel->deleteApplication($application_id);
             $application_id = null;
-        }
-
-        // Get or create application
-        if ($application_id) {
-            // Resume existing application
-            $application = $this->jobApplicationModel->getApplicationById($application_id);
-            if (!$application) {
-                header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('Application not found.'));
-                exit;
-            }
-        } else {
-            // Check if user already has an application for this job
-            if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-                $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-                if ($jobseeker) {
-                    $existingApp = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
-                        $jobseeker['jobseeker_id'],
-                        $job_id
-                    );
-                    if ($existingApp && !$restart) {
-                        // Redirect to resume existing application
-                        header('Location: ?page=apply-job&job_id=' . $job_id . '&application_id=' . $existingApp['application_id'] . '&step=' . $existingApp['current_step']);
-                        exit;
-                    }
-                }
-            }
         }
 
         // Get jobseeker info
@@ -82,35 +59,52 @@ class JobApplicationController
             exit;
         }
 
+        // FIXED: Only handle existing applications when no application_id is provided in URL
+        if (!$application_id) {
+            // Check if user already has an application for this job
+            $existingApp = $this->jobApplicationModel->getApplicationByJobseekerAndJob(
+                $jobseeker['jobseeker_id'],
+                $job_id
+            );
+
+            if ($existingApp && !$restart) {
+                error_log("🔍 DEBUG: Found existing application - ID: {$existingApp['application_id']}, Step: {$existingApp['current_step']}, Finalized: {$existingApp['is_finalized']}");
+
+                if ($existingApp['is_finalized'] == 1) {
+                    // Complete application - redirect to view
+                    header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('You have already applied for this job.'));
+                    exit;
+                } else {
+                    // Incomplete application - use it
+                    $application_id = $existingApp['application_id'];
+                    // REMOVED: No automatic step adjustment here
+                    error_log("🔍 DEBUG: Using existing incomplete application - ID: $application_id");
+                }
+            }
+        } else {
+            // FIXED: If application_id is provided, validate it belongs to this user and job
+            $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+            if (!$applicationData) {
+                error_log("⚠️ DEBUG: Application ID $application_id not found, creating new");
+                $application_id = null;
+            } elseif ($applicationData['jobseeker_id'] != $jobseeker['jobseeker_id'] || $applicationData['job_id'] != $job_id) {
+                error_log("⚠️ DEBUG: Application ID $application_id doesn't belong to this user/job");
+                header('Location: ?page=apply-job&job_id=' . $job_id . '&step=1&error=' . urlencode('Invalid application access.'));
+                exit;
+            } elseif ($applicationData['is_finalized'] == 1) {
+                error_log("⚠️ DEBUG: Application ID $application_id is already finalized");
+                header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('This application has already been submitted.'));
+                exit;
+            } else {
+                error_log("🔍 DEBUG: Valid existing application found - ID: $application_id, Current Step: {$applicationData['current_step']}");
+            }
+        }
+
         // Check age eligibility
         $ageCheck = $this->checkAgeEligibility($job, $jobseeker);
         if (!$ageCheck['eligible']) {
             header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode($ageCheck['message']));
             exit;
-        }
-
-        // Check if already applied (and application is finalized)
-        $existingApplication = $this->jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
-        if ($existingApplication && $existingApplication['is_finalized']) {
-            header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('You have already applied for this job.'));
-            exit;
-        }
-
-        // If there's an existing draft application, use it
-        if ($existingApplication && !$existingApplication['is_finalized']) {
-            $application_id = $existingApplication['application_id'];
-            // Allow user to navigate to any step they've reached or go backwards
-            // Don't override the step from URL unless it's invalid
-            if ($step > $existingApplication['current_step']) {
-                $step = $existingApp['current_step'];
-            }
-
-            // Update current_step if user is moving to a new step they haven't reached
-            // but only if it's not going backwards
-            if ($step <= $existingApplication['current_step'] && $step != $existingApplication['current_step']) {
-                // User is navigating backwards, update the step in database for tracking
-                $this->jobApplicationModel->updateCurrentStep($application_id, $step);
-            }
         }
 
         // Handle form submissions for each step
@@ -119,7 +113,11 @@ class JobApplicationController
             return;
         }
 
-        // Route to appropriate step
+        // REMOVED: Step validation logic that was causing redirects
+
+        error_log("🔍 DEBUG: Final routing - Step: $step, Application ID: " . ($application_id ?? 'null'));
+
+        // Route to appropriate step WITHOUT any redirects
         switch ($step) {
             case 1:
                 $this->showStep1($job, $jobseeker, $application_id);
@@ -134,8 +132,12 @@ class JobApplicationController
                 $this->showStep4($job, $jobseeker, $application_id);
                 break;
             default:
-                header('Location: ?page=apply-job&job_id=' . $job_id . '&step=1');
-                exit;
+                // ONLY redirect for truly invalid steps
+                if ($step < 1 || $step > 4) {
+                    error_log("⚠️ DEBUG: Invalid step $step, redirecting to step 1");
+                    header('Location: ?page=apply-job&job_id=' . $job_id . '&step=1' . ($application_id ? '&application_id=' . $application_id : ''));
+                    exit;
+                }
         }
     }
 
@@ -162,33 +164,32 @@ class JobApplicationController
     // Step 2: Screening Questions
     private function showStep2($job, $jobseeker, $application_id)
     {
-        // Debug logging
-        error_log("DEBUG Step2: job_id = " . $job['job_id']);
-        error_log("DEBUG Step2: screening_questions_enabled = " . ($job['screening_questions_enabled'] ?? 'not set'));
+        error_log("🔍 DEBUG Step2: job_id = " . $job['job_id']);
+        error_log("🔍 DEBUG Step2: application_id = " . ($application_id ?? 'null'));
+
+        // FIXED: Only require application_id, don't validate step access here
+        if (!$application_id) {
+            error_log("⚠️ DEBUG Step2: No application_id, redirecting to step 1");
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
+            exit;
+        }
+
+        // REMOVED: Step validation that was causing redirects
+        // Just check if application exists
+        $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
+        if (!$applicationData) {
+            error_log("⚠️ DEBUG Step2: Application not found");
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Application not found. Please start over.'));
+            exit;
+        }
+
+        error_log("🔍 DEBUG Step2: Application found, proceeding to show step 2");
 
         // Get screening questions if enabled
         $screeningQuestions = [];
         if (($job['screening_questions_enabled'] ?? 0) == 1) {
             $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job['job_id']);
-            error_log("DEBUG Step2: Found " . count($screeningQuestions) . " screening questions");
-            foreach ($screeningQuestions as $q) {
-                error_log("DEBUG Step2: Question - " . $q['question_text'] . " (Type: " . $q['question_type'] . ")");
-            }
-        } else {
-            error_log("DEBUG Step2: Screening questions not enabled");
-        }
-
-        // Allow navigation to step 2 if application exists and user has reached at least step 2
-        if (!$application_id) {
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
-            exit;
-        }
-
-        // Check if user has reached this step (only block if they've never reached step 2)
-        $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
-        if ($applicationData && $applicationData['current_step'] < 2) {
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
-            exit;
+            error_log("🔍 DEBUG Step2: Found " . count($screeningQuestions) . " screening questions");
         }
 
         // Get existing answers if any
@@ -207,16 +208,17 @@ class JobApplicationController
     // Step 3: Eligibility Information
     private function showStep3($job, $jobseeker, $application_id)
     {
-        // Allow navigation to step 3 if application exists and user has reached at least step 3
+        // FIXED: Only require application_id
         if (!$application_id) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete previous steps first.'));
             exit;
         }
 
-        // Check if user has reached this step (only block if they've never reached step 3)
+        // REMOVED: Step validation
+        // Just check if application exists
         $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
-        if ($applicationData && $applicationData['current_step'] < 3) {
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=' . $applicationData['current_step'] . '&application_id=' . $application_id . '&error=' . urlencode('Please complete previous steps first.'));
+        if (!$applicationData) {
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Application not found. Please start over.'));
             exit;
         }
 
@@ -232,16 +234,17 @@ class JobApplicationController
     // Step 4: Review & Submit
     private function showStep4($job, $jobseeker, $application_id)
     {
-        // Allow navigation to step 4 if application exists and user has reached step 4
+        // FIXED: Only require application_id
         if (!$application_id) {
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete previous steps first.'));
             exit;
         }
 
-        // Check if user has reached this step
+        // REMOVED: Step validation
+        // Just check if application exists
         $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
-        if ($applicationData && $applicationData['current_step'] < 4) {
-            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=' . $applicationData['current_step'] . '&application_id=' . $application_id . '&error=' . urlencode('Please complete previous steps first.'));
+        if (!$applicationData) {
+            header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Application not found. Please start over.'));
             exit;
         }
 
