@@ -125,14 +125,11 @@ error_log("Existing education data: " . json_encode($education ?? []));
             <!-- Display parsed education if available -->
             <?php if (isset($_SESSION['parsed_resume_data']['education']) && !empty($_SESSION['parsed_resume_data']['education']['school_name'])): ?>
                 <?php $parsedEdu = $_SESSION['parsed_resume_data']['education']; ?>
-                <div class="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
-                    <h3 class="mb-2 text-sm font-medium text-green-800">
-                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                <div class="p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50">
+                    <h3 class="mb-2 text-sm font-medium text-primary">
                         Education extracted from your resume:
                     </h3>
-                    <div class="space-y-2 text-sm text-green-800">
+                    <div class="space-y-2 text-sm text-gray-600">
                         <?php if (!empty($parsedEdu['school_name'])): ?>
                             <p><strong>Institution:</strong> <?php echo htmlspecialchars($parsedEdu['school_name']); ?></p>
                         <?php endif; ?>
@@ -146,7 +143,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
                             <p><strong>Duration:</strong> <?php echo date('Y', strtotime($parsedEdu['start_date'])); ?> - <?php echo date('Y', strtotime($parsedEdu['end_date'])); ?></p>
                         <?php endif; ?>
                     </div>
-                    <p class="mt-2 text-xs text-green-600">This education data has been automatically filled below. You can edit if needed.</p>
+                    <p class="mt-2 text-xs text-gray-400">This education data has been automatically filled below. You can edit if needed.</p>
                 </div>
             <?php endif; ?>
 
@@ -170,7 +167,25 @@ error_log("Existing education data: " . json_encode($education ?? []));
             if (!empty($_POST['education_level'])) {
                 $currentEducationLevel = $_POST['education_level'];
             } elseif (!empty($_SESSION['parsed_resume_data']['education']['education_level'])) {
-                $currentEducationLevel = $_SESSION['parsed_resume_data']['education']['education_level'];
+                // FIXED: Map the parsed education level to our dropdown values with better matching
+                $parsedLevel = strtolower($_SESSION['parsed_resume_data']['education']['education_level']);
+                
+                // More comprehensive mapping
+                if (strpos($parsedLevel, 'bachelor') !== false || strpos($parsedLevel, "bachelor's") !== false || strpos($parsedLevel, 'undergraduate') !== false) {
+                    $currentEducationLevel = 'Bachelor';
+                } elseif (strpos($parsedLevel, 'master') !== false || strpos($parsedLevel, "master's") !== false || strpos($parsedLevel, 'graduate') !== false) {
+                    $currentEducationLevel = 'Master';
+                } elseif (strpos($parsedLevel, 'doctoral') !== false || strpos($parsedLevel, 'doctorate') !== false || strpos($parsedLevel, 'phd') !== false || strpos($parsedLevel, 'ph.d') !== false) {
+                    $currentEducationLevel = 'Doctorate';
+                } elseif (strpos($parsedLevel, 'associate') !== false) {
+                    $currentEducationLevel = 'Associate';
+                } elseif (strpos($parsedLevel, 'high school') !== false || strpos($parsedLevel, 'secondary') !== false || strpos($parsedLevel, 'senior high') !== false) {
+                    $currentEducationLevel = 'High School';
+                } elseif (strpos($parsedLevel, 'vocational') !== false || strpos($parsedLevel, 'technical') !== false || strpos($parsedLevel, 'tesda') !== false) {
+                    $currentEducationLevel = 'Vocational';
+                } else {
+                    $currentEducationLevel = 'Bachelor'; // Default fallback
+                }
             } elseif (!empty($education) && !empty($education[0]['education_level'])) {
                 $currentEducationLevel = $education[0]['education_level'];
             }
@@ -198,6 +213,10 @@ error_log("Existing education data: " . json_encode($education ?? []));
             } elseif (!empty($education) && !empty($education[0]['end_date'])) {
                 $currentEndYear = date('Y', strtotime($education[0]['end_date']));
             }
+
+            // Debug output
+            error_log("STEP 3 DEBUG: Current education level = '$currentEducationLevel'");
+            error_log("STEP 3 DEBUG: Current school name = '$currentSchoolName'");
             ?>
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=3" id="educationForm">
@@ -214,31 +233,37 @@ error_log("Existing education data: " . json_encode($education ?? []));
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                             oninput="validateInstitutionName(this)">
                         <div id="school_name_error" class="hidden mt-1 text-xs text-red-600"></div>
-
                     </div>
                 </div>
 
-                <!-- Degree/Program - IMPROVED DROPDOWN -->
+                <!-- Degree/Program - FIXED DROPDOWN WITH PROPER ALPINE INITIALIZATION -->
                 <div>
                     <label for="education_level" class="block mb-1 text-xs font-medium text-gray-500">
                         Degree / Program
                     </label>
-                    <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($currentEducationLevel); ?>' || 'Select Degree/Program' }">
-                        <button type="button" @click="open = !open"
-                            @click.away="open = false"
-                            class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                            <span x-text="selected === 'Select Degree/Program' ? 'Select Degree/Program' : selected"
-                                :class="selected === 'Select Degree/Program' ? 'text-gray-400' : 'text-gray-700'"></span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="relative mt-1"
+                        x-data="educationLevelDropdown()"
+                        x-init="initializeSelected('<?php echo htmlspecialchars($currentEducationLevel); ?>')">
+
+                        <button type="button"
+                            @click="toggleDropdown()"
+                            @click.away="closeDropdown()"
+                            class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                            :class="{'border-red-500': hasError, 'border-green-500': isValid}">
+                            <span x-text="getDisplayText()"
+                                :class="selected === '' ? 'text-gray-400' : 'text-gray-700'"></span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                :class="{'rotate-180': isOpen}"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
 
                         <!-- Hidden input for form submission -->
-                        <input type="hidden" name="education_level" x-model="selected === 'Select Degree/Program' ? '' : selected">
+                        <input type="hidden" name="education_level" :value="selected" x-ref="hiddenInput">
 
                         <!-- Dropdown Menu -->
-                        <div x-show="open"
+                        <div x-show="isOpen"
                             x-transition:enter="transition ease-out duration-100"
                             x-transition:enter-start="transform opacity-0 scale-95"
                             x-transition:enter-end="transform opacity-100 scale-100"
@@ -246,48 +271,16 @@ error_log("Existing education data: " . json_encode($education ?? []));
                             x-transition:leave-start="transform opacity-100 scale-100"
                             x-transition:leave-end="transform opacity-0 scale-95"
                             class="absolute left-0 z-50 w-full mt-2 overflow-y-auto bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60"
-                            x-cloak>
+                            style="display: none;">
                             <div class="py-1">
-                                <button type="button"
-                                    @click="selected = 'Select Degree/Program'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Select Degree/Program
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'High School'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    High School
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Vocational'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Vocational/Technical
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Associate'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Associate Degree
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Bachelor'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Bachelor's Degree
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Master'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Master's Degree
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Doctorate'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Doctorate/PhD
-                                </button>
-                                <button type="button"
-                                    @click="selected = 'Other'; open = false"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                    Other
-                                </button>
+                                <template x-for="option in options" :key="option.value">
+                                    <button type="button"
+                                        @click="selectOption(option.value)"
+                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                                        :class="{'bg-blue-50 text-blue-700': selected === option.value}"
+                                        x-text="option.label">
+                                    </button>
+                                </template>
                             </div>
                         </div>
                         <div id="education_level_error" class="hidden mt-1 text-xs text-red-600"></div>
@@ -307,33 +300,39 @@ error_log("Existing education data: " . json_encode($education ?? []));
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                             oninput="validateFieldOfStudy(this)">
                         <div id="field_of_study_error" class="hidden mt-1 text-xs text-red-600"></div>
-
                     </div>
                 </div>
 
                 <!-- Year Range -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- Start Year - IMPROVED DROPDOWN -->
+                    <!-- Start Year - FIXED DROPDOWN -->
                     <div>
                         <label for="start_year" class="block mb-1 text-xs font-medium text-gray-500">
                             Start Year <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($currentStartYear); ?>' || 'Select Year' }">
-                            <button type="button" @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                                <span x-text="selected === 'Select Year' ? 'Select Year' : selected"
-                                    :class="selected === 'Select Year' ? 'text-gray-400' : 'text-gray-700'"></span>
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="relative mt-1"
+                            x-data="yearDropdown('start')"
+                            x-init="initializeSelected('<?php echo htmlspecialchars($currentStartYear); ?>')">
+
+                            <button type="button"
+                                @click="toggleDropdown()"
+                                @click.away="closeDropdown()"
+                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                                :class="{'border-red-500': hasError, 'border-green-500': isValid}">
+                                <span x-text="getDisplayText()"
+                                    :class="selected === '' ? 'text-gray-400' : 'text-gray-700'"></span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{'rotate-180': isOpen}"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
 
                             <!-- Hidden input for form submission -->
-                            <input type="hidden" name="start_year" x-model="selected === 'Select Year' ? '' : selected" required>
+                            <input type="hidden" name="start_year" :value="selected" required>
 
                             <!-- Dropdown Menu -->
-                            <div x-show="open"
+                            <div x-show="isOpen"
                                 x-transition:enter="transition ease-out duration-100"
                                 x-transition:enter-start="transform opacity-0 scale-95"
                                 x-transition:enter-end="transform opacity-100 scale-100"
@@ -341,44 +340,50 @@ error_log("Existing education data: " . json_encode($education ?? []));
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 class="absolute left-0 z-50 w-full mt-2 overflow-y-auto bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60"
-                                x-cloak>
+                                style="display: none;">
                                 <div class="py-1">
-                                    <?php
-                                    for ($year = date('Y'); $year >= 1950; $year--):
-                                    ?>
+                                    <template x-for="year in years" :key="year">
                                         <button type="button"
-                                            @click="selected = '<?php echo $year; ?>'; open = false"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            <?php echo $year; ?>
+                                            @click="selectOption(year)"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                                            :class="{'bg-blue-50 text-blue-700': selected === year.toString()}"
+                                            x-text="year">
                                         </button>
-                                    <?php endfor; ?>
+                                    </template>
                                 </div>
                             </div>
                             <div id="start_year_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
 
-                    <!-- End Year - IMPROVED DROPDOWN -->
+                    <!-- End Year - FIXED DROPDOWN -->
                     <div>
                         <label for="end_year" class="block mb-1 text-xs font-medium text-gray-500">
                             End Year <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative mt-1" x-data="{ open: false, selected: '<?php echo htmlspecialchars($currentEndYear); ?>' || 'Select Year' }">
-                            <button type="button" @click="open = !open"
-                                @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                                <span x-text="selected === 'Select Year' ? 'Select Year' : selected"
-                                    :class="selected === 'Select Year' ? 'text-gray-400' : 'text-gray-700'"></span>
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="relative mt-1"
+                            x-data="yearDropdown('end')"
+                            x-init="initializeSelected('<?php echo htmlspecialchars($currentEndYear); ?>')">
+
+                            <button type="button"
+                                @click="toggleDropdown()"
+                                @click.away="closeDropdown()"
+                                class="flex items-center justify-between w-full px-3 py-2 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                                :class="{'border-red-500': hasError, 'border-green-500': isValid}">
+                                <span x-text="getDisplayText()"
+                                    :class="selected === '' ? 'text-gray-400' : 'text-gray-700'"></span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{'rotate-180': isOpen}"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
 
                             <!-- Hidden input for form submission -->
-                            <input type="hidden" name="end_year" x-model="selected === 'Select Year' ? '' : selected" required>
+                            <input type="hidden" name="end_year" :value="selected" required>
 
                             <!-- Dropdown Menu -->
-                            <div x-show="open"
+                            <div x-show="isOpen"
                                 x-transition:enter="transition ease-out duration-100"
                                 x-transition:enter-start="transform opacity-0 scale-95"
                                 x-transition:enter-end="transform opacity-100 scale-100"
@@ -386,22 +391,22 @@ error_log("Existing education data: " . json_encode($education ?? []));
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 class="absolute left-0 z-50 w-full mt-2 overflow-y-auto bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60"
-                                x-cloak>
+                                style="display: none;">
                                 <div class="py-1">
                                     <button type="button"
-                                        @click="selected = 'Present'; open = false"
-                                        class="flex items-center w-full px-4 py-2 text-sm font-medium text-left text-primary hover:bg-blue-50">
+                                        @click="selectOption('Present')"
+                                        class="flex items-center w-full px-4 py-2 text-sm font-medium text-left transition-colors duration-150 text-primary hover:bg-blue-50"
+                                        :class="{'bg-blue-50 text-blue-700': selected === 'Present'}">
                                         Present (Currently Studying)
                                     </button>
-                                    <?php
-                                    for ($year = date('Y') + 10; $year >= 1950; $year--):
-                                    ?>
+                                    <template x-for="year in years" :key="year">
                                         <button type="button"
-                                            @click="selected = '<?php echo $year; ?>'; open = false"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            <?php echo $year; ?>
+                                            @click="selectOption(year)"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                                            :class="{'bg-blue-50 text-blue-700': selected === year.toString()}"
+                                            x-text="year">
                                         </button>
-                                    <?php endfor; ?>
+                                    </template>
                                 </div>
                             </div>
                             <div id="end_year_error" class="hidden mt-1 text-xs text-red-600"></div>
@@ -430,8 +435,157 @@ error_log("Existing education data: " . json_encode($education ?? []));
     </div>
 </div>
 
+<!-- Load Alpine.js first -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
-    // Validation functions
+    // Alpine.js functions must be defined before Alpine loads
+    window.educationLevelDropdown = function() {
+        return {
+            isOpen: false,
+            selected: '',
+            hasError: false,
+            isValid: false,
+            options: [{
+                    value: '',
+                    label: 'Select Degree/Program'
+                },
+                {
+                    value: 'High School',
+                    label: 'High School'
+                },
+                {
+                    value: 'Vocational',
+                    label: 'Vocational/Technical'
+                },
+                {
+                    value: 'Associate',
+                    label: 'Associate Degree'
+                },
+                {
+                    value: 'Bachelor',
+                    label: "Bachelor's Degree"
+                },
+                {
+                    value: 'Master',
+                    label: "Master's Degree"
+                },
+                {
+                    value: 'Doctorate',
+                    label: 'Doctorate/PhD'
+                },
+                {
+                    value: 'Other',
+                    label: 'Other'
+                }
+            ],
+
+            initializeSelected(value) {
+                console.log('Initializing education level with:', value);
+                if (value && value !== '') {
+                    this.selected = value;
+                    this.isValid = true;
+                }
+            },
+
+            toggleDropdown() {
+                this.isOpen = !this.isOpen;
+                console.log('Education dropdown toggled:', this.isOpen);
+            },
+
+            closeDropdown() {
+                this.isOpen = false;
+            },
+
+            selectOption(value) {
+                console.log('Education level selected:', value);
+                this.selected = value;
+                this.isOpen = false;
+                this.hasError = false;
+                this.isValid = value !== '';
+
+                // Update the hidden input
+                this.$refs.hiddenInput.value = value;
+
+                // Clear any existing error
+                document.getElementById('education_level_error').classList.add('hidden');
+            },
+
+            getDisplayText() {
+                if (this.selected === '') {
+                    return 'Select Degree/Program';
+                }
+                const option = this.options.find(opt => opt.value === this.selected);
+                return option ? option.label : this.selected;
+            }
+        }
+    };
+
+    window.yearDropdown = function(type) {
+        return {
+            isOpen: false,
+            selected: '',
+            hasError: false,
+            isValid: false,
+            type: type,
+
+            get years() {
+                const currentYear = new Date().getFullYear();
+                const years = [];
+
+                if (this.type === 'end') {
+                    // For end year, allow up to 10 years in the future
+                    for (let year = currentYear + 10; year >= 1950; year--) {
+                        years.push(year);
+                    }
+                } else {
+                    // For start year, only up to current year
+                    for (let year = currentYear; year >= 1950; year--) {
+                        years.push(year);
+                    }
+                }
+
+                return years;
+            },
+
+            initializeSelected(value) {
+                console.log(`Initializing ${this.type} year with:`, value);
+                if (value && value !== '') {
+                    this.selected = value;
+                    this.isValid = true;
+                }
+            },
+
+            toggleDropdown() {
+                this.isOpen = !this.isOpen;
+                console.log(`${this.type} year dropdown toggled:`, this.isOpen);
+            },
+
+            closeDropdown() {
+                this.isOpen = false;
+            },
+
+            selectOption(value) {
+                console.log(`${this.type} year selected:`, value);
+                this.selected = value.toString();
+                this.isOpen = false;
+                this.hasError = false;
+                this.isValid = true;
+
+                // Clear any existing error
+                document.getElementById(`${this.type}_year_error`).classList.add('hidden');
+            },
+
+            getDisplayText() {
+                if (this.selected === '') {
+                    return 'Select Year';
+                }
+                return this.selected;
+            }
+        }
+    };
+
+    // Regular validation functions
     function validateInstitutionName(input) {
         const value = input.value.trim();
         const errorDiv = document.getElementById('school_name_error');
@@ -523,7 +677,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
         endYearError.classList.add('hidden');
 
         // Validate start year
-        if (!startYearInput.value || startYearInput.value === 'Select Year') {
+        if (!startYearInput.value || startYearInput.value === '') {
             showError(null, startYearError, 'Start year is required');
             isValid = false;
         } else {
@@ -540,7 +694,7 @@ error_log("Existing education data: " . json_encode($education ?? []));
         }
 
         // Validate end year
-        if (!endYearInput.value || endYearInput.value === 'Select Year') {
+        if (!endYearInput.value || endYearInput.value === '') {
             showError(null, endYearError, 'End year is required');
             isValid = false;
         } else if (endYearInput.value !== 'Present') {
@@ -578,66 +732,59 @@ error_log("Existing education data: " . json_encode($education ?? []));
             const style = document.createElement('style');
             style.id = 'shakeAnimation';
             style.textContent = `
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    25% { transform: translateX(-5px); }
-                    75% { transform: translateX(5px); }
-                }
-            `;
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
             document.head.appendChild(style);
         }
     }
 
     // Form submission validation
-    document.getElementById('educationForm').addEventListener('submit', function(e) {
-        let isValid = true;
-
-        // Validate all fields
-        const institutionName = document.getElementById('school_name');
-        const fieldOfStudy = document.getElementById('field_of_study');
-
-        if (!validateInstitutionName(institutionName)) isValid = false;
-        if (!validateFieldOfStudy(fieldOfStudy)) isValid = false;
-        if (!validateYears()) isValid = false;
-
-        // Check dropdowns
-        const educationLevelInput = document.querySelector('input[name="education_level"]');
-        if (!educationLevelInput.value || educationLevelInput.value === 'Select Degree/Program') {
-            document.getElementById('education_level_error').textContent = 'Please select an education level';
-            document.getElementById('education_level_error').classList.remove('hidden');
-            isValid = false;
-        }
-
-        if (!isValid) {
-            e.preventDefault();
-            alert('Please fix the errors before continuing.');
-        }
-    });
-
-    // Initialize Alpine.js dropdowns and ensure they work properly
     document.addEventListener('DOMContentLoaded', function() {
-        // Make sure Alpine.js is working
-        if (typeof Alpine !== 'undefined') {
-            console.log('Alpine.js is loaded');
-        } else {
-            console.error('Alpine.js is not loaded - dropdowns may not work');
-        }
+        console.log('DOM Content Loaded - Step 3');
 
-        // Add click handlers as fallback
-        document.querySelectorAll('[x-data]').forEach(dropdown => {
-            const button = dropdown.querySelector('button');
-            const menu = dropdown.querySelector('div[x-show="open"]');
+        // Wait a bit for Alpine.js to initialize
+        setTimeout(() => {
+            console.log('Alpine.js should be initialized now');
 
-            if (button && menu) {
-                button.addEventListener('click', function(e) {
+            // Test if dropdowns are working
+            const dropdowns = document.querySelectorAll('[x-data]');
+            console.log('Found', dropdowns.length, 'Alpine components');
+
+            dropdowns.forEach((dropdown, index) => {
+                console.log(`Dropdown ${index}:`, dropdown.__x);
+            });
+        }, 100);
+
+        const form = document.getElementById('educationForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Validate all fields
+                const institutionName = document.getElementById('school_name');
+                const fieldOfStudy = document.getElementById('field_of_study');
+
+                if (!validateInstitutionName(institutionName)) isValid = false;
+                if (!validateFieldOfStudy(fieldOfStudy)) isValid = false;
+                if (!validateYears()) isValid = false;
+
+                // Check dropdowns
+                const educationLevelInput = document.querySelector('input[name="education_level"]');
+                if (!educationLevelInput.value || educationLevelInput.value === '') {
+                    document.getElementById('education_level_error').textContent = 'Please select an education level';
+                    document.getElementById('education_level_error').classList.remove('hidden');
+                    isValid = false;
+                }
+
+                if (!isValid) {
                     e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Dropdown button clicked');
-                });
-            }
-        });
+                    alert('Please fix the errors before continuing.');
+                }
+            });
+        }
     });
 </script>
-
-<!-- Make sure Alpine.js is loaded -->
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
