@@ -40,7 +40,7 @@ $hiredApplications = $GLOBALS['hiredApplications'] ?? [];
                 </div>
               </div>
               <div class="flex items-center">
-                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 rounded-md text-green-800">
+                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 rounded-md text-primary">
                   <i class="mr-1 fas fa-check-circle"></i>
                   Hired
                 </span>

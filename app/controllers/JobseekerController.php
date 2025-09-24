@@ -1172,17 +1172,39 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
     }
 
-    public function uploadProfilePhoto()
-    {
-        header('Content-Type: application/json');
+public function uploadProfilePhoto()
+{
+    // Clear any output buffers and set headers first
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json');
+    header('Cache-Control: no-cache, must-revalidate');
 
+    try {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
 
         if (!isset($_FILES['profile_picture']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
-            echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
+            $errorMsg = 'No file uploaded or upload error';
+            if (isset($_FILES['profile_picture']['error'])) {
+                switch ($_FILES['profile_picture']['error']) {
+                    case UPLOAD_ERR_INI_SIZE:
+                    case UPLOAD_ERR_FORM_SIZE:
+                        $errorMsg = 'File is too large';
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        $errorMsg = 'No file was uploaded';
+                        break;
+                    default:
+                        $errorMsg = 'Upload error occurred';
+                }
+            }
+            echo json_encode(['success' => false, 'message' => $errorMsg]);
             exit;
         }
 
@@ -1195,12 +1217,13 @@ class JobseekerController
             exit;
         }
 
-        // Validate file size (2MB max for profile photos)
-        if ($file['size'] > 2 * 1024 * 1024) {
-            echo json_encode(['success' => false, 'message' => 'File size must be less than 2MB.']);
+        // UPDATED: Validate file size (5MB max for profile photos)
+        if ($file['size'] > 5 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'message' => 'File size must be less than 5MB.']);
             exit;
         }
 
+        // Rest of your existing code remains the same...
         // Validate that it's actually an image
         $imageInfo = getimagesize($file['tmp_name']);
         if ($imageInfo === false) {
@@ -1215,53 +1238,72 @@ class JobseekerController
             exit;
         }
 
-        // Check for existing profile picture and delete old file
-        if (!empty($jobseeker['profile_picture'])) {
-            $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
-            if (file_exists($oldPhotoPath)) {
-                unlink($oldPhotoPath);
-                error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
-            }
-        }
-
         // Create upload directory if it doesn't exist
         $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {
+                error_log("ERROR: Failed to create upload directory: $uploadDir");
                 echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
                 exit;
             }
         }
 
         // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
         $filepath = $uploadDir . $filename;
 
         error_log("DEBUG: Attempting to upload profile photo to: $filepath");
 
         // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            // Update database with new profile picture path
-            $relativePath = 'uploads/profile_pictures/' . $filename;
-            $result = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $relativePath);
-
-            if ($result) {
-                error_log("DEBUG: Profile photo uploaded and database updated successfully");
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Profile photo updated successfully',
-                    'image_url' => $relativePath
-                ]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to update database']);
-            }
-        } else {
-            error_log("DEBUG: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
-            echo json_encode(['success' => false, 'message' => 'Failed to upload file']);
+        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            error_log("ERROR: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
+            echo json_encode(['success' => false, 'message' => 'Failed to upload file. Please check permissions.']);
+            exit;
         }
-        exit;
+
+        // Set proper file permissions
+        chmod($filepath, 0644);
+
+        // Update database with new profile picture path
+        $relativePath = 'uploads/profile_pictures/' . $filename;
+        $result = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $relativePath);
+
+        if (!$result) {
+            // If database update fails, clean up the uploaded file
+            if (file_exists($filepath)) {
+                unlink($filepath);
+            }
+            error_log("ERROR: Failed to update profile picture in database for user_id: " . $_SESSION['user_id']);
+            echo json_encode(['success' => false, 'message' => 'Failed to update database']);
+            exit;
+        }
+
+        // Delete old profile picture after successful database update
+        if (!empty($jobseeker['profile_picture'])) {
+            $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
+            if (file_exists($oldPhotoPath) && is_file($oldPhotoPath)) {
+                unlink($oldPhotoPath);
+                error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
+            }
+        }
+
+        error_log("DEBUG: Profile photo uploaded and database updated successfully");
+        
+        // Send success response
+        echo json_encode([
+            'success' => true,
+            'message' => 'Profile photo updated successfully',
+            'image_url' => $relativePath
+        ]);
+
+    } catch (Exception $e) {
+        error_log("ERROR: Exception in uploadProfilePhoto: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
     }
+    
+    exit;
+}
 
     public function savedJobs()
     {

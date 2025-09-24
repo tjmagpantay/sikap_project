@@ -535,4 +535,97 @@ class NotificationService
             return false;
         }
     }
+    public function notifyResignationStatusUpdate($resignationId, $newStatus, $employerNotes = null)
+{
+    try {
+        error_log("🔍 DEBUG notifyResignationStatusUpdate: Starting notification process");
+        error_log("   - Resignation ID: $resignationId");
+        error_log("   - New Status: $newStatus");
+        error_log("   - Employer Notes: " . ($employerNotes ?: 'None'));
+
+        // Get resignation request details from model
+        $resignationDetails = $this->notification->getResignationRequestDetails($resignationId);
+
+        if (!$resignationDetails) {
+            error_log("❌ Resignation Status Notification: Could not find resignation details for resignation_id: $resignationId");
+            return false;
+        }
+
+        error_log("✅ DEBUG: Found resignation details: " . json_encode($resignationDetails));
+
+        // Create status-specific messages
+        $statusMessages = [
+            'pending' => [
+                'title' => 'Resignation Request Under Review',
+                'message' => "Your resignation request for {$resignationDetails['job_title']} at {$resignationDetails['company_name']} is being reviewed by your employer."
+            ],
+            'approved' => [
+                'title' => 'Resignation Request Approved',
+                'message' => "Your resignation request for {$resignationDetails['job_title']} at {$resignationDetails['company_name']} has been approved. Your employment status has been updated."
+            ],
+            'rejected' => [
+                'title' => 'Resignation Request Response',
+                'message' => "Your resignation request for {$resignationDetails['job_title']} at {$resignationDetails['company_name']} has been reviewed by your employer."
+            ]
+        ];
+
+        // Get the appropriate message for the status
+        $statusInfo = $statusMessages[$newStatus] ?? [
+            'title' => 'Resignation Request Update',
+            'message' => "Your resignation request status has been updated."
+        ];
+
+        $title = $statusInfo['title'];
+        $message = $statusInfo['message'];
+
+        // Add employer notes if provided
+        if (!empty($employerNotes)) {
+            $message .= " Employer notes: " . $employerNotes;
+        }
+
+        $link = "?page=view-application&application_id={$resignationDetails['application_id']}";
+
+        $data = [
+            'resignation_id' => $resignationId,
+            'application_id' => $resignationDetails['application_id'],
+            'status' => $newStatus,
+            'job_title' => $resignationDetails['job_title'],
+            'company_name' => $resignationDetails['company_name'],
+            'employer_notes' => $employerNotes,
+            'notification_type' => 'resignation_update'
+        ];
+
+        error_log("🔍 DEBUG: Creating resignation status notification");
+        error_log("   - Title: $title");
+        error_log("   - Message: $message");
+        error_log("   - Link: $link");
+        error_log("   - Target user_id: {$resignationDetails['jobseeker_user_id']}");
+        error_log("   - Data: " . json_encode($data));
+
+        // Use the notification model's create method
+        $result = $this->notification->create(
+            $resignationDetails['jobseeker_user_id'],
+            'jobseeker',
+            'resignation_update',
+            $title,
+            $message,
+            $link,
+            $data
+        );
+
+        error_log("🔔 DEBUG: Resignation notification create() returned: " . ($result ? 'TRUE' : 'FALSE'));
+
+        if ($result) {
+            error_log("✅ Resignation status notification created for jobseeker user_id: {$resignationDetails['jobseeker_user_id']} (resignation_id: $resignationId)");
+        } else {
+            error_log("❌ Failed to create resignation status notification for jobseeker user_id: {$resignationDetails['jobseeker_user_id']}");
+        }
+
+        return $result;
+    } catch (Exception $e) {
+        error_log("❌ Error notifying resignation status update: " . $e->getMessage());
+        error_log("❌ Stack trace: " . $e->getTraceAsString());
+        return false;
+    }
+}
 }

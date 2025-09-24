@@ -107,7 +107,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                     <!-- Notification Icon -->
                                     <div class="flex-shrink-0">
                                         <div class="flex items-center justify-center w-10 h-10 rounded-full <?php
-                                                                                                            echo $notification['type'] === 'program' ? 'bg-green-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : ($notification['type'] === 'application_update' ? 'bg-orange-100' : ($notification['type'] === 'interview' ? 'bg-purple-100' : 'bg-gray-100'))); ?>">
+                                                                                                            echo $notification['type'] === 'program' ? 'bg-green-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : ($notification['type'] === 'application_update' ? 'bg-orange-100' : ($notification['type'] === 'interview' ? 'bg-purple-100' : ($notification['type'] === 'resignation_update' ? 'bg-red-100' : 'bg-gray-100')))); ?>">
 
                                             <?php if ($notification['type'] === 'job_post'): ?>
                                                 <!-- Job Post Icon -->
@@ -129,6 +129,11 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                                 <!-- Interview Icon -->
                                                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            <?php elseif ($notification['type'] === 'resignation_update'): ?>
+                                                <!-- Resignation Update Icon -->
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                             <?php else: ?>
                                                 <!-- Default Icon -->
@@ -158,7 +163,12 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                     <!-- Type Badge -->
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
         <?php
-                    echo $notification['type'] === 'program' ? 'bg-green-100 text-green-700' : ($notification['type'] === 'job_post' ? 'bg-blue-100 text-blue-700' : ($notification['type'] === 'application_update' ? 'bg-orange-100 text-orange-700' : ($notification['type'] === 'interview' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700')));
+            echo ($notification['type'] === 'program') ? 'bg-green-100 text-green-700'
+                : (($notification['type'] === 'job_post') ? 'bg-blue-100 text-blue-700'
+                : (($notification['type'] === 'application_update') ? 'bg-orange-100 text-orange-700'
+                : (($notification['type'] === 'interview') ? 'bg-purple-100 text-purple-700'
+                : (($notification['type'] === 'resignation_update') ? 'bg-red-100 text-red-700'
+                : 'bg-gray-100 text-gray-700'))));
         ?>">
                                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $notification['type']))); ?>
                                     </span>

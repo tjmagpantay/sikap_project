@@ -46,12 +46,12 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
               <div class="p-6 border-b border-gray-200" style="background-image: url('assets/images/profile-header-bg.svg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                 <div class="flex items-center space-x-4">
                   <!-- Profile Logo/Image -->
-                  <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
+                  <div class="flex items-center justify-center bg-white border-2 border-gray-200 rounded-lg profile-image-container">
                     <img src="<?php if (!empty($jobseeker['profile_picture'])) {
                                 echo htmlspecialchars('/sikap/public/' . $jobseeker['profile_picture']);
                               } else {
                                 echo '/sikap/public/assets/images/default-avatar.jpg';
-                              } ?>" alt="Profile" class="object-cover w-full h-full">
+                              } ?>" alt="Profile" class="object-cover">
                   </div>
 
                   <div class="flex-1">
@@ -332,8 +332,9 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
           return;
         }
 
-        if (file.size > 2 * 1024 * 1024) {
-          showNotification('File size must be less than 2MB.', 'error');
+        // UPDATED: Changed from 2MB to 5MB
+        if (file.size > 5 * 1024 * 1024) {
+          showNotification('File size must be less than 5MB.', 'error');
           return;
         }
 
@@ -342,31 +343,63 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
         const button = document.querySelector('button[title="Change profile photo"]');
         const originalContent = button.innerHTML;
-        button.innerHTML = '<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        button.innerHTML = '<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Uploading...';
         button.disabled = true;
 
         fetch('?page=upload-profile-photo', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
           })
-          .then(response => response.json())
+          .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers.get('content-type'));
+
+            // Check if the response is ok
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              console.error('Expected JSON response but got:', contentType);
+              return response.text().then(text => {
+                console.error('Response text:', text);
+                throw new Error('Server returned invalid response format');
+              });
+            }
+
+            return response.json();
+          })
           .then(data => {
+            console.log('Upload response:', data);
+
             if (data.success) {
+              // Update the profile image
               const profileImg = document.querySelector('img[alt="Profile"]');
-              profileImg.src = '/sikap/public/' + data.image_url + '?t=' + new Date().getTime();
-              showNotification('Profile photo updated successfully!', 'success');
+              if (profileImg && data.image_url) {
+                const newImageUrl = '/sikap/public/' + data.image_url + '?t=' + new Date().getTime();
+                profileImg.src = newImageUrl;
+                console.log('Updated profile image to:', newImageUrl);
+              }
+              showNotification(data.message || 'Profile photo updated successfully!', 'success');
             } else {
+              console.error('Upload failed:', data.message);
               showNotification(data.message || 'Failed to upload photo', 'error');
             }
           })
           .catch(error => {
-            console.error('Error:', error);
-            showNotification('Failed to upload photo', 'error');
+            console.error('Upload error:', error);
+            showNotification('Failed to upload photo: ' + error.message, 'error');
           })
           .finally(() => {
+            // Reset button state
             button.innerHTML = originalContent;
             button.disabled = false;
-            input.value = '';
+            input.value = ''; // Clear file input
           });
       }
     }
@@ -404,6 +437,25 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
   </script>
 
   <style>
+    /* Enhanced profile image container for consistent sizing */
+    .profile-image-container {
+      width: 64px !important;
+      height: 64px !important;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-image-container img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+    }
+
     .tab-button.active .tab-indicator {
       transform: scaleX(1);
     }

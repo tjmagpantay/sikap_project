@@ -425,4 +425,44 @@ class Notification
             return null;
         }
     }
+    public function getResignationRequestDetails($resignationId)
+    {
+        try {
+            error_log("🔍 DEBUG: Getting resignation request details for resignation_id: $resignationId");
+
+            $stmt = $this->db->prepare("
+            SELECT 
+                rr.resignation_id,
+                rr.application_id,
+                rr.jobseeker_id,
+                rr.employer_id,
+                rr.request_status,
+                rr.employer_notes,
+                rr.reviewed_at,
+                js.user_id as jobseeker_user_id,
+                js.first_name,
+                js.last_name,
+                u.email as jobseeker_email,
+                jp.job_title,
+                COALESCE(eb.business_name, e.company_name) as company_name
+            FROM resignation_requests rr
+            JOIN jobseeker js ON rr.jobseeker_id = js.jobseeker_id
+            JOIN users u ON js.user_id = u.user_id
+            JOIN job_application ja ON rr.application_id = ja.application_id
+            JOIN job_post jp ON ja.job_id = jp.job_id
+            JOIN employer e ON rr.employer_id = e.employer_id
+            LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+            WHERE rr.resignation_id = ? AND u.status = 'active'
+        ");
+            $stmt->execute([$resignationId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            error_log("🔍 DEBUG: Resignation request details query result: " . json_encode($result));
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("❌ Error getting resignation request details: " . $e->getMessage());
+            return null;
+        }
+    }
 }

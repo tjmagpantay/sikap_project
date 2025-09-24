@@ -34,7 +34,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                 <div class="p-6">
                     <div class="flex items-start gap-4">
                         <!-- Company Logo -->
-                        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 overflow-hidden border-2 border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden border-2 border-gray-200 rounded-lg">
                             <?php if (!empty($application['business_logo'])): ?>
                                 <img src="<?php echo htmlspecialchars($application['business_logo']); ?>" alt="Company Logo" class="object-cover w-full h-full">
                             <?php else: ?>
@@ -49,7 +49,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                             <p class="text-sm text-gray-600">
                                 <?php echo htmlspecialchars($application['company_name'] ?? $application['business_name'] ?? 'Company'); ?>
                             </p>
-                            <div class="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
                                 <span>
                                     <i class="mr-1 fas fa-calendar"></i>
                                     Hired on <?php echo date('M j, Y', strtotime($application['reviewed_at'] ?? $application['applied_at'])); ?>

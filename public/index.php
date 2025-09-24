@@ -147,7 +147,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
                     // Use the controller method instead of direct model access
                     require_once __DIR__ . '/../app/controllers/JobseekerController.php';
                     $controller = new JobseekerController();
-                    $controller->profileTabContent();
+                    $controller->getprofileTabContent();
                 }
             }
             break;
