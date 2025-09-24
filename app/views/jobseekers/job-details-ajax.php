@@ -16,9 +16,7 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                 <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
                     <?php if (!empty($selectedJob['business_logo'])): ?>
                         <?php
-                        // Handle different logo path formats
                         $logoSrc = $selectedJob['business_logo'];
-                        // If the path doesn't start with http or /, assume it's relative to public
                         if (strpos($logoSrc, 'http') !== 0 && strpos($logoSrc, '/') !== 0 && strpos($logoSrc, './') !== 0) {
                             $logoSrc = './' . $logoSrc;
                         }
@@ -34,10 +32,9 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
                 <!-- Job Title and Company -->
                 <div class="flex-1">
-                    <h2 class="mb-1 text-xl font-bold text-grayMain">
+                    <h2 class="text-xl font-bold text-grayMain">
                         <?php echo htmlspecialchars($selectedJob['job_title']); ?>
                     </h2>
-
                     <?php
                     $companyName = '';
                     if (!empty($selectedJob['company_name'])) {
@@ -54,10 +51,12 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                         class="font-normal text-gray-600 transition-colors hover:text-primary hover:underline">
                         <?php echo htmlspecialchars($companyName); ?>
                     </a>
+                     <div class="flex items-center transition-colors duration-300">
+                    <span class="text-sm text-gray-600 transition-colors duration-300"><?php echo htmlspecialchars($selectedJob['location']); ?></span>
                 </div>
-
+                </div>
             </div>
-
+            
             <!-- Action Buttons Box -->
             <div class="flex items-center gap-2 p-2">
                 <!-- Verified Badge -->
@@ -68,9 +67,9 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
                 </button>
                 <!-- Share Button -->
-                <button 
+                <button
                     onclick="shareJob('<?php echo htmlspecialchars($selectedJob['job_title'], ENT_QUOTES); ?>', window.location.origin + window.location.pathname + '?page=view-job&job_id=<?php echo $selectedJob['job_id']; ?>')"
-                    class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100" 
+                    class="flex items-center justify-center w-8 h-8 text-gray-600 transition-colors border border-gray-400 rounded-lg bg-gray-50 hover:bg-gray-100"
                     title="Share">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#828282" stroke-width="1.5" />
@@ -96,7 +95,7 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
             </div>
         </div>
-
+        
         <!-- Tags and Stats Section -->
         <div class="flex items-center justify-between mt-4">
             <!-- Job Tags -->
@@ -117,7 +116,6 @@ if (!isset($selectedJob) || empty($selectedJob)) {
             <!-- Stats Section -->
             <div class="flex items-center gap-2 text-sm font-medium text-gray-600">
                 <?php
-                // Calculate days left before Application Deadline (not expiration_date)
                 $daysLeft = 'N/A';
                 if (!empty($selectedJob['application_deadline'])) {
                     $deadline = new DateTime($selectedJob['application_deadline']);
@@ -136,8 +134,6 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                     $diff = $now->diff($posted);
                     $daysLeft = $diff->days . ' days ago';
                 }
-
-                // Use the application count that was already calculated in the controller
                 $applicationCount = $selectedJob['application_count'] ?? 0;
                 ?>
 
@@ -207,17 +203,6 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
         <!-- Action Buttons -->
         <div class="flex w-full gap-3 mt-8">
-            <?php
-            // Debug: Log the values to understand what's happening
-            error_log("DEBUG - hasProfile: " . ($hasProfile ? 'true' : 'false'));
-            error_log("DEBUG - has_applied: " . (isset($selectedJob['has_applied']) ? ($selectedJob['has_applied'] ? 'true' : 'false') : 'not set'));
-            error_log("DEBUG - is_finalized: " . (isset($selectedJob['is_finalized']) ? $selectedJob['is_finalized'] : 'not set'));
-            error_log("DEBUG - application_status: " . (isset($selectedJob['application_status']) ? $selectedJob['application_status'] : 'not set'));
-            error_log("DEBUG - application_id: " . (isset($selectedJob['application_id']) ? $selectedJob['application_id'] : 'not set'));
-            error_log("DEBUG - current_step: " . (isset($selectedJob['current_step']) ? $selectedJob['current_step'] : 'not set'));
-            error_log("DEBUG - jobseeker_id: " . ($jobseekerId ?? 'null'));
-            ?>
-
             <?php if (!$hasProfile): ?>
                 <!-- Profile Incomplete -->
                 <a href="?page=complete-jobseeker-profile"
@@ -228,9 +213,7 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
             <?php elseif (isset($selectedJob['has_applied']) && $selectedJob['has_applied'] === true): ?>
                 <?php if (isset($selectedJob['is_finalized']) && $selectedJob['is_finalized'] == 0): ?>
-                    <!-- Incomplete Application - Show In Progress Status with Continue Button -->
                     <div class="flex flex-col flex-1 gap-2">
-                        <!-- Continue Application Button - Primary Style -->
                         <a href="?page=apply-job&job_id=<?php echo $selectedJob['job_id']; ?>&application_id=<?php echo $selectedJob['application_id']; ?>&step=<?php echo $selectedJob['current_step'] ?? 1; ?>"
                             class="flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
                             <i class="mr-2 fas fa-play"></i>
@@ -241,7 +224,6 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                 <?php else: ?>
                     <!-- Complete Application - Show Status Button -->
                     <div class="flex flex-col flex-1 gap-2">
-                        <!-- Status Display as Button - Primary Style -->
                         <a href="?page=view-application&application_id=<?php echo $selectedJob['application_id']; ?>"
                             class="flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
 

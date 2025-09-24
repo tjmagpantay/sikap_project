@@ -9,6 +9,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
         <!-- Job Info Card -->
         <div class="p-6 mb-4 border rounded-lg bg-blue-50">
+            
             <div class="flex items-start space-x-4">
                 <!-- Business Logo -->
                 <div class="flex items-center justify-center w-12 h-12 overflow-hidden border-2 rounded-lg border-primary">

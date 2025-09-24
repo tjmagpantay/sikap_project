@@ -8,7 +8,7 @@
 ?>
 
 
-<div class="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+<div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
             <h2 class="text-2xl font-bold text-gray-900">2-Factor Authentication</h2>
@@ -47,7 +47,7 @@
                 </div>
             </form>
             <form method="POST" action="?page=resend-otp" class="mt-4 text-center">
-                <button id="resendBtn" type="submit" class="text-primary hover:underline" <?php if ($remaining > 0) echo 'disabled style="opacity:0.5;cursor:not-allowed;"'; ?>>
+                <button id="resendBtn" type="submit" class="text-sm text-primary hover:underline" <?php if ($remaining > 0) echo 'disabled style="opacity:0.5;cursor:not-allowed;"'; ?>>
                     <?php if ($remaining > 0): ?>
                         Resend OTP (<span id="timer"></span>)
                     <?php else: ?>

@@ -420,7 +420,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
         // Updated job filtering function - Only Most Recent and Best Matches
         function filterJobs(filterType, buttonElement) {
-            console.log('Filtering by:', filterType); // Debug log
 
             // Update active filter button - Remove active styles from all buttons
             document.querySelectorAll('[data-filter]').forEach(btn => {
@@ -443,7 +442,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     const dateB = parseInt(b.dataset.postedDate || 0);
                     return dateB - dateA; // Most recent first
                 });
-                console.log('Sorted by recent'); // Debug log
             } else if (filterType === 'matches') {
                 // Sort by best matches (match percentage)
                 sortedCards.sort((a, b) => {
@@ -451,7 +449,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     const matchB = parseFloat(b.dataset.matchPercentage || 0);
                     return matchB - matchA; // Highest match first
                 });
-                console.log('Sorted by matches'); // Debug log
             }
 
             // Show only top 5 jobs
@@ -491,13 +488,10 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
         // Initialize with "Most Recent" as default - Updated to match your working code
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing filters'); // Debug log
 
             // Set "Most Recent" as default active with proper styling
             const recentButton = document.querySelector('[data-filter="recent"]');
             if (recentButton) {
-                console.log('Setting Most Recent as default active'); // Debug log
-
                 // Set initial active state
                 recentButton.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
                 recentButton.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
@@ -512,8 +506,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
                     if (firstJobCard) {
                         const latestJobId = firstJobCard.getAttribute('data-job-id');
-                        console.log('Auto-loading first job:', latestJobId);
-
                         // Mark the first card as active immediately
                         firstJobCard.classList.remove('border-gray-200');
                         firstJobCard.classList.add('border-primary', 'bg-primary/5');
@@ -563,8 +555,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
         // Updated toggleSaveJob function with better error handling and real-time updates
         function toggleSaveJob(jobId, button) {
-            console.log('Toggling save for job:', jobId);
-
             // Get current state from button
             const icon = button.querySelector('i');
             const currentlySaved = icon.classList.contains('fas');
@@ -592,9 +582,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     }
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers.get('content-type'));
-
+                  
                     // Check if response is ok
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -612,7 +600,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Save/unsave response:', data);
 
                     if (data.success) {
                         // Update button state immediately
@@ -644,7 +631,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     // Restore original state on error
                     icon.className = originalIcon;
                     button.title = originalTitle;
@@ -899,7 +885,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                         }
                     } else if (selectedLocation.toLowerCase() === 'others') {
                         // Only show non-Rosario jobs - FIXED: This was the problem
-                        if (!locationText.includes('rosario')) {
+                        if (locationText.includes('rosario')) {
                             shouldShow = false;
                         }
                     }
@@ -1001,8 +987,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 const jobId = firstVisibleCard.getAttribute('data-job-id');
                 loadJobDetails(jobId, firstVisibleCard, true);
             }
-
-            console.log(`Filtered results: ${visibleCount} jobs (${rosarioJobs.length} in Rosario, ${otherJobs.length} others)`);
         }
 
         // Update the clearAllFilters function to handle Rosario priority
@@ -1074,8 +1058,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 const jobId = firstJob.getAttribute('data-job-id');
                 loadJobDetails(jobId, firstJob, true);
             }
-
-            console.log(`Cleared filters: ${rosarioJobs.length} Rosario jobs, ${otherJobs.length} other jobs`);
         }
 
         // Update job count display
@@ -1134,7 +1116,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
         // Add the missing loadJobDetails function
         function loadJobDetails(jobId, cardElement, isAutoLoad = false) {
-            console.log('Loading job details for ID:', jobId, 'Auto-load:', isAutoLoad);
 
             // Show loading state
             const container = document.getElementById('job-details-container');
@@ -1162,7 +1143,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
             // Make AJAX request - Using your working endpoint format
             const url = `?page=get-job-details-ajax&job_id=${jobId}`;
-            console.log('Making AJAX request to:', url);
 
             fetch(url, {
                     method: 'GET',
@@ -1172,8 +1152,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     }
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
 
                     // Handle different HTTP status codes
                     if (response.status === 404) {
@@ -1196,7 +1174,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Parsed response data:', data);
 
                     if (data.success) {
                         container.innerHTML = data.html;

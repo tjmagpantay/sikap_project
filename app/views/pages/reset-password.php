@@ -4,7 +4,7 @@ include_once __DIR__ . '/../components/navbar.php';
 include_once __DIR__ . '/../components/alert-modal.php';
 ?>
 
-<div class="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+<div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
             Reset Password
