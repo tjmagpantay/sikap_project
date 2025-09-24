@@ -41,7 +41,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                         <div class="relative" x-data="{ open: false, selected: 'Location' }">
                             <button @click="open = !open"
                                 @click.away="open = false"
-                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 shadow-ssmappearance-none rounded-SM hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-sm shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 <span x-text="selected" class="text-gray-500 truncate"></span>
                                 <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -63,33 +63,16 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                         class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                         All Locations
                                     </button>
-                                    <button @click="selected = 'Manila'; open = false; filterByLocation('manila')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Manila
+                                    <button @click="selected = 'Rosario'; open = false; filterByLocation('rosario')"
+                                        class="block w-full px-4 py-2 text-sm font-medium text-left border-l-2 text-primary hover:bg-primary/10 border-primary">
+                                        <div class="flex items-center justify-between">
+                                            <span>Rosario</span>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">Priority</span>
+                                        </div>
                                     </button>
-                                    <button @click="selected = 'Quezon City'; open = false; filterByLocation('quezon-city')"
+                                    <button @click="selected = 'Others'; open = false; filterByLocation('others')"
                                         class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Quezon City
-                                    </button>
-                                    <button @click="selected = 'Makati'; open = false; filterByLocation('makati')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Makati
-                                    </button>
-                                    <button @click="selected = 'Taguig'; open = false; filterByLocation('taguig')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Taguig
-                                    </button>
-                                    <button @click="selected = 'Pasig'; open = false; filterByLocation('pasig')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Pasig
-                                    </button>
-                                    <button @click="selected = 'Cebu'; open = false; filterByLocation('cebu')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Cebu
-                                    </button>
-                                    <button @click="selected = 'Davao'; open = false; filterByLocation('davao')"
-                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                        Davao
+                                        Others (Outside Rosario)
                                     </button>
                                 </div>
                             </div>
@@ -433,6 +416,22 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
             </div>
         <?php endif; ?>
     </div>
+    <!-- Pagination Controls (Hidden by default, shown when needed) -->
+    <div id="paginationContainer" class="flex items-center justify-center hidden mt-8 space-x-2">
+        <button id="prevPage" onclick="changePage(-1)"
+            class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Previous
+        </button>
+
+        <div id="pageNumbers" class="flex space-x-1">
+            <!-- Page numbers will be generated here -->
+        </div>
+
+        <button id="nextPage" onclick="changePage(1)"
+            class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Next
+        </button>
+    </div>
 </div>
 
 <style>
@@ -609,6 +608,9 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
         console.log('Active filters:', activeFilters);
 
+        let rosarioJobs = [];
+        let otherJobs = [];
+
         filteredJobs = allJobs.filter(job => {
             let shouldShow = true;
 
@@ -621,11 +623,25 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                 }
             }
 
-            // Location filter
+            // Location filter with Rosario priority logic
             if (activeFilters.location && shouldShow) {
                 const location = job.getAttribute('data-location') || '';
-                if (!location.includes(activeFilters.location.toLowerCase())) {
-                    shouldShow = false;
+
+                if (activeFilters.location.toLowerCase() === 'rosario') {
+                    // Only show Rosario jobs
+                    if (!location.includes('rosario')) {
+                        shouldShow = false;
+                    }
+                } else if (activeFilters.location.toLowerCase() === 'others') {
+                    // Only show non-Rosario jobs
+                    if (location.includes('rosario')) {
+                        shouldShow = false;
+                    }
+                } else {
+                    // Regular location filtering
+                    if (!location.includes(activeFilters.location.toLowerCase())) {
+                        shouldShow = false;
+                    }
                 }
             }
 
@@ -637,31 +653,176 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                 }
             }
 
-            // Workplace filter
+            // FIXED: Workplace filter - Updated to match the job card's data structure
             if (activeFilters.workplace && shouldShow) {
                 const jobType = job.getAttribute('data-job-type') || '';
-                if (!jobType.includes(activeFilters.workplace.toLowerCase())) {
-                    shouldShow = false;
+
+                // Handle different workplace type matching
+                if (activeFilters.workplace.toLowerCase() === 'on-site') {
+                    // Match both "on-site" and "onsite" variations
+                    if (!jobType.includes('on-site') && !jobType.includes('onsite')) {
+                        shouldShow = false;
+                    }
+                } else if (activeFilters.workplace.toLowerCase() === 'remote') {
+                    if (!jobType.includes('remote')) {
+                        shouldShow = false;
+                    }
+                } else if (activeFilters.workplace.toLowerCase() === 'hybrid') {
+                    if (!jobType.includes('hybrid')) {
+                        shouldShow = false;
+                    }
+                } else {
+                    // Fallback for exact match
+                    if (!jobType.includes(activeFilters.workplace.toLowerCase())) {
+                        shouldShow = false;
+                    }
                 }
             }
 
             return shouldShow;
         });
 
-        console.log('Filtered jobs:', filteredJobs.length);
-
-        // Show/hide jobs
-        allJobs.forEach(job => {
-            if (filteredJobs.includes(job)) {
-                job.style.display = 'block';
+        // Categorize filtered jobs by location for priority display
+        filteredJobs.forEach(job => {
+            const location = job.getAttribute('data-location') || '';
+            if (location.includes('rosario')) {
+                rosarioJobs.push(job);
+                addPriorityBadge(job);
             } else {
-                job.style.display = 'none';
+                otherJobs.push(job);
+                removePriorityBadge(job);
             }
         });
 
+        // Reorder filtered jobs with Rosario priority
+        if (activeFilters.location && activeFilters.location.toLowerCase() === 'others') {
+            // Show only non-Rosario jobs when "Others" is selected
+            filteredJobs = otherJobs;
+        } else if (activeFilters.location && activeFilters.location.toLowerCase() === 'rosario') {
+            // Show only Rosario jobs when "Rosario" is selected
+            filteredJobs = rosarioJobs;
+        } else {
+            // Show all with Rosario priority (Rosario first, then others)
+            filteredJobs = [...rosarioJobs, ...otherJobs];
+        }
+
+        console.log('Filtered jobs:', filteredJobs.length, '(Rosario:', rosarioJobs.length, ', Others:', otherJobs.length, ')');
+
+        // Reset to first page when filters change
+        currentPage = 1;
+
         updateResultsCount();
         updateActiveFiltersDisplay();
+        displayCurrentPage();
+        updatePagination();
         showNoResultsMessage(filteredJobs.length === 0);
+    }
+
+    // Add priority badge to Rosario jobs
+    function addPriorityBadge(jobCard) {
+        // Check if badge already exists
+        if (jobCard.querySelector('.rosario-priority-badge')) return;
+
+        const locationElement = jobCard.querySelector('.flex.items-center.gap-1.mb-3');
+        if (locationElement) {
+            const badge = document.createElement('span');
+            badge.className = 'rosario-priority-badge ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded-full';
+            badge.textContent = 'Priority';
+            locationElement.appendChild(badge);
+        }
+    }
+
+    // Remove priority badge
+    function removePriorityBadge(jobCard) {
+        const badge = jobCard.querySelector('.rosario-priority-badge');
+        if (badge) {
+            badge.remove();
+        }
+    }
+
+    // Pagination functions
+    let currentPage = 1;
+    const jobsPerPage = 12;
+
+    function displayCurrentPage() {
+        const startIndex = (currentPage - 1) * jobsPerPage;
+        const endIndex = startIndex + jobsPerPage;
+        const jobsToShow = filteredJobs.slice(startIndex, endIndex);
+
+        // Hide all jobs first
+        allJobs.forEach(job => {
+            job.style.display = 'none';
+        });
+
+        // Show jobs for current page
+        jobsToShow.forEach(job => {
+            job.style.display = 'block';
+        });
+
+        console.log(`Displaying page ${currentPage}: jobs ${startIndex + 1}-${Math.min(endIndex, filteredJobs.length)} of ${filteredJobs.length}`);
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+        const paginationContainer = document.getElementById('paginationContainer');
+        const pageNumbers = document.getElementById('pageNumbers');
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+
+        if (totalPages <= 1) {
+            paginationContainer.classList.add('hidden');
+            return;
+        }
+
+        paginationContainer.classList.remove('hidden');
+
+        // Update prev/next buttons
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+
+        // Generate page numbers
+        pageNumbers.innerHTML = '';
+
+        // Show max 5 page numbers
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = `px-3 py-2 text-sm font-medium rounded-md ${
+            i === currentPage 
+                ? 'bg-primary text-white' 
+                : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+        }`;
+            pageButton.textContent = i;
+            pageButton.onclick = () => goToPage(i);
+            pageNumbers.appendChild(pageButton);
+        }
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+        const newPage = currentPage + direction;
+
+        if (newPage >= 1 && newPage <= totalPages) {
+            goToPage(newPage);
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        displayCurrentPage();
+        updatePagination();
+
+        // Scroll to top of job listings
+        document.getElementById('jobListingsContainer').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
     }
 
     // Sort by best matches

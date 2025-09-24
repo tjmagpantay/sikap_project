@@ -149,78 +149,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 </form>
             </div>
 
-            <!-- Privacy Settings -->
-            <div class="p-6 bg-white rounded-lg shadow">
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-900">Privacy Settings</h3>
-                    <p class="mt-1 text-sm text-gray-600">Control who can see your profile and contact information</p>
-                </div>
-
-                <form id="privacy-settings-form">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Profile Visibility</h4>
-                                <p class="text-xs text-gray-500">Allow employers to find and view your profile</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input
-                                    type="checkbox"
-                                    id="profile_visibility"
-                                    name="profile_visibility"
-                                    value="1"
-                                    <?php echo (isset($settings['profile_visibility']) && $settings['profile_visibility'] == 1) ? 'checked' : ''; ?>>
-                                <label for="profile_visibility" class="toggle-label">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Contact Information</h4>
-                                <p class="text-xs text-gray-500">Show your contact details to potential employers</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input
-                                    type="checkbox"
-                                    id="contact_information"
-                                    name="contact_information"
-                                    value="1"
-                                    <?php echo (isset($settings['contact_information']) && $settings['contact_information'] == 1) ? 'checked' : ''; ?>>
-                                <label for="contact_information" class="toggle-label">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900">Resume Download</h4>
-                                <p class="text-xs text-gray-500">Allow employers to download your resume</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input
-                                    type="checkbox"
-                                    id="resume_download"
-                                    name="resume_download"
-                                    value="1"
-                                    <?php echo (isset($settings['resume_download']) && $settings['resume_download'] == 1) ? 'checked' : ''; ?>>
-                                <label for="resume_download" class="toggle-label">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                            Save Privacy Settings
-                        </button>
-                    </div>
-                </form>
-            </div>
-
             <!-- Account Information -->
             <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
                 <div class="flex items-start gap-3 mb-6">
@@ -254,7 +182,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Profile Status</p>
-                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-primary">
+                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 border rounded-md text-primary">
                             <i class="mr-1 fas fa-check-circle"></i>
                             Active
                         </span>

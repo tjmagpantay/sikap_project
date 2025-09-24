@@ -1851,4 +1851,54 @@ class JobseekerController
         header('Location: ?page=complete-jobseeker-profile&step=6');
         exit;
     }
+
+    public function getProfileTabContent()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
+    $tab = $_GET['tab'] ?? 'profile';
+    
+    // Get jobseeker info
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+    if (!$jobseeker) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Profile not found']);
+        exit;
+    }
+
+    // For applications tab, get hired applications
+    if ($tab === 'applications') {
+        // Get hired applications using the existing method
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+        
+        $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus(
+            $jobseeker['jobseeker_id'], 
+            'hired'
+        );
+        
+        // Make sure it's available in the included file
+        $GLOBALS['hiredApplications'] = $hiredApplications;
+    }
+
+    // Include the appropriate tab content
+    switch ($tab) {
+        case 'profile':
+            include __DIR__ . '/../views/jobseekers/profile-components/profile-content.php';
+            break;
+        case 'documents':
+            include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
+            break;
+        case 'applications':
+            include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
+            break;
+        default:
+            echo '<div class="py-8 text-center"><p class="text-gray-500">Tab not found</p></div>';
+    }
+    exit;
+}
 }
