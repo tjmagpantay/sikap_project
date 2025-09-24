@@ -267,7 +267,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->dashboard();
             break;
 
-
+        case 'notifications-admin':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->notifications(); // Use the controller method
+            break;
 
         case 'all-reports':
             if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {

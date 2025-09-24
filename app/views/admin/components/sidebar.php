@@ -168,8 +168,22 @@
                             <span>Create Event</span>
                         </a>
                     </li>
+
                 </ul>
             </li>
+
+            <li>
+                <a href="?page=notifications-admin" class="flex items-center w-full px-4 py-3 text-sm font-normal text-gray-600 transition-colors rounded-lg hover:bg-primary hover:text-white focus:outline-none">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <!-- Bell Icon -->
+                        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span>Notifications</span>
+                </a>
+            </li>
+
+
+
         </ul>
     </nav>
 

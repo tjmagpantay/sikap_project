@@ -167,64 +167,111 @@ class AdminController
         include __DIR__ . '/../views/admin/review-accreditation.php';
     }
 
-    public function processAccreditation()
-    {
-        if (!$this->isAdminLoggedIn()) {
-            header('Location: ?page=admin-login');
-            exit;
-        }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ?page=admin-accreditations');
-            exit;
-        }
+public function processAccreditation()
+{
+    if (!$this->isAdminLoggedIn()) {
+        header('Location: ?page=admin-login');
+        exit;
+    }
 
-        $accreditation_id = $_POST['accreditation_id'] ?? '';
-        $status = $_POST['status'] ?? '';
-        $notes = $_POST['notes'] ?? '';
-        $admin_id = $_SESSION['admin_id'] ?? null;
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ?page=admin-accreditations');
+        exit;
+    }
 
-        if (empty($accreditation_id) || empty($status)) {
-            $_SESSION['error'] = 'Missing required information';
-            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
-            exit;
-        }
+    $accreditation_id = $_POST['accreditation_id'] ?? '';
+    $status = $_POST['status'] ?? '';
+    $notes = $_POST['notes'] ?? '';
+    $admin_id = $_SESSION['admin_id'] ?? null;
 
-        // Validate status
-        $validStatuses = ['pending', 'approved', 'rejected'];
-        if (!in_array($status, $validStatuses)) {
-            $_SESSION['error'] = 'Invalid status';
-            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
-            exit;
-        }
-
-        try {
-            // ✅ FIXED: Update both accreditation and employer status
-            $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
-
-            if ($result) {
-                // ✅ NEW: Also update the employer status to match
-                $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
-
-                $statusText = ucfirst($status);
-
-                if ($syncResult) {
-                    $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized.";
-                } else {
-                    $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed.";
-                }
-            } else {
-                $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
-            }
-        } catch (Exception $e) {
-            error_log("Error updating accreditation status: " . $e->getMessage());
-            $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
-        }
-
-        // ✅ FIXED: Redirect back to the same review page instead of accreditations list
+    if (empty($accreditation_id) || empty($status)) {
+        $_SESSION['error'] = 'Missing required information';
         header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
         exit;
     }
+
+    // Validate status
+    $validStatuses = ['pending', 'approved', 'rejected'];
+    if (!in_array($status, $validStatuses)) {
+        $_SESSION['error'] = 'Invalid status';
+        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+        exit;
+    }
+
+    try {
+        // Get the current accreditation details before updating (for notification comparison)
+        $currentAccreditation = $this->adminModel->getAccreditationDetails($accreditation_id);
+        $previousStatus = $currentAccreditation['status'] ?? 'pending';
+
+        // Update accreditation status
+        $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
+
+        if ($result) {
+            // Sync employer status
+            $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
+
+            $statusText = ucfirst($status);
+
+            // ADDED: Send notification to employer about status update (only if status actually changed)
+            if ($previousStatus !== $status) {
+                try {
+                    require_once __DIR__ . '/../services/NotificationService.php';
+                    require_once __DIR__ . '/../../config/sikap_db.php';
+
+                    $config = require __DIR__ . '/../../config/sikap_db.php';
+                    $notificationPdo = new PDO(
+                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        $config['db_user'],
+                        $config['db_pass']
+                    );
+                    $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    $notificationService = new NotificationService($notificationPdo);
+
+                    error_log("🔔 DEBUG: Sending accreditation status update notification to employer");
+                    error_log("   - Accreditation ID: $accreditation_id");
+                    error_log("   - Previous Status: $previousStatus");
+                    error_log("   - New Status: $status");
+                    error_log("   - Admin Notes: " . ($notes ?: 'None'));
+
+                    // Send notification to employer
+                    $notificationResult = $notificationService->notifyEmployerAboutAccreditationUpdate(
+                        $accreditation_id,
+                        $status,
+                        $notes
+                    );
+
+                    if ($notificationResult) {
+                        error_log("✅ Accreditation status notification sent to employer for accreditation ID: $accreditation_id");
+                    } else {
+                        error_log("❌ Failed to send accreditation status notification for accreditation ID: $accreditation_id");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Error sending accreditation status notification: " . $e->getMessage());
+                    // Don't fail the status update if notification fails
+                }
+            } else {
+                error_log("ℹ️ Accreditation status unchanged ($previousStatus -> $status), skipping notification");
+            }
+
+            if ($syncResult) {
+                $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized and notification sent.";
+            } else {
+                $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed. Notification sent.";
+            }
+        } else {
+            $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
+        }
+    } catch (Exception $e) {
+        error_log("Error updating accreditation status: " . $e->getMessage());
+        $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
+    }
+
+    // Redirect back to the same review page
+    header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+    exit;
+}
 
     // ✅ NEW METHOD: Sync employer status with accreditation status
     private function syncEmployerStatus($accreditation_id, $accreditation_status)

@@ -1069,92 +1069,143 @@ class JobApplicationController
         exit;
     }
 
-    public function resignFromJob()
-    {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            header('Location: ?page=login-jobseeker');
-            exit;
-        }
-
-        $application_id = $_GET['id'] ?? null;
-        if (!$application_id) {
-            header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
-            exit;
-        }
-
-        // Get jobseeker info
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        if (!$jobseeker) {
-            header('Location: ?page=my-applications&error=' . urlencode('Jobseeker profile not found.'));
-            exit;
-        }
-
-        // Check if jobseeker can resign (must be hired)
-        if (!$this->jobApplicationModel->canResign($application_id, $jobseeker['jobseeker_id'])) {
-            header('Location: ?page=my-applications&error=' . urlencode('You can only resign from jobs where you have been hired.'));
-            exit;
-        }
-
-        // Check if there's already a pending resignation request
-        require_once __DIR__ . '/../models/ResignationRequest.php';
-        $resignationModel = new ResignationRequest();
-
-        $existingRequest = $resignationModel->getResignationRequestByApplication($application_id);
-        if ($existingRequest && $existingRequest['request_status'] === 'pending') {
-            header('Location: ?page=view-application&id=' . $application_id . '&error=' . urlencode('You already have a pending resignation request for this position.'));
-            exit;
-        }
-
-        // Handle resignation request submission
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_resignation'])) {
-            error_log('Processing resignation request for application: ' . $application_id);
-
-            try {
-                // Get application details to find employer
-                $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
-                if (!$application) {
-                    error_log('Application not found for ID: ' . $application_id);
-                    throw new Exception('Application not found.');
-                }
-
-                error_log('Application found - Employer ID: ' . $application['employer_id']);
-
-                $resignationData = [
-                    'application_id' => $application_id,
-                    'jobseeker_id' => $jobseeker['jobseeker_id'],
-                    'employer_id' => $application['employer_id'],
-                    'resignation_reason' => trim($_POST['resignation_reason']) ?: null
-                ];
-
-                error_log('Resignation data: ' . json_encode($resignationData));
-
-                $result = $resignationModel->createResignationRequest($resignationData);
-
-                error_log('Resignation creation result: ' . ($result ? 'SUCCESS' : 'FAILED'));
-
-                if ($result) {
-                    error_log('Redirecting to success page');
-                    header('Location: ?page=view-application&id=' . $application_id . '&success=' . urlencode('Your resignation request has been submitted and is pending employer approval.'));
-                } else {
-                    throw new Exception('Failed to submit resignation request.');
-                }
-            } catch (Exception $e) {
-                error_log('Error in resignation submission: ' . $e->getMessage());
-                header('Location: ?page=resign-from-job&id=' . $application_id . '&error=' . urlencode($e->getMessage()));
-            }
-            exit;
-        }
-
-        // Show resignation confirmation page
-        $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
-        if (!$application) {
-            header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
-            exit;
-        }
-
-        include __DIR__ . '/../views/jobseekers/job-application/resign-confirmation.php';
+public function resignFromJob()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+        header('Location: ?page=login-jobseeker');
+        exit;
     }
 
+    $application_id = $_GET['id'] ?? null;
+    if (!$application_id) {
+        header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
+        exit;
+    }
+
+    // Get jobseeker info
+    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+    if (!$jobseeker) {
+        header('Location: ?page=my-applications&error=' . urlencode('Jobseeker profile not found.'));
+        exit;
+    }
+
+    // Check if jobseeker can resign (must be hired)
+    if (!$this->jobApplicationModel->canResign($application_id, $jobseeker['jobseeker_id'])) {
+        header('Location: ?page=my-applications&error=' . urlencode('You can only resign from jobs where you have been hired.'));
+        exit;
+    }
+
+    // Check if there's already a pending resignation request
+    require_once __DIR__ . '/../models/ResignationRequest.php';
+    $resignationModel = new ResignationRequest();
+
+    $existingRequest = $resignationModel->getResignationRequestByApplication($application_id);
+    if ($existingRequest && $existingRequest['request_status'] === 'pending') {
+        header('Location: ?page=view-application&id=' . $application_id . '&error=' . urlencode('You already have a pending resignation request for this position.'));
+        exit;
+    }
+
+    // Handle resignation request submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_resignation'])) {
+        error_log('Processing resignation request for application: ' . $application_id);
+
+        try {
+            $resignationReason = trim($_POST['resignation_reason']) ?: null;
+
+            // Get application details for notification
+            $application = $this->jobApplicationModel->getApplicationDetails($application_id);
+            if (!$application) {
+                throw new Exception('Application not found');
+            }
+
+            // Create resignation request data
+            $resignationData = [
+                'application_id' => $application_id,
+                'jobseeker_id' => $jobseeker['jobseeker_id'],
+                'employer_id' => $application['employer_id'], // Make sure this field exists
+                'resignation_reason' => $resignationReason
+            ];
+
+            error_log('DEBUG: Resignation data: ' . json_encode($resignationData));
+
+            // Create the resignation request
+            $result = $resignationModel->createResignationRequest($resignationData);
+
+            if ($result) {
+                // Get the resignation ID for notification
+                $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
+                $resignationId = $resignationRequest['resignation_id'];
+
+                error_log('✅ Resignation request created successfully with ID: ' . $resignationId);
+
+                // ADDED: Send notification to employer about resignation request
+                try {
+                    require_once __DIR__ . '/../services/NotificationService.php';
+                    require_once __DIR__ . '/../../config/sikap_db.php';
+
+                    $config = require __DIR__ . '/../../config/sikap_db.php';
+                    $notificationPdo = new PDO(
+                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        $config['db_user'],
+                        $config['db_pass']
+                    );
+                    $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    $notificationService = new NotificationService($notificationPdo);
+
+                    // Get jobseeker's full name
+                    $jobseekerName = trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']);
+
+                    // Get company name (you may need to adjust this based on your data structure)
+                    $companyName = $application['company_name'] ?? 'Your Company';
+
+                    error_log("🔔 DEBUG: Sending resignation request notification to employer");
+                    error_log("   - Application ID: $application_id");
+                    error_log("   - Resignation ID: $resignationId");
+                    error_log("   - Jobseeker Name: $jobseekerName");
+                    error_log("   - Job Title: {$application['job_title']}");
+                    error_log("   - Company Name: $companyName");
+
+                    // Send notification to employer
+                    $notificationResult = $notificationService->notifyEmployerAboutResignation(
+                        $application_id,
+                        $resignationId,
+                        $jobseekerName,
+                        $application['job_title'],
+                        $companyName,
+                        $resignationReason
+                    );
+
+                    if ($notificationResult) {
+                        error_log("✅ Resignation request notification sent to employer for resignation ID: $resignationId");
+                    } else {
+                        error_log("❌ Failed to send resignation request notification for resignation ID: $resignationId");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Error sending resignation request notification: " . $e->getMessage());
+                    // Don't fail the resignation request if notification fails
+                }
+
+                header('Location: ?page=view-application&id=' . $application_id . '&success=' . urlencode('Resignation request submitted successfully. Your employer will review your request.'));
+            } else {
+                header('Location: ?page=view-application&id=' . $application_id . '&error=' . urlencode('Failed to submit resignation request. Please try again.'));
+            }
+        } catch (Exception $e) {
+            error_log('Error processing resignation request: ' . $e->getMessage());
+            header('Location: ?page=view-application&id=' . $application_id . '&error=' . urlencode('An error occurred while submitting your resignation request.'));
+        }
+        exit;
+    }
+
+    // Show resignation confirmation page
+    $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
+    if (!$application) {
+        header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
+        exit;
+    }
+
+    include __DIR__ . '/../views/jobseekers/job-application/resign-confirmation.php';
+}
     // Update the viewJob method in JobApplicationController.php:
 
     private function saveOrUpdateProfileDocument($jobseeker_id, $file_path, $file_type, $file_name)

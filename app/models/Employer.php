@@ -510,64 +510,120 @@ class Employer
         }
     }
 
-    public function markProfileCompleted($employer_id)
-    {
-        try {
-            error_log("DEBUG: Marking profile completed for employer_id: $employer_id");
+public function markProfileCompleted($employer_id)
+{
+    try {
+        error_log("DEBUG: Marking profile completed for employer_id: $employer_id");
 
-            $sql = "UPDATE employer SET 
-                        profile_completed = 1, 
-                        status = :status, 
-                        updated_at = CURRENT_TIMESTAMP 
-                    WHERE employer_id = :employer_id";
+        $sql = "UPDATE employer SET 
+                    profile_completed = 1, 
+                    status = :status, 
+                    updated_at = CURRENT_TIMESTAMP 
+                WHERE employer_id = :employer_id";
 
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute([
+            'employer_id' => $employer_id,
+            'status' => self::STATUS_PENDING_VERIFICATION
+        ]);
+
+        if ($result) {
+            $accreditationId = $this->createAccreditationRecord($employer_id);
+            
+            // ADDED: Send notification to admins about new accreditation request
+            if ($accreditationId) {
+                try {
+                    require_once __DIR__ . '/../services/NotificationService.php';
+                    require_once __DIR__ . '/../../config/sikap_db.php';
+
+                    $config = require __DIR__ . '/../../config/sikap_db.php';
+                    $notificationPdo = new PDO(
+                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        $config['db_user'],
+                        $config['db_pass']
+                    );
+                    $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    $notificationService = new NotificationService($notificationPdo);
+
+                    // Get employer details for notification
+                    $employer = $this->findById($employer_id);
+                    $business = $this->getBusiness($employer_id);
+
+                    $employerName = trim($employer['first_name'] . ' ' . $employer['last_name']);
+                    $businessName = $business['business_name'] ?? $employer['company_name'] ?? 'Unknown Business';
+                    $businessType = $business['business_type'] ?? null;
+
+                    error_log("🔔 DEBUG: Sending accreditation request notification to admins");
+                    error_log("   - Accreditation ID: $accreditationId");
+                    error_log("   - Employer Name: $employerName");
+                    error_log("   - Business Name: $businessName");
+                    error_log("   - Business Type: " . ($businessType ?: 'N/A'));
+
+                    // Send notification to admins
+                    $notificationResult = $notificationService->notifyAdminsAboutNewAccreditation(
+                        $accreditationId,
+                        $employerName,
+                        $businessName,
+                        $businessType
+                    );
+
+                    if ($notificationResult) {
+                        error_log("✅ Accreditation request notification sent to admins for accreditation ID: $accreditationId");
+                    } else {
+                        error_log("❌ Failed to send accreditation request notification for accreditation ID: $accreditationId");
+                    }
+                } catch (Exception $e) {
+                    error_log("❌ Error sending accreditation request notification: " . $e->getMessage());
+                    // Don't fail the profile completion if notification fails
+                }
+            }
+
+            // Update business completion status
+            $this->updateBusinessCompletionStatus($employer_id);
+            error_log("DEBUG: Profile marked as completed successfully");
+        }
+
+        return $result;
+    } catch (PDOException $e) {
+        error_log('Error marking profile as completed: ' . $e->getMessage());
+        return false;
+    }
+}
+
+// Update the createAccreditationRecord method to return the accreditation ID
+
+private function createAccreditationRecord($employer_id)
+{
+    try {
+        // Check if accreditation record already exists
+        $checkSql = "SELECT accreditation_id FROM accreditation WHERE employer_id = ?";
+        $checkStmt = $this->db->prepare($checkSql);
+        $checkStmt->execute([$employer_id]);
+        $existing = $checkStmt->fetch();
+
+        if (!$existing) {
+            // Create new accreditation record
+            $sql = "INSERT INTO accreditation (employer_id, status, created_at) VALUES (?, 'pending', NOW())";
             $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute([
-                'employer_id' => $employer_id,
-                'status' => self::STATUS_PENDING_VERIFICATION
-            ]);
+            $result = $stmt->execute([$employer_id]);
 
             if ($result) {
-                $this->createAccreditationRecord($employer_id);
-                // Update business completion status
-                $this->updateBusinessCompletionStatus($employer_id);
-                error_log("DEBUG: Profile marked as completed successfully");
+                $accreditationId = $this->db->lastInsertId();
+                error_log("DEBUG: Accreditation record created for employer_id: $employer_id with accreditation_id: $accreditationId");
+                return $accreditationId;
             }
-
-            return $result;
-        } catch (PDOException $e) {
-            error_log('Error marking profile as completed: ' . $e->getMessage());
-            return false;
+        } else {
+            error_log("DEBUG: Accreditation record already exists for employer_id: $employer_id");
+            return $existing['accreditation_id'];
         }
+
+        return false;
+    } catch (PDOException $e) {
+        error_log('Error creating accreditation record: ' . $e->getMessage());
+        return false;
     }
-
-    private function createAccreditationRecord($employer_id)
-    {
-        try {
-            // Check if accreditation record already exists
-            $checkSql = "SELECT accreditation_id FROM accreditation WHERE employer_id = ?";
-            $checkStmt = $this->db->prepare($checkSql);
-            $checkStmt->execute([$employer_id]);
-
-            if (!$checkStmt->fetch()) {
-                // Create new accreditation record
-                $sql = "INSERT INTO accreditation (employer_id, status, created_at) VALUES (?, 'pending', NOW())";
-                $stmt = $this->db->prepare($sql);
-                $result = $stmt->execute([$employer_id]);
-
-                if ($result) {
-                    error_log("DEBUG: Accreditation record created for employer_id: $employer_id");
-                }
-
-                return $result;
-            }
-
-            return true; // Already exists
-        } catch (PDOException $e) {
-            error_log('Error creating accreditation record: ' . $e->getMessage());
-            return false;
-        }
-    }
+}
 
     public function getVerificationStatus($user_id)
     {

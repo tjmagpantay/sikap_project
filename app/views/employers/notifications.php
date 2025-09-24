@@ -66,8 +66,84 @@ include_once __DIR__ . '/components/navbar-employer.php';
                         <div class="flex items-start gap-4 p-6 pb-4 <?php echo $notification['status'] === 'unread' ? 'bg-blue-50' : 'bg-gray-50'; ?>">
                             <!-- Notification Icon -->
                             <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center w-12 h-12 rounded-full <?php echo $notification['type'] === 'job_application' ? 'bg-purple-100' : ($notification['type'] === 'program' ? 'bg-green-100' : 'bg-blue-100'); ?>">
-                                    <?php if ($notification['type'] === 'job_application'): ?>
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full <?php
+                                                                                                    if ($notification['type'] === 'accreditation') {
+                                                                                                        $notificationData = json_decode($notification['data'], true);
+                                                                                                        $isStatusUpdate = isset($notificationData['notification_type']) && $notificationData['notification_type'] === 'accreditation_status_update';
+                                                                                                        $status = $notificationData['status'] ?? 'pending';
+
+                                                                                                        if ($isStatusUpdate) {
+                                                                                                            if ($status === 'approved') {
+                                                                                                                echo 'bg-green-100';
+                                                                                                            } elseif ($status === 'rejected') {
+                                                                                                                echo 'bg-red-100';
+                                                                                                            } else {
+                                                                                                                echo 'bg-yellow-100';
+                                                                                                            }
+                                                                                                        } else {
+                                                                                                            echo 'bg-orange-100';
+                                                                                                        }
+                                                                                                    } elseif ($notification['type'] === 'resignation_update') {
+                                                                                                        $notificationData = json_decode($notification['data'], true);
+                                                                                                        $isResignationRequest = isset($notificationData['notification_type']) && $notificationData['notification_type'] === 'resignation_request';
+                                                                                                        echo $isResignationRequest ? 'bg-orange-100' : 'bg-red-100';
+                                                                                                    } elseif ($notification['type'] === 'job_application') {
+                                                                                                        echo 'bg-purple-100';
+                                                                                                    } elseif ($notification['type'] === 'program') {
+                                                                                                        echo 'bg-green-100';
+                                                                                                    } else {
+                                                                                                        echo 'bg-blue-100';
+                                                                                                    }
+                                                                                                    ?>">
+
+                                    <?php if ($notification['type'] === 'accreditation'): ?>
+                                        <!-- Parse the data to check if it's a status update -->
+                                        <?php
+                                        $notificationData = json_decode($notification['data'], true);
+                                        $isStatusUpdate = isset($notificationData['notification_type']) && $notificationData['notification_type'] === 'accreditation_status_update';
+                                        $status = $notificationData['status'] ?? 'pending';
+                                        ?>
+
+                                        <?php if ($isStatusUpdate): ?>
+                                            <!-- Accreditation Status Update Icon (different colors for different statuses) -->
+                                            <?php if ($status === 'approved'): ?>
+                                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                                </svg>
+                                            <?php elseif ($status === 'rejected'): ?>
+                                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            <?php else: ?>
+                                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <!-- Default accreditation icon -->
+                                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                            </svg>
+                                        <?php endif; ?>
+                                    <?php elseif ($notification['type'] === 'resignation_update'): ?>
+                                        <!-- Keep existing resignation update icon handling -->
+                                        <?php
+                                        $notificationData = json_decode($notification['data'], true);
+                                        $isResignationRequest = isset($notificationData['notification_type']) && $notificationData['notification_type'] === 'resignation_request';
+                                        ?>
+
+                                        <?php if ($isResignationRequest): ?>
+                                            <!-- Resignation Request Icon (for employers) -->
+                                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                            </svg>
+                                        <?php else: ?>
+                                            <!-- Regular resignation response icon -->
+                                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        <?php endif; ?>
+                                    <?php elseif ($notification['type'] === 'job_application'): ?>
                                         <!-- Job Application Icon -->
                                         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

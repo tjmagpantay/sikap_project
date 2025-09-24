@@ -84,25 +84,25 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <?php
                                     switch ($application['application_status']) {
                                         case 'pending':
-                                            echo 'bg-blue-100 text-primary border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200 rounded-md';
                                             break;
                                         case 'reviewed':
-                                            echo 'bg-blue-100 text-primary border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200 rounded-md';
                                             break;
                                         case 'shortlisted':
-                                            echo 'bg-blue-100 text-primary border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200 rounded-md';
                                             break;
                                         case 'rejected':
-                                            echo 'bg-red-100 text-red-800 border border-red-200';
+                                            echo 'bg-red-100 text-red-800 border border-red-200 rounded-md';
                                             break;
                                         case 'hired':
-                                            echo 'bg-blue-100 text-primary border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200 rounded-md';
                                             break;
                                         case 'resigned':
-                                            echo 'bg-blue-100 text-primary border border-blue-200';
+                                            echo 'bg-blue-100 text-primary border border-blue-200 rounded-md';
                                             break;
                                         default:
-                                            echo 'bg-gray-100 text-gray-800 border border-gray-200';
+                                            echo 'bg-gray-100 text-gray-800 border border-gray-200 rounded-md';
                                     }
                                     ?>">
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
