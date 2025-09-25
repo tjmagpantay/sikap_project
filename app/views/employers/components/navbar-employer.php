@@ -277,7 +277,7 @@
 
               <hr class="my-1">
 
-              <a href="?page=logout"
+              <a href="?page=login-employer"
                 class="flex items-center px-4 py-2 text-sm text-red-700 transition-colors duration-200 hover:bg-red-50 hover:text-red-900">
                 Sign Out
               </a>

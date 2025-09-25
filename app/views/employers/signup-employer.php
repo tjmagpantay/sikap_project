@@ -32,20 +32,24 @@ include_once __DIR__ . '/../components/alert-modal.php';
                     <?php endif; ?>
 
                     <!-- Form -->
-                    <form class="space-y-6" method="POST" action="?page=signup-employer">
+                    <form class="space-y-6" method="POST" action="?page=signup-employer" id="signupForm">
                         <!-- Email -->
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input id="email" name="email" type="email" required
+                            <input id="email" name="email" type="email" required maxlength="255"
+                                value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>"
                                 class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
                                 placeholder="your.email@example.com">
+                            <div class="flex justify-between text-xs">
+                                <span id="email-error" class="hidden text-red-500"></span>
+                            </div>
                         </div>
 
                         <!-- Password -->
                         <div class="space-y-2">
                             <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                             <div class="relative">
-                                <input id="password" name="password" type="password" required
+                                <input id="password" name="password" type="password" required maxlength="50"
                                     class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
                                     placeholder="Create a strong password">
                                 <button type="button" onclick="togglePassword('password')" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
@@ -58,13 +62,16 @@ include_once __DIR__ . '/../components/alert-modal.php';
                                     </svg>
                                 </button>
                             </div>
+                            <div class="flex justify-between text-xs">
+                                <span id="password-error" class="hidden text-red-500"></span>
+                            </div>
                         </div>
 
                         <!-- Confirm Password -->
                         <div class="space-y-2">
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
                             <div class="relative">
-                                <input id="confirm_password" name="confirm_password" type="password" required
+                                <input id="confirm_password" name="confirm_password" type="password" required maxlength="50"
                                     class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
                                     placeholder="Confirm your password">
                                 <button type="button" onclick="togglePassword('confirm_password')" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
@@ -76,6 +83,9 @@ include_once __DIR__ . '/../components/alert-modal.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                                     </svg>
                                 </button>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span id="confirm-password-error" class="hidden text-red-500"></span>
                             </div>
                         </div>
 
@@ -101,8 +111,8 @@ include_once __DIR__ . '/../components/alert-modal.php';
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit"
-                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-secondary hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
+                        <button type="submit" id="submitBtn"
+                            class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-secondary hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             Create Account
                         </button>
                     </form>
@@ -160,4 +170,155 @@ include_once __DIR__ . '/../components/alert-modal.php';
             showIcon.classList.remove('hidden');
         }
     }
+
+    // Character limit validation - Same as jobseeker signup
+    document.addEventListener('DOMContentLoaded', function() {
+        const fields = [{
+                id: 'email',
+                limit: 255,
+                errorId: 'email-error',
+                countId: 'email-count'
+            },
+            {
+                id: 'password',
+                limit: 50,
+                errorId: 'password-error',
+                countId: 'password-count'
+            },
+            {
+                id: 'confirm_password',
+                limit: 50,
+                errorId: 'confirm-password-error',
+                countId: 'confirm-password-count'
+            }
+        ];
+
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('signupForm');
+
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errorSpan = document.getElementById(field.errorId);
+            const countSpan = document.getElementById(field.countId);
+
+            input.addEventListener('input', function() {
+                const value = this.value;
+                const length = value.length;
+
+                countSpan.textContent = `${length}/${field.limit}`;
+
+                if (length > field.limit) {
+                    errorSpan.textContent = `Cannot exceed ${field.limit} characters`;
+                    errorSpan.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                } else {
+                    errorSpan.classList.add('hidden');
+                    this.classList.remove('border-red-500');
+                }
+
+                // Check for password matching
+                if (field.id === 'confirm_password') {
+                    const passwordInput = document.getElementById('password');
+                    const passwordValue = passwordInput.value;
+
+                    if (value && passwordValue && value !== passwordValue) {
+                        errorSpan.textContent = 'Passwords do not match';
+                        errorSpan.classList.remove('hidden');
+                        this.classList.add('border-red-500');
+                    } else if (length <= field.limit) {
+                        errorSpan.classList.add('hidden');
+                        this.classList.remove('border-red-500');
+                    }
+                }
+
+                validateForm();
+            });
+
+            // Initialize count
+            countSpan.textContent = `${input.value.length}/${field.limit}`;
+        });
+
+        // Additional password matching validation
+        document.getElementById('password').addEventListener('input', function() {
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const confirmPasswordError = document.getElementById('confirm-password-error');
+
+            if (confirmPasswordInput.value && this.value !== confirmPasswordInput.value) {
+                confirmPasswordError.textContent = 'Passwords do not match';
+                confirmPasswordError.classList.remove('hidden');
+                confirmPasswordInput.classList.add('border-red-500');
+            } else if (confirmPasswordInput.value.length <= 50) {
+                confirmPasswordError.classList.add('hidden');
+                confirmPasswordInput.classList.remove('border-red-500');
+            }
+
+            validateForm();
+        });
+
+        function validateForm() {
+            let isValid = true;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (input.value.length > field.limit || input.value.length === 0) {
+                    isValid = false;
+                }
+            });
+
+            // Check password matching
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            if (password && confirmPassword && password !== confirmPassword) {
+                isValid = false;
+            }
+
+            // Check terms checkbox
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                isValid = false;
+            }
+
+            submitBtn.disabled = !isValid;
+        }
+
+        // Terms checkbox validation
+        document.getElementById('terms').addEventListener('change', validateForm);
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let hasError = false;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const errorSpan = document.getElementById(field.errorId);
+
+                if (input.value.length > field.limit) {
+                    e.preventDefault();
+                    errorSpan.textContent = `Cannot exceed ${field.limit} characters`;
+                    errorSpan.classList.remove('hidden');
+                    input.classList.add('border-red-500');
+                    hasError = true;
+                }
+            });
+
+            // Check password matching on submit
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                const confirmPasswordError = document.getElementById('confirm-password-error');
+                confirmPasswordError.textContent = 'Passwords do not match';
+                confirmPasswordError.classList.remove('hidden');
+                document.getElementById('confirm_password').classList.add('border-red-500');
+                hasError = true;
+            }
+
+            if (hasError) {
+                return false;
+            }
+        });
+
+        // Initialize form validation
+        validateForm();
+    });
 </script>

@@ -16,18 +16,20 @@ class EmployerController
     public function signup()
     {
         $error = '';
+        $formData = []; // Add form data for repopulation
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $formData = $_POST; // Store form data for repopulation on error
+
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $confirm_password = $_POST['confirm_password'] ?? '';
 
-            if (empty($email) || empty($password)) {
-                $error = 'Please fill in all required fields.';
-            } elseif ($password !== $confirm_password) {
-                $error = 'Passwords do not match.';
-            } elseif (strlen($password) < 6) {
-                $error = 'Password must be at least 6 characters long.';
+            // Enhanced validation with character limits
+            $validationErrors = $this->validateSignupInput($formData);
+
+            if (!empty($validationErrors)) {
+                $error = implode(' ', $validationErrors);
             } elseif ($this->userModel->findByEmail($email)) {
                 $error = 'Email already exists.';
             } else {
@@ -75,13 +77,18 @@ class EmployerController
     public function login()
     {
         $error = '';
+        $formData = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $formData = $_POST;
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            if (empty($email) || empty($password)) {
-                $error = 'Please fill in all fields.';
+            // Add character limit validation for login
+            $validationErrors = $this->validateLoginInput($email, $password);
+
+            if (!empty($validationErrors)) {
+                $error = implode(' ', $validationErrors);
             } else {
                 $user = $this->userModel->findByEmail($email);
 
@@ -101,6 +108,65 @@ class EmployerController
         }
 
         include __DIR__ . '/../views/employers/login-employer.php';
+    }
+
+    // Add this new validation method for signup
+    private function validateSignupInput($data)
+    {
+        $errors = [];
+
+        // Email validation
+        if (empty($data['email'])) {
+            $errors[] = 'Email is required.';
+        } elseif (strlen($data['email']) > 255) {
+            $errors[] = 'Email cannot exceed 255 characters.';
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address.';
+        }
+
+        // Password validation
+        if (empty($data['password'])) {
+            $errors[] = 'Password is required.';
+        } elseif (strlen($data['password']) < 6) {
+            $errors[] = 'Password must be at least 6 characters long.';
+        } elseif (strlen($data['password']) > 50) {
+            $errors[] = 'Password cannot exceed 50 characters.';
+        }
+
+        // Confirm Password validation
+        if (empty($data['confirm_password'])) {
+            $errors[] = 'Please confirm your password.';
+        } elseif (strlen($data['confirm_password']) > 50) {
+            $errors[] = 'Confirm password cannot exceed 50 characters.';
+        } elseif ($data['password'] !== $data['confirm_password']) {
+            $errors[] = 'Passwords do not match.';
+        }
+
+        return $errors;
+    }
+
+    // Add this new validation method for login
+    private function validateLoginInput($email, $password)
+    {
+        $errors = [];
+
+        // Email validation
+        if (empty($email)) {
+            $errors[] = 'Email is required.';
+        } elseif (strlen($email) > 255) {
+            $errors[] = 'Email cannot exceed 255 characters.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address.';
+        }
+
+        // Password validation
+        if (empty($password)) {
+            $errors[] = 'Password is required.';
+        } elseif (strlen($password) > 50) {
+            $errors[] = 'Password cannot exceed 50 characters.';
+        }
+
+        return $errors;
     }
 
     public function dashboard()

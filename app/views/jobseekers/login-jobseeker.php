@@ -18,6 +18,7 @@ include_once __DIR__ . '/../components/navbar.php';
                     <?php endif; ?>
 
                     <form class="space-y-6" method="POST" action="?page=login-jobseeker" id="loginForm">
+                        <!-- Email -->
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                             <input id="email" name="email" type="email" required maxlength="255"
@@ -25,9 +26,10 @@ include_once __DIR__ . '/../components/navbar.php';
                                 class="block w-full px-3 py-3 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                             <div class="flex justify-between text-xs">
                                 <span id="email-error" class="hidden text-red-500"></span>
-                                
                             </div>
                         </div>
+
+                        <!-- Password -->
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <label for="password" class="text-sm font-medium text-gray-700">Password</label>
@@ -39,20 +41,14 @@ include_once __DIR__ . '/../components/navbar.php';
                                 <input id="password" name="password" type="password" required maxlength="50"
                                     class="w-full px-3 py-3 pr-12 text-sm placeholder-gray-400 transition-colors border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                                 <button type="button" onclick="togglePassword()" class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
-                                    <svg id="password-icon-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    <svg id="password-icon-hide" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                                    </svg>
+                                    <!-- icons stay as is -->
                                 </button>
                             </div>
                             <div class="flex justify-between text-xs">
                                 <span id="password-error" class="hidden text-red-500"></span>
-                                
                             </div>
                         </div>
+
                         <button type="submit"
                             class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             id="submitBtn">
@@ -161,7 +157,7 @@ include_once __DIR__ . '/../components/navbar.php';
             const value = this.value;
             const length = value.length;
 
-            emailCount.textContent = `${length}/255`;
+            if (emailCount) emailCount.textContent = `${length}/255`;
 
             if (length > 255) {
                 emailError.textContent = 'Email cannot exceed 255 characters';
@@ -180,7 +176,7 @@ include_once __DIR__ . '/../components/navbar.php';
             const value = this.value;
             const length = value.length;
 
-            passwordCount.textContent = `${length}/50`;
+            if (passwordCount) passwordCount.textContent = `${length}/50`;
 
             if (length > 50) {
                 passwordError.textContent = 'Password cannot exceed 50 characters';
@@ -222,9 +218,9 @@ include_once __DIR__ . '/../components/navbar.php';
             }
         });
 
-        // Initialize counts
-        emailCount.textContent = `${emailInput.value.length}/255`;
-        passwordCount.textContent = `${passwordInput.value.length}/50`;
+        // Initialize counts if elements exist
+        if (emailCount) emailCount.textContent = `${emailInput.value.length}/255`;
+        if (passwordCount) passwordCount.textContent = `${passwordInput.value.length}/50`;
         validateForm();
 
         // Image Carousel
