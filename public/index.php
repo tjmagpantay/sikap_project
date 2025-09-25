@@ -144,10 +144,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
             if (isset($_GET['tab']) && in_array($_GET['tab'], ['profile', 'documents', 'applications'])) {
                 // Check if it's an AJAX request
                 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                    // Use the controller method instead of direct model access
+                    // FIXED: Method name typo
                     require_once __DIR__ . '/../app/controllers/JobseekerController.php';
                     $controller = new JobseekerController();
-                    $controller->getprofileTabContent();
+                    $controller->profileTabContent(); // Fixed: was getprofileTabContent()
                 }
             }
             break;

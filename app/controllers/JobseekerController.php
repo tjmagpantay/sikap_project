@@ -1628,7 +1628,7 @@ class JobseekerController
 
     private function loadProfileTab($jobseeker)
     {
-        // Load all profile data
+        // FIXED: Load ALL profile data for AJAX requests
         $education = $this->jobseekerModel->getEducation($_SESSION['user_id']);
         $workExperience = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']);
         $skills = $this->jobseekerModel->getSkills($_SESSION['user_id']);
@@ -1640,7 +1640,17 @@ class JobseekerController
         if ($skills === false) $skills = [];
         if ($certificates === false) $certificates = [];
         if ($jobseeker === false) {
-            $jobseeker = ['first_name' => '', 'last_name' => '', 'middle_name' => '', 'suffix' => '', 'date_of_birth' => null, 'sex' => '', 'address' => '', 'contact_no' => ''];
+            $jobseeker = [
+                'first_name' => '',
+                'last_name' => '',
+                'middle_name' => '',
+                'suffix' => '',
+                'date_of_birth' => null,
+                'sex' => '',
+                'address' => '',
+                'contact_no' => '',
+                'profile_picture' => ''
+            ];
         }
 
         include __DIR__ . '/../views/jobseekers/profile-components/profile-content.php';
@@ -1653,10 +1663,9 @@ class JobseekerController
 
         include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
     }
-
     private function loadApplicationsTab($jobseeker)
     {
-        // Get hired applications through the controller (proper MVC)
+        // FIXED: Load applications data properly
         $hiredApplications = [];
 
         if ($jobseeker && $jobseeker['jobseeker_id']) {
@@ -1664,6 +1673,9 @@ class JobseekerController
             $jobApplicationModel = new JobApplication();
             $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus($jobseeker['jobseeker_id'], 'hired');
         }
+
+        // Make sure $GLOBALS is set for the view
+        $GLOBALS['hiredApplications'] = $hiredApplications;
 
         include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
     }
