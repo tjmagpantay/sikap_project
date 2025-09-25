@@ -307,9 +307,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         class="inline-flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-colors duration-200 rounded-md bg-primary hover:bg-primary">
                                         View Details
                                     </a>
-                                    <a href="?page=view-all-applicants&job_id=<?php echo $job['job_id']; ?>"
+                                    <!-- FIXED: Use view-applicants instead of view-all-applicants to show job-specific candidates -->
+                                    <a href="?page=view-applicants&job_id=<?php echo $job['job_id']; ?>"
                                         class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-secondary rounded-lg hover:secondary transition-colors duration-200">
-                                        Candidates
+                                        Candidates (<?php echo $job['application_count'] ?? 0; ?>)
                                     </a>
                                 </div>
                             </div>
