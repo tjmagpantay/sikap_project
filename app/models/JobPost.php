@@ -225,29 +225,32 @@ class JobPost
     {
         try {
             $sql = "SELECT 
-                    jp.*,
-                    e.first_name as employer_first_name,
-                    e.last_name as employer_last_name,
-                    e.company_name,
-                    e.contact_no as contact_phone,
-                    e.profile_picture as company_logo,
-                    eb.business_name,
-                    eb.business_logo,
-                    eb.business_desc as company_description,
-                    eb.business_address as company_location,
-                    eb.business_email as contact_email,
-                    eb.business_website as website,
-                    jpas.screening_questions_enabled,
-                    jpas.allow_cover_letter,
-                    jpas.resume_required,
-                    jpas.max_applicants,
-                    jpas.notify_on_new_application,
-                    jpas.is_highlighted
-                FROM job_post jp
-                LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                LEFT JOIN job_post_application_settings jpas ON jp.job_id = jpas.job_id
-                WHERE jp.job_id = ?";
+                jp.*,
+                e.first_name as employer_first_name,
+                e.last_name as employer_last_name,
+                e.company_name,
+                e.contact_no as contact_phone,
+                e.profile_picture as company_logo,
+                eb.business_name,
+                eb.business_logo,
+                eb.business_desc as company_description,
+                eb.business_address as company_location,
+                eb.business_email as contact_email,
+                eb.business_website as website,
+                jpas.screening_questions_enabled,
+                jpas.allow_cover_letter,
+                jpas.resume_required,
+                jpas.max_applicants,
+                jpas.notify_on_new_application,
+                jpas.is_highlighted
+            FROM job_post jp
+            LEFT JOIN employer e ON jp.employer_id = e.employer_id
+            LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+            LEFT JOIN job_post_application_settings jpas ON jp.job_id = jpas.job_id
+            LEFT JOIN accreditation acc ON e.employer_id = acc.employer_id
+            WHERE jp.job_id = ?
+                AND e.status = 'verified'
+                AND acc.status = 'approved'";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$job_id]);
@@ -599,50 +602,60 @@ class JobPost
     {
         try {
             $sql = "SELECT DISTINCT
-                    jp.job_id,
-                    jp.job_title,
-                    jp.job_summary,
-                    jp.location,
-                    jp.job_type,
-                    jp.pay_range,
-                    jp.salary,
-                    jp.show_pay,
-                    jp.job_status,
-                    jp.created_at,
-                    jp.application_deadline,
-                    jc.category_name,
-                    e.first_name as employer_first_name,
-                    e.last_name as employer_last_name,
-                    e.company_name,
-                    COALESCE(eb.business_name, e.company_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                    COALESCE(eb.business_logo, e.profile_picture) as business_logo,
-                    jpas.screening_questions_enabled,
-                    jpas.allow_cover_letter,
-                    jpas.resume_required";
+                jp.job_id,
+                jp.job_title,
+                jp.job_summary,
+                jp.location,
+                jp.job_type,
+                jp.pay_range,
+                jp.salary,
+                jp.show_pay,
+                jp.job_status,
+                jp.created_at,
+                jp.application_deadline,
+                jp.min_age,
+                jp.max_age,
+                jc.category_name,
+                e.first_name as employer_first_name,
+                e.last_name as employer_last_name,
+                e.company_name,
+                COALESCE(eb.business_name, e.company_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                COALESCE(eb.business_logo, e.profile_picture) as business_logo,
+                jpas.screening_questions_enabled,
+                jpas.allow_cover_letter,
+                jpas.resume_required";
 
             // Add application status check if jobseeker_id is provided
             if ($jobseeker_id) {
                 $sql .= ", CASE WHEN ja.application_id IS NOT NULL THEN 1 ELSE 0 END as has_applied,
-                         ja.application_id,
-                         ja.application_status,
-                         ja.is_finalized,
-                         ja.current_step,
-                         ja.applied_at";
+                     ja.application_status,
+                     ja.is_finalized,
+                     ja.current_step,
+                     ja.applied_at";
+            } else {
+                $sql .= ", 0 as has_applied, NULL as application_status, 0 as is_finalized, 1 as current_step, NULL as applied_at";
             }
 
             $sql .= " FROM job_post jp
-                  LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                  LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                  LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                  LEFT JOIN job_post_application_settings jpas ON jp.job_id = jpas.job_id";
+              LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+              LEFT JOIN employer e ON jp.employer_id = e.employer_id
+              LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+              LEFT JOIN job_post_application_settings jpas ON jp.job_id = jpas.job_id";
 
+            // Add accreditation check for verification
+            $sql .= " LEFT JOIN accreditation acc ON e.employer_id = acc.employer_id";
+
+            // Add application check JOIN if jobseeker_id is provided
             if ($jobseeker_id) {
-                $sql .= " LEFT JOIN job_application ja ON jp.job_id = ja.job_id AND ja.jobseeker_id = ?";
+                $sql .= " LEFT JOIN job_application ja ON jp.job_id = ja.job_id 
+                      AND ja.jobseeker_id = ? AND ja.is_finalized = 1";
             }
 
             $sql .= " WHERE jp.job_status = 'open'
-                  AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
-                  ORDER BY jp.created_at DESC";
+              AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
+              AND e.status = 'verified'
+              AND acc.status = 'approved'
+              ORDER BY jp.created_at DESC";
 
             $stmt = $this->db->prepare($sql);
 
@@ -834,18 +847,20 @@ class JobPost
     {
         try {
             $sql = "SELECT e.employer_id, e.first_name, e.last_name, e.profile_picture, e.profile_completed,
-                           eb.business_name, eb.business_logo, eb.business_desc, 
-                           eb.business_industry, eb.business_type, eb.business_address,
-                           eb.business_website, eb.business_socials, eb.business_completed,
-                           (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id AND job_status = 'open') as active_jobs_count,
-                           (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id) as total_jobs_count
-                    FROM employer e 
-                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    WHERE eb.business_name IS NOT NULL 
-                        AND e.profile_completed = 1
-                        AND eb.business_completed = 1
-                        AND e.status IN ('verified', 'pending_verification')
-                    ORDER BY eb.business_name ASC";
+                       eb.business_name, eb.business_logo, eb.business_desc, 
+                       eb.business_industry, eb.business_type, eb.business_address,
+                       eb.business_website, eb.business_socials, eb.business_completed,
+                       (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id AND job_status = 'open') as active_jobs_count,
+                       (SELECT COUNT(*) FROM job_post WHERE employer_id = e.employer_id) as total_jobs_count
+                FROM employer e 
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                LEFT JOIN accreditation acc ON e.employer_id = acc.employer_id
+                WHERE eb.business_name IS NOT NULL 
+                    AND e.profile_completed = 1
+                    AND eb.business_completed = 1
+                    AND e.status = 'verified'
+                    AND acc.status = 'approved'
+                ORDER BY eb.business_name ASC";
 
             if ($limit) {
                 $sql .= " LIMIT :limit";
@@ -882,32 +897,37 @@ class JobPost
     {
         try {
             $sql = "SELECT DISTINCT
-                    jp.job_id,
-                    jp.job_title,
-                    jp.job_summary,
-                    jp.location,
-                    jp.job_type,
-                    jp.pay_range,
-                    jp.salary,
-                    jp.show_pay,
-                    jp.job_status,
-                    jp.created_at,
-                    jp.application_deadline,
-                    jc.category_name,
-                    e.first_name as employer_first_name,
-                    e.last_name as employer_last_name,
-                    eb.business_name,
-                    COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
-                    eb.business_logo
-                    FROM job_post jp 
-                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
-                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    WHERE jp.employer_id = :employer_id 
-                        AND jp.job_status = 'open'
-                        AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
-                    ORDER BY jp.created_at DESC
-                    LIMIT :limit";
+                jp.job_id,
+                jp.job_title,
+                jp.job_summary,
+                jp.location,
+                jp.job_type,
+                jp.pay_range,
+                jp.salary,
+                jp.show_pay,
+                jp.job_status,
+                jp.created_at,
+                jp.application_deadline,
+                jp.min_age,
+                jp.max_age,
+                jc.category_name,
+                e.first_name as employer_first_name,
+                e.last_name as employer_last_name,
+                eb.business_name,
+                COALESCE(eb.business_name, CONCAT(e.first_name, ' ', e.last_name)) as company_name,
+                eb.business_logo
+                FROM job_post jp 
+                LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                LEFT JOIN accreditation acc ON e.employer_id = acc.employer_id
+                WHERE jp.employer_id = :employer_id 
+                    AND jp.job_status = 'open'
+                    AND (jp.application_deadline IS NULL OR jp.application_deadline >= NOW())
+                    AND e.status = 'verified'
+                    AND acc.status = 'approved'
+                ORDER BY jp.created_at DESC
+                LIMIT :limit";
 
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':employer_id', $employer_id, PDO::PARAM_INT);
@@ -1090,9 +1110,9 @@ class JobPost
 
             $stmt = $this->db->prepare($query);
             $stmt->execute();
-            
+
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             // Process results to set proper company name display
             foreach ($results as &$result) {
                 // Priority: business_name > company_name > first_name + last_name
@@ -1102,12 +1122,86 @@ class JobPost
                     $result['company_name'] = trim($result['employer_first_name'] . ' ' . $result['employer_last_name']);
                 }
             }
-            
+
             return $results;
-            
         } catch (PDOException $e) {
             error_log("Error fetching jobs for admin: " . $e->getMessage());
             throw new Exception("Failed to fetch jobs for admin management");
+        }
+    }
+    public function getJobsByEmployerWithStatus($employer_id)
+    {
+        try {
+            // Single query with LEFT JOIN to get application counts efficiently
+            $sql = "SELECT jp.*, jc.category_name, jas.max_applicants,
+                       COALESCE(app_counts.application_count, 0) as application_count,
+                       COALESCE(app_counts.pending_count, 0) as pending_count,
+                       COALESCE(app_counts.shortlisted_count, 0) as shortlisted_count,
+                       COALESCE(app_counts.hired_count, 0) as hired_count,
+                       e.profile_picture as employer_profile_photo,
+                       e.first_name as employer_first_name,
+                       e.last_name as employer_last_name,
+                       eb.business_logo,
+                       eb.business_name,
+                       eb.business_desc,
+                       -- Determine actual status considering deadline
+                       CASE 
+                           WHEN jp.job_status = 'open' AND jp.application_deadline IS NOT NULL AND jp.application_deadline < NOW() THEN 'expired'
+                           ELSE jp.job_status
+                       END as actual_status
+                FROM job_post jp
+                LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                LEFT JOIN job_post_application_settings jas ON jp.job_id = jas.job_id
+                LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                LEFT JOIN (
+                    SELECT job_id, 
+                           COUNT(*) as application_count,
+                           SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+                           SUM(CASE WHEN application_status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
+                           SUM(CASE WHEN application_status = 'hired' THEN 1 ELSE 0 END) as hired_count
+                    FROM job_application 
+                    WHERE is_finalized = 1
+                    GROUP BY job_id
+                ) app_counts ON jp.job_id = app_counts.job_id
+                WHERE jp.employer_id = :employer_id
+                ORDER BY jp.created_at DESC";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['employer_id' => $employer_id]);
+            $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $jobs;
+        } catch (PDOException $e) {
+            error_log('Error getting jobs by employer with status: ' . $e->getMessage());
+            // Fallback to simple query without application counts
+            try {
+                $sql = "SELECT jp.*, jc.category_name, 0 as application_count, 0 as pending_count, 0 as shortlisted_count, 0 as hired_count,
+                           e.profile_picture as employer_profile_photo,
+                           e.first_name as employer_first_name,
+                           e.last_name as employer_last_name,
+                           eb.business_logo,
+                           eb.business_name,
+                           eb.business_desc,
+                           -- Determine actual status considering deadline
+                           CASE 
+                               WHEN jp.job_status = 'open' AND jp.application_deadline IS NOT NULL AND jp.application_deadline < NOW() THEN 'expired'
+                               ELSE jp.job_status
+                           END as actual_status
+                    FROM job_post jp
+                    LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
+                    LEFT JOIN employer e ON jp.employer_id = e.employer_id
+                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                    WHERE jp.employer_id = :employer_id
+                    ORDER BY jp.created_at DESC";
+
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute(['employer_id' => $employer_id]);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e2) {
+                error_log('Fallback query also failed: ' . $e2->getMessage());
+                return [];
+            }
         }
     }
 }

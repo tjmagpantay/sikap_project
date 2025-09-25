@@ -28,12 +28,6 @@ class EmployerDashboardController
         // Get employer info
         $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
 
-        // REMOVE THIS REDIRECT - Let them access dashboard even without complete profile
-        // if (!$employer) {
-        //     header('Location: ?page=complete-employer-profile');
-        //     exit;
-        // }
-
         // If no employer profile exists, create a basic one or handle gracefully
         if (!$employer) {
             $employer = [
@@ -44,24 +38,23 @@ class EmployerDashboardController
             ];
         }
 
-        // Get employer's job posts with pagination (only if employer exists)
-        $jobPosts = [];
-        $totalJobCount = 0;
+        // Get filter parameters
+        $statusFilter = $_GET['status'] ?? null;
         $currentPage = isset($_GET['p']) ? max(1, intval($_GET['p'])) : 1;
         $limit = 5;
-        $offset = ($currentPage - 1) * $limit;
 
+        // Get filtered jobs (only if employer exists)
+        $jobsData = ['jobs' => [], 'total' => 0, 'total_pages' => 0];
         if ($employer['employer_id']) {
-            $jobPosts = $this->dashboardModel->getEmployerJobPosts($employer['employer_id'], $limit, $offset);
-            $totalJobCount = $this->dashboardModel->getTotalJobCount($employer['employer_id']);
+            $jobsData = $this->getFilteredJobs($employer['employer_id'], $statusFilter, $currentPage, $limit);
         }
 
-        // FIX: Add this line to make $jobs variable available for the view
-        $jobs = $jobPosts;
-        $totalJobPosts = count($jobs);
+        // Extract job data
+        $jobs = $jobsData['jobs'];
+        $totalJobCount = $jobsData['total'];
+        $totalPages = $jobsData['total_pages'];
 
         // Calculate pagination
-        $totalPages = ceil($totalJobCount / $limit);
         $hasNextPage = $currentPage < $totalPages;
         $hasPrevPage = $currentPage > 1;
 
@@ -75,8 +68,32 @@ class EmployerDashboardController
 
         if ($employer['employer_id']) {
             $stats = $this->dashboardModel->getEmployerStats($employer['employer_id']);
-        }        // Add calculated fields to job posts
-        foreach ($jobPosts as &$job) {
+
+            // FIXED: Get ALL jobs to calculate proper active job count
+            require_once __DIR__ . '/../models/JobPost.php';
+            $jobPostModel = new JobPost();
+            $allJobs = $jobPostModel->getJobsByEmployerWithStatus($employer['employer_id']);
+
+            // Calculate proper active jobs count (jobs with actual_status = 'open')
+            $actualActiveJobs = 0;
+            foreach ($allJobs as $job) {
+                $actualStatus = $job['actual_status'] ?? $job['job_status'];
+                if ($actualStatus == 'open') {
+                    $actualActiveJobs++;
+                }
+            }
+
+            // Override the active_jobs count with the correct calculation
+            $stats['active_jobs'] = $actualActiveJobs;
+
+            // Make allJobs available to the view
+            $allJobsForView = $allJobs;
+        } else {
+            $allJobsForView = [];
+        }
+
+        // Add calculated fields to job posts
+        foreach ($jobs as &$job) {
             $job['days_remaining'] = $this->dashboardModel->calculateDaysRemaining($job['application_deadline']);
         }
 
@@ -89,6 +106,9 @@ class EmployerDashboardController
         // Profile status for quick actions
         $hasProfile = $employer && !empty($employer['first_name']);
         $canPostJobs = $employer['employer_id'] ? $this->employerModel->canPostJobs($_SESSION['user_id']) : false;
+
+        // Add allJobs to available variables
+        $allJobs = $allJobsForView;
 
         include __DIR__ . '/../views/employers/dashboard.php';
     }
@@ -157,5 +177,53 @@ class EmployerDashboardController
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'jobs' => $jobPosts]);
         exit;
+    }
+    public function getFilteredJobs($employer_id, $status = null, $page = 1, $limit = 5)
+    {
+        if (!$employer_id) {
+            return [];
+        }
+
+        // Get all jobs with proper status handling like manage-jobs.php
+        require_once __DIR__ . '/../models/JobPost.php';
+        $jobPostModel = new JobPost();
+        $allJobs = $jobPostModel->getJobsByEmployerWithStatus($employer_id);
+
+        // Filter jobs by status with proper expiry handling (same logic as manage-jobs.php)
+        $filteredJobs = array_filter($allJobs, function ($job) use ($status) {
+            $actualStatus = $job['actual_status'] ?? $job['job_status'];
+
+            if (!$status) {
+                return true; // Show all if no status filter
+            }
+
+            switch ($status) {
+                case 'open':
+                    // Show only truly active jobs (open and not expired)
+                    return $actualStatus == 'open';
+                case 'expired':
+                    // Show jobs that are expired (had deadline and passed it)
+                    return $actualStatus == 'expired';
+                case 'closed':
+                    // Show manually closed jobs
+                    return $job['job_status'] == 'closed';
+                case 'draft':
+                    // Show draft jobs
+                    return $job['job_status'] == 'draft';
+                default:
+                    return $actualStatus == $status;
+            }
+        });
+
+        // Apply pagination
+        $totalCount = count($filteredJobs);
+        $offset = ($page - 1) * $limit;
+        $paginatedJobs = array_slice($filteredJobs, $offset, $limit);
+
+        return [
+            'jobs' => $paginatedJobs,
+            'total' => $totalCount,
+            'total_pages' => ceil($totalCount / $limit)
+        ];
     }
 }

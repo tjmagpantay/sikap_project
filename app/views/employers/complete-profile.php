@@ -19,15 +19,15 @@ include_once __DIR__ . '/components/navbar-employer.php';
             <!-- Success Message -->
             <?php if (!empty($_GET['success'])): ?>
                 <div class="max-w-2xl mx-auto mb-6">
-                    <div class="p-4 border border-green-200 rounded-md bg-green-50">
+                    <div class="p-4 border border-gray-200 rounded-md ">
                         <div class="flex">
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm text-green-800">Profile updated successfully!</p>
+                                <p class="text-sm text-primary">Profile updated successfully!</p>
                             </div>
                         </div>
                     </div>
@@ -90,14 +90,14 @@ include_once __DIR__ . '/components/navbar-employer.php';
 
                                 <div class="mt-6">
                                     <?php if ($personalCompleted ?? false): ?>
-                                        <div class="flex items-center justify-between p-3 border border-green-200 rounded-lg bg-green-50">
+                                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg ">
                                             <div class="flex items-center">
-                                                <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                                 </svg>
-                                                <span class="text-sm font-medium text-green-800">Completed</span>
+                                                <span class="text-sm font-medium text-primary">Completed</span>
                                             </div>
-                                            <a href="?page=employer-personal-profile" class="text-sm text-green-700 hover:text-green-800">Edit</a>
+                                            <a href="?page=employer-personal-profile" class="text-sm text-primary hover:text-primary">Edit</a>
                                         </div>
                                     <?php else: ?>
                                         <a href="?page=employer-personal-profile"

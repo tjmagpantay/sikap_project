@@ -220,6 +220,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->signup();
             break;
         case 'employer-dashboard':
+        case 'dashboard': // ADD this alias to handle the filtering URLs
             require_once __DIR__ . '/../app/controllers/EmployerDashboardController.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();

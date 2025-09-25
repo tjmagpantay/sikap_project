@@ -14,9 +14,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     <?php
                     $activeTab = $_GET['job_status'] ?? 'open';
                     $tabs = [
-                        'open' => 'Open Jobs',
+                        'open' => 'Active Jobs',
                         'draft' => 'Drafts',
-                        'closed' => 'Expired'
+                        'expired' => 'Expired',
+                        'closed' => 'Closed'
                     ];
                     foreach ($tabs as $status => $label): ?>
                         <a href="?page=manage-jobs&job_status=<?php echo $status; ?>"
@@ -43,11 +44,28 @@ include_once __DIR__ . '../components/navbar-employer.php';
         <div class="py-4">
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <?php
-                // Filter jobs by status
+                // FIXED: Filter jobs by status with proper expiry handling
                 $filteredJobs = array_filter($jobs, function ($job) use ($activeTab) {
-                    if ($activeTab == 'closed') return $job['job_status'] == 'closed';
-                    return $job['job_status'] == $activeTab;
+                    $actualStatus = $job['actual_status'] ?? $job['job_status'];
+
+                    switch ($activeTab) {
+                        case 'open':
+                            // Show only truly active jobs (open and not expired)
+                            return $actualStatus == 'open';
+                        case 'expired':
+                            // Show jobs that are expired (had deadline and passed it)
+                            return $actualStatus == 'expired';
+                        case 'closed':
+                            // Show manually closed jobs
+                            return $job['job_status'] == 'closed';
+                        case 'draft':
+                            // Show draft jobs
+                            return $job['job_status'] == 'draft';
+                        default:
+                            return $actualStatus == $activeTab;
+                    }
                 });
+
                 if (empty($filteredJobs)): ?>
                     <div class="col-span-full">
                         <div class="flex flex-col items-center justify-center w-screen p-16 text-center bg-white border-2 border-gray-200 border-dashed rounded-lg min-h-[300px]">
@@ -57,9 +75,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
-                                <?php elseif ($activeTab == 'closed'): ?>
+                                <?php elseif ($activeTab == 'expired'): ?>
                                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                <?php elseif ($activeTab == 'closed'): ?>
+                                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 <?php else: ?>
                                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,10 +95,15 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <p class="max-w-md mb-8 text-sm text-gray-500">
                                     You don't have any draft jobs. Start creating a job post and save it as a draft to continue later.
                                 </p>
-                            <?php elseif ($activeTab == 'closed'): ?>
+                            <?php elseif ($activeTab == 'expired'): ?>
                                 <h3 class="mb-3 text-lg font-semibold text-primary">No Expired Jobs</h3>
                                 <p class="max-w-md mb-8 text-sm text-gray-500">
-                                    You don't have any expired or closed jobs yet. Jobs will appear here when they reach their deadline or are manually closed.
+                                    You don't have any expired jobs yet. Jobs will appear here when they reach their application deadline.
+                                </p>
+                            <?php elseif ($activeTab == 'closed'): ?>
+                                <h3 class="mb-3 text-lg font-semibold text-primary">No Closed Jobs</h3>
+                                <p class="max-w-md mb-8 text-sm text-gray-500">
+                                    You don't have any manually closed jobs yet. Jobs will appear here when you close them manually.
                                 </p>
                             <?php else: ?>
                                 <h3 class="mb-3 text-2xl font-semibold text-gray-900">No Active Jobs</h3>
@@ -85,7 +112,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </p>
                             <?php endif; ?>
 
-                            <?php if ($activeTab != 'closed'): ?>
+                            <?php if ($activeTab != 'expired' && $activeTab != 'closed'): ?>
                                 <div class="flex flex-col gap-3 sm:flex-row">
                                     <a href="?page=post-job"
                                         class="inline-flex items-center px-6 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-lg bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -122,13 +149,19 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     foreach ($filteredJobs as $job):
                         // Calculate days remaining
                         $daysRemaining = 0;
+                        $isExpired = false;
                         if (!empty($job['application_deadline'])) {
                             $deadline = new DateTime($job['application_deadline']);
                             $now = new DateTime();
                             if ($deadline > $now) {
                                 $daysRemaining = $now->diff($deadline)->days;
+                            } else {
+                                $isExpired = true;
                             }
                         }
+
+                        // FIXED: Use actual_status for display logic
+                        $displayStatus = $job['actual_status'] ?? $job['job_status'];
                     ?>
                         <div class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg">
                             <div class="flex flex-col h-full">
@@ -158,15 +191,18 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         <!-- Tags Section -->
                                         <div class="flex flex-wrap gap-2">
                                             <!-- Employment Type Tag -->
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm font-medium bg-blue-100 text-primary" style="font-size: 0.65rem;">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm font-medium bg-gray-100 text-primary" style="font-size: 0.65rem;">
                                                 <?php echo strtoupper($job['job_type'] ?? 'FULL-TIME'); ?>
                                             </span>
 
-                                            <!-- Status Tag -->
+                                            <!-- FIXED: Status Tag with proper status handling -->
                                             <?php
-                                            switch (trim($job['job_status'])) {
+                                            switch ($displayStatus) {
                                                 case 'open':
                                                     echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm font-medium bg-green-100 text-green-800" style="font-size: 0.65rem;">ACTIVE</span>';
+                                                    break;
+                                                case 'expired':
+                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm font-medium bg-orange-100 text-orange-800" style="font-size: 0.65rem;">EXPIRED</span>';
                                                     break;
                                                 case 'closed':
                                                     echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-red-100 text-red-800" style="font-size: 0.65rem;">CLOSED</span>';
@@ -175,10 +211,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                     echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-yellow-100 text-yellow-800" style="font-size: 0.65rem;">DRAFT</span>';
                                                     break;
                                                 case 'paused':
-                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-orange-100 text-orange-800" style="font-size: 0.65rem;">PAUSED</span>';
+                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-purple-100 text-purple-800" style="font-size: 0.65rem;">PAUSED</span>';
                                                     break;
                                                 default:
-                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-gray-100 text-gray-600" style="font-size: 0.65rem;">' . strtoupper(trim($job['job_status'])) . '</span>';
+                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-gray-100 text-gray-600" style="font-size: 0.65rem;">' . strtoupper($displayStatus) . '</span>';
                                             }
                                             ?>
                                         </div>
@@ -207,15 +243,23 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         }
                                         ?>
                                 </div>
-                                <!-- Days Remaining -->
+                                <!-- FIXED: Days Remaining/Status Information -->
                                 <div class="flex items-center mb-4 text-sm text-gray-600">
                                     <svg class="w-4 h-4 mr-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path d="M12 7V12H15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </svg>
                                     <span class="text-xs text-gray-500">
                                         <?php
-                                        if ($daysRemaining > 0) {
+                                        if ($displayStatus == 'expired') {
+                                            echo 'Expired on ' . date('M j, Y', strtotime($job['application_deadline']));
+                                        } elseif ($displayStatus == 'open' && $daysRemaining > 0) {
                                             echo $daysRemaining . ' days remaining';
+                                        } elseif ($displayStatus == 'draft') {
+                                            echo 'Draft - not published';
+                                        } elseif ($displayStatus == 'closed') {
+                                            echo 'Manually closed';
+                                        } elseif ($displayStatus == 'paused') {
+                                            echo 'Currently paused';
                                         } else {
                                             echo 'Posted ' . date('M j, Y', strtotime($job['created_at']));
                                         }
@@ -244,8 +288,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         $progressColor = 'bg-yellow-500';
                                     }
 
-                                    // Only show if job is open and has capacity
-                                    if (($job['job_status'] ?? '') === 'open' && $maxCapacity > 0):
+                                    // Only show if job is active and has capacity
+                                    if ($displayStatus === 'open' && $maxCapacity > 0):
                                     ?>
                                         <div class="w-full h-2 mb-2 overflow-hidden bg-gray-200 rounded-full">
                                             <div class="h-full transition-all duration-300 <?= $progressColor ?>"

@@ -457,8 +457,8 @@ class JobPostController
             exit;
         }
 
-        // Get all jobs for this employer (now includes employer profile data)
-        $jobs = $this->jobPostModel->getJobsByEmployer($employer['employer_id']);
+        // Get all jobs for this employer with proper status handling
+        $jobs = $this->jobPostModel->getJobsByEmployerWithStatus($employer['employer_id']);
 
         // Get any messages
         $error = $_GET['error'] ?? '';
@@ -466,6 +466,7 @@ class JobPostController
 
         include __DIR__ . '/../views/employers/manage-jobs.php';
     }
+
 
     // This method is for EMPLOYERS to view their own jobs
     public function viewEmployerJob()
@@ -621,10 +622,34 @@ class JobPostController
         $employer = null;
 
         if ($employer_id) {
-            // Get employer info for display
+            // FIXED: Verify employer is verified and approved before showing their jobs
             $employer = $this->jobPostModel->getEmployerProfileData($employer_id);
-            // Get jobs from specific employer only
-            $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+
+            // Check if employer is verified and approved
+            if ($employer) {
+                $sql = "SELECT e.status as employer_status, acc.status as accreditation_status
+                    FROM employer e 
+                    LEFT JOIN accreditation acc ON e.employer_id = acc.employer_id
+                    WHERE e.employer_id = ?";
+                $stmt = $this->jobPostModel->getDatabase()->prepare($sql);
+                $stmt->execute([$employer_id]);
+                $statusCheck = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (
+                    !$statusCheck ||
+                    $statusCheck['employer_status'] !== 'verified' ||
+                    $statusCheck['accreditation_status'] !== 'approved'
+                ) {
+                    // Employer not verified/approved, show no jobs
+                    $jobs = [];
+                    $employer = null;
+                } else {
+                    // Get jobs from verified employer only
+                    $jobs = $this->jobPostModel->getEmployerActiveJobs($employer_id);
+                }
+            } else {
+                $jobs = [];
+            }
 
             // Add application status for jobseeker
             if ($jobseeker_id && !empty($jobs)) {
@@ -635,10 +660,11 @@ class JobPostController
                 }
             }
         } else {
-            // Get all active jobs
+            // Get all active jobs (only from verified and approved employers)
             $jobs = $this->jobPostModel->getAllActiveJobs($jobseeker_id);
         }
 
+        // Rest of the method remains the same...
         // ENHANCED: Get real recommendation percentages if jobseeker is logged in
         if ($jobseeker_id && $recommendationService && !empty($jobs)) {
             try {

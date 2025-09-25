@@ -128,16 +128,16 @@ include_once __DIR__ . '/components/navbar-employer.php';
         </div>
 
         <!-- Candidates Table -->
-        <div class="mb-8">
-            <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div class="mb-8 border border-gray-200 rounded-lg">
+            <div class="rounded-lg shadow-sm ">
                 <div class="w-full">
                     <!-- Table Header with Filters -->
-                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                    <div class="px-4 py-5 sm:px-6">
                         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                             <!-- Left side: Title and Count -->
                             <div class="flex items-center mb-4 lg:mb-0">
                                 <h3 class="text-xl font-semibold text-gray-900">All Candidates</h3>
-                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <span class="ml-3 mr-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                     <?php
                                     // Get current filter values
                                     $selectedJob = $_GET['job'] ?? '';
@@ -185,7 +185,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                 <!-- Applied For Filter -->
                                 <div class="relative">
                                     <button @click="jobOpen = !jobOpen" @click.away="jobOpen = false"
-                                        class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full lg:min-w-[180px]">
+                                        class="appearance-none bg-white border border-gray-200 rounded-sm px-4 py-3 pr-12 text-sm text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 flex items-center justify-between w-full lg:min-w-[240px]">
                                         <span class="flex items-center">
                                             <?php echo !empty($selectedJob) ? htmlspecialchars($selectedJob) : 'Applied For'; ?>
                                         </span>
@@ -314,16 +314,15 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                         onchange="window.location.href = '?' + new URLSearchParams({...Object.fromEntries(new URLSearchParams(window.location.search)), date: this.value}).toString()"
                                         class="w-full px-4 py-3 text-sm transition-all duration-200 border border-gray-200 rounded-sm lg:w-auto focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                                 </div>
-
                                 <!-- Clear Filters Button -->
-                                <?php if (!empty($selectedJob) || !empty($selectedStatus) || !empty($selectedDate)): ?>
-                                    <a href="?"
-                                        class="inline-flex items-center px-3 py-3 text-sm font-medium text-gray-600 transition-all duration-200 bg-gray-100 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                <?php if (!empty($_GET['job']) || !empty($_GET['status']) || !empty($_GET['date'])): ?>
+                                    <button onclick="clearFilters()"
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 bg-gray-100 rounded-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                         Clear Filters
-                                    </a>
+                                    </button>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -346,7 +345,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                     <?php else: ?>
                         <!-- Desktop Table View (Hidden on Mobile) -->
                         <div class="hidden w-full overflow-visible lg:block">
-                            <table class="w-full divide-y divide-gray-300 table-fixed">
+                            <table class="w-full divide-y divide-gray-300 table-fixed ">
                                 <!-- Table Header -->
                                 <thead class="bg-primary">
                                     <tr>
@@ -367,7 +366,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-300">
+                                <tbody class="divide-y divide-gray-300 ">
                                     <?php
                                     // Get current filter values and process applicants
                                     $allApplicants = [];
@@ -426,7 +425,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($allApplicants as $app): ?>
-                                            <tr class="hover:bg-gray-50">
+                                            <tr class="border-t border-gray-200 hover:bg-gray-100">
                                                 <!-- Candidate Info Column -->
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center">
@@ -752,6 +751,14 @@ include_once __DIR__ . '/components/navbar-employer.php';
 </div>
 </div>
 </div>
+
+<script>
+function clearFilters() {
+    // Construct URL with only the page parameter, removing all filters
+    const baseUrl = window.location.pathname + '?page=browse-candidates';
+    window.location.href = baseUrl;
+}
+</script>
 
 <!-- Alpine.js -->
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

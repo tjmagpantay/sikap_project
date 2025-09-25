@@ -79,8 +79,12 @@ class EmployerDashboard
             $stmt->execute([$employer_id]);
             $stats['total_jobs'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            // Active jobs
-            $sql = "SELECT COUNT(*) as count FROM job_post WHERE employer_id = ? AND job_status = 'open'";
+            // FIXED: Active jobs (open jobs that haven't expired)
+            $sql = "SELECT COUNT(*) as count 
+                    FROM job_post 
+                    WHERE employer_id = ? 
+                    AND job_status = 'open' 
+                    AND (application_deadline IS NULL OR application_deadline >= NOW())";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id]);
             $stats['active_jobs'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
