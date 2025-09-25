@@ -1172,138 +1172,137 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
     }
 
-public function uploadProfilePhoto()
-{
-    // Clear any output buffers and set headers first
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    
-    header('Content-Type: application/json');
-    header('Cache-Control: no-cache, must-revalidate');
-
-    try {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            exit;
+    public function uploadProfilePhoto()
+    {
+        // Clear any output buffers and set headers first
+        while (ob_get_level()) {
+            ob_end_clean();
         }
 
-        if (!isset($_FILES['profile_picture']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
-            $errorMsg = 'No file uploaded or upload error';
-            if (isset($_FILES['profile_picture']['error'])) {
-                switch ($_FILES['profile_picture']['error']) {
-                    case UPLOAD_ERR_INI_SIZE:
-                    case UPLOAD_ERR_FORM_SIZE:
-                        $errorMsg = 'File is too large';
-                        break;
-                    case UPLOAD_ERR_NO_FILE:
-                        $errorMsg = 'No file was uploaded';
-                        break;
-                    default:
-                        $errorMsg = 'Upload error occurred';
-                }
-            }
-            echo json_encode(['success' => false, 'message' => $errorMsg]);
-            exit;
-        }
+        header('Content-Type: application/json');
+        header('Cache-Control: no-cache, must-revalidate');
 
-        $file = $_FILES['profile_picture'];
-
-        // Validate file type
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed.']);
-            exit;
-        }
-
-        // UPDATED: Validate file size (5MB max for profile photos)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            echo json_encode(['success' => false, 'message' => 'File size must be less than 5MB.']);
-            exit;
-        }
-
-        // Rest of your existing code remains the same...
-        // Validate that it's actually an image
-        $imageInfo = getimagesize($file['tmp_name']);
-        if ($imageInfo === false) {
-            echo json_encode(['success' => false, 'message' => 'Invalid image file']);
-            exit;
-        }
-
-        // Get jobseeker info
-        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-        if (!$jobseeker) {
-            echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
-            exit;
-        }
-
-        // Create upload directory if it doesn't exist
-        $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
-                error_log("ERROR: Failed to create upload directory: $uploadDir");
-                echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
+        try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
                 exit;
             }
-        }
 
-        // Generate unique filename
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-
-        error_log("DEBUG: Attempting to upload profile photo to: $filepath");
-
-        // Move uploaded file
-        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-            error_log("ERROR: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
-            echo json_encode(['success' => false, 'message' => 'Failed to upload file. Please check permissions.']);
-            exit;
-        }
-
-        // Set proper file permissions
-        chmod($filepath, 0644);
-
-        // Update database with new profile picture path
-        $relativePath = 'uploads/profile_pictures/' . $filename;
-        $result = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $relativePath);
-
-        if (!$result) {
-            // If database update fails, clean up the uploaded file
-            if (file_exists($filepath)) {
-                unlink($filepath);
+            if (!isset($_FILES['profile_picture']) || $_FILES['profile_picture']['error'] !== UPLOAD_ERR_OK) {
+                $errorMsg = 'No file uploaded or upload error';
+                if (isset($_FILES['profile_picture']['error'])) {
+                    switch ($_FILES['profile_picture']['error']) {
+                        case UPLOAD_ERR_INI_SIZE:
+                        case UPLOAD_ERR_FORM_SIZE:
+                            $errorMsg = 'File is too large';
+                            break;
+                        case UPLOAD_ERR_NO_FILE:
+                            $errorMsg = 'No file was uploaded';
+                            break;
+                        default:
+                            $errorMsg = 'Upload error occurred';
+                    }
+                }
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+                exit;
             }
-            error_log("ERROR: Failed to update profile picture in database for user_id: " . $_SESSION['user_id']);
-            echo json_encode(['success' => false, 'message' => 'Failed to update database']);
-            exit;
-        }
 
-        // Delete old profile picture after successful database update
-        if (!empty($jobseeker['profile_picture'])) {
-            $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
-            if (file_exists($oldPhotoPath) && is_file($oldPhotoPath)) {
-                unlink($oldPhotoPath);
-                error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
+            $file = $_FILES['profile_picture'];
+
+            // Validate file type
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($file['type'], $allowedTypes)) {
+                echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed.']);
+                exit;
             }
+
+            // UPDATED: Validate file size (5MB max for profile photos)
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'message' => 'File size must be less than 5MB.']);
+                exit;
+            }
+
+            // Rest of your existing code remains the same...
+            // Validate that it's actually an image
+            $imageInfo = getimagesize($file['tmp_name']);
+            if ($imageInfo === false) {
+                echo json_encode(['success' => false, 'message' => 'Invalid image file']);
+                exit;
+            }
+
+            // Get jobseeker info
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                echo json_encode(['success' => false, 'message' => 'Jobseeker profile not found']);
+                exit;
+            }
+
+            // Create upload directory if it doesn't exist
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    error_log("ERROR: Failed to create upload directory: $uploadDir");
+                    echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
+                    exit;
+                }
+            }
+
+            // Generate unique filename
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+            $filepath = $uploadDir . $filename;
+
+            error_log("DEBUG: Attempting to upload profile photo to: $filepath");
+
+            // Move uploaded file
+            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+                error_log("ERROR: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
+                echo json_encode(['success' => false, 'message' => 'Failed to upload file. Please check permissions.']);
+                exit;
+            }
+
+            // Set proper file permissions
+            chmod($filepath, 0644);
+
+            // Update database with new profile picture path
+            $relativePath = 'uploads/profile_pictures/' . $filename;
+            $result = $this->jobseekerModel->updateProfilePicture($_SESSION['user_id'], $relativePath);
+
+            if (!$result) {
+                // If database update fails, clean up the uploaded file
+                if (file_exists($filepath)) {
+                    unlink($filepath);
+                }
+                error_log("ERROR: Failed to update profile picture in database for user_id: " . $_SESSION['user_id']);
+                echo json_encode(['success' => false, 'message' => 'Failed to update database']);
+                exit;
+            }
+
+            // Delete old profile picture after successful database update
+            if (!empty($jobseeker['profile_picture'])) {
+                $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
+                if (file_exists($oldPhotoPath) && is_file($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
+                    error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
+                }
+            }
+
+            error_log("DEBUG: Profile photo uploaded and database updated successfully");
+
+            // Send success response
+            echo json_encode([
+                'success' => true,
+                'message' => 'Profile photo updated successfully',
+                'image_url' => $relativePath
+            ]);
+        } catch (Exception $e) {
+            error_log("ERROR: Exception in uploadProfilePhoto: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
         }
 
-        error_log("DEBUG: Profile photo uploaded and database updated successfully");
-        
-        // Send success response
-        echo json_encode([
-            'success' => true,
-            'message' => 'Profile photo updated successfully',
-            'image_url' => $relativePath
-        ]);
-
-    } catch (Exception $e) {
-        error_log("ERROR: Exception in uploadProfilePhoto: " . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
+        exit;
     }
-    
-    exit;
-}
 
     public function savedJobs()
     {
@@ -1895,52 +1894,250 @@ public function uploadProfilePhoto()
     }
 
     public function getProfileTabContent()
-{
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'Unauthorized']);
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Unauthorized']);
+            exit;
+        }
+
+        $tab = $_GET['tab'] ?? 'profile';
+
+        // Get jobseeker info
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Profile not found']);
+            exit;
+        }
+
+        // For applications tab, get hired applications
+        if ($tab === 'applications') {
+            // Get hired applications using the existing method
+            require_once __DIR__ . '/../models/JobApplication.php';
+            $jobApplicationModel = new JobApplication();
+
+            $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus(
+                $jobseeker['jobseeker_id'],
+                'hired'
+            );
+
+            // Make sure it's available in the included file
+            $GLOBALS['hiredApplications'] = $hiredApplications;
+        }
+
+        // Include the appropriate tab content
+        switch ($tab) {
+            case 'profile':
+                include __DIR__ . '/../views/jobseekers/profile-components/profile-content.php';
+                break;
+            case 'documents':
+                include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
+                break;
+            case 'applications':
+                include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
+                break;
+            default:
+                echo '<div class="py-8 text-center"><p class="text-gray-500">Tab not found</p></div>';
+        }
         exit;
     }
 
-    $tab = $_GET['tab'] ?? 'profile';
-    
-    // Get jobseeker info
-    $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-    if (!$jobseeker) {
+    public function settings()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            header('Location: ?page=login-jobseeker');
+            exit;
+        }
+
+        // Get jobseeker profile for navbar
+        $jobseeker = $this->getJobseekerData();
+
+        include __DIR__ . '/../views/jobseekers/settings-jobseeker.php';
+    }
+
+    public function changePassword()
+    {
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Profile not found']);
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        // Validation
+        $validationErrors = $this->validatePasswordChange($currentPassword, $newPassword, $confirmPassword);
+
+        if (!empty($validationErrors)) {
+            echo json_encode(['success' => false, 'message' => implode(' ', $validationErrors)]);
+            exit;
+        }
+
+        // Verify current password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($currentPassword, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+            exit;
+        }
+
+        // Update password
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $result = $this->userModel->updatePassword($_SESSION['user_id'], $hashedPassword);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Password updated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update password']);
+        }
         exit;
     }
 
-    // For applications tab, get hired applications
-    if ($tab === 'applications') {
-        // Get hired applications using the existing method
-        require_once __DIR__ . '/../models/JobApplication.php';
-        $jobApplicationModel = new JobApplication();
-        
-        $hiredApplications = $jobApplicationModel->getApplicationsByJobseekerAndStatus(
-            $jobseeker['jobseeker_id'], 
-            'hired'
-        );
-        
-        // Make sure it's available in the included file
-        $GLOBALS['hiredApplications'] = $hiredApplications;
+    private function validatePasswordChange($currentPassword, $newPassword, $confirmPassword)
+    {
+        $errors = [];
+
+        // Current password validation
+        if (empty($currentPassword)) {
+            $errors[] = 'Current password is required.';
+        }
+
+        // New password validation
+        if (empty($newPassword)) {
+            $errors[] = 'New password is required.';
+        } elseif (strlen($newPassword) < 8) {
+            $errors[] = 'New password must be at least 8 characters long.';
+        } elseif (strlen($newPassword) > 50) {
+            $errors[] = 'New password cannot exceed 50 characters.';
+        } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+            $errors[] = 'New password must contain at least one uppercase letter, one lowercase letter, and one number.';
+        }
+
+        // Confirm password validation
+        if (empty($confirmPassword)) {
+            $errors[] = 'Please confirm your new password.';
+        } elseif ($newPassword !== $confirmPassword) {
+            $errors[] = 'New passwords do not match.';
+        }
+
+        // Check if new password is different from current
+        if (!empty($currentPassword) && !empty($newPassword) && $currentPassword === $newPassword) {
+            $errors[] = 'New password must be different from current password.';
+        }
+
+        return $errors;
     }
 
-    // Include the appropriate tab content
-    switch ($tab) {
-        case 'profile':
-            include __DIR__ . '/../views/jobseekers/profile-components/profile-content.php';
-            break;
-        case 'documents':
-            include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
-            break;
-        case 'applications':
-            include __DIR__ . '/../views/jobseekers/profile-components/applications-contents.php';
-            break;
-        default:
-            echo '<div class="py-8 text-center"><p class="text-gray-500">Tab not found</p></div>';
+    public function deactivateAccount()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $password = $_POST['password'] ?? '';
+
+        if (empty($password)) {
+            echo json_encode(['success' => false, 'message' => 'Password is required to deactivate account']);
+            exit;
+        }
+
+        // Verify password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($password, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Incorrect password']);
+            exit;
+        }
+
+        // Deactivate account (set status to inactive)
+        $result = $this->userModel->updateUserStatus($_SESSION['user_id'], 'inactive');
+
+        if ($result) {
+            // Log the user out
+            session_destroy();
+            echo json_encode([
+                'success' => true,
+                'message' => 'Account deactivated successfully',
+                'redirect' => '?page=landing'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to deactivate account']);
+        }
+        exit;
     }
-    exit;
-}
+
+    public function deleteAccount()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $password = $_POST['password'] ?? '';
+        $confirmText = $_POST['confirm_text'] ?? '';
+
+        if (empty($password)) {
+            echo json_encode(['success' => false, 'message' => 'Password is required to delete account']);
+            exit;
+        }
+
+        if (strtolower($confirmText) !== 'delete my account') {
+            echo json_encode(['success' => false, 'message' => 'Please type "DELETE MY ACCOUNT" to confirm']);
+            exit;
+        }
+
+        // Verify password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($password, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Incorrect password']);
+            exit;
+        }
+
+        // Optional: Log the account deletion for debugging purposes
+        try {
+            $jobseeker = $this->getJobseekerData();
+            $jobseekerName = trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? ''));
+            error_log("Jobseeker account deleted: {$jobseekerName} (Email: {$user['email']}) - User ID: {$_SESSION['user_id']}");
+        } catch (Exception $e) {
+            error_log('Failed to log account deletion: ' . $e->getMessage());
+        }
+
+        // Delete the entire user account (cascade will handle related records)
+        $result = $this->userModel->deleteUser($_SESSION['user_id']);
+
+        if ($result) {
+            // Log the user out
+            session_destroy();
+            echo json_encode([
+                'success' => true,
+                'message' => 'Account deleted successfully',
+                'redirect' => '?page=landing'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete account']);
+        }
+        exit;
+    }
 }

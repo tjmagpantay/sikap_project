@@ -15,8 +15,13 @@ if (!isset($employer)) {
     $employer = $employerModel->findByUserId($_SESSION['user_id']);
 
     if ($employer === false) {
-        $employer = ['business_name' => '', 'contact_person' => ''];
+        $employer = ['business_name' => '', 'contact_person' => '', 'first_name' => '', 'last_name' => ''];
     }
+}
+
+// Get business info for company name
+if (!isset($business) && $employer && isset($employer['employer_id'])) {
+    $business = $employerModel->getBusiness($employer['employer_id']);
 }
 ?>
 
@@ -26,86 +31,87 @@ include_once __DIR__ . '/components/navbar-employer.php';
 
 <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
     <div class="py-8 mx-auto sm:px-2 md:px-4 lg:px-12 max-w-7xl">
-        <!-- Header with breadcrumbs -->
-        <div class="mb-8">
-            <!-- Breadcrumb Navigation -->
-            <nav class="flex mb-4" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a href="?page=employer-dashboard" class="inline-flex items-center text-sm text-gray-400 hover:text-gray-600">
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            <a href="?page=profile-employer" class="ml-1 text-sm text-gray-400 hover:text-gray-600 md:ml-2">
-                                Profile
-                            </a>
-                        </div>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="ml-1 text-sm text-primary md:ml-2">Account Settings</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-
-            <div class="flex items-center mb-2 space-x-3">
-                <h1 class="text-2xl font-bold text-mainGray sm:text-3xl">Account Settings</h1>
+        <!-- Breadcrumbs -->
+        <nav class="mb-6">
+            <div class="flex items-center space-x-2 text-sm">
+                <a href="?page=employer-dashboard" class="text-gray-500 transition-colors hover:text-primary">
+                    Dashboard
+                </a>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="font-medium text-primary">Account Settings</span>
             </div>
-            <p class="text-sm text-gray-600 sm:text-base">Manage your company account security and preferences</p>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center mb-2 space-x-3">
+                <h1 class="text-3xl font-bold text-mainGray">Account Settings</h1>
+            </div>
+            <p class="mt-2 text-sm text-gray-600">Manage your company account security and preferences</p>
         </div>
 
         <!-- Settings Content -->
         <div class="space-y-6">
             <!-- Change Password -->
-            <div class="p-4 bg-white rounded-lg shadow sm:p-6">
-                <div class="flex flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
                         <p class="mt-1 text-sm text-gray-600">Update your password to keep your account secure</p>
                     </div>
                     <button onclick="togglePasswordForm()"
-                        class="flex items-center w-full px-4 py-2 text-sm font-medium transition-colors border rounded-md sm:w-auto border-primary text-primary bg-blue-50 hover:bg-blue-100">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2H9a2 2 0 01-2-2m2-2h.01M15 7h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        class="flex items-center px-4 py-2 text-sm font-medium transition-colors border rounded-md border-primary text-primary bg-blue-50 hover:bg-blue-100">
+                        <i class="mr-2 fas fa-edit"></i>
                         Change Password
                     </button>
                 </div>
 
                 <!-- Password Change Form (Hidden by default) -->
-                <div id="password-form" class="hidden pt-4 mt-4 border-t border-gray-200 sm:pt-6 sm:mt-6">
-                    <form class="max-w-md space-y-4">
+                <div id="password-form" class="hidden pt-6 mt-4 border-t border-gray-200">
+                    <form id="change-password-form" class="max-w-md mt-2 space-y-4">
                         <div>
                             <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
-                            <input type="password" id="current-password" name="current_password"
-                                class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            <div class="relative mt-1">
+                                <input type="password" id="current-password" name="current_password" required
+                                    class="block w-full px-3 py-3 pr-12 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <button type="button" onclick="togglePasswordVisibility('current-password')"
+                                    class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-eye" id="current-password-icon"></i>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
-                            <input type="password" id="new-password" name="new_password"
-                                class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            <div class="relative mt-1">
+                                <input type="password" id="new-password" name="new_password" required
+                                    class="block w-full px-3 py-3 pr-12 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <button type="button" onclick="togglePasswordVisibility('new-password')"
+                                    class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-eye" id="new-password-icon"></i>
+                                </button>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters with uppercase, lowercase, and number</p>
                         </div>
                         <div>
                             <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                            <input type="password" id="confirm-password" name="confirm_password"
-                                class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            <div class="relative mt-1">
+                                <input type="password" id="confirm-password" name="confirm_password" required
+                                    class="block w-full px-3 py-3 pr-12 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <button type="button" onclick="togglePasswordVisibility('confirm-password')"
+                                    class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-eye" id="confirm-password-icon"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3 sm:flex-row">
-                            <button type="submit"
-                                class="w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md sm:w-auto bg-primary hover:bg-secondary">
+                        <div class="flex gap-3">
+                            <button type="submit" id="password-submit-btn"
+                                class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed">
                                 Update Password
                             </button>
                             <button type="button" onclick="togglePasswordForm()"
-                                class="w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-gray-100 rounded-md sm:w-auto hover:bg-gray-200">
+                                class="px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
                                 Cancel
                             </button>
                         </div>
@@ -113,115 +119,40 @@ include_once __DIR__ . '/components/navbar-employer.php';
                 </div>
             </div>
 
-            <!-- Email Preferences -->
-            <div class="p-4 bg-white rounded-lg shadow sm:p-6" id="email-preferences">
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-900">Email Preferences</h3>
-                    <p class="mt-1 text-sm text-gray-600">Choose what emails you want to receive</p>
-                </div>
-
-                <div class="space-y-4 sm:space-y-6">
-                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">Application Notifications</h4>
-                            <p class="text-xs text-gray-500">Get notified when candidates apply to your job posts</p>
-                        </div>
-                        <div class="toggle-switch">
-                            <input
-                                type="checkbox"
-                                id="application_notifications"
-                                name="application_notifications"
-                                value="1"
-                                <?php echo (isset($settings['application_notifications']) && $settings['application_notifications'] == 1) ? 'checked' : ''; ?>>
-                            <label for="application_notifications" class="toggle-label">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">Candidate Matches</h4>
-                            <p class="text-xs text-gray-500">Receive recommendations for qualified candidates</p>
-                        </div>
-                        <div class="toggle-switch">
-                            <input
-                                type="checkbox"
-                                id="candidate_matches"
-                                name="candidate_matches"
-                                value="1"
-                                <?php echo (isset($settings['candidate_matches']) && $settings['candidate_matches'] == 1) ? 'checked' : ''; ?>>
-                            <label for="candidate_matches" class="toggle-label">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">Job Post Updates</h4>
-                            <p class="text-xs text-gray-500">Get notified about job post performance and statistics</p>
-                        </div>
-                        <div class="toggle-switch">
-                            <input
-                                type="checkbox"
-                                id="job_post_updates"
-                                name="job_post_updates"
-                                value="1"
-                                <?php echo (isset($settings['job_post_updates']) && $settings['job_post_updates'] == 1) ? 'checked' : ''; ?>>
-                            <label for="job_post_updates" class="toggle-label">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">Platform Updates</h4>
-                            <p class="text-xs text-gray-500">Receive updates about new features and hiring insights</p>
-                        </div>
-                        <div class="toggle-switch">
-                            <input
-                                type="checkbox"
-                                id="platform_updates"
-                                name="platform_updates"
-                                value="1"
-                                <?php echo (isset($settings['platform_updates']) && $settings['platform_updates'] == 1) ? 'checked' : ''; ?>>
-                            <label for="platform_updates" class="toggle-label">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Save Button -->
-                <div class="flex justify-end mt-6">
-                    <button id="save-email-preferences"
-                        class="w-full px-4 py-2 text-white rounded-md sm:w-auto bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Save Preferences
-                    </button>
-                </div>
-            </div>
-
-
             <!-- Account Information -->
             <div class="p-4 transition-shadow bg-white border border-gray-100 rounded-lg shadow-sm sm:p-6 hover:shadow-md">
-                <div class="mb-6">
-                    <h3 class="text-lg font-medium text-gray-900">Company Account Information</h3>
-                    <p class="mt-1 text-sm text-gray-600">Your company account details and registration information</p>
+                <div class="flex items-start gap-3 mb-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Company Account Information</h3>
+                        <p class="mt-1 text-sm text-gray-600">Your company account details and registration information</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                     <div>
                         <p class="text-sm text-gray-500">Company Name</p>
                         <p class="text-sm font-medium text-gray-900">
-                            <?php echo htmlspecialchars($employer['business_name'] ?? 'Not provided'); ?>
+                            <?php
+                            $companyName = 'Not provided';
+                            if (isset($business['business_name']) && !empty($business['business_name'])) {
+                                $companyName = htmlspecialchars($business['business_name']);
+                            } elseif (isset($employer['company_name']) && !empty($employer['company_name'])) {
+                                $companyName = htmlspecialchars($employer['company_name']);
+                            }
+                            echo $companyName;
+                            ?>
                         </p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Contact Person</p>
                         <p class="text-sm font-medium text-gray-900">
-                            <?php echo htmlspecialchars($employer['contact_person'] ?? 'Not provided'); ?>
+                            <?php
+                            $contactPerson = 'Not provided';
+                            if (isset($employer['first_name']) && !empty($employer['first_name'])) {
+                                $contactPerson = htmlspecialchars(trim($employer['first_name'] . ' ' . ($employer['last_name'] ?? '')));
+                            }
+                            echo $contactPerson;
+                            ?>
                         </p>
                     </div>
                     <div>
@@ -240,55 +171,59 @@ include_once __DIR__ . '/components/navbar-employer.php';
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Company Status</p>
-                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            Active
+                        <?php
+                        $status = $employer['status'] ?? 'incomplete';
+                        $statusColors = [
+                            'verified' => 'bg-green-100 text-green-800',
+                            'pending_verification' => 'bg-yellow-100 text-yellow-800',
+                            'incomplete' => 'bg-gray-100 text-gray-800',
+                            'rejected' => 'bg-red-100 text-red-800',
+                            'suspended' => 'bg-red-100 text-red-800'
+                        ];
+                        $statusLabels = [
+                            'verified' => 'Verified',
+                            'pending_verification' => 'Pending Verification',
+                            'incomplete' => 'Profile Incomplete',
+                            'rejected' => 'Rejected',
+                            'suspended' => 'Suspended'
+                        ];
+                        ?>
+                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium border rounded-md <?php echo $statusColors[$status] ?? 'bg-gray-100 text-gray-800'; ?>">
+                            <?php if ($status === 'verified'): ?>
+                                <i class="mr-1 fas fa-check-circle"></i>
+                            <?php endif; ?>
+                            <?php echo $statusLabels[$status] ?? ucfirst($status); ?>
                         </span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Active Job Posts</p>
-                        <p class="text-sm font-medium text-gray-900">
-                            <?php echo isset($employer['active_jobs_count']) ? $employer['active_jobs_count'] : '0'; ?> active
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Total Applications Received</p>
-                        <p class="text-sm font-medium text-gray-900">
-                            <?php echo isset($employer['total_applications']) ? $employer['total_applications'] : '0'; ?> applications
-                        </p>
                     </div>
                 </div>
             </div>
 
-
             <!-- Danger Zone -->
-            <div class="p-4 bg-white border-l-4 border-red-400 rounded-lg shadow sm:p-6">
+            <div class="p-6 bg-white border-l-4 border-red-400 rounded-lg shadow">
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-red-900">Danger Zone</h3>
                     <p class="mt-1 text-sm text-red-700">These actions cannot be undone and will affect your company account</p>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex flex-col items-start justify-between p-4 space-y-3 rounded-lg sm:flex-row sm:items-center sm:space-y-0 bg-red-50">
-                        <div class="flex-1">
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                        <div>
                             <h4 class="text-sm font-medium text-red-900">Deactivate Company Account</h4>
                             <p class="text-xs text-red-600">Temporarily disable your account and hide all job posts (can be reactivated)</p>
                         </div>
-                        <button onclick="confirmDeactivation()"
-                            class="w-full px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md sm:w-auto hover:bg-red-50">
+                        <button onclick="showDeactivationModal()"
+                            class="px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md hover:bg-red-100">
                             Deactivate
                         </button>
                     </div>
 
-                    <div class="flex flex-col items-start justify-between p-4 space-y-3 rounded-lg sm:flex-row sm:items-center sm:space-y-0 bg-red-50">
-                        <div class="flex-1">
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                        <div>
                             <h4 class="text-sm font-medium text-red-900">Delete Company Account</h4>
                             <p class="text-xs text-red-600">Permanently delete your company account, job posts, and all associated data</p>
                         </div>
-                        <button onclick="confirmDeletion()"
-                            class="w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-red-600 rounded-md sm:w-auto hover:bg-red-700">
+                        <button onclick="showDeletionModal()"
+                            class="px-4 py-2 text-sm font-medium text-white transition-colors bg-red-600 rounded-md hover:bg-red-700">
                             Delete Account
                         </button>
                     </div>
@@ -298,343 +233,358 @@ include_once __DIR__ . '/components/navbar-employer.php';
     </div>
 </div>
 
-<style>
-    /* Custom Toggle Switch Styles */
-    .toggle-switch {
-        position: relative;
-        display: inline-block;
-    }
+<!-- Deactivation Modal -->
+<div id="deactivation-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4 py-12">
+        <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+            <div class="px-6 py-8 lg:px-8">
+               
 
-    .toggle-switch input[type="checkbox"] {
-        display: none;
-    }
+                <!-- Modal Content -->
+                <div class="text-center">
+                    <h3 class="mb-2 text-2xl font-bold text-gray-900">Deactivate Company Account</h3>
+                    <p class="mb-6 text-sm text-gray-600">
+                        Are you sure you want to deactivate your company account? This will hide all job posts and prevent new applications. You can reactivate it later by logging in.
+                    </p>
+                </div>
 
-    .toggle-label {
-        position: relative;
-        display: block;
-        width: 44px;
-        height: 24px;
-        cursor: pointer;
-        border-radius: 12px;
-        background-color: #e5e7eb;
-        transition: background-color 0.3s ease;
-    }
+                <!-- Password Input -->
+                <div class="mb-6">
+                    <label for="deactivate-password" class="block mb-2 text-sm font-medium text-gray-700">
+                        Enter your password to confirm
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="deactivate-password" required
+                            class="block w-full px-3 py-3 pr-12 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                            placeholder="Enter your password">
+                        <button type="button" onclick="togglePasswordVisibility('deactivate-password')"
+                            class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
+                            <i class="fas fa-eye" id="deactivate-password-icon"></i>
+                        </button>
+                    </div>
+                </div>
 
-    .toggle-slider {
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease;
-    }
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button type="button" onclick="confirmDeactivation()" id="deactivate-confirm-btn"
+                        class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Deactivate Company Account
+                    </button>
+                    <button type="button" onclick="hideDeactivationModal()"
+                        class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    /* Changed from green to primary color */
-    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
-        background-color: var(--primary-color, #3b82f6);
-    }
+<!-- Deletion Modal -->
+<div id="deletion-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4 py-12">
+        <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+            <div class="px-6 py-8 lg:px-8">
+               
 
-    .toggle-switch input[type="checkbox"]:checked+.toggle-label .toggle-slider {
-        transform: translateX(20px);
-    }
+                <!-- Modal Content -->
+                <div class="mb-6 text-center">
+                    <h3 class="mb-2 text-2xl font-bold text-gray-900">Delete Company Account</h3>
+                    <p class="mb-2 text-sm font-medium text-red-600">
+                        This action cannot be undone. All company data, job posts, and applications will be permanently deleted.
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        Please enter your password and type "DELETE MY ACCOUNT" to confirm.
+                    </p>
+                </div>
 
-    .toggle-switch input[type="checkbox"]:focus+.toggle-label {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
+                <!-- Form Inputs -->
+                <div class="space-y-4">
+                    <!-- Password Input -->
+                    <div>
+                        <label for="delete-password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+                        <div class="relative">
+                            <input type="password" id="delete-password" required
+                                class="block w-full px-3 py-3 pr-12 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                placeholder="Enter your password">
+                            <button type="button" onclick="togglePasswordVisibility('delete-password')"
+                                class="absolute text-gray-400 transition-colors transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600 focus:outline-none">
+                                <i class="fas fa-eye" id="delete-password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
 
-    /* Fallback if CSS variables not available */
-    .toggle-switch input[type="checkbox"]:checked+.toggle-label {
-        background-color: #3b82f6;
-    }
-</style>
+                    <!-- Confirmation Text Input -->
+                    <div>
+                        <label for="delete-confirm" class="block mb-2 text-sm font-medium text-gray-700">
+                            Type "DELETE MY ACCOUNT"
+                        </label>
+                        <input type="text" id="delete-confirm" required
+                            class="block w-full px-3 py-3 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                            placeholder="DELETE MY ACCOUNT">
+                    </div>
+                </div>
 
+                <!-- Action Buttons -->
+                <div class="mt-6 space-y-3">
+                    <button type="button" onclick="confirmDeletion()" id="delete-confirm-btn"
+                        class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Delete Company Account Permanently
+                    </button>
+                    <button type="button" onclick="hideDeletionModal()"
+                        class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 <script>
+    // Password visibility toggle
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + '-icon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+
+    // Password form toggle
     function togglePasswordForm() {
         const form = document.getElementById('password-form');
         form.classList.toggle('hidden');
-    }
 
-    function confirmDeactivation() {
-        if (confirm('Are you sure you want to deactivate your company account? This will hide all your job posts and prevent new applications. You can reactivate it later by logging in.')) {
-            console.log('Company account deactivation requested');
-            alert('Account deactivation functionality will be implemented.');
+        // Clear form when hiding
+        if (form.classList.contains('hidden')) {
+            document.getElementById('change-password-form').reset();
         }
     }
 
-    function confirmDeletion() {
-        if (confirm('Are you sure you want to permanently delete your company account? This will permanently remove all job posts, applications, and company data.')) {
-            if (confirm('This is your final warning. Are you absolutely sure you want to delete your company account? This action cannot be undone and all hiring data will be lost.')) {
-                console.log('Company account deletion requested');
-                alert('Account deletion functionality will be implemented.');
-            }
-        }
-    }
-
-    // Handle settings updates
+    // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-        // Email Preferences Save Button
-        const emailSaveBtn = document.getElementById('save-email-preferences');
-        if (emailSaveBtn) {
-            emailSaveBtn.addEventListener('click', function() {
-                updateEmailPreferences();
-            });
-        }
-
-        // Visibility Settings Save Button
-        const visibilitySaveBtn = document.getElementById('save-visibility-settings');
-        if (visibilitySaveBtn) {
-            visibilitySaveBtn.addEventListener('click', function() {
-                updateVisibilitySettings();
-            });
-        }
-
-        // Hiring Preferences Save Button
-        const hiringSaveBtn = document.getElementById('save-hiring-preferences');
-        if (hiringSaveBtn) {
-            hiringSaveBtn.addEventListener('click', function() {
-                updateHiringPreferences();
-            });
-        }
-
-        // Auto-save on toggle change (optional)
-        const allToggles = document.querySelectorAll('input[type="checkbox"]');
-        allToggles.forEach(toggle => {
-            toggle.addEventListener('change', function() {
-                // Auto-save functionality - you can remove this if you only want manual save
-                const section = this.closest('[id$="-preferences"], [id$="-settings"]');
-                if (section) {
-                    const sectionId = section.id;
-                    if (sectionId === 'email-preferences') {
-                        setTimeout(() => updateEmailPreferences(), 500);
-                    } else if (sectionId === 'visibility-settings') {
-                        setTimeout(() => updateVisibilitySettings(), 500);
-                    } else if (sectionId === 'hiring-preferences') {
-                        setTimeout(() => updateHiringPreferences(), 500);
-                    }
-                }
-            });
-        });
-
-        // Password form
-        const passwordForm = document.querySelector('#password-form form');
-        if (passwordForm) {
-            passwordForm.addEventListener('submit', function(e) {
+        // Change password form submission
+        const changePasswordForm = document.getElementById('change-password-form');
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 const currentPassword = document.getElementById('current-password').value;
                 const newPassword = document.getElementById('new-password').value;
                 const confirmPassword = document.getElementById('confirm-password').value;
+                const submitBtn = document.getElementById('password-submit-btn');
 
-                if (!currentPassword || !newPassword || !confirmPassword) {
-                    alert('Please fill in all password fields.');
+                // Client-side validation
+                if (newPassword.length < 8) {
+                    showNotification('New password must be at least 8 characters long', 'error');
+                    return;
+                }
+
+                if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) {
+                    showNotification('Password must contain at least one uppercase letter, one lowercase letter, and one number', 'error');
                     return;
                 }
 
                 if (newPassword !== confirmPassword) {
-                    alert('New passwords do not match.');
+                    showNotification('New passwords do not match', 'error');
                     return;
                 }
 
-                if (newPassword.length < 6) {
-                    alert('New password must be at least 6 characters long.');
+                if (currentPassword === newPassword) {
+                    showNotification('New password must be different from current password', 'error');
                     return;
                 }
 
-                console.log('Password change requested');
-                alert('Password change functionality will be implemented.');
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Updating...';
+
+                const formData = new FormData();
+                formData.append('current_password', currentPassword);
+                formData.append('new_password', newPassword);
+                formData.append('confirm_password', confirmPassword);
+
+                fetch('?page=employer-change-password', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                            document.getElementById('change-password-form').reset();
+                            togglePasswordForm();
+                        } else {
+                            showNotification(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while updating password', 'error');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Update Password';
+                    });
             });
         }
     });
 
-    function updateEmailPreferences() {
-        const formData = new FormData();
-        formData.append('action', 'update_email_preferences');
+    // Modal functions
+    function showDeactivationModal() {
+        document.getElementById('deactivation-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
 
-        const applicationNotifications = document.getElementById('application_notifications');
-        const candidateMatches = document.getElementById('candidate_matches');
-        const jobPostUpdates = document.getElementById('job_post_updates');
-        const platformUpdates = document.getElementById('platform_updates');
+    function hideDeactivationModal() {
+        document.getElementById('deactivation-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('deactivate-password').value = '';
+    }
 
-        formData.append('application_notifications', applicationNotifications && applicationNotifications.checked ? '1' : '0');
-        formData.append('candidate_matches', candidateMatches && candidateMatches.checked ? '1' : '0');
-        formData.append('job_post_updates', jobPostUpdates && jobPostUpdates.checked ? '1' : '0');
-        formData.append('platform_updates', platformUpdates && platformUpdates.checked ? '1' : '0');
+    function showDeletionModal() {
+        document.getElementById('deletion-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
 
-        // Show loading state
-        const saveBtn = document.getElementById('save-email-preferences');
-        if (saveBtn) {
-            saveBtn.textContent = 'Saving...';
-            saveBtn.disabled = true;
+    function hideDeletionModal() {
+        document.getElementById('deletion-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('delete-password').value = '';
+        document.getElementById('delete-confirm').value = '';
+    }
+
+    // Account deactivation
+    function confirmDeactivation() {
+        const password = document.getElementById('deactivate-password').value;
+        const confirmBtn = document.getElementById('deactivate-confirm-btn');
+
+        if (!password) {
+            showNotification('Please enter your password', 'error');
+            return;
         }
 
-        fetch('?page=update-employer-settings', {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Deactivating...';
+
+        const formData = new FormData();
+        formData.append('password', password);
+
+        fetch('?page=employer-deactivate-account', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showSuccessMessage('Email preferences updated successfully!');
+                    showNotification(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2000);
                 } else {
-                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
+                    showNotification(data.message, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showErrorMessage('An error occurred while updating preferences. Please try again.');
+                showNotification('An error occurred while deactivating account', 'error');
             })
             .finally(() => {
-                // Reset button state
-                if (saveBtn) {
-                    saveBtn.textContent = 'Save Preferences';
-                    saveBtn.disabled = false;
-                }
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Deactivate Company Account';
             });
     }
 
-    function updateVisibilitySettings() {
-        const formData = new FormData();
-        formData.append('action', 'update_visibility_settings');
+    // Account deletion
+    function confirmDeletion() {
+        const password = document.getElementById('delete-password').value;
+        const confirmText = document.getElementById('delete-confirm').value;
+        const confirmBtn = document.getElementById('delete-confirm-btn');
 
-        const companyProfileVisibility = document.getElementById('company_profile_visibility');
-        const contactInformation = document.getElementById('contact_information');
-        const jobPostAnalytics = document.getElementById('job_post_analytics');
-
-        formData.append('company_profile_visibility', companyProfileVisibility && companyProfileVisibility.checked ? '1' : '0');
-        formData.append('contact_information', contactInformation && contactInformation.checked ? '1' : '0');
-        formData.append('job_post_analytics', jobPostAnalytics && jobPostAnalytics.checked ? '1' : '0');
-
-        // Show loading state
-        const saveBtn = document.getElementById('save-visibility-settings');
-        if (saveBtn) {
-            saveBtn.textContent = 'Saving...';
-            saveBtn.disabled = true;
+        if (!password) {
+            showNotification('Please enter your password', 'error');
+            return;
         }
 
-        fetch('?page=update-employer-settings', {
+        if (confirmText.toUpperCase() !== 'DELETE MY ACCOUNT') {
+            showNotification('Please type "DELETE MY ACCOUNT" exactly as shown', 'error');
+            return;
+        }
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Deleting...';
+
+        const formData = new FormData();
+        formData.append('password', password);
+        formData.append('confirm_text', confirmText);
+
+        fetch('?page=employer-delete-account', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showSuccessMessage('Visibility settings updated successfully!');
+                    showNotification(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2000);
                 } else {
-                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
+                    showNotification(data.message, 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showErrorMessage('An error occurred while updating settings. Please try again.');
+                showNotification('An error occurred while deleting account', 'error');
             })
             .finally(() => {
-                // Reset button state
-                if (saveBtn) {
-                    saveBtn.textContent = 'Save Visibility Settings';
-                    saveBtn.disabled = false;
-                }
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Delete Company Account Permanently';
             });
     }
 
-    function updateHiringPreferences() {
-        const formData = new FormData();
-        formData.append('action', 'update_hiring_preferences');
+    // Notification system
+    function showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
 
-        const autoScreenApplications = document.getElementById('auto_screen_applications');
-        const sendAutoReplies = document.getElementById('send_auto_replies');
-        const priorityCandidateAlerts = document.getElementById('priority_candidate_alerts');
+        const notification = document.createElement('div');
+        notification.className = `notification fixed top-4 right-4 z-[9999] max-w-sm p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0`;
 
-        formData.append('auto_screen_applications', autoScreenApplications && autoScreenApplications.checked ? '1' : '0');
-        formData.append('send_auto_replies', sendAutoReplies && sendAutoReplies.checked ? '1' : '0');
-        formData.append('priority_candidate_alerts', priorityCandidateAlerts && priorityCandidateAlerts.checked ? '1' : '0');
-
-        // Show loading state
-        const saveBtn = document.getElementById('save-hiring-preferences');
-        if (saveBtn) {
-            saveBtn.textContent = 'Saving...';
-            saveBtn.disabled = true;
+        if (type === 'success') {
+            notification.className += ' bg-green-500 text-white text-sm';
+            notification.innerHTML = `<i class="mr-2 fas fa-check-circle"></i>${message}`;
+        } else if (type === 'error') {
+            notification.className += ' bg-red-500 text-white text-sm';
+            notification.innerHTML = `<i class="mr-2 fas fa-exclamation-circle"></i>${message}`;
+        } else {
+            notification.className += ' bg-blue-500 text-white text-sm';
+            notification.innerHTML = `<i class="mr-2 fas fa-info-circle"></i>${message}`;
         }
 
-        fetch('?page=update-employer-settings', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    showSuccessMessage('Hiring preferences updated successfully!');
-                } else {
-                    showErrorMessage('Error: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorMessage('An error occurred while updating preferences. Please try again.');
-            })
-            .finally(() => {
-                // Reset button state
-                if (saveBtn) {
-                    saveBtn.textContent = 'Save Hiring Preferences';
-                    saveBtn.disabled = false;
-                }
-            });
-    }
+        document.body.appendChild(notification);
 
-    function showSuccessMessage(message) {
-        // Remove any existing messages
-        const existing = document.querySelector('.success-message, .error-message');
-        if (existing) {
-            existing.remove();
-        }
-
-        // Create a new success message
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        alertDiv.textContent = message;
-        document.body.appendChild(alertDiv);
-
+        // Auto-remove after 5 seconds
         setTimeout(() => {
-            if (document.body.contains(alertDiv)) {
-                document.body.removeChild(alertDiv);
-            }
-        }, 3000);
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
     }
 
-    function showErrorMessage(message) {
-        // Remove any existing messages
-        const existing = document.querySelector('.success-message, .error-message');
-        if (existing) {
-            existing.remove();
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideDeactivationModal();
+            hideDeletionModal();
         }
-
-        // Create a new error message
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'error-message fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        alertDiv.textContent = message;
-        document.body.appendChild(alertDiv);
-
-        setTimeout(() => {
-            if (document.body.contains(alertDiv)) {
-                document.body.removeChild(alertDiv);
-            }
-        }, 3000);
-    }
+    });
 </script>

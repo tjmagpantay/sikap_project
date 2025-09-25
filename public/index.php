@@ -225,6 +225,30 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerDashboardController();
             $controller->dashboard();
             break;
+        case 'setting-employer':
+        case 'settings-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->settings();
+            break;
+
+        case 'employer-change-password':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->changePassword();
+            break;
+
+        case 'employer-deactivate-account':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->deactivateAccount();
+            break;
+
+        case 'employer-delete-account':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->deleteAccount();
+            break;
 
         case 'view-all-applicants':
             require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
@@ -720,6 +744,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->downloadDocument();
             break;
 
+
+
         // Forgot Password Routes NEWWWWWWWWWWWWWW
 
         case 'forgot-password':
@@ -801,6 +827,29 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->reviewParsedData();
+            break;
+        case 'settings-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->settings();
+            break;
+
+        case 'change-password':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->changePassword();
+            break;
+
+        case 'deactivate-account':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->deactivateAccount();
+            break;
+
+        case 'delete-account':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->deleteAccount();
             break;
 
 

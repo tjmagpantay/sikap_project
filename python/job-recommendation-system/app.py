@@ -5,7 +5,7 @@ Flask application that provides REST endpoints for job recommendations
 import os
 import sys
 
-# FIXED: Handle Windows encoding issues at the very start
+# Handle Windows encoding issues at the very start
 if os.name == 'nt':  # Windows
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
@@ -29,26 +29,16 @@ def home():
     """API home page with available endpoints"""
     return """
     <div style="font-family: Arial, sans-serif; margin: 40px;">
-        <h1>🎯 SIKAP Job Recommendation API</h1>
-        <p>AI-powered job matching system for the SIKAP platform</p>
+        <h1>SIKAP Job Recommendation API</h1>
         
-        <h3>📋 Available Endpoints:</h3>
+        
+        <h3>Available Endpoints:</h3>
         <ul>
             <li><strong>GET /health</strong> - Check API and database status</li>
             <li><strong>GET /recommendations</strong> - Get job recommendations for a jobseeker</li>
         </ul>
         
-        <h3>🔗 Usage Examples:</h3>
-        <ul>
-            <li><a href="/health">/health</a> - Health check</li>
-            <li><a href="/recommendations?jobseeker_id=1&top_k=5">/recommendations?jobseeker_id=1&top_k=5</a> - Get recommendations</li>
-        </ul>
-        
-        <h3>📊 Request Parameters:</h3>
-        <ul>
-            <li><strong>jobseeker_id</strong> (required) - ID of the jobseeker</li>
-            <li><strong>top_k</strong> (optional, default=10) - Number of recommendations to return</li>
-        </ul>
+      
     </div>
     """
 
@@ -101,8 +91,6 @@ def get_recommendations():
             }), 400
         
         # Generate recommendations
-        print(f"🎯 API Request: Generating recommendations for jobseeker {jobseeker_id}, top_k={top_k}")
-        
         result = recommendation_engine.generate_recommendations(jobseeker_id, top_k)
         
         if "error" in result:
@@ -115,7 +103,6 @@ def get_recommendations():
             "algorithm": "TF-IDF + Skill Matching + ESCO + Role Matching"
         }
         
-        print(f"✅ API Response: {len(result['recommendations'])} recommendations generated")
         return jsonify(result)
         
     except ValueError as e:
@@ -124,7 +111,6 @@ def get_recommendations():
         }), 400
         
     except Exception as e:
-        print(f"❌ API Error: {str(e)}")
         return jsonify({
             "error": "Internal server error",
             "message": "An unexpected error occurred while generating recommendations"
@@ -148,7 +134,6 @@ def get_jobseeker_profile(jobseeker_id):
         })
         
     except Exception as e:
-        print(f"❌ Profile Error: {str(e)}")
         return jsonify({
             "error": "Internal server error"
         }), 500
@@ -169,7 +154,6 @@ def internal_error(error):
         "message": "An unexpected error occurred"
     }), 500
 
-# FIXED: Add command line handling for PHP integration
 def handle_command_line():
     """Handle command line arguments for PHP integration"""
     import sys
@@ -188,9 +172,6 @@ def handle_command_line():
         try:
             jobseeker_id = int(sys.argv[2])
             top_k = int(sys.argv[3])
-            
-            # Send debug to stderr so it doesn't interfere with JSON output
-            print(f"DEBUG: Processing jobseeker_id={jobseeker_id}, top_k={top_k}", file=sys.stderr)
             
             result = recommendation_engine.generate_recommendations(jobseeker_id, top_k)
             
@@ -229,17 +210,8 @@ if __name__ == "__main__":
         handle_command_line()
     else:
         # Run Flask server
-        print("🚀 Starting SIKAP Job Recommendation API...")
-        print("📍 Server: http://127.0.0.1:5001")
-        print("📊 Database: sikap_db")
-        print("🔗 Health Check: http://127.0.0.1:5001/health")
-        print("=" * 60)
+        print("Starting SIKAP Job Recommendation API...")
+        print("Server: http://127.0.0.1:5001")
         
-        # Test database connection on startup
-        if test_database_connection():
-            print("✅ Database connection successful")
-        else:
-            print("❌ Database connection failed")
-        
-        print("=" * 60)
+        # Run the app
         app.run(debug=True, host='127.0.0.1', port=5001)

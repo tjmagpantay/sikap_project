@@ -1273,4 +1273,227 @@ class EmployerController
     {
         return $this->employerModel->getDocuments($employer_id);
     }
+
+    public function settings()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        // Get employer profile for navbar and page display
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if (!$employer) {
+            $employer = ['business_name' => '', 'contact_person' => '', 'first_name' => '', 'last_name' => ''];
+        }
+
+        // Get business info for company name display
+        $business = null;
+        if ($employer && isset($employer['employer_id'])) {
+            $business = $this->employerModel->getBusiness($employer['employer_id']);
+        }
+
+        // Set settings variable for the view
+        $settings = true;
+
+        include __DIR__ . '/../views/employers/setting-employer.php';
+    }
+
+    public function changePassword()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        // Validation
+        $validationErrors = $this->validatePasswordChange($currentPassword, $newPassword, $confirmPassword);
+
+        if (!empty($validationErrors)) {
+            echo json_encode(['success' => false, 'message' => implode(' ', $validationErrors)]);
+            exit;
+        }
+
+        // Verify current password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($currentPassword, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+            exit;
+        }
+
+        // Update password
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $result = $this->userModel->updatePassword($_SESSION['user_id'], $hashedPassword);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Password updated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update password']);
+        }
+        exit;
+    }
+
+    private function validatePasswordChange($currentPassword, $newPassword, $confirmPassword)
+    {
+        $errors = [];
+
+        // Current password validation
+        if (empty($currentPassword)) {
+            $errors[] = 'Current password is required.';
+        }
+
+        // New password validation
+        if (empty($newPassword)) {
+            $errors[] = 'New password is required.';
+        } elseif (strlen($newPassword) < 8) {
+            $errors[] = 'New password must be at least 8 characters long.';
+        } elseif (strlen($newPassword) > 50) {
+            $errors[] = 'New password cannot exceed 50 characters.';
+        } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+            $errors[] = 'New password must contain at least one uppercase letter, one lowercase letter, and one number.';
+        }
+
+        // Confirm password validation
+        if (empty($confirmPassword)) {
+            $errors[] = 'Please confirm your new password.';
+        } elseif ($newPassword !== $confirmPassword) {
+            $errors[] = 'New passwords do not match.';
+        }
+
+        // Check if new password is different from current
+        if (!empty($currentPassword) && !empty($newPassword) && $currentPassword === $newPassword) {
+            $errors[] = 'New password must be different from current password.';
+        }
+
+        return $errors;
+    }
+
+    public function deactivateAccount()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $password = $_POST['password'] ?? '';
+
+        if (empty($password)) {
+            echo json_encode(['success' => false, 'message' => 'Password is required to deactivate account']);
+            exit;
+        }
+
+        // Verify password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($password, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Incorrect password']);
+            exit;
+        }
+
+        // Deactivate account (set status to inactive)
+        $result = $this->userModel->updateUserStatus($_SESSION['user_id'], 'inactive');
+
+        // Also update employer status to suspended
+        $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+        if ($employer) {
+            $this->employerModel->updateEmployerStatus($employer['employer_id'], 'suspended');
+        }
+
+        if ($result) {
+            // Log the user out
+            session_destroy();
+            echo json_encode([
+                'success' => true,
+                'message' => 'Company account deactivated successfully',
+                'redirect' => '?page=landing'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to deactivate account']);
+        }
+        exit;
+    }
+
+    public function deleteAccount()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            exit;
+        }
+
+        $password = $_POST['password'] ?? '';
+        $confirmText = $_POST['confirm_text'] ?? '';
+
+        if (empty($password)) {
+            echo json_encode(['success' => false, 'message' => 'Password is required to delete account']);
+            exit;
+        }
+
+        if (strtolower($confirmText) !== 'delete my account') {
+            echo json_encode(['success' => false, 'message' => 'Please type "DELETE MY ACCOUNT" to confirm']);
+            exit;
+        }
+
+        // Verify password
+        $user = $this->userModel->findById($_SESSION['user_id']);
+        if (!$user || !password_verify($password, $user['password'])) {
+            echo json_encode(['success' => false, 'message' => 'Incorrect password']);
+            exit;
+        }
+
+        // Optional: Log the account deletion for debugging purposes
+        try {
+            $employer = $this->employerModel->findByUserId($_SESSION['user_id']);
+            $business = null;
+            if ($employer && isset($employer['employer_id'])) {
+                $business = $this->employerModel->getBusiness($employer['employer_id']);
+            }
+
+            $employerName = trim(($employer['first_name'] ?? '') . ' ' . ($employer['last_name'] ?? ''));
+            $companyName = $business['business_name'] ?? $employer['company_name'] ?? 'Unknown Company';
+
+            error_log("Employer account deleted: {$employerName} from {$companyName} (Email: {$user['email']}) - User ID: {$_SESSION['user_id']}");
+        } catch (Exception $e) {
+            error_log('Failed to log employer account deletion: ' . $e->getMessage());
+        }
+
+        // Delete the entire user account (cascade will handle related records)
+        $result = $this->userModel->deleteUser($_SESSION['user_id']);
+
+        if ($result) {
+            // Log the user out
+            session_destroy();
+            echo json_encode([
+                'success' => true,
+                'message' => 'Company account deleted successfully',
+                'redirect' => '?page=landing'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete account']);
+        }
+        exit;
+    }
 }

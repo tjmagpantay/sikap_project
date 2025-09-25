@@ -185,7 +185,7 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                 <div class="mb-6 space-y-3">
                                     <a href="?page=complete-employer-profile"
                                         class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-all duration-200 border-2 rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
-                                        
+
                                         Complete Profile
                                     </a>
 
@@ -317,7 +317,36 @@ $businessCompletion = ($businessCompleted / $totalBusinessItems) * 100;
                                     <div class="text-xs text-gray-500">Documents</div>
                                 </div>
                                 <div class="flex-1 text-center">
-                                    <div class="text-lg font-bold text-secondary">0</div>
+                                    <div class="text-lg font-bold text-secondary">
+                                        <?php
+                                        // Calculate real active jobs count (same logic as dashboard)
+                                        $activeJobsCount = 0;
+
+                                        // Get all jobs for this employer
+                                        require_once __DIR__ . '/../../models/JobPost.php';
+                                        $jobPostModel = new JobPost();
+                                        $allEmployerJobs = $jobPostModel->getJobsByEmployer($employer['employer_id'] ?? 0);
+
+                                        if (!empty($allEmployerJobs)) {
+                                            foreach ($allEmployerJobs as $job) {
+                                                // Check if job is truly active (open and not expired)
+                                                $isExpired = false;
+                                                if (!empty($job['application_deadline'])) {
+                                                    $deadline = new DateTime($job['application_deadline']);
+                                                    $now = new DateTime();
+                                                    $isExpired = $deadline <= $now;
+                                                }
+
+                                                // Count only jobs that are open and not expired
+                                                if ($job['job_status'] === 'open' && !$isExpired) {
+                                                    $activeJobsCount++;
+                                                }
+                                            }
+                                        }
+
+                                        echo $activeJobsCount;
+                                        ?>
+                                    </div>
                                     <div class="text-xs text-gray-500">Active Jobs</div>
                                 </div>
                             </div>
