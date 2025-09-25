@@ -408,28 +408,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->deleteJob();
             break;
 
-        // case 'admin-toggle-job-status':
-        //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        //         require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
-        //         $controller = new AdminDashboardController();
-        //         $controller->updateJobStatus();
-        //     }
-        //     break;
-
-        // case 'admin-delete-job':
-        //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        //         require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
-        //         $controller = new AdminDashboardController();
-        //         $controller->deleteJob();
-        //     }
-        //     break;
-
-        // case 'admin-reports':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->reports();
-        //     break;
-
         case 'admin-view-application':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
@@ -453,18 +431,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new AdminDashboardController();
             $controller->applications();
             break;
-
-        // case 'admin-announcements':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageAnnouncements();
-        //     break;
-
-        // case 'admin-chatbot':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageChatbot();
-        //     break;
 
         case 'admin-event-status':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';

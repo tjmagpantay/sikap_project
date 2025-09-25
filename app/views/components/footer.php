@@ -23,7 +23,7 @@
     <!-- Candidate -->
     <div>
       <h4 class="mb-3 font-medium">Candidate</h4>
-      <ul class="space-y-4 text-gray-400">
+      <ul class="space-y-4 text-gray-400 hover:text-white">
         <li><a href="?page=how-to-apply" class="transition-colors hover:text-white">How to Apply</a></li>
         <li><a href="?page=resume-tips" class="transition-colors hover:text-white">Resume Tips</a></li>
         <li><a href="?page=govt-programs" class="transition-colors hover:text-white">Gov't Programs</a></li>

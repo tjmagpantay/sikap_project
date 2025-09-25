@@ -336,13 +336,6 @@
     // Top Job Categories Bar Chart with Real Data
     const topJobsCtx = document.getElementById('topJobsChart').getContext('2d');
 
-    // Mock data for categories
-    const mockCategoryData = {
-        categories: ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance'],
-        job_posts: [45, 32, 28, 24, 18],
-        applications: [186, 142, 98, 87, 65]
-    };
-
     // Use real data if available, otherwise use mock data
     const jobCategoryData = <?php echo isset($jobCategoryChart) ? json_encode($jobCategoryChart) : 'mockCategoryData'; ?>;
 

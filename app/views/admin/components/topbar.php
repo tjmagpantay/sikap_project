@@ -57,10 +57,10 @@
                     x-transition:leave-end="transform opacity-0 scale-95"
                     @click.away="isOpen = false"
                     class="absolute right-0 z-50 mt-3 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl w-[400px] max-h-[500px]"
-                    style="display: none; top: calc(100% + 8px);">
+                    style="display: none; top: calc(100% + 8px); width: 400px !important;">
 
                     <!-- Header -->
-                    <div class="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <div class="flex items-center justify-between px-4 py-3 bg-gray-100 border-b">
                         <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
                         <button @click="markAllAsRead()"
                             x-show="unreadCount > 0"
@@ -176,10 +176,11 @@
                 </div>
             </div>
 
-            <button type="submit" id="submit-btn"
+            <button onclick="window.location.href='?page=admin-dashboard'"
                 class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-primary">
-                Logs
+                Home
             </button>
+
         </div>
     </div>
 </header>

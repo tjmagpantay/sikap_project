@@ -132,7 +132,7 @@
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-12 h-12 bg-yellow-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-gray-300 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
