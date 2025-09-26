@@ -163,7 +163,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'resigned'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="hired">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -189,7 +189,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] === 'pending'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="reviewed">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -203,7 +203,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if (in_array($application['application_status'], ['pending', 'reviewed'])): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="shortlisted">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
                                         </svg>
@@ -217,7 +217,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <button type="submit"
                                         onclick="return confirm('Are you sure you want to set this employee as resigned? This action cannot be undone.')"
-                                        class="items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm nline-flex bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
@@ -231,7 +231,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 $application['application_status'] !== 'resigned' &&
                                 (!$resignationRequest || $resignationRequest['request_status'] === 'pending')
                             ): ?>
-                                <button @click="activeTab = 'schedule'" class="items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm nline-flex bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                <button @click="activeTab = 'schedule'" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                     <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
                                     </svg>
