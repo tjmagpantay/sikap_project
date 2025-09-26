@@ -21,13 +21,16 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
             </p>
 
             <div class="flex flex-row gap-4 mt-4 animate-fade-in-up-delayed-2">
-                <button class="px-6 py-3 text-sm font-medium text-white transition-colors duration-300 rounded-md bg-primary hover:bg-blue-700">
+                <a href="https://peis.philjobnet.ph/" target="_blank"
+                    class="px-6 py-3 text-sm font-medium text-white transition-colors duration-300 rounded-md bg-primary hover:bg-blue-700">
                     ABOUT PESO
-                </button>
-                <button class="px-6 py-3 text-sm font-medium transition-colors duration-300 bg-gray-100 rounded-md text-primary hover:bg-blue-800">
+                </a>
+                <a href="https://www.lgurosariobatangas.com/" target="_blank"
+                    class="px-6 py-3 text-sm font-medium transition-colors duration-300 bg-gray-100 rounded-md text-primary hover:bg-blue-800">
                     ABOUT ROSARIO
-                </button>
+                </a>
             </div>
+
 
         </div>
     </div>

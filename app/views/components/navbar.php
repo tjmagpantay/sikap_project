@@ -36,9 +36,9 @@
       <!-- Desktop Menu -->
       <div class="hidden lg:block">
         <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-10">
-          <li><a href="#popular-jobs" class="nav-link">Job Search</a></li>
+          <li><a href="?page=landing#popular-jobs" class="nav-link">Job Search</a></li>
           <li><a href="?page=program-events" class="nav-link">Programs</a></li>
-          <li><a href="#top-companies" class="nav-link">Explore Companies</a></li>
+          <li><a href="?page=landing#top-companies" class="nav-link">Explore Companies</a></li>
           <li><a href="?page=about-page" class="nav-link">About Us</a></li>
         </ul>
       </div>
@@ -85,16 +85,16 @@
       style="display: none;">
       <div class="p-4">
         <ul class="flex flex-col gap-3">
-          <li><a href="#popular-jobs" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Job Search</a></li>
+          <li><a href="?page=landing#popular-jobs" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Job Search</a></li>
           <li><a href="?page=program-events" class="block px-3 py-2 text-base text-gray-700 rounded-md m hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Programs</a></li>
-          <li><a href="#top-companies" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Explore Companies</a></li>
-          <li><a href="?page=about-us" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">About Us</a></li>
+          <li><a href="?page=landing#top-companies" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">Explore Companies</a></li>
+          <li><a href="?page=about-page" class="block px-3 py-2 text-base text-gray-700 rounded-md hover:bg-gray-100 hover:text-primary nav-link" @click="open = false">About Us</a></li>
 
           <!-- Mobile Action Buttons -->
           <li class="pt-3 mt-2 border-t border-gray-200 mborder-t">
             <div class="flex flex-col gap-2 mt-4">
               <button
-                type="button" 
+                type="button"
                 class="w-full px-4 py-2 text-sm font-semibold text-center border border-gray-300 rounded-md hover:bg-gray-100"
                 onclick="window.location.href='?page=login-jobseeker';"
                 @click="open = false">
