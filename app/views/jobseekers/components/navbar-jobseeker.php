@@ -689,9 +689,49 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           await this.markAsRead(notification.notification_id);
         }
 
-        // Navigate to link if exists
+        // Navigate to link with error handling - FIXED: Better fallback
         if (notification.link) {
-          window.location.href = notification.link;
+          try {
+            // For job-related links, add extra validation
+            if (notification.link.includes('view-job') ||
+              notification.link.includes('my-applications') ||
+              notification.link.includes('view-application')) {
+
+              // FIXED: Use fetch to test if the page exists
+              try {
+                const testResponse = await fetch(notification.link, {
+                  method: 'HEAD',
+                  credentials: 'same-origin'
+                });
+
+                if (testResponse.ok && testResponse.status < 400) {
+                  // Page exists, navigate normally
+                  window.location.href = notification.link;
+                } else {
+                  // Page doesn't exist, redirect to notifications page
+                  console.log('⚠️ Link not accessible, redirecting to notifications page');
+                  window.location.href = '?page=notifications-jobseeker&info=' +
+                    encodeURIComponent('The content you\'re looking for is no longer available.');
+                }
+              } catch (fetchError) {
+                // Fetch failed, redirect to notifications page
+                console.error('❌ Error testing link:', fetchError);
+                window.location.href = '?page=notifications-jobseeker&info=' +
+                  encodeURIComponent('Unable to access the requested content.');
+              }
+            } else {
+              // For other links, navigate directly
+              window.location.href = notification.link;
+            }
+          } catch (error) {
+            console.error('Navigation error:', error);
+            // Always redirect to notifications page instead of showing white screen
+            window.location.href = '?page=notifications-jobseeker&info=' +
+              encodeURIComponent('Unable to access the requested content.');
+          }
+        } else {
+          // No link, just go to notifications page
+          window.location.href = '?page=notifications-jobseeker';
         }
 
         this.isOpen = false;

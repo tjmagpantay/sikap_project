@@ -54,6 +54,18 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             </div>
         <?php endif; ?>
 
+        <!-- Info Messages for fallback scenarios -->
+        <?php if (isset($_GET['info'])): ?>
+            <div class="p-4 mb-6 text-blue-800 bg-blue-100 border border-blue-300 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <?php echo htmlspecialchars($_GET['info']); ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Page Header - Same style as settings page -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
@@ -163,12 +175,12 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                     <!-- Type Badge -->
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
         <?php
-            echo ($notification['type'] === 'program') ? 'bg-green-100 text-green-700'
-                : (($notification['type'] === 'job_post') ? 'bg-blue-100 text-blue-700'
-                : (($notification['type'] === 'application_update') ? 'bg-orange-100 text-orange-700'
-                : (($notification['type'] === 'interview') ? 'bg-purple-100 text-purple-700'
-                : (($notification['type'] === 'resignation_update') ? 'bg-red-100 text-red-700'
-                : 'bg-gray-100 text-gray-700'))));
+                    echo ($notification['type'] === 'program') ? 'bg-green-100 text-green-700'
+                        : (($notification['type'] === 'job_post') ? 'bg-blue-100 text-blue-700'
+                            : (($notification['type'] === 'application_update') ? 'bg-orange-100 text-orange-700'
+                                : (($notification['type'] === 'interview') ? 'bg-purple-100 text-purple-700'
+                                    : (($notification['type'] === 'resignation_update') ? 'bg-red-100 text-red-700'
+                                        : 'bg-gray-100 text-gray-700'))));
         ?>">
                                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $notification['type']))); ?>
                                     </span>
@@ -195,29 +207,28 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             <p class="mb-4 text-xs leading-relaxed text-gray-700">
                                 <?php echo htmlspecialchars($notification['message']); ?>
                             </p>
-                        <!-- Action Buttons -->
-                        <div class="flex flex-row items-end gap-2 py-2 border-t border-gray-100">
-                            <?php if ($notification['status'] === 'unread'): ?>
-                                <button onclick="markAsRead(<?php echo $notification['notification_id']; ?>)"
-                                    class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Mark as Read
-                                </button>
-                            <?php endif; ?>
+                            <!-- Action Buttons -->
+                            <div class="flex flex-row items-end gap-2 py-2 border-t border-gray-100">
+                                <?php if ($notification['status'] === 'unread'): ?>
+                                    <button onclick="markAsRead(<?php echo $notification['notification_id']; ?>)"
+                                        class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Mark as Read
+                                    </button>
+                                <?php endif; ?>
 
-                            <?php if (!empty($notification['link'])): ?>
-                                <a href="<?php echo htmlspecialchars($notification['link']); ?>"
-                                    onclick="<?php if ($notification['status'] === 'unread'): ?>markAsRead(<?php echo $notification['notification_id']; ?>)<?php endif; ?>"
-                                    class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                    View Details
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                                <?php if (!empty($notification['link'])): ?>
+                                    <button onclick="handleNotificationClick('<?php echo htmlspecialchars($notification['link']); ?>', <?php echo $notification['notification_id']; ?>, '<?php echo $notification['status']; ?>'); event.stopPropagation();"
+                                        class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-xs font-medium text-white transition-colors rounded-md bg-primary hover:bg-secondary">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        View Details
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -361,4 +372,76 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             }, 300);
         }, 3000);
     }
+    // FIXED: Enhanced notification click handler with proper fallback
+    async function handleNotificationClick(link, notificationId, status) {
+        // Mark as read if unread
+        if (status === 'unread') {
+            await markAsRead(notificationId);
+        }
+
+        // Navigate with fallback handling - FIXED: Proper error handling
+        if (link) {
+            try {
+                // For job-related and application links, validate they exist
+                if (link.includes('view-job') ||
+                    link.includes('my-applications') ||
+                    link.includes('view-application') ||
+                    link.includes('apply-job')) {
+
+                    // FIXED: Use a simpler approach - just try to navigate and handle errors
+                    const tempLink = document.createElement('a');
+                    tempLink.href = link;
+                    tempLink.style.display = 'none';
+                    document.body.appendChild(tempLink);
+
+                    // Add error handler to window
+                    const originalOnError = window.onerror;
+                    window.onerror = function(msg, url, lineNo, columnNo, error) {
+                        // Restore original handler
+                        window.onerror = originalOnError;
+
+                        // Show error message and stay on notifications page
+                        showToast('The content you\'re looking for is no longer available or has expired.', 'error');
+                        return true; // Prevent default error handling
+                    };
+
+                    // Try to navigate
+                    setTimeout(() => {
+                        try {
+                            window.location.href = link;
+                        } catch (navError) {
+                            console.error('Navigation error:', navError);
+                            showToast('Unable to access the requested content.', 'error');
+                            // Stay on current page instead of white screen
+                        }
+                    }, 100);
+
+                    // Clean up
+                    document.body.removeChild(tempLink);
+
+                } else {
+                    // For other links (programs, general pages), navigate directly
+                    window.location.href = link;
+                }
+            } catch (error) {
+                console.error('Error handling notification click:', error);
+                showToast('Unable to access the requested content.', 'error');
+                // Don't navigate anywhere - stay on notifications page
+            }
+        }
+    }
+
+    // Update the existing View Details button click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update all "View Details" buttons to use the new handler
+        document.querySelectorAll('a[onclick*="markAsRead"]').forEach(button => {
+            const originalOnclick = button.getAttribute('onclick');
+            const notificationId = originalOnclick.match(/markAsRead\((\d+)\)/)?.[1];
+            const link = button.getAttribute('href');
+
+            if (notificationId) {
+                button.setAttribute('onclick', `handleNotificationClick('${link}', ${notificationId}, 'unread'); return false;`);
+            }
+        });
+    });
 </script>
