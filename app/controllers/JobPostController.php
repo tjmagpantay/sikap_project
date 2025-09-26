@@ -526,6 +526,12 @@ class JobPostController
             exit;
         }
 
+        // ADDED: Check if job is expired
+        if (!empty($job['application_deadline']) && strtotime($job['application_deadline']) < time()) {
+            header('Location: ?page=browse-jobs&error=' . urlencode('This job has expired and is no longer accepting applications.'));
+            exit;
+        }
+
         // Get job skills and attachments
         $job['skills'] = $this->jobPostModel->getJobSkills($job_id);
         $job['attachments'] = $this->jobPostModel->getJobAttachments($job_id);

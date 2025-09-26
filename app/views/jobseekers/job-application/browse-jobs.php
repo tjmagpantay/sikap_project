@@ -320,6 +320,34 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                         <?php echo htmlspecialchars($currentJob['category_name']); ?>
                                     </span>
                                 <?php endif; ?>
+                                <!-- Applied Status with different states -->
+                                <?php if (isset($currentJob['has_applied']) && $currentJob['has_applied']): ?>
+                                    <?php
+                                    $applicationStatus = $currentJob['application_status'] ?? 'pending';
+                                    $statusColors = [
+                                        'pending' => 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+                                        'reviewed' => 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+                                        'shortlisted' => 'bg-purple-100 text-purple-700 hover:bg-purple-200',
+                                        'hired' => 'bg-green-100 text-green-700 hover:bg-green-200',
+                                        'rejected' => 'bg-red-100 text-red-700 hover:bg-red-200'
+                                    ];
+                                    $statusIcons = [
+                                        'pending' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+                                        'reviewed' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                                        'shortlisted' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z',
+                                        'hired' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                                        'rejected' => 'M6 18L18 6M6 6l12 12'
+                                    ];
+                                    $colorClass = $statusColors[$applicationStatus] ?? $statusColors['pending'];
+                                    $iconPath = $statusIcons[$applicationStatus] ?? $statusIcons['pending'];
+                                    ?>
+                                    <span class="flex items-center px-3 py-2 text-xs transition-all duration-300 rounded-sm <?php echo $colorClass; ?>">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $iconPath; ?>"></path>
+                                        </svg>
+                                        <?php echo ucfirst($applicationStatus); ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Job Summary -->
@@ -327,7 +355,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                 <?php echo htmlspecialchars(substr($currentJob['job_summary'], 0, 150)) . (strlen($currentJob['job_summary']) > 150 ? '...' : ''); ?>
                             </p>
 
-                            
+
 
                             <!-- Footer: Posted Date and Match Percentage -->
                             <div class="flex items-center justify-between pt-4 mt-2">

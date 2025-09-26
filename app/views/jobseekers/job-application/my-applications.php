@@ -222,10 +222,10 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                         <div class="flex items-center">
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    <?php echo htmlspecialchars($application['job_title']); ?>
+                                                    <?php echo htmlspecialchars($application['job_title'] ?? 'Unknown Position'); ?>
                                                 </div>
                                                 <div class="text-xs text-gray-500">
-                                                    <?php echo ucfirst(str_replace('-', ' ', $application['job_type'])); ?> • <?php echo htmlspecialchars($application['location']); ?>
+                                                    <?php echo ucfirst(str_replace('-', ' ', $application['job_type'] ?? 'full-time')); ?> • <?php echo htmlspecialchars($application['location'] ?? 'Location not specified'); ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -240,7 +240,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
                                     <!-- Status Column -->
                                     <td class="px-6 py-5">
-                                        <?php if (!$application['is_finalized']): ?>
+                                        <?php if (!($application['is_finalized'] ?? 1)): ?>
                                             <div class="flex items-center">
                                                 <div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-orange-500 rounded-full">
                                                     <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +313,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                     <td class="px-6 py-5">
                                         <div class="flex items-center space-x-3">
                                             <!-- View Application Button -->
-                                            <a href="?page=view-application&id=<?php echo $application['application_id']; ?>"
+                                            <a href="?page=view-application&id=<?php echo ($application['application_id'] ?? 0); ?>"
                                                 class="inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 bg-gray-100 rounded-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                                 View
                                             </a>
@@ -339,29 +339,29 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                                     class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                                     style="display: none;">
                                                     <div class="py-1">
-                                                        <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
+                                                        <a href="?page=view-job&job_id=<?php echo ($application['job_id'] ?? 0); ?>"
                                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                             <i class="mr-3 text-blue-400 fas fa-external-link-alt"></i>
                                                             View Job Details
                                                         </a>
 
-                                                        <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)"
+                                                        <button onclick="toggleSaveJob(<?php echo ($application['job_id'] ?? 0); ?>, this)"
                                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                            data-job-id="<?php echo $application['job_id']; ?>"
+                                                            data-job-id="<?php echo ($application['job_id'] ?? 0); ?>"
                                                             data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>">
                                                             <i class="mr-3 text-yellow-400 <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
                                                             <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
                                                         </button>
 
                                                         <?php if ($application['application_status'] === 'hired'): ?>
-                                                            <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
+                                                            <a href="?page=resign-from-job&id=<?php echo ($application['application_id'] ?? 0); ?>"
                                                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                                 <i class="mr-3 text-orange-400 fas fa-sign-out-alt"></i>
                                                                 Resign from Job
                                                             </a>
                                                         <?php elseif ($application['application_status'] === 'pending'): ?>
-                                                            <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
-                                                                onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
+                                                            <a href="?page=withdraw-application&id=<?php echo ($application['application_id'] ?? 0); ?>"
+                                                                onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title'] ?? 'this job'); ?>&quot;?\n\nThis action cannot be undone.')"
                                                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                                 <i class="mr-3 text-red-400 fas fa-times"></i>
                                                                 Withdraw Application
@@ -451,29 +451,29 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                     class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                                     style="display: none;">
                                     <div class="py-1">
-                                        <a href="?page=view-job&job_id=<?php echo $application['job_id']; ?>"
+                                        <a href="?page=view-job&job_id=<?php echo ($application['job_id'] ?? 0); ?>"
                                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             <i class="mr-3 text-blue-400 fas fa-external-link-alt"></i>
                                             View Job Details
                                         </a>
 
-                                        <button onclick="toggleSaveJob(<?php echo $application['job_id']; ?>, this)"
+                                        <button onclick="toggleSaveJob(<?php echo ($application['job_id'] ?? 0); ?>, this)"
                                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            data-job-id="<?php echo $application['job_id']; ?>"
+                                            data-job-id="<?php echo ($application['job_id'] ?? 0); ?>"
                                             data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>">
                                             <i class="mr-3 text-yellow-400 <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
                                             <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
                                         </button>
 
                                         <?php if ($application['application_status'] === 'hired'): ?>
-                                            <a href="?page=resign-from-job&id=<?php echo $application['application_id']; ?>"
+                                            <a href="?page=resign-from-job&id=<?php echo ($application['application_id'] ?? 0); ?>"
                                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                 <i class="mr-3 text-orange-400 fas fa-sign-out-alt"></i>
                                                 Resign from Job
                                             </a>
                                         <?php elseif ($application['application_status'] === 'pending'): ?>
-                                            <a href="?page=withdraw-application&id=<?php echo $application['application_id']; ?>"
-                                                onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title']); ?>&quot;?\n\nThis action cannot be undone.')"
+                                            <a href="?page=withdraw-application&id=<?php echo ($application['application_id'] ?? 0); ?>"
+                                                onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title'] ?? 'this job'); ?>&quot;?\n\nThis action cannot be undone.')"
                                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                 <i class="mr-3 text-red-400 fas fa-times"></i>
                                                 Withdraw Application

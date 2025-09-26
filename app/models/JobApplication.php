@@ -127,27 +127,28 @@ class JobApplication
             error_log("DEBUG: Querying applications for jobseeker_id = " . $jobseeker_id);
 
             $sql = "SELECT ja.application_id,
-                           ja.jobseeker_id,
-                           ja.job_id,
-                           ja.application_status,
-                           ja.applied_at,
-                           ja.reviewed_at,
-                           ja.current_step,
-                           ja.is_finalized,
-                           jp.job_title, 
-                           jp.job_type, 
-                           jp.location,
-                           jp.pay_range,
-                           jp.workplace_option,
-                           COALESCE(eb.business_name, e.company_name) as company_name,
-                           e.first_name as employer_first_name, 
-                           e.last_name as employer_last_name
-                    FROM job_application ja
-                    JOIN job_post jp ON ja.job_id = jp.job_id
-                    JOIN employer e ON jp.employer_id = e.employer_id
-                    LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-                    WHERE ja.jobseeker_id = ?
-                    ORDER BY ja.application_id DESC";
+                       ja.jobseeker_id,
+                       ja.job_id,
+                       ja.application_status,
+                       ja.applied_at,
+                       ja.reviewed_at,
+                       ja.current_step,
+                       ja.is_finalized,
+                       jp.job_title, 
+                       jp.job_type, 
+                       jp.location,
+                       jp.pay_range,
+                       jp.workplace_option,
+                       jp.application_deadline,
+                       COALESCE(eb.business_name, e.company_name) as company_name,
+                       e.first_name as employer_first_name, 
+                       e.last_name as employer_last_name
+                FROM job_application ja
+                JOIN job_post jp ON ja.job_id = jp.job_id
+                JOIN employer e ON jp.employer_id = e.employer_id
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                WHERE ja.jobseeker_id = ?
+                ORDER BY ja.application_id DESC";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id]);
@@ -159,10 +160,10 @@ class JobApplication
             for ($i = 0; $i < count($applications); $i++) {
                 if ($applications[$i]['is_finalized']) {
                     $interviewSql = "SELECT interview_date, interview_location, notes 
-                                   FROM job_application_management 
-                                   WHERE application_id = ? 
-                                   ORDER BY created_at DESC 
-                                   LIMIT 1";
+                               FROM job_application_management 
+                               WHERE application_id = ? 
+                               ORDER BY created_at DESC 
+                               LIMIT 1";
                     $interviewStmt = $this->db->prepare($interviewSql);
                     $interviewStmt->execute([$applications[$i]['application_id']]);
                     $interview = $interviewStmt->fetch(PDO::FETCH_ASSOC);
