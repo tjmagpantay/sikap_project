@@ -84,7 +84,7 @@
 
                 <!-- Main image container -->
                 <div class="relative flex items-center justify-center overflow-hidden shadow-xl rounded-xl bg-gradient-to-br from-white to-gray-50 min-h-[300px]">
-                    <img src="./assets/images/job-guide-img.png"
+                    <img src="./assets/images/help-desk.png"
                         alt="Professional job seeker success story"
                         class="object-cover transition-opacity duration-300 w-90% h-90% hover:opacity-90">
                 </div>

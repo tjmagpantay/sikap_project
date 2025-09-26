@@ -49,8 +49,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
 
-        case 'about-us':
-            include __DIR__ . '/../app/views/pages/about-us.php';
+        case 'about-page':
+            include __DIR__ . '/../app/views/pages/about-page.php';
             break;
 
         case 'program-events':
