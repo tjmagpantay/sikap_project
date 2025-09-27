@@ -333,4 +333,139 @@ class NotificationController
         }
         exit;
     }
+    public function validateAndRedirect()
+    {
+        // Get the target link from GET parameter
+        $targetLink = $_GET['link'] ?? '';
+        $fallbackPage = $_GET['fallback'] ?? 'notifications-jobseeker';
+
+        if (!$targetLink) {
+            header("Location: ?page=$fallbackPage");
+            exit;
+        }
+
+        // Try to validate the link by checking if the target exists
+        try {
+            // Parse the target link to extract page and parameters
+            $parsedUrl = parse_url($targetLink);
+            parse_str($parsedUrl['query'] ?? '', $queryParams);
+
+            $targetPage = $queryParams['page'] ?? '';
+
+            // Check if target content exists based on page type
+            $contentExists = $this->validateTargetContent($targetPage, $queryParams);
+
+            if ($contentExists) {
+                // Content exists, redirect to original link
+                header("Location: $targetLink");
+            } else {
+                // Content doesn't exist, redirect to fallback
+                header("Location: ?page=$fallbackPage");
+            }
+        } catch (Exception $e) {
+            // Any error, redirect to fallback
+            header("Location: ?page=$fallbackPage");
+        }
+
+        exit;
+    }
+
+
+    /**
+     * Validate if target content exists
+     */
+    private function validateTargetContent($page, $params)
+    {
+        try {
+            switch ($page) {
+                case 'job-details':
+                case 'view-job':
+                case 'apply-job':
+                    if (isset($params['job_id']) || isset($params['id'])) {
+                        $jobId = $params['job_id'] ?? $params['id'];
+
+                        // Check if JobPost model exists
+                        if (file_exists(__DIR__ . '/../models/JobPost.php')) {
+                            require_once __DIR__ . '/../models/JobPost.php';
+                            $jobPostModel = new JobPost($this->pdo);
+
+                            // Check if method exists
+                            if (method_exists($jobPostModel, 'isJobActiveById')) {
+                                return $jobPostModel->isJobActiveById($jobId);
+                            }
+                        }
+
+                        // Fallback: Direct database query
+                        $stmt = $this->pdo->prepare("SELECT job_id FROM job_post WHERE job_id = ? AND job_status = 'open'");
+                        $stmt->execute([$jobId]);
+                        return $stmt->fetchColumn() !== false;
+                    }
+                    break;
+
+                case 'view-application':
+                case 'my-applications':
+                    if (isset($params['application_id'])) {
+                        // Check if JobApplication model exists
+                        if (file_exists(__DIR__ . '/../models/JobApplication.php')) {
+                            require_once __DIR__ . '/../models/JobApplication.php';
+                            $jobApplicationModel = new JobApplication($this->pdo);
+
+                            // Check if method exists
+                            if (method_exists($jobApplicationModel, 'exists')) {
+                                return $jobApplicationModel->exists($params['application_id']);
+                            }
+                        }
+
+                        // Fallback: Direct database query
+                        $stmt = $this->pdo->prepare("SELECT application_id FROM job_application WHERE application_id = ?");
+                        $stmt->execute([$params['application_id']]);
+                        return $stmt->fetchColumn() !== false;
+                    }
+                    // If no specific application_id, allow access to general applications page
+                    return true;
+                    break;
+
+                case 'event-details':
+                case 'event-info':
+                case 'event-info-jobseeker':
+                case 'program-details':
+                case 'programs-jobseeker':
+                    if (isset($params['id']) || isset($params['event_id'])) {
+                        $eventId = $params['id'] ?? $params['event_id'];
+
+                        // Direct database query for events (since Event model might not exist)
+                        $stmt = $this->pdo->prepare("SELECT event_id FROM events WHERE event_id = ? AND status = 'show'");
+                        $stmt->execute([$eventId]);
+                        return $stmt->fetchColumn() !== false;
+                    }
+                    return true;
+                    break;
+
+                case 'review-application':
+                    if (isset($params['application_id'])) {
+                        // Direct database query fallback
+                        $stmt = $this->pdo->prepare("SELECT application_id FROM job_application WHERE application_id = ?");
+                        $stmt->execute([$params['application_id']]);
+                        return $stmt->fetchColumn() !== false;
+                    }
+                    break;
+
+                // General pages that don't need validation
+                case 'applications':
+                case 'job-posts':
+                case 'employer-programs':
+                case 'manage-jobs':
+                case 'browse-jobs':
+                case 'program-events':
+                    return true;
+                    break;
+            }
+
+            // For unknown pages, assume they don't exist
+            return false;
+        } catch (Exception $e) {
+            error_log("❌ Error validating target content: " . $e->getMessage());
+            return false;
+        }
+    }
 }

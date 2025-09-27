@@ -87,6 +87,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new NotificationController();
             $controller->viewAllJobseekerNotifications();
             break;
+        case 'validate-link':
+            require_once __DIR__ . '/../app/controllers/NotificationController.php';
+            $controller = new NotificationController();
+            $controller->validateAndRedirect();
+            break;
 
         case 'notifications-employer':
             require_once __DIR__ . '/../app/controllers/NotificationController.php';
@@ -856,6 +861,31 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->deleteAccount();
+            break;
+
+
+        case 'job-details':
+            require_once __DIR__ . '/../app/controllers/JobValidationController.php';
+            $controller = new JobValidationController();
+            $controller->validateJobDetails();
+            break;
+
+        case 'applications':
+            require_once __DIR__ . '/../app/controllers/JobValidationController.php';
+            $controller = new JobValidationController();
+            $controller->validateApplicationsAccess();
+            break;
+
+        case 'job-posts':
+            require_once __DIR__ . '/../app/controllers/JobValidationController.php';
+            $controller = new JobValidationController();
+            $controller->validateJobPostsAccess();
+            break;
+
+        case 'employer-programs':
+            require_once __DIR__ . '/../app/controllers/JobValidationController.php';
+            $controller = new JobValidationController();
+            $controller->validateEmployerProgramsAccess();
             break;
 
 

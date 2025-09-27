@@ -211,13 +211,13 @@ class EventProgram
             // Use the same database connection from this model
             $notificationService = new EventEmailNotifService($this->db);
             $result = $notificationService->notifyJobseekersAboutNewProgram($eventId);
-            
+
             if ($result) {
                 error_log("✅ Email notifications sent successfully for event ID: " . $eventId);
             } else {
                 error_log("⚠️ Failed to send email notifications for event ID: " . $eventId);
             }
-            
+
             return $result;
         } catch (Exception $e) {
             error_log("❌ Error in EventProgram::notifyJobseekersAboutNewProgram: " . $e->getMessage());
@@ -244,5 +244,41 @@ class EventProgram
     public function getDatabase()
     {
         return $this->db;
+    }
+    public function isActiveById($eventId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT event_id 
+                FROM events 
+                WHERE event_id = ? AND status = 'show'
+            ");
+            $stmt->execute([$eventId]);
+
+            return $stmt->fetchColumn() !== false;
+        } catch (Exception $e) {
+            error_log("Error checking if event is active: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if an event exists by ID (regardless of status)
+     */
+    public function exists($eventId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT event_id 
+                FROM events 
+                WHERE event_id = ?
+            ");
+            $stmt->execute([$eventId]);
+
+            return $stmt->fetchColumn() !== false;
+        } catch (Exception $e) {
+            error_log("Error checking if event exists: " . $e->getMessage());
+            return false;
+        }
     }
 }

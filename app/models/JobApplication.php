@@ -787,4 +787,20 @@ class JobApplication
             return false;
         }
     }
+    public function exists($applicationId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT application_id 
+            FROM job_application 
+            WHERE application_id = ?
+        ");
+            $stmt->execute([$applicationId]);
+
+            return $stmt->fetchColumn() !== false;
+        } catch (PDOException $e) {
+            error_log("Error checking if application exists: " . $e->getMessage());
+            return false;
+        }
+    }
 }

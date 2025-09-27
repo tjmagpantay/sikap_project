@@ -373,61 +373,20 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
         }, 3000);
     }
     // FIXED: Enhanced notification click handler with proper fallback
-    async function handleNotificationClick(link, notificationId, status) {
+    function handleNotificationClick(link, notificationId, status) {
         // Mark as read if unread
         if (status === 'unread') {
-            await markAsRead(notificationId);
+            markAsRead(notificationId);
         }
 
-        // Navigate with fallback handling - FIXED: Proper error handling
+        // FIXED: Always use validation controller for links
         if (link) {
-            try {
-                // For job-related and application links, validate they exist
-                if (link.includes('view-job') ||
-                    link.includes('my-applications') ||
-                    link.includes('view-application') ||
-                    link.includes('apply-job')) {
-
-                    // FIXED: Use a simpler approach - just try to navigate and handle errors
-                    const tempLink = document.createElement('a');
-                    tempLink.href = link;
-                    tempLink.style.display = 'none';
-                    document.body.appendChild(tempLink);
-
-                    // Add error handler to window
-                    const originalOnError = window.onerror;
-                    window.onerror = function(msg, url, lineNo, columnNo, error) {
-                        // Restore original handler
-                        window.onerror = originalOnError;
-
-                        // Show error message and stay on notifications page
-                        showToast('The content you\'re looking for is no longer available or has expired.', 'error');
-                        return true; // Prevent default error handling
-                    };
-
-                    // Try to navigate
-                    setTimeout(() => {
-                        try {
-                            window.location.href = link;
-                        } catch (navError) {
-                            console.error('Navigation error:', navError);
-                            showToast('Unable to access the requested content.', 'error');
-                            // Stay on current page instead of white screen
-                        }
-                    }, 100);
-
-                    // Clean up
-                    document.body.removeChild(tempLink);
-
-                } else {
-                    // For other links (programs, general pages), navigate directly
-                    window.location.href = link;
-                }
-            } catch (error) {
-                console.error('Error handling notification click:', error);
-                showToast('Unable to access the requested content.', 'error');
-                // Don't navigate anywhere - stay on notifications page
-            }
+            // Use the validation controller for all links
+            const fallbackLink = `?page=validate-link&link=${encodeURIComponent(link)}&fallback=notifications-jobseeker`;
+            window.location.href = fallbackLink;
+        } else {
+            // No link, stay on notifications page
+            window.location.href = '?page=notifications-jobseeker';
         }
     }
 
