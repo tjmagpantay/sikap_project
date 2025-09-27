@@ -60,21 +60,6 @@
                     <img src="assets/images/abt-peso1.png"
                         alt="PESO Rosario Team"
                         class="object-cover transition-opacity duration-300 w-90% h-90% hover:opacity-90">
-
-
-                    <div class="absolute p-4 bg-white rounded-lg shadow-lg -bottom-4 -right-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-secondary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h11-2zm2 4h-2v2h2V9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-xl font-bold text-primary">100+</p>
-                                <p class="text-xs text-gray-600">Companies</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

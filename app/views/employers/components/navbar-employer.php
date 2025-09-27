@@ -116,11 +116,11 @@
               </template>
 
               <!-- Notification Items -->
-              <template x-for="notification in notifications" :key="notification.notification_id">
+              <template x-for="notification in notifications" :key="notification.notification_id" >
                 <div class="transition-all duration-200 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
-                  :class="notification.status === 'unread' ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''"
+                  :class="notification.status === 'unread' ? 'bg-blue-50  border-l-4 border-l-blue-500' : ''"
                   @click="handleNotificationClick(notification)">
-                  <div class="px-4 py-3">
+                  <div class="px-4 py-3 border-t border-gray-200">
                     <div class="flex items-start justify-between">
                       <div class="flex-1 min-w-0">
                         <!-- Notification Icon -->
@@ -220,7 +220,7 @@
             <!-- Footer -->
             <div class="px-4 py-2 border-t bg-gray-50">
               <a href="?page=notifications-employer"
-                class="block text-xs font-medium text-center text-blue-600 transition-colors duration-200 hover:text-blue-800">
+                class="block text-xs font-medium text-center transition-colors duration-200 text-primary hover:text-primary/90">
                 View all notifications →
               </a>
             </div>
