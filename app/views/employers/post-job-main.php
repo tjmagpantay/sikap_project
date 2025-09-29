@@ -96,4 +96,3 @@ switch ($step) {
     default:
         include __DIR__ . '/post-job/post-job-step1.php';
 }
-?>

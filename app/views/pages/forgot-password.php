@@ -35,7 +35,7 @@ include_once __DIR__ . '/../components/navbar.php';
                         <input id="email" name="email" type="email" required maxlength="50"
                             class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                         <div class="flex justify-between mt-1 text-xs">
-                            <span id="email-error" class="hidden text-red-500"></span>  
+                            <span id="email-error" class="hidden text-red-500"></span>
                         </div>
                     </div>
                 </div>
@@ -52,40 +52,40 @@ include_once __DIR__ . '/../components/navbar.php';
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const emailInput = document.getElementById('email');
-    const errorSpan = document.getElementById('email-error');
-    const countSpan = document.getElementById('email-count');
-    const submitBtn = document.getElementById('submitBtn');
-    const form = document.getElementById('forgotPasswordForm');
-    const maxLimit = 50;
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.getElementById('email');
+        const errorSpan = document.getElementById('email-error');
+        const countSpan = document.getElementById('email-count');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('forgotPasswordForm');
+        const maxLimit = 50;
 
-    function validateEmail() {
-        const length = emailInput.value.length;
-        countSpan.textContent = `${length}/${maxLimit}`;
+        function validateEmail() {
+            const length = emailInput.value.length;
+            countSpan.textContent = `${length}/${maxLimit}`;
 
-        if (length > maxLimit) {
-            errorSpan.textContent = `Email cannot exceed ${maxLimit} characters`;
-            errorSpan.classList.remove('hidden');
-            emailInput.classList.add('border-red-500');
-            submitBtn.disabled = true;
-        } else {
-            errorSpan.classList.add('hidden');
-            emailInput.classList.remove('border-red-500');
-            submitBtn.disabled = false;
+            if (length > maxLimit) {
+                errorSpan.textContent = `Email cannot exceed ${maxLimit} characters`;
+                errorSpan.classList.remove('hidden');
+                emailInput.classList.add('border-red-500');
+                submitBtn.disabled = true;
+            } else {
+                errorSpan.classList.add('hidden');
+                emailInput.classList.remove('border-red-500');
+                submitBtn.disabled = false;
+            }
         }
-    }
 
-    emailInput.addEventListener('input', validateEmail);
-    validateEmail(); // Initial run
+        emailInput.addEventListener('input', validateEmail);
+        validateEmail(); // Initial run
 
-    form.addEventListener('submit', function(e) {
-        if (emailInput.value.length > maxLimit) {
-            e.preventDefault();
-            errorSpan.textContent = `Email cannot exceed ${maxLimit} characters`;
-            errorSpan.classList.remove('hidden');
-            emailInput.classList.add('border-red-500');
-        }
+        form.addEventListener('submit', function(e) {
+            if (emailInput.value.length > maxLimit) {
+                e.preventDefault();
+                errorSpan.textContent = `Email cannot exceed ${maxLimit} characters`;
+                errorSpan.classList.remove('hidden');
+                emailInput.classList.add('border-red-500');
+            }
+        });
     });
-});
 </script>

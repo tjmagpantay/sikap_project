@@ -396,7 +396,7 @@
                                     <?php endif; ?>
                                 </td>
 
-                                
+
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

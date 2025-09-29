@@ -119,7 +119,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         placeholder="e.g., Senior Web Developer"
                         class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary placeholder:text-xs">
                     <div id="job-title-error" class="hidden mt-1 text-xs text-red-600"></div>
-                    
+
                 </div>
 
                 <!-- Job Category -->

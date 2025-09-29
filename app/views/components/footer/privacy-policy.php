@@ -8,7 +8,7 @@ include_once __DIR__ . '/../navbar.php';
         <!-- Header Section -->
         <div class="mb-12 text-center" data-aos="fade-up">
             <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
-                Privacy Policy
+                Privacy Policy (need change UI)
             </h1>
             <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
                 Sikap, developed and managed by PESO Rosario, Batangas, is committed to protecting your personal data.

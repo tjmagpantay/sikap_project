@@ -753,11 +753,11 @@ include_once __DIR__ . '/components/navbar-employer.php';
 </div>
 
 <script>
-function clearFilters() {
-    // Construct URL with only the page parameter, removing all filters
-    const baseUrl = window.location.pathname + '?page=browse-candidates';
-    window.location.href = baseUrl;
-}
+    function clearFilters() {
+        // Construct URL with only the page parameter, removing all filters
+        const baseUrl = window.location.pathname + '?page=browse-candidates';
+        window.location.href = baseUrl;
+    }
 </script>
 
 <!-- Alpine.js -->

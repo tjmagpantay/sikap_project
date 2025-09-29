@@ -26,8 +26,6 @@ if (!$employer) {
 // Get existing documents
 $documents = $this->employerModel->getDocuments($employer['employer_id']) ?: [];
 
-// Debug output
-error_log("DEBUG: Documents retrieved: " . print_r($documents, true));
 ?>
 
 <div class="min-h-screen py-6">

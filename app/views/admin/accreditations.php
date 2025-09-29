@@ -1,9 +1,3 @@
-<?php
-// Remove the auth check since dashboard.php already handles it
-// include_once __DIR__ . '/components/admin_auth_check.php'; 
-?>
-
-<!-- Remove ALL HTML structure - make it content-only like main-board.php -->
 <div class="space-y-6">
     <!-- Messages -->
     <?php if ($error ?? false): ?>

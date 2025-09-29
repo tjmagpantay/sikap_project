@@ -6,4 +6,3 @@ include_once __DIR__ . '/../components/abt-peso-page.php';
 include_once __DIR__ . '/../components/abt-card-page.php';
 include_once __DIR__ . '/../components/abt-call-page.php';
 include_once __DIR__ . '/../components/footer.php';
-

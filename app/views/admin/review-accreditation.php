@@ -1,8 +1,5 @@
 <?php
-// Remove the auth check since dashboard.php already handles it
-// Content-only page - no HTML structure, no auth check
 
-// Document types
 $documentTypes = [
     'letter_of_intent' => 'Letter of Intent',
     'company_profile' => 'Company Profile',

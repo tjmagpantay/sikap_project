@@ -141,17 +141,14 @@ include_once __DIR__ . '/../components/navbar.php';
 
                                 <!-- Tags Container -->
                                 <div class="absolute flex gap-2 top-4 left-4">
-                                    <!-- Pinned Badge - No background, just border -->
                                     <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
                                         PINNED
                                     </span>
-                                    <!-- Event Type Badge -->
                                     <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
                                         <?php echo ucwords(htmlspecialchars($event['type'])); ?>
                                     </span>
                                 </div>
 
-                                <!-- Event Content -->
                                 <div class="absolute text-left text-white bottom-4 left-4 right-4">
                                     <h3 class="mb-2 text-base font-medium leading-tight sm:text-lg">
                                         <?php echo htmlspecialchars($event['title']); ?>
@@ -199,15 +196,12 @@ include_once __DIR__ . '/../components/navbar.php';
                                         class="object-cover w-full h-full">
                                 <?php endif; ?>
 
-                                <!-- Gradient overlay -->
                                 <div class="absolute inset-0" style="background: linear-gradient(0deg, #092C4C 0%, rgba(255,255,255,0.3) 67%); background-blend-mode: overlay;"></div>
 
-                                <!-- Event Type Badge -->
                                 <span class="absolute px-3 py-1 text-xs font-medium text-white border border-white rounded-full top-4 left-4">
                                     <?php echo ucwords(htmlspecialchars($event['type'])); ?>
                                 </span>
 
-                                <!-- Event Content -->
                                 <div class="absolute text-left text-white bottom-4 left-4 right-4">
                                     <h3 class="mb-2 text-base font-medium leading-tight sm:text-lg">
                                         <?php echo htmlspecialchars($event['title']); ?>

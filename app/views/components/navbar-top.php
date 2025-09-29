@@ -17,7 +17,7 @@
           <a href="?page=abt-sikap" class="flex items-center">Sikap</a>
         </li>
         <li class="sm:block nav-link-top">
-          <a href="?page=customer-support" class="flex items-center">Customer Support</a>
+          <a href="?page=contact-support" class="flex items-center">Contact Support</a>
         </li>
       </ul>
     </div>
@@ -26,7 +26,7 @@
     <div class="hidden lg:block">
       <div class="flex items-center gap-2">
         <img src="assets/images/phonecall.png" alt="Phone Icon" class="w-auto h-4">
-        <a href="#" class="flex items-center nav-link-top">+1-202-555-0178</a>
+        <a href="#" class="flex items-center nav-link-top">+639175119692</a>
       </div>
     </div>
   </div>

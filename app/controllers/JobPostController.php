@@ -980,4 +980,6 @@ class JobPostController
 
         include __DIR__ . '/../views/jobseekers/explore-companies.php';
     }
+
 }
+

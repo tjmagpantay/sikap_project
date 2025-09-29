@@ -1,9 +1,3 @@
-<?php
-// Remove this line completely - dashboard.php already handles auth
-// include_once __DIR__ . '/components/admin_auth_check.php';
-?>
-
-<!-- Content-only dashboard - no HTML structure, no auth check -->
 <div class="space-y-6">
     <!-- Greeting Section -->
     <div class="mb-8">

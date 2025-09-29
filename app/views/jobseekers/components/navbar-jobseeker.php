@@ -689,51 +689,17 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           await this.markAsRead(notification.notification_id);
         }
 
-        // Navigate to link with error handling - FIXED: Better fallback
+        // FIXED: Always use validation controller for links
         if (notification.link) {
-          try {
-            // For job-related links, add extra validation
-            if (notification.link.includes('view-job') ||
-              notification.link.includes('my-applications') ||
-              notification.link.includes('view-application')) {
-
-              // FIXED: Use fetch to test if the page exists
-              try {
-                const testResponse = await fetch(notification.link, {
-                  method: 'HEAD',
-                  credentials: 'same-origin'
-                });
-
-                if (testResponse.ok && testResponse.status < 400) {
-                  // Page exists, navigate normally
-                  window.location.href = notification.link;
-                } else {
-                  // Page doesn't exist, redirect to notifications page
-                  console.log('⚠️ Link not accessible, redirecting to notifications page');
-                  window.location.href = '?page=notifications-jobseeker&info=' +
-                    encodeURIComponent('The content you\'re looking for is no longer available.');
-                }
-              } catch (fetchError) {
-                // Fetch failed, redirect to notifications page
-                console.error('❌ Error testing link:', fetchError);
-                window.location.href = '?page=notifications-jobseeker&info=' +
-                  encodeURIComponent('Unable to access the requested content.');
-              }
-            } else {
-              // For other links, navigate directly
-              window.location.href = notification.link;
-            }
-          } catch (error) {
-            console.error('Navigation error:', error);
-            // Always redirect to notifications page instead of showing white screen
-            window.location.href = '?page=notifications-jobseeker&info=' +
-              encodeURIComponent('Unable to access the requested content.');
-          }
+          // Use the validation controller for all links
+          const fallbackLink = `?page=validate-link&link=${encodeURIComponent(notification.link)}&fallback=notifications-jobseeker`;
+          window.location.href = fallbackLink;
         } else {
-          // No link, just go to notifications page
+          // No link, stay on notifications page
           window.location.href = '?page=notifications-jobseeker';
         }
 
+        // Close dropdown
         this.isOpen = false;
       },
 

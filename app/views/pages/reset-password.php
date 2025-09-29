@@ -20,7 +20,7 @@ include_once __DIR__ . '/../components/alert-modal.php';
                     </label>
                     <div class="mt-1">
                         <input id="password" name="password" type="password" required minlength="8"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                     </div>
                 </div>
 
@@ -30,13 +30,13 @@ include_once __DIR__ . '/../components/alert-modal.php';
                     </label>
                     <div class="mt-1">
                         <input id="confirm_password" name="confirm_password" type="password" required minlength="8"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                     </div>
                 </div>
 
                 <div>
                     <button type="submit"
-                            class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Reset Password
                     </button>
                 </div>
@@ -46,13 +46,13 @@ include_once __DIR__ . '/../components/alert-modal.php';
 </div>
 
 <script>
-document.querySelector('form').addEventListener('submit', function(e) {
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirm_password').value;
-    
-    if (password !== confirm) {
-        e.preventDefault();
-        alert('Passwords do not match!');
-    }
-});
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm_password').value;
+
+        if (password !== confirm) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+        }
+    });
 </script>

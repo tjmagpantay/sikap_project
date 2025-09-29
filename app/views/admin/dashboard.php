@@ -71,7 +71,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                 case 'admin-events':
                     include __DIR__ . '/events/event.php';
                     break;
-                case 'notifications-admin': 
+                case 'notifications-admin':
                     include __DIR__ . '/notifications.php';
                     break;
                 case 'admin-event-create':

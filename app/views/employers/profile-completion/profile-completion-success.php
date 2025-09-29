@@ -39,7 +39,7 @@ if ($isFirstTime) {
         <div class="max-w-xl mx-auto">
             <!-- Success Animation -->
             <div class="text-center">
-                
+
 
                 <h1 class="mb-2 text-2xl font-bold text-primary">
                     <?php echo $title; ?>

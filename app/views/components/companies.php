@@ -40,60 +40,60 @@
 </section>
 
 <style>
-/* Initial state - hidden below */
-.company-stat {
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s ease-out;
-}
+  /* Initial state - hidden below */
+  .company-stat {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease-out;
+  }
 
-/* Animated state - slide up */
-.company-stat.animate-up {
-  opacity: 1;
-  transform: translateY(0);
-}
+  /* Animated state - slide up */
+  .company-stat.animate-up {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-/* Staggered animation delays */
-.company-stat.animate-up:nth-child(1) {
-  transition-delay: 0ms;
-}
+  /* Staggered animation delays */
+  .company-stat.animate-up:nth-child(1) {
+    transition-delay: 0ms;
+  }
 
-.company-stat.animate-up:nth-child(2) {
-  transition-delay: 200ms;
-}
+  .company-stat.animate-up:nth-child(2) {
+    transition-delay: 200ms;
+  }
 
-.company-stat.animate-up:nth-child(3) {
-  transition-delay: 400ms;
-}
+  .company-stat.animate-up:nth-child(3) {
+    transition-delay: 400ms;
+  }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Create intersection observer for companies section
     const companiesObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Animate all company stats with staggered delays
-                const companyStats = document.querySelectorAll('.company-stat');
-                companyStats.forEach((stat, index) => {
-                    setTimeout(() => {
-                        stat.classList.add('animate-up');
-                    }, index * 200); // 200ms delay between each stat
-                });
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Animate all company stats with staggered delays
+          const companyStats = document.querySelectorAll('.company-stat');
+          companyStats.forEach((stat, index) => {
+            setTimeout(() => {
+              stat.classList.add('animate-up');
+            }, index * 200); // 200ms delay between each stat
+          });
 
-                // Stop observing once animated
-                companiesObserver.unobserve(entry.target);
-            }
-        });
+          // Stop observing once animated
+          companiesObserver.unobserve(entry.target);
+        }
+      });
     }, {
-        threshold: 0.3, // Trigger when 30% of the section is visible
-        rootMargin: '0px 0px -50px 0px' // Start animation 50px before the section is fully visible
+      threshold: 0.3, // Trigger when 30% of the section is visible
+      rootMargin: '0px 0px -50px 0px' // Start animation 50px before the section is fully visible
     });
 
     // Start observing the companies section
     const companiesSection = document.getElementById('companies-section');
     if (companiesSection) {
-        companiesObserver.observe(companiesSection);
+      companiesObserver.observe(companiesSection);
     }
-});
+  });
 </script>

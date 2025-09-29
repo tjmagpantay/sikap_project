@@ -1204,4 +1204,20 @@ class JobPost
             }
         }
     }
+    public function isJobActiveById($jobId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT job_id 
+            FROM job_post 
+            WHERE job_id = ? AND job_status = 'open'
+        ");
+            $stmt->execute([$jobId]);
+
+            return $stmt->fetchColumn() !== false;
+        } catch (Exception $e) {
+            error_log("Error checking if job is active: " . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -100,67 +100,84 @@
 </section>
 
 <style>
-/* Service Card Base Styles */
-.service-card {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease-out;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
+    /* Service Card Base Styles */
+    .service-card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease-out;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
 
-/* Hover Effects */
-.service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba(21, 103, 178, 0.2);
-}
+    /* Hover Effects */
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: rgba(21, 103, 178, 0.2);
+    }
 
-/* Animated State */
-.service-card.animate-up {
-    opacity: 1;
-    transform: translateY(0);
-}
+    /* Animated State */
+    .service-card.animate-up {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-/* Staggered Animation Delays */
-.service-card.animate-up:nth-child(1) { transition-delay: 0ms; }
-.service-card.animate-up:nth-child(2) { transition-delay: 100ms; }
-.service-card.animate-up:nth-child(3) { transition-delay: 200ms; }
-.service-card.animate-up:nth-child(4) { transition-delay: 300ms; }
-.service-card.animate-up:nth-child(5) { transition-delay: 400ms; }
-.service-card.animate-up:nth-child(6) { transition-delay: 500ms; }
+    /* Staggered Animation Delays */
+    .service-card.animate-up:nth-child(1) {
+        transition-delay: 0ms;
+    }
+
+    .service-card.animate-up:nth-child(2) {
+        transition-delay: 100ms;
+    }
+
+    .service-card.animate-up:nth-child(3) {
+        transition-delay: 200ms;
+    }
+
+    .service-card.animate-up:nth-child(4) {
+        transition-delay: 300ms;
+    }
+
+    .service-card.animate-up:nth-child(5) {
+        transition-delay: 400ms;
+    }
+
+    .service-card.animate-up:nth-child(6) {
+        transition-delay: 500ms;
+    }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Create intersection observer for services section
-    const servicesObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Animate all service cards with staggered delays
-                const serviceCards = document.querySelectorAll('.service-card');
-                serviceCards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.classList.add('animate-up');
-                    }, index * 100); // 100ms delay between each card
-                });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create intersection observer for services section
+        const servicesObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Animate all service cards with staggered delays
+                    const serviceCards = document.querySelectorAll('.service-card');
+                    serviceCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.add('animate-up');
+                        }, index * 100); // 100ms delay between each card
+                    });
 
-                // Stop observing once animated
-                servicesObserver.unobserve(entry.target);
-            }
+                    // Stop observing once animated
+                    servicesObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2, // Trigger when 20% of the section is visible
+            rootMargin: '0px 0px -50px 0px' // Start animation 50px before the section is fully visible
         });
-    }, {
-        threshold: 0.2, // Trigger when 20% of the section is visible
-        rootMargin: '0px 0px -50px 0px' // Start animation 50px before the section is fully visible
-    });
 
-    // Start observing the services section
-    const servicesSection = document.getElementById('services-section');
-    if (servicesSection) {
-        servicesObserver.observe(servicesSection);
-    }
-});
+        // Start observing the services section
+        const servicesSection = document.getElementById('services-section');
+        if (servicesSection) {
+            servicesObserver.observe(servicesSection);
+        }
+    });
 </script>
