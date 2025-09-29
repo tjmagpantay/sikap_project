@@ -238,7 +238,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
     <div class="flex items-center justify-center min-h-screen px-4 py-12">
         <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
             <div class="px-6 py-8 lg:px-8">
-               
+
 
                 <!-- Modal Content -->
                 <div class="text-center">
@@ -285,7 +285,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
     <div class="flex items-center justify-center min-h-screen px-4 py-12">
         <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
             <div class="px-6 py-8 lg:px-8">
-               
+
 
                 <!-- Modal Content -->
                 <div class="mb-6 text-center">
