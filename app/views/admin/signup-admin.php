@@ -40,10 +40,10 @@
                         Admin Name
                     </label>
                     <div class="mt-1">
-                        <input id="admin_name" name="admin_name" type="text" required 
-                               placeholder="Enter admin full name"
-                               value="<?php echo htmlspecialchars($_POST['admin_name'] ?? ''); ?>"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        <input id="admin_name" name="admin_name" type="text" required
+                            placeholder="Enter admin full name"
+                            value="<?php echo htmlspecialchars($_POST['admin_name'] ?? ''); ?>"
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                     </div>
                 </div>
 
@@ -53,10 +53,10 @@
                         Admin Email
                     </label>
                     <div class="mt-1">
-                        <input id="email" name="email" type="email" required 
-                               placeholder="Enter admin email"
-                               value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        <input id="email" name="email" type="email" required
+                            placeholder="Enter admin email"
+                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                     </div>
                 </div>
 
@@ -66,9 +66,9 @@
                         Password
                     </label>
                     <div class="relative mt-1">
-                        <input id="password" name="password" type="password" required 
-                               placeholder="Create admin password"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        <input id="password" name="password" type="password" required
+                            placeholder="Create admin password"
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                         <button type="button" onclick="togglePassword('password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye" id="toggleIcon1"></i>
                         </button>
@@ -81,9 +81,9 @@
                         Confirm Password
                     </label>
                     <div class="relative mt-1">
-                        <input id="confirm_password" name="confirm_password" type="password" required 
-                               placeholder="Confirm admin password"
-                               class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        <input id="confirm_password" name="confirm_password" type="password" required
+                            placeholder="Confirm admin password"
+                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                         <button type="button" onclick="togglePassword('confirm_password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye" id="toggleIcon2"></i>
                         </button>
@@ -118,28 +118,28 @@
 </div>
 
 <script>
-function togglePassword(fieldId) {
-    const passwordInput = document.getElementById(fieldId);
-    const toggleIcon = fieldId === 'password' ? document.getElementById('toggleIcon1') : document.getElementById('toggleIcon2');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.className = 'fas fa-eye-slash';
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.className = 'fas fa-eye';
-    }
-}
+    function togglePassword(fieldId) {
+        const passwordInput = document.getElementById(fieldId);
+        const toggleIcon = fieldId === 'password' ? document.getElementById('toggleIcon1') : document.getElementById('toggleIcon2');
 
-// Password validation
-document.getElementById('confirm_password').addEventListener('input', function() {
-    const password = document.getElementById('password').value;
-    const confirmPassword = this.value;
-    
-    if (password !== confirmPassword) {
-        this.setCustomValidity('Passwords do not match');
-    } else {
-        this.setCustomValidity('');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.className = 'fas fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.className = 'fas fa-eye';
+        }
     }
-});
+
+    // Password validation
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+
+        if (password !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
 </script>

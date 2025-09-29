@@ -1,9 +1,3 @@
-<?php
-// Remove the auth check since dashboard.php already handles it
-// Content-only page - no HTML structure, no auth check
-?>
-
-<!-- Remove ALL HTML structure - make it content-only like main-board.php -->
 <div class="space-y-6">
     <!-- Breadcrumbs -->
     <nav class="mb-6">
@@ -84,9 +78,7 @@
                                 <!-- Notification Icon -->
                                 <div class="flex-shrink-0">
                                     <div class="flex items-center justify-center w-10 h-10 rounded-full <?php
-                                        echo $notification['type'] === 'accreditation' ? 'bg-orange-100' : 
-                                            ($notification['type'] === 'job_post' ? 'bg-blue-100' : 
-                                            ($notification['type'] === 'resignation_update' ? 'bg-red-100' : 'bg-gray-100')); ?>">
+                                                                                                        echo $notification['type'] === 'accreditation' ? 'bg-orange-100' : ($notification['type'] === 'job_post' ? 'bg-blue-100' : ($notification['type'] === 'resignation_update' ? 'bg-red-100' : 'bg-gray-100')); ?>">
 
                                         <?php if ($notification['type'] === 'accreditation'): ?>
                                             <!-- Accreditation Icon -->
@@ -132,9 +124,7 @@
                             <div class="flex flex-row items-center gap-2 ml-4">
                                 <!-- Type Badge -->
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
-                                    <?php echo $notification['type'] === 'accreditation' ? 'bg-orange-100 text-orange-700' : 
-                                        ($notification['type'] === 'job_post' ? 'bg-blue-100 text-blue-700' : 
-                                        ($notification['type'] === 'resignation_update' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700')); ?>">
+                                    <?php echo $notification['type'] === 'accreditation' ? 'bg-orange-100 text-orange-700' : ($notification['type'] === 'job_post' ? 'bg-blue-100 text-blue-700' : ($notification['type'] === 'resignation_update' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700')); ?>">
                                     <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $notification['type']))); ?>
                                 </span>
 

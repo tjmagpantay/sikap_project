@@ -1,8 +1,3 @@
-<?php
-// filepath: c:\xampp\htdocs\sikap\app\views\admin\components\sidebar.php
-?>
-
-<!-- Desktop Sidebar - Remove conflicting styles, let CSS handle positioning -->
 <div class="flex flex-col h-full bg-white">
     <!-- Search Bar -->
     <div class="flex-shrink-0 px-6 py-4">

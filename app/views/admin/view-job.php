@@ -1,6 +1,4 @@
 <?php
-// Remove the auth check since dashboard.php already handles it
-// include_once __DIR__ . '/components/admin_auth_check.php';
 
 // ✅ Add check for job data
 if (!isset($job) || empty($job)) {
@@ -521,8 +519,7 @@ if (!isset($job) || empty($job)) {
                     }
                 })
                 .then(async response => {
-                    const text = await response.text();
-                    console.log('Server response:', text); // Debug log
+                    const text = await response.text();g
 
                     try {
                         return JSON.parse(text);
@@ -582,8 +579,7 @@ if (!isset($job) || empty($job)) {
                 })
                 .then(async response => {
                     const text = await response.text();
-                    console.log('Server response:', text); // Debug log
-
+                    
                     try {
                         return JSON.parse(text);
                     } catch (e) {
