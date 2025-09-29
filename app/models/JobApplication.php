@@ -550,10 +550,11 @@ class JobApplication
                     ja.application_status,
                     ja.applied_at,
                     jp.job_title,
-                    jp.job_type,
+                    jp.job_type as employment_type,
                     jp.location,
                     COALESCE(js.first_name, 'Unknown') AS first_name,
                     COALESCE(js.last_name, 'User') AS last_name,
+                    COALESCE(js.address, 'No address provided') AS address,
                     COALESCE(u.email, 'N/A') AS email,
                     COALESCE(eb.business_name, e.company_name, 'Unknown Company') AS company_name,
                     e.first_name AS employer_first_name,
@@ -577,8 +578,10 @@ class JobApplication
                 $sql .= " AND (jp.job_title LIKE ? 
                         OR js.first_name LIKE ? 
                         OR js.last_name LIKE ? 
+                        OR js.address LIKE ?
                         OR COALESCE(eb.business_name, e.company_name) LIKE ?)";
                 $searchParam = "%$searchQuery%";
+                $params[] = $searchParam;
                 $params[] = $searchParam;
                 $params[] = $searchParam;
                 $params[] = $searchParam;
@@ -802,5 +805,5 @@ class JobApplication
             error_log("Error checking if application exists: " . $e->getMessage());
             return false;
         }
-    }
+    } 
 }
