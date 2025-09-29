@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Employer Profile</title>
     <link href="/assets/css/output.css" rel="stylesheet">
 </head>
+
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
-    <form class="bg-white p-8 rounded shadow-md w-full max-w-2xl" method="POST" action="?page=employer-complete-profile" enctype="multipart/form-data">
-        <h2 class="text-2xl font-bold mb-6 text-center">Complete Your Employer Profile</h2>
+    <form class="w-full max-w-2xl p-8 bg-white rounded shadow-md" method="POST" action="?page=employer-complete-profile" enctype="multipart/form-data">
+        <h2 class="mb-6 text-2xl font-bold text-center">Complete Your Employer Profile</h2>
         <?php if (!empty($error)) : ?>
-            <div class="mb-4 text-red-600 text-sm text-center"><?php echo $error; ?></div>
+            <div class="mb-4 text-sm text-center text-red-600"><?php echo $error; ?></div>
         <?php endif; ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
             <div>
                 <label class="block mb-1 font-medium" for="first_name">First Name</label>
                 <input class="w-full px-3 py-2 border rounded" type="text" id="first_name" name="first_name" required>
@@ -34,8 +36,8 @@
                 <input class="w-full px-3 py-2 border rounded" type="text" id="contact_no" name="contact_no" required>
             </div>
         </div>
-        <h3 class="text-xl font-semibold mb-4 mt-8">Business Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <h3 class="mt-8 mb-4 text-xl font-semibold">Business Information</h3>
+        <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
             <div>
                 <label class="block mb-1 font-medium" for="business_name">Business Name</label>
                 <input class="w-full px-3 py-2 border rounded" type="text" id="business_name" name="business_name" required>
@@ -88,7 +90,8 @@
                 <textarea class="w-full px-3 py-2 border rounded" id="business_socials" name="business_socials" rows="2"></textarea>
             </div>
         </div>
-        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" type="submit">Save Profile</button>
+        <button class="w-full py-2 text-white bg-blue-600 rounded hover:bg-blue-700" type="submit">Save Profile</button>
     </form>
 </body>
-</html> 
+
+</html>

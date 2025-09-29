@@ -76,7 +76,7 @@ $jobs = $landingController->getPopularJobs(6);
               </svg>
               <span class="ml-1.5 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
             </div>
-            
+
 
             <!-- Row 4: Tags for Job Info -->
             <div class="flex items-center gap-2 mb-4">

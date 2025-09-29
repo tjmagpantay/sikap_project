@@ -26,7 +26,7 @@
     <div class="hidden lg:block">
       <div class="flex items-center gap-2">
         <img src="assets/images/phonecall.png" alt="Phone Icon" class="w-auto h-4">
-        <a href="#" class="flex items-center nav-link-top">+1-202-555-0178</a>
+        <a href="#" class="flex items-center nav-link-top">+639175119692</a>
       </div>
     </div>
   </div>

@@ -87,7 +87,7 @@ $localRecruitment = array_filter($allEvents, function ($event) {
               <h3 class="mb-3 text-base font-medium leading-tight line-clamp-2 sm:text-lg" title="<?php echo htmlspecialchars($event['title']); ?>">
                 <?php echo htmlspecialchars($event['title']); ?>
               </h3>
-              
+
               <div class="flex items-center justify-between">
                 <span class="text-xs opacity-60">
                   <?php echo date('g:i A', strtotime($event['time_start'])); ?>
@@ -108,7 +108,7 @@ $localRecruitment = array_filter($allEvents, function ($event) {
 
     <!-- Empty State -->
     <?php if (empty($allEvents)): ?>
-      <div class="py-16 text-center">
+      <div class="justify-center py-16 text-center">
         <div class="flex flex-col items-center">
           <div class="flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,25 +184,25 @@ $localRecruitment = array_filter($allEvents, function ($event) {
       if (!document.getElementById('emptyState')) {
         const emptyState = document.createElement('div');
         emptyState.id = 'emptyState';
-        emptyState.className = 'col-span-full py-16 text-center';
+        emptyState.className = 'col-span-full py-16 text-center flex items-center justify-center min-h-[300px]';
         emptyState.innerHTML = `
-          <div class="flex flex-col items-center">
-            <div class="flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-            <h3 class="mb-2 text-lg font-medium text-gray-900">No ${category === 'all' ? 'events' : category} found</h3>
-            <p class="max-w-sm text-gray-500">
-              ${category === 'all' ? 'Check back later for upcoming events.' : `No ${category} events in the current preview.`}
-              <br>
-              <a href="?page=programs-events" class="text-blue-600 underline hover:text-blue-700">View all events</a> for more options.
-            </p>
-          </div>
-        `;
+      <div class="flex flex-col items-center justify-center">
+        <div class="flex items-center justify-center w-16 h-16 mb-4 rounded-full">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h3 class="mb-2 font-medium text-gray-900 text-md">No ${category === 'all' ? 'events' : category} found</h3>
+        <p class="max-w-sm text-sm text-gray-500">
+          ${category === 'all' ? 'Check back later for upcoming events.' : `No ${category} events in the current preview.`}
+          <br>
+          <a href="?page=program-events" class="text-blue-600 underline hover:text-blue-700">View all events</a> for more options.
+        </p>
+      </div>
+    `;
         eventsGrid.appendChild(emptyState);
       }
-      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('emptyState').style.display = 'flex';
     } else {
       const emptyState = document.getElementById('emptyState');
       if (emptyState) {

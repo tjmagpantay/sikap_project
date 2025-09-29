@@ -1,4 +1,3 @@
-
 <section
   class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[650px] flex items-center"
   style="
@@ -34,7 +33,7 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
                 placeholder="Job title"
                 class="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0" />
             </div>
-            
+
             <!-- Search Button -->
             <button type="submit" class="w-full px-3 py-2 mt-2 text-xs rounded-md btn-primary sm:text-lg md:w-auto md:mt-0 md:ml-2 md:px-4">
               Find Job
@@ -93,7 +92,7 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
             <!-- Text content -->
             <div class="flex flex-col items-start leading-tight">
               <p class="text-sm font-bold text-primary">Congrats!</p>
-              <p class="text-xs text-gray-600">You have got an Email</p> 
+              <p class="text-xs text-gray-600">You have got an Email</p>
             </div>
           </div>
         </div>
@@ -103,100 +102,104 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
 </section>
 
 <style>
-/* Animation Keyframes */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100px);
-    opacity: 0;
+  /* Animation Keyframes */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
-}
 
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100px);
-    opacity: 0;
+  /* Animation Classes */
+  .animate-slide-in-right {
+    animation: slideInRight 1s ease-out 0.5s both;
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+
+  .animate-slide-in-right-delayed {
+    animation: slideInRight 1s ease-out 1s both;
   }
-}
 
-/* Animation Classes */
-.animate-slide-in-right {
-  animation: slideInRight 1s ease-out 0.5s both;
-}
+  .animate-slide-in-left-delayed {
+    animation: slideInLeft 1s ease-out 1.5s both;
+  }
 
-.animate-slide-in-right-delayed {
-  animation: slideInRight 1s ease-out 1s both;
-}
-
-.animate-slide-in-left-delayed {
-  animation: slideInLeft 1s ease-out 1.5s both;
-}
-
-/* Hover effects for extra interactivity */
-.animate-slide-in-right:hover,
-.animate-slide-in-right-delayed:hover,
-.animate-slide-in-left-delayed:hover {
-  transform: translateY(-5px);
-  transition: transform 0.3s ease;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
+  /* Hover effects for extra interactivity */
+  .animate-slide-in-right:hover,
+  .animate-slide-in-right-delayed:hover,
+  .animate-slide-in-left-delayed:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
 </style>
 
 <script>
-function handleSearchSubmit(event) {
+  function handleSearchSubmit(event) {
     event.preventDefault();
-    
+
     const searchInput = document.getElementById('jobSearchInput');
     const searchTerm = searchInput.value.trim();
-    
-    // Find the popular jobs section (adjust selector as needed)
-    const popularJobsSection = document.querySelector('[id*="popular"]') || 
-                              document.querySelector('.popular-jobs') ||
-                              document.querySelector('[class*="popular"]') ||
-                              // Fallback: look for any section after hero
-                              document.querySelector('section:nth-of-type(2)');
-    
-    if (popularJobsSection) {
-        // Smooth scroll to popular jobs section
-        popularJobsSection.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-        
-        // Optional: If you want to filter jobs based on search term
-        if (searchTerm) {
-            // You can add filtering logic here or pass the search term
-            console.log('Searching for:', searchTerm);
-            
-            // Example: Store search term for filtering
-            sessionStorage.setItem('heroSearchTerm', searchTerm);
-            
-            // Or trigger a custom event for other components to listen to
-            const searchEvent = new CustomEvent('heroSearch', {
-                detail: { searchTerm: searchTerm }
-            });
-            document.dispatchEvent(searchEvent);
-        }
-    } else {
-        console.warn('Popular jobs section not found');
-        // Fallback: scroll to a reasonable position
-        window.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth'
-        });
-    }
-}
 
-// Optional: Clear search term when page loads
-document.addEventListener('DOMContentLoaded', function() {
+    // Find the popular jobs section (adjust selector as needed)
+    const popularJobsSection = document.querySelector('[id*="popular"]') ||
+      document.querySelector('.popular-jobs') ||
+      document.querySelector('[class*="popular"]') ||
+      // Fallback: look for any section after hero
+      document.querySelector('section:nth-of-type(2)');
+
+    if (popularJobsSection) {
+      // Smooth scroll to popular jobs section
+      popularJobsSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      // Optional: If you want to filter jobs based on search term
+      if (searchTerm) {
+        // You can add filtering logic here or pass the search term
+        console.log('Searching for:', searchTerm);
+
+        // Example: Store search term for filtering
+        sessionStorage.setItem('heroSearchTerm', searchTerm);
+
+        // Or trigger a custom event for other components to listen to
+        const searchEvent = new CustomEvent('heroSearch', {
+          detail: {
+            searchTerm: searchTerm
+          }
+        });
+        document.dispatchEvent(searchEvent);
+      }
+    } else {
+      console.warn('Popular jobs section not found');
+      // Fallback: scroll to a reasonable position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // Optional: Clear search term when page loads
+  document.addEventListener('DOMContentLoaded', function() {
     // Clear any stored search term on page load if needed
     // sessionStorage.removeItem('heroSearchTerm');
-});
+  });
 </script>

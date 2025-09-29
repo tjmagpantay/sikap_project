@@ -7,13 +7,13 @@ include_once __DIR__ . '/../components/navbar.php';
     <div class="min-h-screen py-8">
         <div class="mx-auto max-w-7xl">
             <!-- Event Not Found -->
-            <div class="flex items-center justify-center min-h-screen ">
+            <div class="flex items-center justify-center ">
                 <div class="max-w-md p-8 text-center rounded-lg shadow-lg">
-                    <div class="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full">
+                    <div class="flex items-center justify-center w-20 h-20 mx-auto mb-6 rounded-full">
                         <i class="text-3xl text-gray-400 fas fa-exclamation-triangle"></i>
                     </div>
                     <h1 class="mb-4 text-2xl font-bold text-gray-900">Event Not Found</h1>
-                    <p class="mb-6 text-gray-600">The event you're looking for doesn't exist or may have been removed.</p>
+                    <p class="mb-6 text-sm text-gray-600">The event you're looking for doesn't exist or may have been removed.</p>
                     <div class="flex gap-3">
                         <a href="index.php"
                             class="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium transition-colors duration-200 border rounded-lg text-primary border-primary hover:bg-primary hover:text-white">
