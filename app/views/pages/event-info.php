@@ -28,7 +28,7 @@ include_once __DIR__ . '/../components/navbar.php';
 <?php else: ?>
 
     <!-- Event Details -->
-    <div class="min-h-screen py-8 bg-gray-50">
+    <div class="min-h-screen py-8 ">
         <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="flex flex-col gap-8 lg:flex-row">
                 <!-- Main Content (Left Section) -->
@@ -164,13 +164,11 @@ include_once __DIR__ . '/../components/navbar.php';
                                 </div>
                             </div>
 
-                            <!-- Action Buttons - Now in 2-column layout -->
-                            <div class="grid grid-cols-2 gap-3 mt-8">
-                                <button onclick="shareEvent()" class="px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 bg-gray-100 rounded-xl hover:bg-gray-200">
+                            <!-- Action Buttons - Full Width -->
+                            <div class="mt-8">
+                                <button onclick="shareEvent()"
+                                    class="flex items-center justify-center w-full gap-2 px-4 py-3 text-sm font-medium text-white transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90">
                                     Share Event
-                                </button>
-                                <button onclick="saveEvent()" class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 bg-primary rounded-xl hover:bg-gray-800">
-                                    Save Event
                                 </button>
                             </div>
                         </div>

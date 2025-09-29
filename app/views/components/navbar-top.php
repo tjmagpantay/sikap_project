@@ -17,7 +17,7 @@
           <a href="?page=abt-sikap" class="flex items-center">Sikap</a>
         </li>
         <li class="sm:block nav-link-top">
-          <a href="?page=customer-support" class="flex items-center">Customer Support</a>
+          <a href="?page=contact-support" class="flex items-center">Contact Support</a>
         </li>
       </ul>
     </div>
