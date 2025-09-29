@@ -17,7 +17,6 @@ if (isset($_SESSION['error_message'])) {
 $parsedCertificates = [];
 if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['parsed_resume_data']['certificates'])) {
     $parsedCertificates = $_SESSION['parsed_resume_data']['certificates'];
-    error_log("🔍 DEBUG: Found " . count($parsedCertificates) . " parsed certificates: " . json_encode($parsedCertificates));
 }
 ?>
 
@@ -162,11 +161,9 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         <?php foreach ($parsedCertificates as $cert): ?>
                             <li class="text-sm text-green-800">
                                 <?php
-                                // FIXED: Handle different possible key structures properly
                                 $certTitle = '';
 
                                 if (is_array($cert)) {
-                                    // Try different key variations from ResumeParser
                                     if (isset($cert['certificate_title'])) {
                                         $certTitle = $cert['certificate_title'];
                                     } elseif (isset($cert['certificate_name'])) {
@@ -174,20 +171,15 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                     } elseif (isset($cert['name'])) {
                                         $certTitle = $cert['name'];
                                     } else {
-                                        // Fallback: use first non-empty value
                                         $certTitle = array_values(array_filter($cert))[0] ?? 'Certificate';
                                     }
                                 } elseif (is_string($cert)) {
                                     $certTitle = $cert;
                                 } else {
-                                    $certTitle = 'Certificate'; // Final fallback
+                                    $certTitle = 'Certificate';
                                 }
 
                                 echo htmlspecialchars($certTitle);
-
-                                // Debug output
-                                error_log("🔍 DEBUG: Certificate data structure: " . json_encode($cert));
-                                error_log("🔍 DEBUG: Extracted title: " . $certTitle);
                                 ?>
                             </li>
                         <?php endforeach; ?>
@@ -200,13 +192,8 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                 <div>
                     <div id="certificates-container">
                         <?php
-                        // FIXED: Better merging logic to avoid duplicates and include parsed certificates
                         $allCertificates = [];
-                        $certTitles = []; // Track certificate titles to avoid duplicates
-
-                        error_log("🔍 DEBUG: Building allCertificates array");
-                        error_log("🔍 DEBUG: Existing DB certificates count: " . (is_array($certificates) ? count($certificates) : 0));
-                        error_log("🔍 DEBUG: Parsed certificates count: " . count($parsedCertificates));
+                        $certTitles = [];
 
                         // First, add existing certificates from database if available
                         if (!empty($certificates) && is_array($certificates)) {
@@ -215,7 +202,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 if (!empty($certTitle) && !in_array($certTitle, $certTitles)) {
                                     $allCertificates[] = $cert;
                                     $certTitles[] = $certTitle;
-                                    error_log("✅ DEBUG: Added existing certificate: " . $cert['certificate_title']);
                                 }
                             }
                         }
@@ -223,14 +209,12 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         // Then, add parsed certificates that aren't already in the database
                         if (!empty($parsedCertificates)) {
                             foreach ($parsedCertificates as $parsedCert) {
-                                // Normalize the certificate data structure
                                 $normalizedCert = [
                                     'certificate_title' => '',
                                     'issuing_organization' => '',
                                     'date_issued' => ''
                                 ];
 
-                                // Handle different possible structures
                                 if (is_array($parsedCert)) {
                                     if (isset($parsedCert['certificate_title'])) {
                                         $normalizedCert['certificate_title'] = $parsedCert['certificate_title'];
@@ -256,18 +240,13 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                         $normalizedCert['date_issued'] = $parsedCert['date'];
                                     }
                                 } elseif (is_string($parsedCert)) {
-                                    // If it's just a string, use it as the certificate title
                                     $normalizedCert['certificate_title'] = $parsedCert;
                                 }
 
-                                // Check for duplicates
                                 $certTitle = strtolower(trim($normalizedCert['certificate_title']));
                                 if (!empty($certTitle) && !in_array($certTitle, $certTitles)) {
                                     $allCertificates[] = $normalizedCert;
                                     $certTitles[] = $certTitle;
-                                    error_log("✅ DEBUG: Added parsed certificate: " . $normalizedCert['certificate_title']);
-                                } else {
-                                    error_log("⚠️ DEBUG: Skipped duplicate parsed certificate: " . $normalizedCert['certificate_title']);
                                 }
                             }
                         }
@@ -279,10 +258,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 'issuing_organization' => '',
                                 'date_issued' => ''
                             ];
-                            error_log("ℹ️ DEBUG: Added empty certificate row");
                         }
-
-                        error_log("🔍 DEBUG: Final allCertificates count: " . count($allCertificates));
 
                         foreach ($allCertificates as $index => $cert): ?>
                             <div class="mb-4 space-y-4 certificate-row" data-index="<?php echo $index; ?>">
@@ -290,9 +266,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                 <!-- Add hidden field for existing certificate ID -->
                                 <?php if (isset($cert['certificate_id'])): ?>
                                     <input type="hidden" name="certificates[<?php echo $index; ?>][certificate_id]" value="<?php echo $cert['certificate_id']; ?>">
-                                    <?php error_log("🔍 DEBUG: Certificate {$index} has certificate_id: {$cert['certificate_id']}"); ?>
-                                <?php else: ?>
-                                    <?php error_log("🔍 DEBUG: Certificate {$index} is new (no certificate_id)"); ?>
                                 <?php endif; ?>
 
                                 <!-- Mark for deletion field (hidden) -->
@@ -317,7 +290,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                         class="w-full px-3 py-2 mt-1 text-sm text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary <?php echo (!empty($cert['issuing_organization']) && !isset($cert['certificate_id'])) ? 'bg-green-50 border-green-300' : ''; ?>">
                                 </div>
 
-                                <!-- FIXED: Delete button height alignment -->
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
                                     <div class="sm:col-span-3">
                                         <label class="block text-xs font-medium text-gray-500">Date Issued</label>
@@ -328,8 +300,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                                     </div>
 
                                     <div class="flex flex-col sm:col-span-1">
-                                        <label class="block text-xs font-medium text-gray-500">&nbsp;</label> <!-- Spacer for label alignment -->
-                                        <!-- FIXED: Button now has same height as input field (py-2) -->
+                                        <label class="block text-xs font-medium text-gray-500">&nbsp;</label>
                                         <button type="button"
                                             class="flex items-center justify-center w-full px-3 py-2 mt-1 text-red-600 transition-colors border border-red-200 rounded-md hover:text-white hover:bg-red-600 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                             onclick="deleteCertificate(this, <?php echo isset($cert['certificate_id']) ? $cert['certificate_id'] : 'null'; ?>)"
@@ -352,9 +323,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                     </button>
                 </div>
 
-                <!-- Multiple Button Layout - Fixed to 1 Row -->
                 <div class="flex items-center justify-between">
-                    <!-- Left Side - Previous Button -->
                     <div>
                         <a href="?page=complete-jobseeker-profile&step=5"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
@@ -365,9 +334,7 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         </a>
                     </div>
 
-                    <!-- Right Side - Action Buttons -->
                     <div class="flex gap-2">
-                        <!-- Save Certificates Button -->
                         <button type="submit" name="save_certificates"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,7 +343,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                             Save Certificates
                         </button>
 
-                        <!-- Skip & Continue Button -->
                         <button type="submit" name="submit_step6"
                             class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                             <span>
@@ -404,14 +370,11 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
         const addCertificateBtn = document.getElementById('add-certificate');
         const certificatesContainer = document.getElementById('certificates-container');
 
-        console.log('🔍 DEBUG: DOM loaded, certificate count:', certificateCount);
-
         function updateIndices() {
             const certificateRows = document.querySelectorAll('.certificate-row:not(.deleted)');
             certificateRows.forEach((row, index) => {
                 row.setAttribute('data-index', index);
 
-                // Update all input names within this row
                 const inputs = row.querySelectorAll('input');
                 inputs.forEach(input => {
                     const name = input.name;
@@ -478,7 +441,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
             addCertificateBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 addEmptyCertificateRow();
-                console.log('✅ DEBUG: Added new certificate row');
             });
         }
 
@@ -539,8 +501,6 @@ if (isset($_SESSION['parsed_resume_data']['certificates']) && !empty($_SESSION['
                         alert('Please fill in at least one certificate title to save.');
                         return false;
                     }
-                } else {
-                    console.log('✅ DEBUG: Form validation passed');
                 }
             });
         }

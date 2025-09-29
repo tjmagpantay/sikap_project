@@ -3,9 +3,6 @@ include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
 include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
-// Debug - let's see what data we have
-error_log("Parsed education data: " . json_encode($_SESSION['parsed_resume_data']['education'] ?? []));
-error_log("Existing education data: " . json_encode($education ?? []));
 ?>
 
 <div class="min-h-screen py-6">
@@ -214,9 +211,6 @@ error_log("Existing education data: " . json_encode($education ?? []));
                 $currentEndYear = date('Y', strtotime($education[0]['end_date']));
             }
 
-            // Debug output
-            error_log("STEP 3 DEBUG: Current education level = '$currentEducationLevel'");
-            error_log("STEP 3 DEBUG: Current school name = '$currentSchoolName'");
             ?>
 
             <form class="space-y-6" method="POST" action="?page=complete-jobseeker-profile&step=3" id="educationForm">

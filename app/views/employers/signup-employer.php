@@ -125,7 +125,7 @@ include_once __DIR__ . '/../components/alert-modal.php';
                     </div>
 
                     <!-- Google Sign Up -->
-                    <a href="?page=google-signup&type=employer"
+                    <a href="?page=google-login&type=employer"
                         class="flex items-center justify-center w-full px-4 py-3 mb-6 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="w-5 h-5 mr-3">
                         Sign up with Google

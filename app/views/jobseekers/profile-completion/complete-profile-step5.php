@@ -13,12 +13,6 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// Check if we have parsed data in session
-$parsedSkills = [];
-if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed_resume_data']['skills'])) {
-    $parsedSkills = $_SESSION['parsed_resume_data']['skills'];
-    error_log("🔍 DEBUG: Found " . count($parsedSkills) . " parsed skills: " . json_encode($parsedSkills));
-}
 ?>
 
 <div class="min-h-screen py-6">
@@ -175,13 +169,9 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                     <label class="block mb-3 text-xs font-medium text-gray-500">Skills</label>
                     <div id="skills-container">
                         <?php
-                        // FIXED: Proper merging logic to avoid duplicates and include parsed skills
+                        // Proper merging logic to avoid duplicates and include parsed skills
                         $allSkills = [];
                         $skillNames = []; // Track skill names to avoid duplicates
-
-                        error_log("🔍 DEBUG: Building allSkills array");
-                        error_log("🔍 DEBUG: Existing DB skills count: " . (is_array($skills) ? count($skills) : 0));
-                        error_log("🔍 DEBUG: Parsed skills count: " . count($parsedSkills));
 
                         // First, add existing skills from database if available
                         if (!empty($skills) && is_array($skills)) {
@@ -190,7 +180,6 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                 if (!empty($skillName) && !in_array($skillName, $skillNames)) {
                                     $allSkills[] = $skill;
                                     $skillNames[] = $skillName;
-                                    error_log("✅ DEBUG: Added existing skill: " . $skill['skill_name']);
                                 }
                             }
                         }
@@ -208,9 +197,6 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                     ];
                                     $allSkills[] = $skillToAdd;
                                     $skillNames[] = $skillName;
-                                    error_log("✅ DEBUG: Added parsed skill: " . $parsedSkill['skill_name']);
-                                } else {
-                                    error_log("⚠️ DEBUG: Skipped duplicate parsed skill: " . $parsedSkill['skill_name']);
                                 }
                             }
                         }
@@ -218,19 +204,13 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                         // If no skills at all, add one empty row
                         if (empty($allSkills)) {
                             $allSkills[] = ['skill_name' => '', 'proficiency_level' => 'Intermediate'];
-                            error_log("ℹ️ DEBUG: Added empty skill row");
                         }
-
-                        error_log("🔍 DEBUG: Final allSkills count: " . count($allSkills));
 
                         foreach ($allSkills as $index => $skill): ?>
                             <div class="flex gap-4 mb-4 skill-row" data-index="<?php echo $index; ?>">
                                 <!-- Hidden field for skill ID if it exists -->
                                 <?php if (isset($skill['skill_id'])): ?>
                                     <input type="hidden" name="skills[<?php echo $index; ?>][skill_id]" value="<?php echo $skill['skill_id']; ?>">
-                                    <?php error_log("🔍 DEBUG: Skill {$index} has skill_id: {$skill['skill_id']}"); ?>
-                                <?php else: ?>
-                                    <?php error_log("🔍 DEBUG: Skill {$index} is new (no skill_id)"); ?>
                                 <?php endif; ?>
 
                                 <!-- Hidden field for ESCO URI if it exists -->
@@ -252,7 +232,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                                     <div id="skill_name_error_<?php echo $index; ?>" class="hidden mt-1 text-xs text-red-600"></div>
                                 </div>
 
-                                <!-- Proficiency Level Dropdown - FIXED WIDTH -->
+                                <!-- Proficiency Level Dropdown -->
                                 <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: '<?php echo htmlspecialchars($skill['proficiency_level'] ?? 'Intermediate'); ?>' }">
                                     <button type="button" @click="open = !open"
                                         @click.away="open = false"
@@ -436,7 +416,7 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
             <div id="skill_name_error_${skillCount}" class="hidden mt-1 text-xs text-red-600"></div>
         </div>
 
-        <!-- Proficiency Level Dropdown - FIXED WIDTH -->
+        <!-- Proficiency Level Dropdown -->
         <div class="relative flex-shrink-0 w-28" x-data="{ open: false, selected: 'Intermediate' }">
             <button type="button" @click="open = !open"
                 @click.away="open = false"
@@ -556,21 +536,17 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
         const addSkillBtn = document.getElementById('add-skill');
         const form = document.getElementById('skillsForm');
 
-        console.log('🔍 DEBUG: DOM loaded, skill count:', skillCount);
-
         // Event listener for add button
         if (addSkillBtn) {
             addSkillBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 addEmptySkillRow();
-                console.log('✅ DEBUG: Added new skill row');
             });
         }
 
         // Form submission handling with validation
         if (form) {
             form.addEventListener('submit', function(e) {
-                console.log('🔍 DEBUG: Form submitted');
                 let isValid = true;
 
                 // Validate all skill name inputs
@@ -583,8 +559,6 @@ if (isset($_SESSION['parsed_resume_data']['skills']) && !empty($_SESSION['parsed
                 if (!isValid) {
                     e.preventDefault();
                     alert('Please fix the skill validation errors before continuing.');
-                } else {
-                    console.log('✅ DEBUG: Form validation passed');
                 }
             });
         }
