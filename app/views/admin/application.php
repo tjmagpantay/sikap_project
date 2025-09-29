@@ -280,7 +280,7 @@
                         class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         Clear
                     </button>
-                    <button onclick="exportResults('csv')"
+                    <button onclick="exportResults('pdf')"
                         class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-md bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Export
                     </button>
@@ -319,10 +319,13 @@
                             <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                 Company
                             </th>
+                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(3)">
+                                Address <i class="ml-1 text-gray-400 fas fa-sort"></i>
+                            </th>
                             <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                 Status
                             </th>
-                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(4)">
+                            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer hover:bg-gray-100" onclick="sortTable(5)">
                                 Applied Date <i class="ml-1 text-gray-400 fas fa-sort"></i>
                             </th>
                         </tr>
@@ -335,7 +338,8 @@
                                 data-applied="<?php echo htmlspecialchars($application['applied_at']); ?>"
                                 data-name="<?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>"
                                 data-company="<?php echo htmlspecialchars($application['company_name']); ?>"
-                                data-job-title="<?php echo htmlspecialchars($application['job_title']); ?>">
+                                data-job-title="<?php echo htmlspecialchars($application['job_title']); ?>"
+                                data-address="<?php echo htmlspecialchars($application['address'] ?? ''); ?>">
 
                                 <!-- Applicant -->
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -362,6 +366,13 @@
                                     <div class="text-sm text-gray-900"><?php echo htmlspecialchars($application['company_name']); ?></div>
                                     <div class="text-xs text-gray-500">
                                         <?php echo htmlspecialchars(($application['employer_first_name'] ?? '') . ' ' . ($application['employer_last_name'] ?? '')); ?>
+                                    </div>
+                                </td>
+
+                                <!-- Address -->
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <?php echo htmlspecialchars($application['address'] ?? 'No address provided'); ?>
                                     </div>
                                 </td>
 
@@ -487,7 +498,8 @@
             const searchMatch = !searchValue || (
                 row.dataset.name.toLowerCase().includes(searchValue) ||
                 row.dataset.company.toLowerCase().includes(searchValue) ||
-                row.dataset.jobTitle.toLowerCase().includes(searchValue)
+                row.dataset.jobTitle.toLowerCase().includes(searchValue) ||
+                row.dataset.address.toLowerCase().includes(searchValue)
             );
 
             const statusMatch = !statusValue || statusValue === 'all' ||
@@ -720,7 +732,7 @@
 
         currentPage = 1;
         updatePagination();
-
+ 
         // Update sort icons
         document.querySelectorAll('th i.fas').forEach(icon => {
             icon.className = 'ml-1 fas fa-sort text-gray-400';
@@ -733,49 +745,71 @@
     }
 
     // Export functionality
-    function exportResults(format) {
-        // Export all filtered results, not just current page
-        const visibleData = filteredRows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                applicant: cells[0].textContent.trim(),
-                job_title: cells[1].textContent.trim(),
-                company: cells[2].textContent.trim(),
-                status: cells[3].textContent.trim(),
-                applied: cells[4].textContent.trim()
-            };
-        });
-
-        if (format === 'csv') {
-            exportToCSV(visibleData);
-        }
+function exportResults(format) {
+    if (format === 'pdf') {
+        // Create a new window for printing
+        const printWindow = window.open('', '_blank');
+        
+        // Create a print-friendly version of the table
+        const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Applications Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f5f5f5; }
+                    h1 { text-align: center; color: #333; }
+                    @media print {
+                        @page { size: landscape; }
+                        body { padding: 20px; }
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Applications Report</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Applied Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredRows.map(row => `
+                            <tr>
+                                <td>${row.dataset.name}</td>
+                                <td>${row.dataset.jobTitle}</td>
+                                <td>${row.dataset.company}</td>
+                                <td>${row.dataset.address || 'No address provided'}</td>
+                                <td>${row.dataset.status}</td>
+                                <td>${new Date(row.dataset.applied).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+        
+        // Write the content to the new window and trigger print
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        
+        // Wait for the content to load before printing
+        printWindow.onload = function() {
+            printWindow.print();
+            // Optional: close the window after printing
+            // printWindow.onafterprint = function() { printWindow.close(); };
+        };
     }
-
-    function exportToCSV(data) {
-        const headers = ['Applicant', 'Job Title', 'Company', 'Status', 'Applied'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => [
-                `"${row.applicant}"`,
-                `"${row.job_title}"`,
-                `"${row.company}"`,
-                `"${row.status}"`,
-                `"${row.applied}"`
-            ].join(','))
-        ].join('\n');
-
-        const blob = new Blob([csvContent], {
-            type: 'text/csv'
-        });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `applications_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }
+}
 
     // Application summary modal - FIXED MESSAGE
     function viewApplicationSummary(applicationId) {
