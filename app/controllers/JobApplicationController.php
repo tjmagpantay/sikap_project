@@ -18,8 +18,6 @@ class JobApplicationController
         $this->jobseekerModel = new Jobseeker();
     }
 
-    // Main entry point for job application
-
     public function applyForJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
@@ -32,7 +30,6 @@ class JobApplicationController
         $application_id = $_GET['application_id'] ?? null;
         $restart = $_GET['restart'] ?? false;
 
-        error_log("🔍 DEBUG applyForJob: job_id=$job_id, step=$step, application_id=$application_id, restart=" . ($restart ? 'true' : 'false'));
 
         if (!$job_id) {
             header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
@@ -73,35 +70,27 @@ class JobApplicationController
             );
 
             if ($existingApp && !$restart) {
-                error_log("🔍 DEBUG: Found existing application - ID: {$existingApp['application_id']}, Step: {$existingApp['current_step']}, Finalized: {$existingApp['is_finalized']}");
 
                 if ($existingApp['is_finalized'] == 1) {
                     // Complete application - redirect to view
                     header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('You have already applied for this job.'));
                     exit;
                 } else {
-                    // Incomplete application - use it
                     $application_id = $existingApp['application_id'];
-                    // REMOVED: No automatic step adjustment here
-                    error_log("🔍 DEBUG: Using existing incomplete application - ID: $application_id");
                 }
             }
         } else {
             // FIXED: If application_id is provided, validate it belongs to this user and job
             $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
             if (!$applicationData) {
-                error_log("⚠️ DEBUG: Application ID $application_id not found, creating new");
                 $application_id = null;
             } elseif ($applicationData['jobseeker_id'] != $jobseeker['jobseeker_id'] || $applicationData['job_id'] != $job_id) {
-                error_log("⚠️ DEBUG: Application ID $application_id doesn't belong to this user/job");
                 header('Location: ?page=apply-job&job_id=' . $job_id . '&step=1&error=' . urlencode('Invalid application access.'));
                 exit;
             } elseif ($applicationData['is_finalized'] == 1) {
-                error_log("⚠️ DEBUG: Application ID $application_id is already finalized");
+
                 header('Location: ?page=view-job&job_id=' . $job_id . '&error=' . urlencode('This application has already been submitted.'));
                 exit;
-            } else {
-                error_log("🔍 DEBUG: Valid existing application found - ID: $application_id, Current Step: {$applicationData['current_step']}");
             }
         }
 
@@ -117,10 +106,6 @@ class JobApplicationController
             $this->handleStepSubmission($step, $job, $jobseeker, $application_id);
             return;
         }
-
-        // REMOVED: Step validation logic that was causing redirects
-
-        error_log("🔍 DEBUG: Final routing - Step: $step, Application ID: " . ($application_id ?? 'null'));
 
         // Route to appropriate step WITHOUT any redirects
         switch ($step) {
@@ -139,7 +124,6 @@ class JobApplicationController
             default:
                 // ONLY redirect for truly invalid steps
                 if ($step < 1 || $step > 4) {
-                    error_log("⚠️ DEBUG: Invalid step $step, redirecting to step 1");
                     header('Location: ?page=apply-job&job_id=' . $job_id . '&step=1' . ($application_id ? '&application_id=' . $application_id : ''));
                     exit;
                 }
@@ -169,12 +153,9 @@ class JobApplicationController
     // Step 2: Screening Questions
     private function showStep2($job, $jobseeker, $application_id)
     {
-        error_log("🔍 DEBUG Step2: job_id = " . $job['job_id']);
-        error_log("🔍 DEBUG Step2: application_id = " . ($application_id ?? 'null'));
 
         // FIXED: Only require application_id, don't validate step access here
         if (!$application_id) {
-            error_log("⚠️ DEBUG Step2: No application_id, redirecting to step 1");
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Please complete Step 1 first.'));
             exit;
         }
@@ -183,18 +164,14 @@ class JobApplicationController
         // Just check if application exists
         $applicationData = $this->jobApplicationModel->getApplicationDetails($application_id);
         if (!$applicationData) {
-            error_log("⚠️ DEBUG Step2: Application not found");
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=1&error=' . urlencode('Application not found. Please start over.'));
             exit;
         }
-
-        error_log("🔍 DEBUG Step2: Application found, proceeding to show step 2");
 
         // Get screening questions if enabled
         $screeningQuestions = [];
         if (($job['screening_questions_enabled'] ?? 0) == 1) {
             $screeningQuestions = $this->jobPostModel->getScreeningQuestions($job['job_id']);
-            error_log("🔍 DEBUG Step2: Found " . count($screeningQuestions) . " screening questions");
         }
 
         // Get existing answers if any
@@ -283,7 +260,6 @@ class JobApplicationController
         }
     }
 
-    // Handle Step 1: Personal Info & Documents
     private function handleStep1($job, $jobseeker, $application_id = null)
     {
         try {
@@ -319,9 +295,6 @@ class JobApplicationController
                 }
             }
 
-            error_log("DEBUG Step1: Current resume attachments: " . count($currentResumeAttachments));
-            error_log("DEBUG Step1: Current CV attachments: " . count($currentCvAttachments));
-
             $resumeHandled = false;
             $cvHandled = false;
 
@@ -330,9 +303,6 @@ class JobApplicationController
             // Check what user wants to do with resume
             $newResumeUploaded = !empty($_FILES['new_resume']['name']) && $_FILES['new_resume']['error'] === UPLOAD_ERR_OK;
             $selectedResumes = $_POST['selected_resumes'] ?? [];
-
-            error_log("DEBUG Step1: New resume uploaded: " . ($newResumeUploaded ? 'yes' : 'no'));
-            error_log("DEBUG Step1: Selected resumes: " . json_encode($selectedResumes));
 
             if ($newResumeUploaded) {
                 // NEW RESUME UPLOAD - Clear all existing resume attachments and add new one
@@ -347,14 +317,10 @@ class JobApplicationController
                     if (isset($_POST['save_resume_to_profile']) && $_POST['save_resume_to_profile'] == '1') {
                         $this->saveOrUpdateProfileDocument($jobseeker['jobseeker_id'], $resumePath, 'resume', $_FILES['new_resume']['name']);
                     }
-
-                    error_log("DEBUG Step1: New resume uploaded and attached");
                 }
             } elseif (!empty($selectedResumes)) {
                 // SELECTED EXISTING RESUME - Clear existing and add selected one
                 $selectedResumePath = $selectedResumes[0]; // Only take first one
-
-                error_log("DEBUG Step1: Processing selected resume: " . $selectedResumePath);
 
                 // Clear existing resume attachments first
                 $this->jobApplicationModel->clearResumeAttachments($application_id);
@@ -366,7 +332,6 @@ class JobApplicationController
                     $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
                     if ($result) {
                         $resumeHandled = true;
-                        error_log("DEBUG Step1: Selected resume attached successfully");
                     } else {
                         error_log("ERROR Step1: Failed to attach selected resume");
                     }
@@ -375,7 +340,6 @@ class JobApplicationController
                     $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedResumePath, 'Resume');
                     if ($result) {
                         $resumeHandled = true;
-                        error_log("DEBUG Step1: Selected resume attached as direct file");
                     } else {
                         error_log("ERROR Step1: Failed to attach selected resume as direct file");
                     }
@@ -384,7 +348,6 @@ class JobApplicationController
                 // NO NEW SELECTION - Keep existing resume attachments if any
                 if (!empty($currentResumeAttachments)) {
                     $resumeHandled = true;
-                    error_log("DEBUG Step1: Keeping existing resume attachments");
                 }
             }
 
@@ -393,9 +356,6 @@ class JobApplicationController
             // Check what user wants to do with CV
             $newCvUploaded = !empty($_FILES['new_cv']['name']) && $_FILES['new_cv']['error'] === UPLOAD_ERR_OK;
             $selectedCvs = $_POST['selected_cvs'] ?? [];
-
-            error_log("DEBUG Step1: New CV uploaded: " . ($newCvUploaded ? 'yes' : 'no'));
-            error_log("DEBUG Step1: Selected CVs: " . json_encode($selectedCvs));
 
             if ($newCvUploaded) {
                 // NEW CV UPLOAD - Clear all existing CV attachments and add new one
@@ -410,14 +370,10 @@ class JobApplicationController
                     if (isset($_POST['save_cv_to_profile']) && $_POST['save_cv_to_profile'] == '1') {
                         $this->saveOrUpdateProfileDocument($jobseeker['jobseeker_id'], $cvPath, 'cv', $_FILES['new_cv']['name']);
                     }
-
-                    error_log("DEBUG Step1: New CV uploaded and attached");
                 }
             } elseif (!empty($selectedCvs)) {
                 // SELECTED EXISTING CV - Clear existing and add selected one
                 $selectedCvPath = $selectedCvs[0]; // Only take first one
-
-                error_log("DEBUG Step1: Processing selected CV: " . $selectedCvPath);
 
                 // Clear existing CV attachments first
                 $this->jobApplicationModel->clearCvAttachments($application_id);
@@ -429,7 +385,6 @@ class JobApplicationController
                     $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
                     if ($result) {
                         $cvHandled = true;
-                        error_log("DEBUG Step1: Selected CV attached successfully");
                     } else {
                         error_log("ERROR Step1: Failed to attach selected CV");
                     }
@@ -438,7 +393,6 @@ class JobApplicationController
                     $result = $this->jobApplicationModel->saveApplicationAttachment($application_id, $selectedCvPath, 'CV');
                     if ($result) {
                         $cvHandled = true;
-                        error_log("DEBUG Step1: Selected CV attached as direct file");
                     } else {
                         error_log("ERROR Step1: Failed to attach selected CV as direct file");
                     }
@@ -447,7 +401,6 @@ class JobApplicationController
                 // NO NEW SELECTION - Keep existing CV attachments if any
                 if (!empty($currentCvAttachments)) {
                     $cvHandled = true;
-                    error_log("DEBUG Step1: Keeping existing CV attachments");
                 }
             }
 
@@ -473,7 +426,6 @@ class JobApplicationController
                         if ($attachmentPath) {
                             $file_type = $_POST['attachment_types'][$index] ?? 'Others';
                             $this->jobApplicationModel->saveApplicationAttachment($application_id, $attachmentPath, $file_type);
-                            error_log("DEBUG Step1: Additional attachment uploaded: $file_type");
                         }
                     }
                 }
@@ -491,7 +443,6 @@ class JobApplicationController
         }
     }
 
-    // Handle Step 2: Screening Questions
     private function handleStep2($job, $jobseeker, $application_id)
     {
         try {
@@ -539,7 +490,6 @@ class JobApplicationController
         }
     }
 
-    // Handle Step 3: Eligibility
     private function handleStep3($job, $jobseeker, $application_id)
     {
         try {
@@ -575,20 +525,13 @@ class JobApplicationController
         }
     }
 
-    // Handle Step 4: Final Submission
     private function handleStep4($job, $jobseeker, $application_id)
     {
         try {
-            error_log("🔍 DEBUG handleStep4: Starting final submission");
-            error_log("   - Application ID: $application_id");
-            error_log("   - Job ID: {$job['job_id']}");
-            error_log("   - Employer ID: {$job['employer_id']}");
-            error_log("   - Jobseeker: {$jobseeker['first_name']} {$jobseeker['last_name']}");
 
-            // FIXED: Finalize the application while keeping current_step for tracking
             $updateData = [
                 'is_finalized' => 1,
-                'current_step' => 4,  // ✅ Keep this - shows they completed all steps
+                'current_step' => 4,
                 'applied_at' => date('Y-m-d H:i:s')
             ];
 
@@ -596,19 +539,13 @@ class JobApplicationController
                 throw new Exception('Failed to finalize application');
             }
 
-            error_log("✅ DEBUG: Application finalized successfully");
-
             // Log the application submission
             $this->jobApplicationModel->logStatusChange($application_id, 'pending', 'jobseeker', 'Application submitted');
-
-            error_log("🔔 DEBUG: Starting notification process");
 
             // ADDED: Send notification to employer about new job application
             try {
                 require_once __DIR__ . '/../services/NotificationService.php';
                 require_once __DIR__ . '/../../config/sikap_db.php';
-
-                error_log("🔍 DEBUG: Loading NotificationService");
 
                 $config = require __DIR__ . '/../../config/sikap_db.php';
                 $pdo = new PDO(
@@ -623,12 +560,6 @@ class JobApplicationController
                 // Get jobseeker's full name
                 $jobseekerName = trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']);
 
-                error_log("🔔 DEBUG: About to call notifyJobApplication");
-                error_log("   - Application ID: $application_id");
-                error_log("   - Job ID: {$job['job_id']}");
-                error_log("   - Employer ID: {$job['employer_id']}");
-                error_log("   - Jobseeker Name: $jobseekerName");
-
                 // Send notification to employer
                 $notificationResult = $notificationService->notifyJobApplication(
                     $application_id,
@@ -636,28 +567,18 @@ class JobApplicationController
                     $job['employer_id'],
                     $jobseekerName
                 );
-
-                error_log("🔔 DEBUG: notifyJobApplication returned: " . ($notificationResult ? 'TRUE' : 'FALSE'));
-
-                if ($notificationResult) {
-                    error_log("✅ Job application notification sent to employer for application ID: $application_id");
-                } else {
-                    error_log("❌ Failed to send job application notification to employer for application ID: $application_id");
-                }
             } catch (Exception $e) {
-                error_log("❌ Error sending job application notification: " . $e->getMessage());
-                error_log("❌ Stack trace: " . $e->getTraceAsString());
+                error_log("Error sending job application notification: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
                 // Don't fail the application submission if notification fails
             }
-
-            error_log("✅ DEBUG: Redirecting to success page");
 
             // Redirect to success page
             header('Location: ?page=application-success&application_id=' . $application_id);
             exit;
         } catch (Exception $e) {
-            error_log('❌ Error in handleStep4: ' . $e->getMessage());
-            error_log('❌ Stack trace: ' . $e->getTraceAsString());
+            error_log('Error in handleStep4: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
             header('Location: ?page=apply-job&job_id=' . $job['job_id'] . '&step=4&application_id=' . $application_id . '&error=' . urlencode('Failed to submit application. Please try again.'));
             exit;
         }
@@ -785,42 +706,6 @@ class JobApplicationController
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
 
-    // public function viewJob()
-    // {
-    //     $job_id = $_GET['job_id'] ?? null;
-    //     if (!$job_id) {
-    //         header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-    //         exit;
-    //     }
-
-    //     // Get jobseeker info to check application status
-    //     $jobseeker = null;
-    //     $jobseeker_id = null;
-    //     $hasApplied = false;
-
-    //     if (isset($_SESSION['user_id']) && $_SESSION['role'] == User::ROLE_JOBSEEKER) {
-    //         require_once __DIR__ . '/../models/Jobseeker.php';
-    //         $jobseekerModel = new Jobseeker();
-    //         $jobseeker = $jobseekerModel->findByUserId($_SESSION['user_id']);
-    //         $jobseeker_id = $jobseeker ? $jobseeker['jobseeker_id'] : null;
-    //     }
-
-    //     // Get job details with application status using the new method
-    //     $job = $this->getJobForJobseeker($job_id, $jobseeker_id);
-
-    //     if (!$job) {
-    //         header('Location: ?page=browse-jobs&error=' . urlencode('Job not found.'));
-    //         exit;
-    //     }
-
-    //     // Set hasApplied for backward compatibility
-    //     $hasApplied = isset($job['has_applied']) ? $job['has_applied'] : false;
-
-    //     include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
-    // }
-
-    // Update methods that use direct database calls:
-
     private function saveToProfile($jobseeker_id, $file_path, $file_type, $file_name)
     {
         // Move this to Jobseeker model
@@ -846,8 +731,6 @@ class JobApplicationController
             return null;
         }
     }
-
-    // Keep existing methods for viewing applications, success page, etc.
 
     public function viewJob()
     {
@@ -879,7 +762,6 @@ class JobApplicationController
             if ($jobseeker) {
                 // Check if profile is completed
                 $profileCompleted = !empty($jobseeker['profile_completed']) && $jobseeker['profile_completed'] == 1;
-                error_log("DEBUG viewJob: Profile completed: " . ($profileCompleted ? 'true' : 'false'));
 
                 // Check for any application (complete or incomplete)
                 $application = $this->jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
@@ -891,29 +773,14 @@ class JobApplicationController
                     if ($application['is_finalized'] == 1) {
                         // Complete application
                         $applicationStatus = $application['application_status'] ?? 'pending';
-                        error_log("DEBUG viewJob: Complete application found - status: $applicationStatus");
                     } else {
                         // Incomplete application
                         $incompleteApplication = $application;
-                        error_log("DEBUG viewJob: Incomplete application found - step: {$application['current_step']}");
                     }
-                } else {
-                    error_log("DEBUG viewJob: No application found for jobseeker_id={$jobseeker['jobseeker_id']}, job_id=$job_id");
                 }
-            } else {
-                error_log("DEBUG viewJob: No jobseeker record found for user_id: " . $_SESSION['user_id']);
             }
-        } else {
-            error_log("DEBUG viewJob: No active jobseeker session - user_id: " . ($_SESSION['user_id'] ?? 'not set') . ", role: " . ($_SESSION['role'] ?? 'not set'));
         }
 
-        // Debug output
-        error_log("DEBUG viewJob FINAL: hasApplied=" . ($hasApplied ? 'true' : 'false'));
-        error_log("DEBUG viewJob FINAL: incompleteApplication=" . ($incompleteApplication ? 'exists' : 'null'));
-        error_log("DEBUG viewJob FINAL: applicationStatus=" . ($applicationStatus ?? 'null'));
-        error_log("DEBUG viewJob FINAL: profileCompleted=" . ($profileCompleted ? 'true' : 'false'));
-
-        // Load view with all variables
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
 
@@ -1022,8 +889,6 @@ class JobApplicationController
                 }
             }
         }
-
-        // REMOVED: All debug error_log statements to prevent header issues
 
         include __DIR__ . '/../views/jobseekers/job-application/my-applications.php';
     }
@@ -1159,8 +1024,6 @@ class JobApplicationController
                     'resignation_reason' => $resignationReason
                 ];
 
-                error_log('DEBUG: Resignation data: ' . json_encode($resignationData));
-
                 // Create the resignation request
                 $result = $resignationModel->createResignationRequest($resignationData);
 
@@ -1169,7 +1032,7 @@ class JobApplicationController
                     $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
                     $resignationId = $resignationRequest['resignation_id'];
 
-                    error_log('✅ Resignation request created successfully with ID: ' . $resignationId);
+                    error_log('Resignation request created successfully with ID: ' . $resignationId);
 
                     // ADDED: Send notification to employer about resignation request
                     try {
@@ -1192,13 +1055,6 @@ class JobApplicationController
                         // Get company name (you may need to adjust this based on your data structure)
                         $companyName = $application['company_name'] ?? 'Your Company';
 
-                        error_log("🔔 DEBUG: Sending resignation request notification to employer");
-                        error_log("   - Application ID: $application_id");
-                        error_log("   - Resignation ID: $resignationId");
-                        error_log("   - Jobseeker Name: $jobseekerName");
-                        error_log("   - Job Title: {$application['job_title']}");
-                        error_log("   - Company Name: $companyName");
-
                         // Send notification to employer
                         $notificationResult = $notificationService->notifyEmployerAboutResignation(
                             $application_id,
@@ -1208,14 +1064,8 @@ class JobApplicationController
                             $companyName,
                             $resignationReason
                         );
-
-                        if ($notificationResult) {
-                            error_log("✅ Resignation request notification sent to employer for resignation ID: $resignationId");
-                        } else {
-                            error_log("❌ Failed to send resignation request notification for resignation ID: $resignationId");
-                        }
                     } catch (Exception $e) {
-                        error_log("❌ Error sending resignation request notification: " . $e->getMessage());
+                        error_log("Error sending resignation request notification: " . $e->getMessage());
                         // Don't fail the resignation request if notification fails
                     }
 
@@ -1230,7 +1080,6 @@ class JobApplicationController
             exit;
         }
 
-        // Show resignation confirmation page
         $application = $this->jobApplicationModel->getApplicationDetails($application_id, $jobseeker['jobseeker_id']);
         if (!$application) {
             header('Location: ?page=my-applications&error=' . urlencode('Application not found.'));
@@ -1239,7 +1088,6 @@ class JobApplicationController
 
         include __DIR__ . '/../views/jobseekers/job-application/resign-confirmation.php';
     }
-    // Update the viewJob method in JobApplicationController.php:
 
     private function saveOrUpdateProfileDocument($jobseeker_id, $file_path, $file_type, $file_name)
     {
@@ -1250,11 +1098,9 @@ class JobApplicationController
             if ($existingDoc) {
                 // Update existing document
                 $this->jobseekerModel->updateDocument($existingDoc['document_id'], $file_path, $file_name);
-                error_log("DEBUG: Updated existing $file_type in profile");
             } else {
                 // Create new profile document
                 $this->jobseekerModel->saveDocument($jobseeker_id, $file_path, $file_type, $file_name);
-                error_log("DEBUG: Created new $file_type in profile");
             }
 
             return true;
@@ -1263,8 +1109,6 @@ class JobApplicationController
             return false;
         }
     }
-
-    // Add this method to check age eligibility:
 
     private function checkAgeEligibility($job, $jobseeker)
     {
@@ -1337,12 +1181,6 @@ class JobApplicationController
                 // Get jobseeker's full name
                 $jobseekerName = trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name']);
 
-                error_log("🔔 DEBUG: Sending job application notification");
-                error_log("   - Application ID: $application_id");
-                error_log("   - Job ID: {$job['job_id']}");
-                error_log("   - Employer ID: {$job['employer_id']}");
-                error_log("   - Jobseeker Name: $jobseekerName");
-
                 // Send notification to employer
                 $notificationResult = $notificationService->notifyJobApplication(
                     $application_id,
@@ -1350,20 +1188,14 @@ class JobApplicationController
                     $job['employer_id'],
                     $jobseekerName
                 );
-
-                if ($notificationResult) {
-                    error_log("✅ Job application notification sent to employer for application ID: $application_id");
-                } else {
-                    error_log("❌ Failed to send job application notification to employer for application ID: $application_id");
-                }
             } catch (Exception $e) {
-                error_log("❌ Error sending job application notification: " . $e->getMessage());
+                error_log("Error sending job application notification: " . $e->getMessage());
                 // Don't fail the application if notification fails
             }
 
             return true;
         } catch (Exception $e) {
-            error_log('❌ Error finalizing application: ' . $e->getMessage());
+            error_log('Error finalizing application: ' . $e->getMessage());
             return false;
         }
     }
