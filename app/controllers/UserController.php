@@ -36,7 +36,6 @@ class UserController
                 $redirectUrl = $_SESSION['redirect_after_login'] ?? null;
                 unset($_SESSION['redirect_after_login']); // Clear the redirect URL
 
-                // If there's a redirect URL, use it (for non-logged-in users trying to access restricted content)
                 if ($redirectUrl) {
                     header('Location: ' . $redirectUrl);
                     exit;
@@ -117,12 +116,6 @@ class UserController
         include __DIR__ . '/../views/pages/signup.php';
     }
 
-    //NEWWWWWWWWWWWWWWWWWWWWWWWW
-
-
-    // -----------------------------------------------
-
-
     public function forgotPassword()
     {
         include __DIR__ . '/../views/pages/forgot-password.php';
@@ -170,10 +163,6 @@ class UserController
 
     public function verifyForgotPasswordOtp()
     {
-        // Debug: show session id and otp_verified
-        $_SESSION['debug']['session_id'] = session_id();
-        $_SESSION['debug']['otp_verified_before'] = isset($_SESSION['otp_verified']) ? $_SESSION['otp_verified'] : 'NOT SET';
-        // Check if OTP session exists for both GET and POST
         if (!isset($_SESSION['otp']) || !isset($_SESSION['otp_expires'])) {
             $_SESSION['error'] = 'No OTP session found. Please start the password reset process again.';
             header('Location: ?page=forgot-password');
@@ -206,7 +195,6 @@ class UserController
             // OTP is correct, unset OTP so it can't be reused
             unset($_SESSION['otp'], $_SESSION['otp_expires'], $_SESSION['otp_cooldown']);
             $_SESSION['otp_verified'] = true;
-            unset($_SESSION['debug']); // Remove debug info for production
             $_SESSION['success'] = 'OTP verified, you may now reset your password.';
             header('Location: ?page=reset-password');
             exit;
@@ -249,7 +237,6 @@ class UserController
 
     public function resetPassword()
     {
-        // Remove debug code and use new session keys for modal compatibility
         if (empty($_SESSION['otp_verified'])) {
             $_SESSION['error'] = 'Please verify your OTP first.';
             header('Location: ?page=forgot-password');
@@ -456,12 +443,11 @@ class UserController
         return $payload;
     }
 
-
-
     public function logout()
     {
         session_destroy();
         header('Location: ?page=landing');
         exit;
     }
+    
 }

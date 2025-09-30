@@ -32,9 +32,6 @@ class UserManagementController {
         }
     }
 
-    /**
-     * Handle AJAX suspend/unsuspend requests
-     */
     public function updateStatus() {
         // Clear any existing output
         while (ob_get_level()) {
@@ -100,9 +97,6 @@ class UserManagementController {
         exit;
     }
 
-    /**
-     * Utility function to send JSON responses and exit
-     */
     private function sendJson($data) {
         // Clear all previous output
         ob_end_clean();
@@ -128,7 +122,6 @@ class UserManagementController {
     }
 
     public function exportEmployersPDF() {
-        // This is just a response endpoint, actual export happens in JavaScript
         try {
             $employers = $this->model->getUsersByType('employer');
             $this->sendJson([

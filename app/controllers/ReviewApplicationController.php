@@ -201,11 +201,7 @@ class ReviewApplicationController
             $result = $model->scheduleInterview($application_id, $interview_date, $interview_location, $notes, $_SESSION['user_id']);
 
             if ($result) {
-                error_log("✅ Interview scheduled successfully");
-
-                // Get application details
-                $application = $model->getApplicationBasic($application_id);
-                error_log("🔍 DEBUG: Application details: " . json_encode($application));
+                error_log("Interview scheduled successfully");
 
                 // FIXED: Send interview notification regardless of status, then update status
                 try {
@@ -227,13 +223,6 @@ class ReviewApplicationController
                     $employerModel = new Employer();
                     $companyName = $employerModel->getCompanyName($employer_id);
 
-                    error_log("🔔 DEBUG: Sending interview notification");
-                    error_log("   - Application ID: $application_id");
-                    error_log("   - Job Title: {$application['job_title']}");
-                    error_log("   - Company: $companyName");
-                    error_log("   - Date/Time: " . $dateTime->format('F j, Y \a\t g:i A'));
-                    error_log("   - Location: $interview_location");
-
                     // FIXED: Send interview notification FIRST
                     $interviewNotificationResult = $notificationService->notifyInterviewScheduled(
                         $application_id,
@@ -244,18 +233,12 @@ class ReviewApplicationController
                         $notes
                     );
 
-                    if ($interviewNotificationResult) {
-                        error_log("✅ Interview notification sent to jobseeker for application ID: $application_id");
-                    } else {
-                        error_log("❌ Failed to send interview notification for application ID: $application_id");
-                    }
-
                     // THEN update application status to 'shortlisted' if it's pending
                     if ($application && $application['application_status'] === 'pending') {
                         $statusUpdateResult = $model->updateStatus($application_id, 'shortlisted', 'employer', 'Interview scheduled');
 
                         if ($statusUpdateResult) {
-                            error_log("✅ Application status updated to shortlisted");
+                            error_log("Application status updated to shortlisted");
 
                             // Send status update notification
                             $statusNotificationResult = $notificationService->notifyApplicationStatusUpdate(
@@ -272,8 +255,8 @@ class ReviewApplicationController
                         }
                     }
                 } catch (Exception $e) {
-                    error_log("❌ Error sending interview notification: " . $e->getMessage());
-                    error_log("❌ Stack trace: " . $e->getTraceAsString());
+                    error_log("Error sending interview notification: " . $e->getMessage());
+                    error_log("Stack trace: " . $e->getTraceAsString());
                 }
 
                 header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Interview scheduled successfully.'));

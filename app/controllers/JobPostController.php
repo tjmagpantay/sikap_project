@@ -5,11 +5,6 @@ require_once __DIR__ . '/../models/Employer.php';
 require_once __DIR__ . '/../models/JobPost.php';
 require_once __DIR__ . '/../models/User.php';
 
-// // FOR FIREBASE NOTIFICATION
-// require_once __DIR__ . '/../services/NotificationService.php';
-// NotificationService::notifyUsersBySkills($job_id, $job_title, "/public/view-job.php?id={$job_id}");
-
-
 class JobPostController
 {
     private $employerModel;
@@ -386,14 +381,8 @@ class JobPostController
                     try {
                         $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
 
-                        if ($notificationResult) {
-                            error_log("✅ Notifications sent for job ID: $job_id");
-                        } else {
-                            error_log("⚠️ Notifications may have failed for job ID: $job_id");
-                        }
                     } catch (Exception $e) {
-                        error_log("❌ Failed to send job notifications: " . $e->getMessage());
-                        // Don't fail the job publishing if notifications fail
+                        error_log("Failed to send job notifications: " . $e->getMessage());
                     }
 
                     header("Location: ?page=job-post-success&job_id=$job_id");
@@ -468,7 +457,6 @@ class JobPostController
     }
 
 
-    // This method is for EMPLOYERS to view their own jobs
     public function viewEmployerJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
@@ -504,7 +492,6 @@ class JobPostController
         include __DIR__ . '/../views/employers/view-job.php';
     }
 
-    // This method is for JOBSEEKERS to view jobs they want to apply for
     public function viewJobForJobseeker()
     {
         $job_id = $_GET['job_id'] ?? null;
@@ -555,8 +542,6 @@ class JobPostController
                 if ($jobseeker) {
                     // Check if profile is completed
                     $profileCompleted = !empty($jobseeker['profile_completed']) && $jobseeker['profile_completed'] == 1;
-                    error_log("DEBUG JobPostController: Profile completed field: " . ($jobseeker['profile_completed'] ?? 'NULL'));
-                    error_log("DEBUG JobPostController: Profile completed boolean: " . ($profileCompleted ? 'true' : 'false'));
 
                     // Check for any application (complete or incomplete)
                     $application = $jobApplicationModel->getApplicationByJobseekerAndJob($jobseeker['jobseeker_id'], $job_id);
@@ -592,12 +577,6 @@ class JobPostController
                 $screeningQuestions = [];
             }
         }
-
-        // Debug output
-        error_log("DEBUG JobPostController FINAL: hasApplied=" . ($hasApplied ? 'true' : 'false'));
-        error_log("DEBUG JobPostController FINAL: incompleteApplication=" . ($incompleteApplication ? 'exists' : 'null'));
-        error_log("DEBUG JobPostController FINAL: applicationStatus=" . ($applicationStatus ?? 'null'));
-        error_log("DEBUG JobPostController FINAL: profileCompleted=" . ($profileCompleted ? 'true' : 'false'));
 
         include __DIR__ . '/../views/jobseekers/job-application/view-job.php';
     }
@@ -674,8 +653,7 @@ class JobPostController
         // ENHANCED: Get real recommendation percentages if jobseeker is logged in
         if ($jobseeker_id && $recommendationService && !empty($jobs)) {
             try {
-                error_log("🎯 Getting recommendation percentages for jobseeker {$jobseeker_id}");
-
+                
                 // FIXED: Check for cached recommendations first
                 $cacheKey = "recommendations_{$jobseeker_id}_" . md5(serialize(array_column($jobs, 'job_id')));
                 $cachedRecommendations = null;
@@ -684,7 +662,6 @@ class JobPostController
                 $cacheFile = sys_get_temp_dir() . "/sikap_rec_" . $cacheKey . ".json";
                 if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 3600) { // Cache for 1 hour
                     $cachedRecommendations = json_decode(file_get_contents($cacheFile), true);
-                    error_log("📄 Using cached recommendations");
                 }
 
                 if ($cachedRecommendations) {
@@ -702,13 +679,10 @@ class JobPostController
 
                         // Cache the results
                         file_put_contents($cacheFile, json_encode($matchPercentages));
-                        error_log("💾 Cached recommendations for future use");
                     } else {
                         $matchPercentages = [];
                     }
                 }
-
-                error_log("📊 Found " . count($matchPercentages) . " job matches");
 
                 // Update jobs with real match percentages
                 foreach ($jobs as &$job) {
@@ -716,12 +690,10 @@ class JobPostController
                         // Use the real/cached recommendation percentage
                         $job['match_percentage'] = round($matchPercentages[$job['job_id']], 1);
                         $job['has_recommendation'] = true;
-                        error_log("✅ Job {$job['job_id']}: {$job['match_percentage']}% match");
                     } else {
                         // Calculate a consistent fallback percentage
                         $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
                         $job['has_recommendation'] = false;
-                        error_log("📈 Job {$job['job_id']}: {$job['match_percentage']}% fallback match");
                     }
                 }
 
@@ -730,9 +702,8 @@ class JobPostController
                     return ($b['match_percentage'] ?? 0) <=> ($a['match_percentage'] ?? 0);
                 });
 
-                error_log("🔄 Sorted jobs by match percentage");
             } catch (Exception $e) {
-                error_log("❌ Error getting recommendations: " . $e->getMessage());
+                error_log("Error getting recommendations: " . $e->getMessage());
                 // Apply consistent fallback matching
                 foreach ($jobs as &$job) {
                     $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
@@ -761,9 +732,6 @@ class JobPostController
         include __DIR__ . '/../views/jobseekers/job-application/browse-jobs.php';
     }
 
-    /**
-     * Calculate basic match percentage as fallback when ML recommendation is unavailable
-     */
     private function calculateBasicMatch($job, $jobseeker)
     {
         if (!$jobseeker) {
@@ -881,14 +849,9 @@ class JobPostController
             if ($new_status === 'open') {
                 try {
                     $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
-
-                    if ($notificationResult) {
-                        error_log("✅ Reopened job notifications sent for job ID: $job_id");
-                    } else {
-                        error_log("⚠️ Reopened job notifications may have failed for job ID: $job_id");
-                    }
+ 
                 } catch (Exception $e) {
-                    error_log("❌ Failed to send job reopened notifications: " . $e->getMessage());
+                    error_log("Failed to send job reopened notifications: " . $e->getMessage());
                 }
             }
 
