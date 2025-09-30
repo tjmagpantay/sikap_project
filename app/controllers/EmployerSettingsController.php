@@ -32,9 +32,6 @@ class EmployerSettingsController
         // Get current settings - THIS IS CRUCIAL!
         $settings = $this->settingsModel->getSettingsByEmployerId($employer['employer_id']);
 
-        // Debug to ensure settings are loaded
-        error_log("EmployerSettings: Settings for view: " . print_r($settings, true));
-
         // Both $employer and $settings variables are now available in the view
         include __DIR__ . '/../views/employers/setting-employer.php';
     }
@@ -43,10 +40,6 @@ class EmployerSettingsController
     {
         header('Content-Type: application/json');
 
-        // Add debug logging
-        error_log("EmployerSettings: updateSettings called");
-        error_log("EmployerSettings: POST data: " . print_r($_POST, true));
-        error_log("EmployerSettings: Session data: " . print_r($_SESSION, true));
 
         // Check authentication
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {

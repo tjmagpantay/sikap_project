@@ -178,6 +178,7 @@ class EmployerDashboardController
         echo json_encode(['success' => true, 'jobs' => $jobPosts]);
         exit;
     }
+    
     public function getFilteredJobs($employer_id, $status = null, $page = 1, $limit = 5)
     {
         if (!$employer_id) {
