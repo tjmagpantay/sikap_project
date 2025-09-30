@@ -65,8 +65,6 @@ class ResumeParser
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $this->escoAliases[strtolower($row['alias'])] = $row['skill_id'];
             }
-
-            error_log("Loaded " . count($this->manualSkills) . " manual skills, " . count($this->escoSkills) . " ESCO skills");
         } catch (PDOException $e) {
             error_log("Error loading skill data: " . $e->getMessage());
             $this->escoSkills = [];
@@ -124,7 +122,6 @@ class ResumeParser
         return $data;
     }
 
-    // Use the EXACT same hybrid skill extraction as your prototype
     private function extractSkillsHybrid($text)
     {
         $foundSkills = [];
@@ -186,7 +183,6 @@ class ResumeParser
         return $skills;
     }
 
-    // New stricter ESCO matching function
     private function strictEscoSkillMatch($text, $escoSkills, $escoAliases)
     {
         $matches = [];
@@ -194,39 +190,43 @@ class ResumeParser
 
         // Define common technical skills that we want to prioritize
         $prioritySkills = [
-            'javascript',
-            'python',
-            'java',
-            'php',
-            'html',
-            'css',
-            'react',
-            'vue',
-            'angular',
-            'node.js',
-            'express',
-            'laravel',
-            'django',
-            'flask',
-            'sql',
-            'mysql',
-            'postgresql',
-            'mongodb',
-            'git',
-            'docker',
-            'kubernetes',
-            'aws',
-            'azure',
-            'linux',
-            'windows',
-            'agile',
-            'scrum',
-            'project management',
-            'leadership',
-            'communication',
-            'problem solving',
-            'teamwork',
-            'critical thinking'
+            "data analysis",
+            "research",
+            "technical writing",
+            "report preparation",
+            "accounting",
+            "bookkeeping",
+            "financial analysis",
+            "marketing",
+            "sales",
+            "customer service",
+            "business strategy",
+            "operations management",
+            "supply chain management",
+            "quality assurance",
+            "project planning",
+            "scheduling",
+            "event planning",
+            "presentation skills",
+            "negotiation",
+            "documentation",
+            "communication",
+            "teamwork",
+            "leadership",
+            "problem solving",
+            "critical thinking",
+            "adaptability",
+            "creativity",
+            "time management",
+            "decision making",
+            "conflict resolution",
+            "collaboration",
+            "work ethic",
+            "emotional intelligence",
+            "attention to detail",
+            "interpersonal skills",
+            "resilience",
+            "active listening"
         ];
 
         // First, look for priority skills in ESCO
@@ -278,7 +278,6 @@ class ResumeParser
         return $matches;
     }
 
-    // EXACT same function as prototype
     private function normalizeEscoSkill($text, $escoSkills, $escoAliases)
     {
         $matches = [];
@@ -407,7 +406,6 @@ class ResumeParser
         ];
     }
 
-    // Add this new validation method
     private function isValidPersonName($name)
     {
         // List of common non-name words that might appear at the beginning of resumes
@@ -587,7 +585,6 @@ class ResumeParser
             $pattern = '/\b' . preg_quote($barangay, '/') . '\b[,\s]*(?:Rosario)?[,\s]*(?:Batangas)?/i';
             if (preg_match($pattern, $text, $match)) {
                 $fullAddress = $barangay . ', Rosario, Batangas';
-                error_log("🔍 DEBUG: Found Rosario barangay address: " . $fullAddress);
                 return $fullAddress;
             }
         }
@@ -645,13 +642,9 @@ class ResumeParser
         return '';
     }
 
-    // Replace the extractWorkExperience method with this improved version:
     private function extractWorkExperience($text)
     {
         $experiences = [];
-
-        error_log("🔍 DEBUG: Starting work experience extraction");
-        error_log("🔍 DEBUG: Text length: " . strlen($text));
 
         // Enhanced patterns to find work experience sections
         $sectionPatterns = [
@@ -663,35 +656,26 @@ class ResumeParser
         foreach ($sectionPatterns as $pattern) {
             if (preg_match($pattern, $text, $match)) {
                 $experienceText = trim($match[1]);
-                error_log("🔍 DEBUG: Found experience section with pattern: " . substr($pattern, 0, 50) . "...");
                 break;
             }
         }
 
         if (empty($experienceText)) {
-            error_log("❌ DEBUG: No work experience section found");
             // Try to find individual job entries without a section header
             $experienceText = $this->extractJobEntriesWithoutHeader($text);
             if (empty($experienceText)) {
-                error_log("❌ DEBUG: No individual job entries found either");
                 return [];
             }
         }
 
-        error_log("✅ DEBUG: Found experience text: " . substr($experienceText, 0, 200) . "...");
-
         // Split by common separators for multiple experiences
         $experienceSections = $this->splitExperienceEntries($experienceText);
-        error_log("🔍 DEBUG: Split into " . count($experienceSections) . " sections");
 
         foreach ($experienceSections as $index => $section) {
             $section = trim($section);
             if (empty($section) || strlen($section) < 15) {
-                error_log("⚠️ DEBUG: Skipping short section $index: " . substr($section, 0, 50));
                 continue;
             }
-
-            error_log("🔍 DEBUG: Processing section $index: " . substr($section, 0, 100) . "...");
 
             $experience = $this->parseExperienceEntry($section);
 
@@ -701,17 +685,12 @@ class ResumeParser
                 strlen($experience['job_title']) > 2 && strlen($experience['company_name']) > 2
             ) {
                 $experiences[] = $experience;
-                error_log("✅ DEBUG: Successfully parsed experience: " . $experience['job_title'] . " at " . $experience['company_name']);
-            } else {
-                error_log("❌ DEBUG: Rejected experience - missing data: " . json_encode($experience));
             }
         }
 
-        error_log("🔍 DEBUG: Total experiences found: " . count($experiences));
         return array_slice($experiences, 0, 5); // Limit to 5 experiences
     }
 
-    // Add this helper method to find job entries without a clear section header
     private function extractJobEntriesWithoutHeader($text)
     {
         $lines = explode("\n", $text);
@@ -739,7 +718,6 @@ class ResumeParser
         return $foundJobPattern ? $jobEntries : '';
     }
 
-    // Add this new method to better split experience entries
     private function splitExperienceEntries($text)
     {
         $entries = [];
@@ -750,7 +728,6 @@ class ResumeParser
         $parts = preg_split($jobTitlePattern, $text, -1, PREG_SPLIT_NO_EMPTY);
 
         if (count($parts) > 1) {
-            error_log("🔍 DEBUG: Split by job titles into " . count($parts) . " parts");
             return $parts;
         }
 
@@ -759,7 +736,6 @@ class ResumeParser
         $parts = preg_split($companyPattern, $text, -1, PREG_SPLIT_NO_EMPTY);
 
         if (count($parts) > 1) {
-            error_log("🔍 DEBUG: Split by companies into " . count($parts) . " parts");
             return $parts;
         }
 
@@ -768,7 +744,6 @@ class ResumeParser
         $parts = preg_split($datePattern, $text, -1, PREG_SPLIT_NO_EMPTY);
 
         if (count($parts) > 1) {
-            error_log("🔍 DEBUG: Split by dates into " . count($parts) . " parts");
             return $parts;
         }
 
@@ -779,16 +754,13 @@ class ResumeParser
         });
 
         if (count($filteredParts) > 1) {
-            error_log("🔍 DEBUG: Split by line breaks into " . count($filteredParts) . " parts");
             return array_values($filteredParts);
         }
 
         // Fallback: return the whole text as one entry
-        error_log("🔍 DEBUG: No split patterns worked, returning as single entry");
         return [$text];
     }
 
-    // Enhanced parseExperienceEntry method
     private function parseExperienceEntry($text)
     {
         $experience = [
@@ -806,34 +778,28 @@ class ResumeParser
         $lines = explode("\n", trim($text));
         $lines = array_filter(array_map('trim', $lines));
 
-        error_log("🔍 DEBUG: Parsing entry with " . count($lines) . " lines");
-
         // Enhanced job title extraction
         $jobTitle = $this->extractJobTitle($lines, $text);
         if ($jobTitle) {
             $experience['job_title'] = $jobTitle;
-            error_log("✅ DEBUG: Found job title: " . $jobTitle);
         }
 
         // Enhanced company extraction
         $companyName = $this->extractCompanyName($lines, $text);
         if ($companyName) {
             $experience['company_name'] = $companyName;
-            error_log("✅ DEBUG: Found company: " . $companyName);
         }
 
         // Enhanced date extraction
         $dateInfo = $this->extractWorkDates($text);
         if ($dateInfo) {
             $experience = array_merge($experience, $dateInfo);
-            error_log("✅ DEBUG: Found dates - Start: " . ($dateInfo['start_date'] ?: 'N/A') . ", End: " . ($dateInfo['end_date'] ?: 'Current'));
         }
 
         // Extract employment type
         $employmentType = $this->extractEmploymentType($text);
         if ($employmentType) {
             $experience['employment_type'] = $employmentType;
-            error_log("✅ DEBUG: Found employment type: " . $employmentType);
         }
 
         // Extract responsibilities
@@ -844,8 +810,6 @@ class ResumeParser
 
         return $experience;
     }
-
-    // Add these helper methods for better extraction
 
     private function extractJobTitle($lines, $fullText)
     {
@@ -1008,7 +972,6 @@ class ResumeParser
                     $dateInfo['end_date'] = null;
                 }
 
-                error_log("✅ DEBUG: Extracted dates - Start: {$dateInfo['start_date']}, End: {$dateInfo['end_date']}, Current: {$dateInfo['currently_working']}");
                 return $dateInfo;
             }
         }
@@ -1104,34 +1067,24 @@ class ResumeParser
 
             $updateResult = $jobseekerModel->updateProfile($userId, $profileData);
             if (!$updateResult) {
-                error_log("❌ Failed to update basic profile");
             }
 
             // ENHANCED: Better work experience handling
             if (!empty($parsedData['experience']) && is_array($parsedData['experience'])) {
-                error_log("🔍 DEBUG: Processing " . count($parsedData['experience']) . " work experiences");
 
-                // Don't delete existing experience, just add new parsed ones
-                // This allows users to keep manually entered experience
                 foreach ($parsedData['experience'] as $index => $exp) {
                     if (empty($exp['job_title']) || empty($exp['company_name'])) {
-                        error_log("⚠️ DEBUG: Skipping experience $index - missing required fields");
+
                         continue;
                     }
 
                     // Check if this experience already exists to avoid duplicates
                     $existingExp = $this->checkDuplicateExperience($jobseekerId, $exp, $jobseekerModel);
                     if ($existingExp) {
-                        error_log("⚠️ DEBUG: Similar experience already exists, skipping: " . $exp['job_title']);
                         continue;
                     }
 
                     $result = $jobseekerModel->saveWorkExperience($jobseekerId, $exp);
-                    if ($result) {
-                        error_log("✅ DEBUG: Saved work experience: " . $exp['job_title'] . " at " . $exp['company_name']);
-                    } else {
-                        error_log("❌ DEBUG: Failed to save work experience: " . $exp['job_title']);
-                    }
                 }
             }
 
@@ -1144,7 +1097,6 @@ class ResumeParser
                     foreach ($parsedData['skills'] as $skill) {
                         $jobseekerModel->saveSkill($jobseekerId, $skill);
                     }
-                    error_log("✅ Updated " . count($parsedData['skills']) . " skills");
                 }
             }
 
@@ -1159,34 +1111,23 @@ class ResumeParser
                         }
                     }
                     $jobseekerModel->saveEducation($jobseekerId, $parsedData['education']);
-                    error_log("✅ Updated education data");
                 }
             }
 
             // Update certificates (existing logic)
             if (!empty($parsedData['certificates'])) {
-                error_log("🔍 DEBUG: Processing " . count($parsedData['certificates']) . " certificates");
-
-                // Don't delete existing certificates, just add new ones if they don't exist
                 foreach ($parsedData['certificates'] as $index => $cert) {
                     if (empty($cert['certificate_title'])) {
-                        error_log("⚠️ DEBUG: Skipping certificate $index - missing title");
                         continue;
                     }
 
                     // Check if certificate already exists
                     $existingCert = $this->checkDuplicateCertificate($jobseekerId, $cert, $jobseekerModel);
                     if ($existingCert) {
-                        error_log("⚠️ DEBUG: Similar certificate already exists, skipping: " . $cert['certificate_title']);
                         continue;
                     }
 
                     $result = $jobseekerModel->saveCertificate($jobseekerId, $cert);
-                    if ($result) {
-                        error_log("✅ DEBUG: Saved certificate: " . $cert['certificate_title']);
-                    } else {
-                        error_log("❌ DEBUG: Failed to save certificate: " . $cert['certificate_title']);
-                    }
                 }
             }
 
@@ -1196,7 +1137,6 @@ class ResumeParser
                 'data' => $parsedData
             ];
         } catch (Exception $e) {
-            error_log("❌ Error updating jobseeker profile from parsed data: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Failed to update profile: ' . $e->getMessage()
@@ -1204,7 +1144,6 @@ class ResumeParser
         }
     }
 
-    // Add this helper method to check for duplicate experiences
     private function checkDuplicateExperience($jobseekerId, $newExp, $jobseekerModel)
     {
         try {
@@ -1224,7 +1163,6 @@ class ResumeParser
         }
     }
 
-    // Add this helper method for certificate duplicates
     private function checkDuplicateCertificate($jobseekerId, $newCert, $jobseekerModel)
     {
         try {
@@ -1294,38 +1232,31 @@ class ResumeParser
         }
 
         if (empty($educationText)) {
-            error_log("🔍 DEBUG: No education section found");
             return $education;
         }
-
-        error_log("🔍 DEBUG: Found education text: " . substr($educationText, 0, 200) . "...");
 
         // Extract school name using advanced method
         $schoolName = $this->extractSchoolNameAdvanced($educationText);
         if ($schoolName) {
             $education['school_name'] = $schoolName;
-            error_log("✅ DEBUG: Found school name: " . $schoolName);
         }
 
         // Extract education level
         $educationLevel = $this->extractEducationLevel($educationText);
         if ($educationLevel) {
             $education['education_level'] = $educationLevel;
-            error_log("✅ DEBUG: Found education level: " . $educationLevel);
         }
 
         // Extract field of study
         $fieldOfStudy = $this->extractFieldOfStudy($educationText);
         if ($fieldOfStudy) {
             $education['field_of_study'] = $fieldOfStudy;
-            error_log("✅ DEBUG: Found field of study: " . $fieldOfStudy);
         }
 
         // Extract years
         $years = $this->extractEducationYears($educationText);
         if ($years) {
             $education = array_merge($education, $years);
-            error_log("✅ DEBUG: Found years - Start: " . ($years['start_year'] ?: 'N/A') . ", End: " . ($years['end_year'] ?: 'N/A'));
         }
 
         return $education;
@@ -1407,8 +1338,6 @@ class ResumeParser
 
     private function extractSchoolNameAdvanced($text)
     {
-        error_log("🔍 DEBUG: Starting advanced school name extraction");
-
         // List of Rosario, Batangas schools for specific matching
         $rosarioSchools = [
             'Rosario Institute',
@@ -1425,7 +1354,6 @@ class ResumeParser
         // Try specific school matches first
         foreach ($rosarioSchools as $school) {
             if (stripos($text, $school) !== false) {
-                error_log("✅ DEBUG: Found local school: " . $school);
                 return $school;
             }
         }
@@ -1434,10 +1362,10 @@ class ResumeParser
         $patterns = [
             // University patterns
             '/([A-Z][A-Za-z\s&\.\',]+(?:University|College|Institute|Academy))/i',
-            
+
             // School patterns
             '/([A-Z][A-Za-z\s&\.\',]+(?:School|Seminary|Polytechnic))/i',
-            
+
             // Education center patterns
             '/([A-Z][A-Za-z\s&\.\',]+(?:Education\s+Center|Training\s+Center|Technical\s+Institute))/i'
         ];
@@ -1445,10 +1373,9 @@ class ResumeParser
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text, $match)) {
                 $schoolName = trim($match[1]);
-                
+
                 // Validate the school name
                 if ($this->isValidSchoolName($schoolName)) {
-                    error_log("✅ DEBUG: Found school name via pattern: " . $schoolName);
                     return $schoolName;
                 }
             }
@@ -1458,7 +1385,7 @@ class ResumeParser
         $lines = explode("\n", $text);
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             // Skip obvious non-school lines
             if (empty($line) || strlen($line) < 5 || strlen($line) > 100) {
                 continue;
@@ -1469,18 +1396,18 @@ class ResumeParser
                 continue;
             }
 
-            // Look for capitalized words that could be school names
-            if (preg_match('/^[A-Z][a-zA-Z\s&\.\',]+$/', $line) && 
-                !preg_match('/\b(?:experience|work|skills|projects|certificates|languages|references)\b/i', $line)) {
-                
+            // Look for capitalized words that could be company names
+            if (
+                preg_match('/^[A-Z][a-zA-Z\s&\.\',]+$/', $line) &&
+                !preg_match('/\b(?:experience|work|skills|projects|certificates|languages|references)\b/i', $line)
+            ) {
+
                 if ($this->isValidSchoolName($line)) {
-                    error_log("✅ DEBUG: Found school name via line analysis: " . $line);
                     return $line;
                 }
             }
         }
 
-        error_log("⚠️ DEBUG: No valid school name found");
         return '';
     }
 
@@ -1604,11 +1531,8 @@ class ResumeParser
         }
 
         if (empty($certificateText)) {
-            error_log("🔍 DEBUG: No certificate section found");
             return [];
         }
-
-        error_log("🔍 DEBUG: Found certificate text: " . substr($certificateText, 0, 200) . "...");
 
         // Split certificates by common separators
         $certificateEntries = $this->splitCertificateEntries($certificateText);
@@ -1622,7 +1546,6 @@ class ResumeParser
             $certificate = $this->parseCertificateEntry($entry);
             if (!empty($certificate['certificate_name'])) {
                 $certificates[] = $certificate;
-                error_log("✅ DEBUG: Found certificate: " . $certificate['certificate_name']);
             }
         }
 
