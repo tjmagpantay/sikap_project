@@ -20,7 +20,7 @@ class JobPost
             die("Connection failed: " . $e->getMessage());
         }
     }
-    // ADD THIS METHOD - following the same pattern as your other models
+
     public function getDatabase()
     {
         return $this->db;
@@ -279,9 +279,6 @@ class JobPost
 
                 // Set logo priority: business_logo > profile_picture
                 $result['display_logo'] = $result['business_logo'] ?? $result['profile_picture'] ?? null;
-
-                error_log("DEBUG getFullJobData: job_id=$job_id, screening_questions_enabled=" . $result['screening_questions_enabled']);
-                error_log("DEBUG getFullJobData: min_age=" . ($result['min_age'] ?? 'null') . ", max_age=" . ($result['max_age'] ?? 'null'));
             }
 
             return $result;
@@ -687,13 +684,12 @@ class JobPost
             return [];
         }
     }
-    // Also make sure you have this method for getting the PDO connection if needed
+
     public function getPdo()
     {
         return $this->db;
     }
 
-    // Add this method for getting single job details:
     public function getJobForJobseeker($job_id, $jobseeker_id = null)
     {
         try {
@@ -745,7 +741,6 @@ class JobPost
         }
     }
 
-    // Add this method for Step 5 review:
     public function getFullJobDataForReview($job_id)
     {
         try {
@@ -941,7 +936,6 @@ class JobPost
         }
     }
 
-    // Add this method to JobPost class
     public function getJobSkillsArray($job_id)
     {
         try {
@@ -1030,7 +1024,6 @@ class JobPost
         }
     }
 
-    // ADD THIS METHOD - following MVC pattern like JobRecommendationService
     public function notifyJobPosted($job_id)
     {
         try {
@@ -1129,6 +1122,7 @@ class JobPost
             throw new Exception("Failed to fetch jobs for admin management");
         }
     }
+
     public function getJobsByEmployerWithStatus($employer_id)
     {
         try {
@@ -1204,6 +1198,7 @@ class JobPost
             }
         }
     }
+
     public function isJobActiveById($jobId)
     {
         try {
