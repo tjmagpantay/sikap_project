@@ -21,7 +21,6 @@ class JobseekerSettings
         }
     }
 
-    // Get settings by jobseeker_id
     public function getSettingsByJobseekerId($jobseeker_id)
     {
         try {
@@ -44,7 +43,6 @@ class JobseekerSettings
         }
     }
 
-    // Create default settings
     public function createDefaultSettings($jobseeker_id)
     {
         try {
@@ -61,7 +59,6 @@ class JobseekerSettings
         }
     }
 
-    // Update email preferences
     public function updateEmailPreferences($jobseeker_id, $preferences)
     {
         try {
@@ -85,7 +82,6 @@ class JobseekerSettings
         }
     }
 
-    // Update privacy settings
     public function updatePrivacySettings($jobseeker_id, $settings)
     {
         try {
