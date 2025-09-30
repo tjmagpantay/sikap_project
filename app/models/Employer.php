@@ -48,9 +48,6 @@ class Employer
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Check if business profile is completed
-     */
     public function checkBusinessCompletion($employer_id)
     {
         try {
@@ -90,9 +87,6 @@ class Employer
         }
     }
 
-    /**
-     * Update business completion status
-     */
     public function updateBusinessCompletionStatus($employer_id)
     {
         try {
@@ -102,10 +96,6 @@ class Employer
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$isCompleted, $employer_id]);
 
-            if ($result) {
-                error_log("Business completion status updated for employer $employer_id: $isCompleted");
-            }
-
             return $result;
         } catch (PDOException $e) {
             error_log('Error updating business completion status: ' . $e->getMessage());
@@ -113,9 +103,6 @@ class Employer
         }
     }
 
-    /**
-     * Update employer profile completion status
-     */
     public function updateEmployerCompletionStatus($employer_id)
     {
         try {
@@ -134,10 +121,6 @@ class Employer
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$isCompleted, $employer_id]);
 
-            if ($result) {
-                error_log("Employer profile completion status updated for employer $employer_id: $isCompleted");
-            }
-
             return $result;
         } catch (PDOException $e) {
             error_log('Error updating employer completion status: ' . $e->getMessage());
@@ -145,9 +128,6 @@ class Employer
         }
     }
 
-    /**
-     * Find employer by ID
-     */
     public function findById($employer_id)
     {
         try {
@@ -161,29 +141,9 @@ class Employer
         }
     }
 
-    // public function findByUserId($user_id)
-    // {
-    //     try {
-    //         $sql = "SELECT * FROM employer WHERE user_id = :user_id";
-    //         $stmt = $this->db->prepare($sql);
-    //         $stmt->execute(['user_id' => $user_id]);
-    //         return $stmt->fetch(PDO::FETCH_ASSOC);
-    //     } catch (PDOException $e) {
-    //         error_log('Error finding employer by user ID: ' . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    // public function getBusiness($employer_id)
-    // {
-    //     $stmt = $this->db->prepare("SELECT * FROM employers_business WHERE employer_id = ? LIMIT 1");
-    //     $stmt->execute([$employer_id]);
-    //     return $stmt->fetch(PDO::FETCH_ASSOC);
-    // }
     public function getDocuments($employer_id)
     {
         try {
-            error_log("DEBUG: Getting documents for employer_id: $employer_id");
 
             // Get the document record for this employer
             $stmt = $this->db->prepare("SELECT * FROM employer_documents WHERE employer_id = ? LIMIT 1");
@@ -191,11 +151,9 @@ class Employer
             $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$record) {
-                error_log("DEBUG: No document record found for employer_id: $employer_id");
                 return [];
             }
 
-            error_log("DEBUG: Found document record: " . print_r($record, true));
 
             // Extract document paths from the columns
             $documents = [];
@@ -214,11 +172,9 @@ class Employer
             foreach ($documentColumns as $column) {
                 if (isset($record[$column]) && !empty($record[$column])) {
                     $documents[$column] = $record[$column];
-                    error_log("DEBUG: Found document $column: " . $record[$column]);
                 }
             }
 
-            error_log("DEBUG: Final documents array: " . print_r($documents, true));
             return $documents;
         } catch (PDOException $e) {
             error_log('Error getting documents: ' . $e->getMessage());
@@ -313,10 +269,8 @@ class Employer
             if ($result) {
                 // Return the employer_id instead of just true
                 $employer_id = $this->db->lastInsertId();
-                error_log('Employer profile created successfully for user_id: ' . $user_id . ' with employer_id: ' . $employer_id);
                 return $employer_id;
             } else {
-                error_log('Failed to create employer profile for user_id: ' . $user_id);
                 return false;
             }
         } catch (Exception $e) {
@@ -442,8 +396,6 @@ class Employer
     public function saveDocument($employer_id, $document_type, $file_path, $original_filename = null, $file_size = null)
     {
         try {
-            error_log("DEBUG: saveDocument called with employer_id=$employer_id, type=$document_type, path=$file_path");
-
             // Define allowed document types for security (match your table columns)
             $allowedTypes = [
                 'letter_of_intent',
@@ -458,7 +410,6 @@ class Employer
             ];
 
             if (!in_array($document_type, $allowedTypes)) {
-                error_log("DEBUG: Invalid document type: $document_type");
                 return false;
             }
 
@@ -473,20 +424,16 @@ class Employer
                 $sql = "UPDATE employer_documents SET `{$document_type}` = ?, upload_date = NOW() WHERE employer_id = ?";
                 $stmt = $this->db->prepare($sql);
                 $result = $stmt->execute([$file_path, $employer_id]);
-                error_log("DEBUG: Updating existing record for document type: $document_type");
             } else {
                 // Insert new record - create new row with this document
                 $sql = "INSERT INTO employer_documents (employer_id, `{$document_type}`, upload_date) VALUES (?, ?, NOW())";
                 $stmt = $this->db->prepare($sql);
                 $result = $stmt->execute([$employer_id, $file_path]);
-                error_log("DEBUG: Inserting new record for document type: $document_type");
             }
 
             if (!$result) {
-                error_log("DEBUG: SQL execution failed: " . print_r($stmt->errorInfo(), true));
                 return false;
             } else {
-                error_log("DEBUG: Document saved successfully: $document_type for employer $employer_id");
                 return true;
             }
         } catch (PDOException $e) {
@@ -510,120 +457,107 @@ class Employer
         }
     }
 
-public function markProfileCompleted($employer_id)
-{
-    try {
-        error_log("DEBUG: Marking profile completed for employer_id: $employer_id");
-
-        $sql = "UPDATE employer SET 
+    public function markProfileCompleted($employer_id)
+    {
+        try {
+            $sql = "UPDATE employer SET 
                     profile_completed = 1, 
                     status = :status, 
                     updated_at = CURRENT_TIMESTAMP 
                 WHERE employer_id = :employer_id";
 
-        $stmt = $this->db->prepare($sql);
-        $result = $stmt->execute([
-            'employer_id' => $employer_id,
-            'status' => self::STATUS_PENDING_VERIFICATION
-        ]);
-
-        if ($result) {
-            $accreditationId = $this->createAccreditationRecord($employer_id);
-            
-            // ADDED: Send notification to admins about new accreditation request
-            if ($accreditationId) {
-                try {
-                    require_once __DIR__ . '/../services/NotificationService.php';
-                    require_once __DIR__ . '/../../config/sikap_db.php';
-
-                    $config = require __DIR__ . '/../../config/sikap_db.php';
-                    $notificationPdo = new PDO(
-                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                        $config['db_user'],
-                        $config['db_pass']
-                    );
-                    $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                    $notificationService = new NotificationService($notificationPdo);
-
-                    // Get employer details for notification
-                    $employer = $this->findById($employer_id);
-                    $business = $this->getBusiness($employer_id);
-
-                    $employerName = trim($employer['first_name'] . ' ' . $employer['last_name']);
-                    $businessName = $business['business_name'] ?? $employer['company_name'] ?? 'Unknown Business';
-                    $businessType = $business['business_type'] ?? null;
-
-                    error_log("🔔 DEBUG: Sending accreditation request notification to admins");
-                    error_log("   - Accreditation ID: $accreditationId");
-                    error_log("   - Employer Name: $employerName");
-                    error_log("   - Business Name: $businessName");
-                    error_log("   - Business Type: " . ($businessType ?: 'N/A'));
-
-                    // Send notification to admins
-                    $notificationResult = $notificationService->notifyAdminsAboutNewAccreditation(
-                        $accreditationId,
-                        $employerName,
-                        $businessName,
-                        $businessType
-                    );
-
-                    if ($notificationResult) {
-                        error_log("✅ Accreditation request notification sent to admins for accreditation ID: $accreditationId");
-                    } else {
-                        error_log("❌ Failed to send accreditation request notification for accreditation ID: $accreditationId");
-                    }
-                } catch (Exception $e) {
-                    error_log("❌ Error sending accreditation request notification: " . $e->getMessage());
-                    // Don't fail the profile completion if notification fails
-                }
-            }
-
-            // Update business completion status
-            $this->updateBusinessCompletionStatus($employer_id);
-            error_log("DEBUG: Profile marked as completed successfully");
-        }
-
-        return $result;
-    } catch (PDOException $e) {
-        error_log('Error marking profile as completed: ' . $e->getMessage());
-        return false;
-    }
-}
-
-// Update the createAccreditationRecord method to return the accreditation ID
-
-private function createAccreditationRecord($employer_id)
-{
-    try {
-        // Check if accreditation record already exists
-        $checkSql = "SELECT accreditation_id FROM accreditation WHERE employer_id = ?";
-        $checkStmt = $this->db->prepare($checkSql);
-        $checkStmt->execute([$employer_id]);
-        $existing = $checkStmt->fetch();
-
-        if (!$existing) {
-            // Create new accreditation record
-            $sql = "INSERT INTO accreditation (employer_id, status, created_at) VALUES (?, 'pending', NOW())";
             $stmt = $this->db->prepare($sql);
-            $result = $stmt->execute([$employer_id]);
+            $result = $stmt->execute([
+                'employer_id' => $employer_id,
+                'status' => self::STATUS_PENDING_VERIFICATION
+            ]);
 
             if ($result) {
-                $accreditationId = $this->db->lastInsertId();
-                error_log("DEBUG: Accreditation record created for employer_id: $employer_id with accreditation_id: $accreditationId");
-                return $accreditationId;
-            }
-        } else {
-            error_log("DEBUG: Accreditation record already exists for employer_id: $employer_id");
-            return $existing['accreditation_id'];
-        }
+                $accreditationId = $this->createAccreditationRecord($employer_id);
 
-        return false;
-    } catch (PDOException $e) {
-        error_log('Error creating accreditation record: ' . $e->getMessage());
-        return false;
+                // ADDED: Send notification to admins about new accreditation request
+                if ($accreditationId) {
+                    try {
+                        require_once __DIR__ . '/../services/NotificationService.php';
+                        require_once __DIR__ . '/../../config/sikap_db.php';
+
+                        $config = require __DIR__ . '/../../config/sikap_db.php';
+                        $notificationPdo = new PDO(
+                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            $config['db_user'],
+                            $config['db_pass']
+                        );
+                        $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        $notificationService = new NotificationService($notificationPdo);
+
+                        // Get employer details for notification
+                        $employer = $this->findById($employer_id);
+                        $business = $this->getBusiness($employer_id);
+
+                        $employerName = trim($employer['first_name'] . ' ' . $employer['last_name']);
+                        $businessName = $business['business_name'] ?? $employer['company_name'] ?? 'Unknown Business';
+                        $businessType = $business['business_type'] ?? null;
+
+                        // Send notification to admins
+                        $notificationResult = $notificationService->notifyAdminsAboutNewAccreditation(
+                            $accreditationId,
+                            $employerName,
+                            $businessName,
+                            $businessType
+                        );
+
+                        if ($notificationResult) {
+                            error_log("✅ Accreditation request notification sent to admins for accreditation ID: $accreditationId");
+                        } else {
+                            error_log("❌ Failed to send accreditation request notification for accreditation ID: $accreditationId");
+                        }
+                    } catch (Exception $e) {
+                        error_log("❌ Error sending accreditation request notification: " . $e->getMessage());
+                        // Don't fail the profile completion if notification fails
+                    }
+                }
+
+                // Update business completion status
+                $this->updateBusinessCompletionStatus($employer_id);
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log('Error marking profile as completed: ' . $e->getMessage());
+            return false;
+        }
     }
-}
+
+    private function createAccreditationRecord($employer_id)
+    {
+        try {
+            // Check if accreditation record already exists
+            $checkSql = "SELECT accreditation_id FROM accreditation WHERE employer_id = ?";
+            $checkStmt = $this->db->prepare($checkSql);
+            $checkStmt->execute([$employer_id]);
+            $existing = $checkStmt->fetch();
+
+            if (!$existing) {
+                // Create new accreditation record
+                $sql = "INSERT INTO accreditation (employer_id, status, created_at) VALUES (?, 'pending', NOW())";
+                $stmt = $this->db->prepare($sql);
+                $result = $stmt->execute([$employer_id]);
+
+                if ($result) {
+                    $accreditationId = $this->db->lastInsertId();
+                    return $accreditationId;
+                }
+            } else {
+                return $existing['accreditation_id'];
+            }
+
+            return false;
+        } catch (PDOException $e) {
+            error_log('Error creating accreditation record: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function getVerificationStatus($user_id)
     {
@@ -818,8 +752,6 @@ private function createAccreditationRecord($employer_id)
         }
     }
 
-
-    //NEWWWWWWWWWWWWW
     public function createMinimal($userId, $firstName, $lastName, $email = null)
     {
         try {
@@ -898,18 +830,17 @@ private function createAccreditationRecord($employer_id)
         }
     }
 
-    // Add to your Employer.php model if it doesn't exist
     public function getAllVerifiedEmployersWithJobCount()
     {
         try {
             $sql = "SELECT e.*, eb.*, 
        COUNT(CASE WHEN jp.job_status = 'open' THEN jp.job_id END) as active_jobs_count
-FROM employer e
-LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-LEFT JOIN job_post jp ON e.employer_id = jp.employer_id
-WHERE e.status = 'verified'
-GROUP BY e.employer_id
-ORDER BY e.created_at DESC";
+        FROM employer e
+        LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+        LEFT JOIN job_post jp ON e.employer_id = jp.employer_id
+        WHERE e.status = 'verified'
+        GROUP BY e.employer_id
+        ORDER BY e.created_at DESC";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
@@ -952,9 +883,6 @@ ORDER BY e.created_at DESC";
         }
     }
 
-    /**
-     * Get business information for employer
-     */
     public function getBusinessInfo($employerId)
     {
         try {
@@ -970,9 +898,6 @@ ORDER BY e.created_at DESC";
         }
     }
 
-    /**
-     * Get company name (business name or personal name)
-     */
     public function getCompanyName($employerId)
     {
         try {
@@ -992,6 +917,7 @@ ORDER BY e.created_at DESC";
             return 'Unknown Company';
         }
     }
+    
     public function updateEmployerStatus($employer_id, $status)
     {
         try {
