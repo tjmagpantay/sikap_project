@@ -16,7 +16,6 @@ class JobApplicants
                 $config['db_pass']
             );
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            error_log("DEBUG: JobPost database connection established successfully");
         } catch (PDOException $e) {
             error_log("JobPost database connection failed: " . $e->getMessage());
             die("Connection failed: " . $e->getMessage());
@@ -128,9 +127,6 @@ class JobApplicants
 
         $sql .= " ORDER BY ja.applied_at DESC";
 
-        error_log("DEBUG JobApplicants: SQL Query: " . $sql);
-        error_log("DEBUG JobApplicants: job_id=$job_id, employer_id=$employer_id");
-
         $stmt = $this->db->prepare($sql);
 
         if ($employer_id !== null) {
@@ -140,7 +136,6 @@ class JobApplicants
         }
 
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        error_log("DEBUG JobApplicants: Found " . count($results) . " applicants");
 
         return $results;
     }
