@@ -93,16 +93,10 @@ class AdminController
         }
     }
 
-
-
     public function dashboard()
     {
-        // Debug logging
-        error_log("Dashboard access - Session: " . print_r($_SESSION, true));
-
         // Changed from User::ROLE_ADMIN to 'admin'
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-            error_log("Access denied - redirecting to login");
             header('Location: ?page=admin-login');
             exit;
         }
@@ -128,14 +122,6 @@ class AdminController
         // Set error/success messages
         $error = $_GET['error'] ?? '';
         $success = $_GET['success'] ?? '';
-
-        // Debug logging
-        error_log('=== ACCREDITATIONS DEBUG ===');
-        error_log('Pending accreditations count: ' . count($pendingAccreditations));
-        error_log('All accreditations count: ' . count($allAccreditations));
-        error_log('Pending data: ' . print_r($pendingAccreditations, true));
-        error_log('All data: ' . print_r($allAccreditations, true));
-        error_log('=== END DEBUG ===');
 
         include __DIR__ . '/../views/admin/accreditations.php';
     }
@@ -167,113 +153,98 @@ class AdminController
         include __DIR__ . '/../views/admin/review-accreditation.php';
     }
 
+    public function processAccreditation()
+    {
+        if (!$this->isAdminLoggedIn()) {
+            header('Location: ?page=admin-login');
+            exit;
+        }
 
-public function processAccreditation()
-{
-    if (!$this->isAdminLoggedIn()) {
-        header('Location: ?page=admin-login');
-        exit;
-    }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ?page=admin-accreditations');
+            exit;
+        }
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: ?page=admin-accreditations');
-        exit;
-    }
+        $accreditation_id = $_POST['accreditation_id'] ?? '';
+        $status = $_POST['status'] ?? '';
+        $notes = $_POST['notes'] ?? '';
+        $admin_id = $_SESSION['admin_id'] ?? null;
 
-    $accreditation_id = $_POST['accreditation_id'] ?? '';
-    $status = $_POST['status'] ?? '';
-    $notes = $_POST['notes'] ?? '';
-    $admin_id = $_SESSION['admin_id'] ?? null;
+        if (empty($accreditation_id) || empty($status)) {
+            $_SESSION['error'] = 'Missing required information';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+            exit;
+        }
 
-    if (empty($accreditation_id) || empty($status)) {
-        $_SESSION['error'] = 'Missing required information';
-        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
-        exit;
-    }
+        // Validate status
+        $validStatuses = ['pending', 'approved', 'rejected'];
+        if (!in_array($status, $validStatuses)) {
+            $_SESSION['error'] = 'Invalid status';
+            header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+            exit;
+        }
 
-    // Validate status
-    $validStatuses = ['pending', 'approved', 'rejected'];
-    if (!in_array($status, $validStatuses)) {
-        $_SESSION['error'] = 'Invalid status';
-        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
-        exit;
-    }
+        try {
+            // Get the current accreditation details before updating (for notification comparison)
+            $currentAccreditation = $this->adminModel->getAccreditationDetails($accreditation_id);
+            $previousStatus = $currentAccreditation['status'] ?? 'pending';
 
-    try {
-        // Get the current accreditation details before updating (for notification comparison)
-        $currentAccreditation = $this->adminModel->getAccreditationDetails($accreditation_id);
-        $previousStatus = $currentAccreditation['status'] ?? 'pending';
+            // Update accreditation status
+            $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
 
-        // Update accreditation status
-        $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
+            if ($result) {
+                // Sync employer status
+                $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
 
-        if ($result) {
-            // Sync employer status
-            $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
+                $statusText = ucfirst($status);
 
-            $statusText = ucfirst($status);
+                // ADDED: Send notification to employer about status update (only if status actually changed)
+                if ($previousStatus !== $status) {
+                    try {
+                        require_once __DIR__ . '/../services/NotificationService.php';
+                        require_once __DIR__ . '/../../config/sikap_db.php';
 
-            // ADDED: Send notification to employer about status update (only if status actually changed)
-            if ($previousStatus !== $status) {
-                try {
-                    require_once __DIR__ . '/../services/NotificationService.php';
-                    require_once __DIR__ . '/../../config/sikap_db.php';
+                        $config = require __DIR__ . '/../../config/sikap_db.php';
+                        $notificationPdo = new PDO(
+                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            $config['db_user'],
+                            $config['db_pass']
+                        );
+                        $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                    $config = require __DIR__ . '/../../config/sikap_db.php';
-                    $notificationPdo = new PDO(
-                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                        $config['db_user'],
-                        $config['db_pass']
-                    );
-                    $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        $notificationService = new NotificationService($notificationPdo);
 
-                    $notificationService = new NotificationService($notificationPdo);
+                        // Send notification to employer
+                        $notificationResult = $notificationService->notifyEmployerAboutAccreditationUpdate(
+                            $accreditation_id,
+                            $status,
+                            $notes
+                        );
 
-                    error_log("🔔 DEBUG: Sending accreditation status update notification to employer");
-                    error_log("   - Accreditation ID: $accreditation_id");
-                    error_log("   - Previous Status: $previousStatus");
-                    error_log("   - New Status: $status");
-                    error_log("   - Admin Notes: " . ($notes ?: 'None'));
-
-                    // Send notification to employer
-                    $notificationResult = $notificationService->notifyEmployerAboutAccreditationUpdate(
-                        $accreditation_id,
-                        $status,
-                        $notes
-                    );
-
-                    if ($notificationResult) {
-                        error_log("✅ Accreditation status notification sent to employer for accreditation ID: $accreditation_id");
-                    } else {
-                        error_log("❌ Failed to send accreditation status notification for accreditation ID: $accreditation_id");
+                    } catch (Exception $e) {
+                        error_log("Error sending accreditation status notification: " . $e->getMessage());
+                        // Don't fail the status update if notification fails
                     }
-                } catch (Exception $e) {
-                    error_log("❌ Error sending accreditation status notification: " . $e->getMessage());
-                    // Don't fail the status update if notification fails
+                } 
+
+                if ($syncResult) {
+                    $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized and notification sent.";
+                } else {
+                    $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed. Notification sent.";
                 }
             } else {
-                error_log("ℹ️ Accreditation status unchanged ($previousStatus -> $status), skipping notification");
+                $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
             }
-
-            if ($syncResult) {
-                $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized and notification sent.";
-            } else {
-                $_SESSION['success'] = "Accreditation status updated to {$statusText}, but employer status sync failed. Notification sent.";
-            }
-        } else {
-            $_SESSION['error'] = 'Failed to update accreditation status. Please try again.';
+        } catch (Exception $e) {
+            error_log("Error updating accreditation status: " . $e->getMessage());
+            $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
         }
-    } catch (Exception $e) {
-        error_log("Error updating accreditation status: " . $e->getMessage());
-        $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
+
+        // Redirect back to the same review page
+        header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
+        exit;
     }
 
-    // Redirect back to the same review page
-    header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
-    exit;
-}
-
-    // ✅ NEW METHOD: Sync employer status with accreditation status
     private function syncEmployerStatus($accreditation_id, $accreditation_status)
     {
         try {
@@ -296,7 +267,6 @@ public function processAccreditation()
         }
     }
 
-    // ✅ NEW METHOD: Map statuses between the two systems
     private function mapAccreditationToEmployerStatus($accreditation_status)
     {
         switch ($accreditation_status) {
@@ -502,34 +472,18 @@ public function processAccreditation()
             $searchQuery = $_GET['search'] ?? '';
             $jobFilter = $_GET['job'] ?? '';
 
-            // DEBUG: Log the filters
-            error_log("DEBUG ApplicationManagement - Filters: status=$statusFilter, search=$searchQuery, job=$jobFilter");
-
             // Get applications using model method
             $applications = $jobApplicationModel->getAllApplicationsForAdmin($statusFilter, $searchQuery, $jobFilter);
-
-            // DEBUG: Log the applications data
-            error_log("DEBUG ApplicationManagement - Found " . count($applications) . " applications");
-            error_log("DEBUG ApplicationManagement - Applications data: " . json_encode($applications));
 
             // Get application statistics using model method
             $stats = $jobApplicationModel->getApplicationStatsForAdmin();
 
-            // DEBUG: Log the stats
-            error_log("DEBUG ApplicationManagement - Stats: " . json_encode($stats));
-
             // Get all jobs for filter dropdown using model method
             $jobs = $jobApplicationModel->getJobsForFilterDropdown();
-
-            // DEBUG: Log the jobs
-            error_log("DEBUG ApplicationManagement - Jobs for filter: " . count($jobs) . " jobs");
 
             // Set error/success messages
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
-
-            // DEBUG: Final check before loading view
-            error_log("DEBUG ApplicationManagement - About to load view with " . count($applications) . " applications");
 
             require __DIR__ . '/../views/admin/application.php';
         } catch (Exception $e) {

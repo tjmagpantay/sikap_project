@@ -22,9 +22,6 @@ class NotificationApiController extends NotificationController
         }
     }
     
-    /**
-     * API endpoint for notifications (used by AJAX polling)
-     */
     public function handleApiRequest()
     {
         try {
@@ -49,10 +46,7 @@ class NotificationApiController extends NotificationController
             echo json_encode(['error' => 'Internal server error']);
         }
     }
-    
-    /**
-     * Handle GET requests for notifications
-     */
+
     private function handleGetNotifications()
     {
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
@@ -61,10 +55,7 @@ class NotificationApiController extends NotificationController
         // Use parent class method
         $this->apiEndpoint();
     }
-    
-    /**
-     * Handle POST actions (mark as read, etc.)
-     */
+
     private function handlePostActions()
     {
         // Use parent class method

@@ -31,9 +31,6 @@ class AdminApplicationController
         $stats = $this->jobApplicationModel->getApplicationStatsForAdmin();
         $jobs = $this->jobApplicationModel->getJobsForFilterDropdown();
 
-        // Debug output
-        error_log("DEBUG Admin Applications: Found " . count($applications) . " applications");
-        error_log("DEBUG Admin Applications Stats: " . json_encode($stats));
 
         include __DIR__ . '/../views/admin/application.php';
     }
