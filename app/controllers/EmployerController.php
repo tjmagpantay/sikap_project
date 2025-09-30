@@ -110,7 +110,6 @@ class EmployerController
         include __DIR__ . '/../views/employers/login-employer.php';
     }
 
-    // Add this new validation method for signup
     private function validateSignupInput($data)
     {
         $errors = [];
@@ -145,7 +144,6 @@ class EmployerController
         return $errors;
     }
 
-    // Add this new validation method for login
     private function validateLoginInput($email, $password)
     {
         $errors = [];
@@ -185,7 +183,6 @@ class EmployerController
 
     public function completeProfile()
     {
-        // Add authentication check
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_EMPLOYER) {
             header('Location: ?page=login-employer');
             exit;
@@ -445,7 +442,6 @@ class EmployerController
                 $oldLogoPath = __DIR__ . '/../../public/' . $business['business_logo'];
                 if (file_exists($oldLogoPath)) {
                     unlink($oldLogoPath);
-                    error_log("DEBUG: Deleted old logo: $oldLogoPath");
                 }
             }
 
@@ -462,16 +458,13 @@ class EmployerController
             $filename = 'business_logo_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
 
-            error_log("DEBUG: Attempting to upload logo to: $filePath");
 
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
-                error_log("DEBUG: Logo uploaded successfully");
                 // Return relative path for database storage
                 return 'uploads/profile_pictures/' . $filename;
             } else {
                 $error = 'Failed to move uploaded logo file';
-                error_log("DEBUG: Failed to move logo file from " . $file['tmp_name'] . " to " . $filePath);
                 return false;
             }
         } catch (Exception $e) {
@@ -483,23 +476,17 @@ class EmployerController
 
     private function handleBusinessStep2($employer_id, $data, &$error, &$success)
     {
-        // Debug to see what data is being received
-        error_log("DEBUG: Step 2 data received: " . print_r($data, true));
-
         // Check if form was submitted
         if (!isset($data['submit_step2'])) {
             $error = 'Invalid form submission.';
             return;
         }
 
-        // ✅ FIXED: Updated required fields array - changed 'business_size' to 'business_team_size'
         $required = ['business_type', 'business_industry', 'business_address', 'business_contact', 'business_team_size', 'business_established_year'];
 
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 $error = "Please fill in all required fields. Missing: $field";
-                error_log("DEBUG: Missing field: $field");
-                error_log("DEBUG: Available fields: " . implode(', ', array_keys($data)));
                 return;
             }
         }
@@ -515,16 +502,12 @@ class EmployerController
             'business_email' => trim($data['business_email'] ?? '')
         ];
 
-        error_log("DEBUG: Business data to save: " . print_r($businessData, true));
-
         $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
 
         if ($result) {
-            error_log("DEBUG: Step 2 data saved successfully");
             header('Location: ?page=complete-employer-business&step=3&success=' . urlencode('Founding information saved!'));
             exit;
         } else {
-            error_log("DEBUG: Failed to save step 2 data");
             $error = 'Failed to save founding information. Please try again.';
             return;
         }
@@ -566,16 +549,12 @@ class EmployerController
             'business_socials' => json_encode($socials)
         ];
 
-        error_log("DEBUG: Social media data to save: " . print_r($businessData, true));
-
         $result = $this->employerModel->createOrUpdateBusiness($employer_id, $businessData);
 
         if ($result) {
-            error_log("DEBUG: Step 3 data saved successfully");
             header('Location: ?page=complete-employer-business&step=4&success=' . urlencode('Social media information saved!'));
             exit;
         } else {
-            error_log("DEBUG: Failed to save step 3 data");
             $error = 'Failed to save social media information. Please try again.';
             return;
         }
@@ -583,10 +562,6 @@ class EmployerController
 
     private function handleBusinessStep4($employer_id, $data, &$error, &$success)
     {
-        // Debug
-        error_log("DEBUG: Step 4 called with employer_id: $employer_id");
-        error_log("DEBUG: POST data: " . print_r($data, true));
-        error_log("DEBUG: FILES data: " . print_r($_FILES, true));
 
         // Check if form was submitted
         if (!isset($data['submit_step4'])) {
@@ -613,27 +588,22 @@ class EmployerController
         // Process each document type
         foreach ($documentTypes as $type => $label) {
             if (isset($_FILES[$type]) && $_FILES[$type]['error'] === UPLOAD_ERR_OK) {
-                error_log("DEBUG: Processing file for type: $type");
 
                 $uploadError = '';
                 $filePath = $this->handleDocumentUpload($_FILES[$type], $type, $uploadError);
 
                 if ($filePath) {
-                    error_log("DEBUG: File uploaded successfully, saving to database...");
 
                     // Save to database
                     $result = $this->employerModel->saveDocument($employer_id, $type, $filePath);
 
                     if ($result) {
                         $uploadedFiles[$type] = $filePath;
-                        error_log("DEBUG: Successfully uploaded and saved $label");
                     } else {
                         $uploadErrors[] = "Failed to save $label to database";
-                        error_log("DEBUG: Failed to save $label to database");
                     }
                 } else {
                     $uploadErrors[] = "Failed to upload $label: $uploadError";
-                    error_log("DEBUG: Failed to upload $label: $uploadError");
                 }
             } elseif (isset($_FILES[$type]) && $_FILES[$type]['error'] !== UPLOAD_ERR_NO_FILE) {
                 $uploadErrors[] = "Error uploading $label: " . $this->getUploadErrorMessage($_FILES[$type]['error']);
@@ -643,7 +613,6 @@ class EmployerController
         // Check if there were any errors
         if (!empty($uploadErrors)) {
             $error = implode('; ', $uploadErrors);
-            error_log("DEBUG: Upload errors: " . $error);
             return;
         }
 
@@ -651,7 +620,6 @@ class EmployerController
         $uploadCount = count($uploadedFiles);
         $successMessage = $uploadCount > 0 ? "Successfully uploaded $uploadCount document(s)!" : "No documents uploaded (this is optional)";
 
-        error_log("DEBUG: Step 4 completed successfully with $uploadCount uploads");
         header('Location: ?page=complete-employer-business&step=5&success=' . urlencode($successMessage));
         exit;
     }
@@ -676,8 +644,6 @@ class EmployerController
     private function handleDocumentUpload($file, $type, &$error)
     {
         try {
-            error_log("DEBUG: handleDocumentUpload called for type: $type");
-
             // Validate file
             $allowedTypes = ['pdf'];  // Only PDF for documents
             $maxSize = 5 * 1024 * 1024; // 5MB
@@ -708,7 +674,6 @@ class EmployerController
                 $oldFilePath = __DIR__ . '/../../' . $existingDocuments[$type];
                 if (file_exists($oldFilePath)) {
                     unlink($oldFilePath);
-                    error_log("DEBUG: Deleted old file: $oldFilePath");
                 }
             }
 
@@ -725,16 +690,12 @@ class EmployerController
             $filename = $type . '_' . $employer['employer_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
 
-            error_log("DEBUG: Attempting to move file to: $filePath");
-
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
-                error_log("DEBUG: File moved successfully");
                 // Return relative path for database storage - consistent format
                 return 'uploads/documents/' . $filename;
             } else {
                 $error = 'Failed to move uploaded file';
-                error_log("DEBUG: Failed to move file from " . $file['tmp_name'] . " to " . $filePath);
                 return false;
             }
         } catch (Exception $e) {
@@ -784,7 +745,6 @@ class EmployerController
                 $oldBannerPath = __DIR__ . '/../../public/' . $business['banner_image'];
                 if (file_exists($oldBannerPath)) {
                     unlink($oldBannerPath);
-                    error_log("DEBUG: Deleted old banner: $oldBannerPath");
                 }
             }
 
@@ -801,16 +761,12 @@ class EmployerController
             $filename = 'business_banner_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $filename;
 
-            error_log("DEBUG: Attempting to upload banner to: $filePath");
-
             // Move uploaded file
             if (move_uploaded_file($file['tmp_name'], $filePath)) {
-                error_log("DEBUG: Banner uploaded successfully");
                 // Return relative path for database storage
                 return 'uploads/profile_pictures/' . $filename;
             } else {
                 $error = 'Failed to move uploaded banner file';
-                error_log("DEBUG: Failed to move banner file from " . $file['tmp_name'] . " to " . $filePath);
                 return false;
             }
         } catch (Exception $e) {
@@ -1132,7 +1088,6 @@ class EmployerController
 
     private function handleDocumentRequest($forceDownload = false)
     {
-        // ✅ FIXED: Allow admin access to employer documents
         if (!isset($_SESSION['user_id'])) {
             http_response_code(403);
             die('Access denied - Please log in');
@@ -1157,7 +1112,6 @@ class EmployerController
             die('Missing parameters');
         }
 
-        // ✅ FIXED: If not admin, check if the logged-in user owns this employer profile
         if (!$isAdmin) {
             $currentEmployer = $this->employerModel->findByUserId($_SESSION['user_id']);
             if (!$currentEmployer || $currentEmployer['employer_id'] != $employer_id) {
@@ -1175,10 +1129,6 @@ class EmployerController
 
         $filePath = $documents[$type];
 
-        // Debug the file path
-        error_log("DEBUG: File path from database: $filePath");
-
-        // ✅ FIXED: Build full path - handle different path formats
         $possiblePaths = [
             // Try the path as stored
             __DIR__ . '/../../' . $filePath,
@@ -1190,18 +1140,14 @@ class EmployerController
 
         $fullPath = null;
         foreach ($possiblePaths as $path) {
-            error_log("DEBUG: Checking path: $path");
             if (file_exists($path)) {
                 $fullPath = $path;
                 break;
             }
         }
 
-        error_log("DEBUG: Final file path: " . ($fullPath ?? 'NOT FOUND'));
-
         // Check if file exists
         if (!$fullPath || !file_exists($fullPath)) {
-            error_log("Document file not found. Tried paths: " . print_r($possiblePaths, true));
             http_response_code(404);
             die('Document file not found on server. File may have been moved or deleted.');
         }
@@ -1266,9 +1212,6 @@ class EmployerController
         exit;
     }
 
-
-    // Add method to get documents (if not exists)
-    // This should already exist in your Employer model, but ensure it returns the right format
     public function getEmployerDocuments($employer_id)
     {
         return $this->employerModel->getDocuments($employer_id);

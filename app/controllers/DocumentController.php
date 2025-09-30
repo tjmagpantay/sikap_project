@@ -19,7 +19,6 @@ class DocumentController
 
     public function viewDocument()
     {
-        // Check if user is logged in
         if (!isset($_SESSION['user_id'])) {
             http_response_code(403);
             die('Access denied - Please login');
@@ -33,27 +32,18 @@ class DocumentController
         }
 
         try {
-            // Get document info from database
             $document = $this->getDocumentById($documentId);
-
-            // Debug output
-            error_log("DEBUG: Document ID: " . $documentId);
-            error_log("DEBUG: Document data: " . json_encode($document));
 
             if (!$document) {
                 http_response_code(404);
                 die('Document not found in database');
             }
 
-            // Security check: Only allow access to own documents or if user is employer/admin
             $canAccess = false;
 
             if ($_SESSION['role'] == User::ROLE_JOBSEEKER) {
                 // Jobseekers can only access their own documents
                 $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-                error_log("DEBUG: Current jobseeker: " . json_encode($jobseeker));
-                error_log("DEBUG: Document jobseeker_id: " . $document['jobseeker_id']);
-
                 $canAccess = ($jobseeker && $jobseeker['jobseeker_id'] == $document['jobseeker_id']);
             } elseif ($_SESSION['role'] == User::ROLE_EMPLOYER || $_SESSION['role'] == User::ROLE_ADMIN) {
                 // Employers and admins can access documents
@@ -67,10 +57,6 @@ class DocumentController
 
             // Build file path - try multiple possible locations
             $filePath = $this->findDocumentPath($document['file_path']);
-
-            // Debug file path search
-            error_log("DEBUG: Original file_path: " . $document['file_path']);
-            error_log("DEBUG: Found file_path: " . ($filePath ?: 'NOT FOUND'));
 
             if (!$filePath || !file_exists($filePath)) {
                 http_response_code(404);
@@ -214,7 +200,6 @@ class DocumentController
             $stmt->execute([$documentId]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("DEBUG: SQL Query result: " . json_encode($result));
 
             return $result;
         } catch (Exception $e) {
@@ -227,9 +212,6 @@ class DocumentController
     {
         // Clean the file path
         $filePath = ltrim($filePath, '/\\');
-
-        // Debug the original file path
-        error_log("DEBUG: Searching for file: " . $filePath);
 
         // Try multiple possible paths based on your upload structure
         $possiblePaths = [
@@ -248,14 +230,11 @@ class DocumentController
         ];
 
         foreach ($possiblePaths as $path) {
-            error_log("DEBUG: Checking path: " . $path);
             if (file_exists($path)) {
-                error_log("DEBUG: Found file at: " . $path);
                 return $path;
             }
         }
 
-        error_log("DEBUG: File not found in any of the expected locations");
         return false;
     }
 
@@ -454,6 +433,5 @@ class DocumentController
 
         return $content_types[$file_extension] ?? 'application/octet-stream';
     }
-
-    
+      
 }
