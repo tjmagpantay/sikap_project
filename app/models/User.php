@@ -113,24 +113,16 @@ class User
         return $stmt->execute([$user_id]);
     }
 
-    /**
-     * Find user by Google ID (now just by email, since we do not store google_id)
-     */
     public function findByGoogleId($googleIdOrEmail)
     {
-        // For compatibility, just call findByEmail
         return $this->findByEmail($googleIdOrEmail);
     }
 
-    /**
-     * Create user with Google info (no google_id stored)
-     */
     public function createWithGoogle($email, $googleId, $name, $role_id, $status = 'active')
     {
         try {
             $this->db->beginTransaction();
 
-            // First check if email exists with any role
             $stmt = $this->db->prepare("
                 SELECT u.user_id, u.email, ur.role_id
                 FROM users u
@@ -183,9 +175,6 @@ class User
         }
     }
 
-    /**
-     * Find user by email and return user info + user type (jobseeker/employer)
-     */
     public function findUserByEmail($email)
     {
         $stmt = $this->db->prepare("
@@ -203,9 +192,6 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Update user password by user_id
-     */
     public function updatePassword($userId, $hashedPassword)
     {
         $stmt = $this->db->prepare("UPDATE users SET password = ? WHERE user_id = ?");
@@ -223,9 +209,6 @@ class User
         return $this->db;
     }
 
-    /**
-     * Clean up duplicate roles in the database
-     */
     public function cleanupDuplicateRoles()
     {
         try {
@@ -263,9 +246,6 @@ class User
         }
     }
 
-    /**
-     * Ensures a user has only one role and returns the current role
-     */
     private function ensureSingleRole($user_id)
     {
         try {
@@ -300,6 +280,7 @@ class User
             return false;
         }
     }
+
     public function updateUserStatus($userId, $status)
     {
         try {
@@ -310,5 +291,4 @@ class User
             return false;
         }
     }
-    
 }

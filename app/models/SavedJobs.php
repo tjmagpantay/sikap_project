@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\models\SavedJobs.php
 require_once __DIR__ . '/../../config/sikap_db.php';
 
 class SavedJobs
@@ -27,8 +26,7 @@ class SavedJobs
         try {
             // Check if already saved - prevent duplicate saves
             if ($this->isSaved($jobseeker_id, $job_id)) {
-                error_log("DEBUG: Job $job_id already saved by jobseeker $jobseeker_id");
-                return false; // Already saved - return false to indicate no action taken
+                return false; 
             }
 
             // Add unique constraint check as extra safety
@@ -37,10 +35,8 @@ class SavedJobs
             $result = $stmt->execute([$jobseeker_id, $job_id]);
 
             if ($result && $stmt->rowCount() > 0) {
-                error_log("DEBUG: Successfully saved job $job_id for jobseeker $jobseeker_id");
                 return true;
             } else {
-                error_log("DEBUG: No rows affected - job $job_id may already be saved for jobseeker $jobseeker_id");
                 return false;
             }
         } catch (PDOException $e) {
@@ -57,10 +53,8 @@ class SavedJobs
             $result = $stmt->execute([$jobseeker_id, $job_id]);
 
             if ($result && $stmt->rowCount() > 0) {
-                error_log("DEBUG: Successfully unsaved job $job_id for jobseeker $jobseeker_id");
                 return true;
             } else {
-                error_log("DEBUG: No rows affected when trying to unsave job $job_id for jobseeker $jobseeker_id");
                 return false;
             }
         } catch (PDOException $e) {
