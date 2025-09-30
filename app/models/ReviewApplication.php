@@ -171,8 +171,6 @@ class ReviewApplication
             $jobseeker_id = $application['jobseeker_id'];
             $user_id = $application['user_id'] ?? null;
 
-            // The education, skills, work_experience, and certificates are already parsed from the main query
-            // But we still need to get documents and answers separately
             $application['documents'] = $this->getJobseekerDocuments($jobseeker_id);
             $application['answers'] = $this->getApplicationAnswers($application_id);
 
@@ -204,7 +202,6 @@ class ReviewApplication
 
     public function getProfileCompletionPercentage($user_id)
     {
-        // Use the Jobseeker model's calculation method for consistency
         return $this->jobseekerModel->calculateProfileCompletion($user_id);
     }
 
@@ -227,7 +224,6 @@ class ReviewApplication
 
     public function scheduleInterview($application_id, $date, $location, $notes, $managed_by_user_id)
     {
-        // Check if interview already exists
         $stmt = $this->db->prepare("SELECT job_manage_id FROM job_application_management WHERE application_id = ?");
         $stmt->execute([$application_id]);
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -249,9 +245,6 @@ class ReviewApplication
         return $stmt->execute([$application_id, $status, $changed_by_role, $remarks]);
     }
 
-    /**
-     * Get application with basic details (used for notifications)
-     */
     public function getApplicationBasic($application_id)
     {
         try {
@@ -275,16 +268,14 @@ class ReviewApplication
             $stmt->execute([$application_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("🔍 DEBUG: getApplicationBasic result: " . json_encode($result));
 
             return $result;
         } catch (Exception $e) {
-            error_log("❌ Error getting basic application details: " . $e->getMessage());
+            error_log("Error getting basic application details: " . $e->getMessage());
             return null;
         }
     }
 
-    // Helper methods to parse concatenated data
     private function parseEducationData($data)
     {
         if (empty($data)) return [];
@@ -383,11 +374,6 @@ class ReviewApplication
         return $certificates;
     }
 
-
-     /**
-     * Get all applications where interview date passed 7+ days ago
-     * and the application status is still 'shortlisted' (no decision made after interview).
-     */
     public function getPendingApplicationsWithExpiredInterview()
     {
         $stmt = $this->db->prepare("
