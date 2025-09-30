@@ -45,6 +45,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
     $page = $_GET['page'] ?? 'landing';
 
     switch ($page) {
+
+
+        // [------------------------ PAGES ----------------------]
         case 'landing':
             include __DIR__ . '/../app/views/pages/landing-page.php';
             break;
@@ -75,7 +78,25 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/view-all-companies.php';
             break;
 
-        // NOTIFICATION ROUTES (MVC pattern)
+
+
+        // [------------------------ LOGIN AND OAUTH ----------------------]
+
+        case 'google-login':
+            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
+            $controller = new GoogleAuthController();
+            $controller->initiateLogin();
+            break;
+        case 'google-callback':
+            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
+            $controller = new GoogleAuthController();
+            $controller->handleCallback();
+            break;
+
+            
+
+        // [------------------------ NOTIFICATION ROUTES ----------------------]
+
         case 'notifications-api':
             require_once __DIR__ . '/../app/controllers/NotificationController.php';
             $controller = new NotificationController();
@@ -87,6 +108,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new NotificationController();
             $controller->viewAllJobseekerNotifications();
             break;
+
         case 'validate-link':
             require_once __DIR__ . '/../app/controllers/NotificationController.php';
             $controller = new NotificationController();
@@ -98,6 +120,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new NotificationController();
             $controller->viewAllEmployerNotifications();
             break;
+
+        case 'notifications-admin':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->notifications(); // Use the controller method
+            break;
+
+            
+
+        // [------------------------ ADMIN ROUTES ----------------------]
 
         case 'update-employer-status':
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
@@ -111,181 +143,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->updateStatus();
             break;
 
-        // Google login Jobseeker & Employer
-
-        case 'google-login':
-            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
-            $controller = new GoogleAuthController();
-            $controller->initiateLogin();
-            break;
-        case 'google-callback':
-            require_once __DIR__ . '/../app/controllers/GoogleAuthController.php';
-            $controller = new GoogleAuthController();
-            $controller->handleCallback();
-            break;
-
-        // Jobseeker Routes
-        case 'login-jobseeker':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->login();
-            break;
-        case 'signup-jobseeker':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->signup();
-            break;
-        case 'jobseeker-dashboard':
-            require_once __DIR__ . '/../app/controllers/JobSeekerDashboardController.php';
-            $controller = new JobSeekerDashboardController();
-            $controller->dashboard();
-            break;
-        case 'profile-jobseeker':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->showProfile();
-            break;
-        case 'profile-tab-content':
-            if (isset($_GET['tab']) && in_array($_GET['tab'], ['profile', 'documents', 'applications'])) {
-                // Check if it's an AJAX request
-                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                    // FIXED: Method name typo
-                    require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-                    $controller = new JobseekerController();
-                    $controller->profileTabContent(); // Fixed: was getprofileTabContent()
-                }
-            }
-            break;
-        case 'upload-profile-photo':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->uploadProfilePhoto();
-            break;
-        case 'jobseeker-documents':
-            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
-            break;
-        case 'download-document':
-            require_once __DIR__ . '/../app/controllers/DocumentController.php';
-            $controller = new DocumentController();
-            $controller->downloadDocument();
-            break;
-        case 'jobseeker-applications':
-            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
-            break;
-        case 'settings-jobseeker':
-            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
-            $controller = new JobseekerSettingsController();
-            $controller->showSettings();
-            break;
-        case 'update-jobseeker-settings':
-            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
-            $controller = new JobseekerSettingsController();
-            $controller->updateSettings();
-            break;
-
-        // Jobseeker 2FA OTP Routes NEWWWWWWWWWW
-        case 'verify-otp':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->verifyLoginOtp();
-            break;
-        case 'resend-otp':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->resendOtp();
-            break;
-
-        // Jobseeker Programs Routes
-        case 'programs-jobseeker':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->programsJobseeker();
-            break;
-
-        case 'event-info-jobseeker':
-            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
-            $eventController = new EventProgramController();
-            $event = null;
-            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                $event = $eventController->getEventById($_GET['id']);
-            }
-            include __DIR__ . '/../app/views/jobseekers/event-info-jobseeker.php';
-            break;
-
-
-        // Employer Routes
-        case 'login-employer':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->login();
-            break;
-        case 'signup-employer':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->signup();
-            break;
-        case 'employer-dashboard':
-        case 'dashboard': // ADD this alias to handle the filtering URLs
-            require_once __DIR__ . '/../app/controllers/EmployerDashboardController.php';
-            $controller = new EmployerDashboardController();
-            $controller->dashboard();
-            break;
-        case 'setting-employer':
-        case 'settings-employer':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->settings();
-            break;
-
-        case 'employer-change-password':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->changePassword();
-            break;
-
-        case 'employer-deactivate-account':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->deactivateAccount();
-            break;
-
-        case 'employer-delete-account':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->deleteAccount();
-            break;
-
-        case 'view-all-applicants':
-            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
-            $controller = new JobApplicantsController();
-            $controller->viewAllApplicants();
-            break;
-        case 'view-applicants':
-            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
-            $controller = new JobApplicantsController();
-            $controller->viewApplicants($_GET['job_id'] ?? null);
-            break;
-        case 'job-applications':
-            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
-            $controller = new JobApplicantsController();
-            $controller->viewApplicants($_GET['job_id'] ?? null);
-            break;
-        case 'manage-applications':
-            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
-            $controller = new JobApplicantsController();
-            $controller->viewApplicants($_GET['job_id'] ?? null);
-            break;
-        case 'review-application':
-            require_once __DIR__ . '/../app/controllers/ReviewApplicationController.php';
-            $controller = new ReviewApplicationController();
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->handlePost($_GET['application_id'] ?? null);
-            }
-            $controller->view($_GET['application_id'] ?? null);
-            break;
-
-        // Admin Routes
-
         case 'admin-login':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
             $controller = new AdminController();
@@ -295,12 +152,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
             $controller = new AdminDashboardController();
             $controller->dashboard();
-            break;
-
-        case 'notifications-admin':
-            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
-            $controller = new AdminDashboardController();
-            $controller->notifications(); // Use the controller method
             break;
 
         case 'all-reports':
@@ -329,8 +180,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new AdminDashboardController();
             $controller->eventEdit(); // Use dashboard layout
             break;
-
-        // Event Operations Routes - Use existing EventProgramController
+            
         case 'admin-event-store':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
@@ -373,19 +223,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->togglePin(); // Toggle pin status
             break;
 
-
-
-        // Replace the User Management Routes section in index.php
         case 'admin-jobseekers':
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
             $controller = new AdminDashboardController();
-            $controller->jobseekerManagement(); // ✅ This will use dashboard.php layout
+            $controller->jobseekerManagement(); // 
             break;
 
         case 'admin-employers':
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
             $controller = new AdminDashboardController();
-            $controller->employerManagement(); // ✅ This will use dashboard.php layout
+            $controller->employerManagement(); // 
             break;
 
         case 'admin-jobpost-management':
@@ -411,13 +258,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new AdminDashboardController();
             $controller->processAccreditation();
             break;
-
-
-        // case 'admin-users':
-        //     require_once __DIR__ . '/../app/controllers/AdminController.php';
-        //     $controller = new AdminController();
-        //     $controller->manageUsers();
-        //     break;
 
         case 'admin-jobpost-management':
             require_once __DIR__ . '/../app/controllers/AdminController.php';
@@ -479,7 +319,98 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->publicView();
             break;
 
-        // Complete Profile Routes
+        // Admin Accreditation Routes
+        case 'upload-business-logo':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->uploadBusinessLogo();
+            break;
+        case 'saved-jobs':
+            require_once __DIR__ . '/../app/controllers/SaveJobController.php';
+            $controller = new SaveJobController();
+            $controller->showSavedJobs();
+            break;
+
+            
+
+        // [------------------------ EMPLOYER ROUTES ----------------------]
+
+        case 'login-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->login();
+            break;
+
+        case 'signup-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->signup();
+            break;
+
+        case 'employer-dashboard':
+        case 'dashboard': // ADD this alias to handle the filtering URLs
+            require_once __DIR__ . '/../app/controllers/EmployerDashboardController.php';
+            $controller = new EmployerDashboardController();
+            $controller->dashboard();
+            break;
+        case 'setting-employer':
+        case 'settings-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->settings();
+            break;
+
+        case 'employer-change-password':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->changePassword();
+            break;
+
+        case 'employer-deactivate-account':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->deactivateAccount();
+            break;
+
+        case 'employer-delete-account':
+            require_once __DIR__ . '/../app/controllers/EmployerController.php';
+            $controller = new EmployerController();
+            $controller->deleteAccount();
+            break;
+
+        case 'view-all-applicants':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewAllApplicants();
+            break;
+
+        case 'view-applicants':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
+
+        case 'job-applications':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
+
+        case 'manage-applications':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->viewApplicants($_GET['job_id'] ?? null);
+            break;
+
+        case 'review-application':
+            require_once __DIR__ . '/../app/controllers/ReviewApplicationController.php';
+            $controller = new ReviewApplicationController();
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->handlePost($_GET['application_id'] ?? null);
+            }
+            $controller->view($_GET['application_id'] ?? null);
+            break;
+
         case 'complete-employer-profile':
             // Call the controller method to properly set variables
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
@@ -526,48 +457,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerController();
             $controller->downloadDocument();
             break;
-
-        case 'complete-jobseeker-profile':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->completeProfile();
-            break;
-
-        case 'profile-completion-success':
-            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
-            $controller = new JobseekerController();
-            $controller->profileCompletionSuccess();
-            break;
+            
         case 'employer-profile-completion-success':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
             $controller->profileCompletionSuccess();
             break;
 
-        // Logout
-        case 'logout':
-            // Start session if not started
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-
-            // Clear all session data
-            $_SESSION = array();
-
-            // Delete the session cookie
-            if (isset($_COOKIE[session_name()])) {
-                setcookie(session_name(), '', time() - 3600, '/');
-            }
-
-            // Destroy the session
-            session_destroy();
-
-            // Redirect to login
-            header('Location: ?page=login-jobseeker');
-            exit();
-            break;
-
-        // New Employer Routes
         case 'post-job':
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
@@ -582,6 +478,150 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
             $controller->manageJobs();
+            break;
+
+        case 'edit-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->editJob();
+            break;
+
+        case 'delete-job':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->deleteJob();
+            break;
+
+        case 'toggle-job-status':
+            require_once __DIR__ . '/../app/controllers/JobPostController.php';
+            $controller = new JobPostController();
+            $controller->toggleJobStatus();
+            break;
+
+        case 'setting-employer':
+            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
+            $controller = new EmployerSettingsController();
+            $controller->showSettings();
+            break;
+
+        case 'update-employer-settings':
+            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
+            $controller = new EmployerSettingsController();
+            $controller->updateSettings();
+            break;
+
+            
+
+        // [------------------------ JOBSEEKER ROUTES ----------------------]
+
+        case 'login-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->login();
+            break;
+
+        case 'signup-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->signup();
+            break;
+
+        case 'jobseeker-dashboard':
+            require_once __DIR__ . '/../app/controllers/JobSeekerDashboardController.php';
+            $controller = new JobSeekerDashboardController();
+            $controller->dashboard();
+            break;
+
+        case 'profile-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->showProfile();
+            break;
+
+        case 'profile-tab-content':
+            if (isset($_GET['tab']) && in_array($_GET['tab'], ['profile', 'documents', 'applications'])) {
+                // Check if it's an AJAX request
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                    // FIXED: Method name typo
+                    require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+                    $controller = new JobseekerController();
+                    $controller->profileTabContent(); // Fixed: was getprofileTabContent()
+                }
+            }
+            break;
+
+        case 'upload-profile-photo':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->uploadProfilePhoto();
+            break;
+
+        case 'jobseeker-documents':
+            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
+            break;
+
+        case 'download-document':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadDocument();
+            break;
+
+        case 'jobseeker-applications':
+            include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-applications.php';
+            break;
+
+        case 'settings-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
+            $controller = new JobseekerSettingsController();
+            $controller->showSettings();
+            break;
+
+        case 'update-jobseeker-settings':
+            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
+            $controller = new JobseekerSettingsController();
+            $controller->updateSettings();
+            break;
+
+        case 'verify-otp':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->verifyLoginOtp();
+            break;
+
+        case 'resend-otp':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->resendOtp();
+            break;
+
+        // Jobseeker Programs Routes
+        case 'programs-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->programsJobseeker();
+            break;
+
+        case 'event-info-jobseeker':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $eventController = new EventProgramController();
+            $event = null;
+            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+                $event = $eventController->getEventById($_GET['id']);
+            }
+            include __DIR__ . '/../app/views/jobseekers/event-info-jobseeker.php';
+            break;
+
+        
+        case 'complete-jobseeker-profile':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->completeProfile();
+            break;
+
+        case 'profile-completion-success':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->profileCompletionSuccess();
             break;
 
         case 'view-job':
@@ -618,24 +658,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobPostController.php';
             $controller = new JobPostController();
             $controller->browseJobs();
-            break;
-
-        case 'edit-job':
-            require_once __DIR__ . '/../app/controllers/JobPostController.php';
-            $controller = new JobPostController();
-            $controller->editJob();
-            break;
-
-        case 'delete-job':
-            require_once __DIR__ . '/../app/controllers/JobPostController.php';
-            $controller = new JobPostController();
-            $controller->deleteJob();
-            break;
-
-        case 'toggle-job-status':
-            require_once __DIR__ . '/../app/controllers/JobPostController.php';
-            $controller = new JobPostController();
-            $controller->toggleJobStatus();
             break;
 
         // Job Application Routes
@@ -675,19 +697,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->resignFromJob();
             break;
 
-        // Admin Accreditation Routes
-
-        case 'upload-business-logo':
-            require_once __DIR__ . '/../app/controllers/EmployerController.php';
-            $controller = new EmployerController();
-            $controller->uploadBusinessLogo();
-            break;
-        case 'saved-jobs':
-            require_once __DIR__ . '/../app/controllers/SaveJobController.php';
-            $controller = new SaveJobController();
-            $controller->showSavedJobs();
-            break;
-
         case 'save-job':
             require_once __DIR__ . '/../app/controllers/SaveJobController.php';
             $controller = new SaveJobController();
@@ -700,78 +709,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new SaveJobController();
             $controller->unsaveJob();
             // No exit needed here since controller handles it
-            break;
-
-        case 'setting-employer':
-            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
-            $controller = new EmployerSettingsController();
-            $controller->showSettings();
-            break;
-
-        case 'update-employer-settings':
-            require_once __DIR__ . '/../app/controllers/EmployerSettingsController.php';
-            $controller = new EmployerSettingsController();
-            $controller->updateSettings();
-            break;
-
-        case 'nlp-test':
-            require_once __DIR__ . '/../app/controllers/NLPController.php';
-            $controller = new NLPController();
-            $controller->collectTrainingData();
-            break;
-
-        // Add any new cases here
-
-        case 'download-job-attachment':
-            require_once __DIR__ . '/../app/controllers/DocumentController.php';
-            $controller = new DocumentController();
-            $controller->downloadJobAttachment();
-            break;
-
-        case 'view-job-attachment':
-            require_once __DIR__ . '/../app/controllers/DocumentController.php';
-            $controller = new DocumentController();
-            $controller->viewJobAttachment();
-            break;
-
-        case 'download-document':
-            require_once __DIR__ . '/../app/controllers/DocumentController.php';
-            $controller = new DocumentController();
-            $controller->downloadDocument();
-            break;
-
-
-
-        // Forgot Password Routes NEWWWWWWWWWWWWWW
-
-        case 'forgot-password':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
-            $controller->forgotPassword();
-            break;
-
-        case 'forgot-password-request':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
-            $controller->forgotPasswordRequest();
-            break;
-
-        case 'verify-forgotpassword':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
-            $controller->verifyForgotPasswordOtp();
-            break;
-
-        case 'resend-forgotpassword':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
-            $controller->resendOtp();
-            break;
-
-        case 'reset-password':
-            require_once __DIR__ . '/../app/controllers/UserController.php';
-            $controller = new UserController();
-            $controller->resetPassword();
             break;
 
         case 'get-job-details-ajax':
@@ -810,16 +747,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->deleteCertificateSimple();
             break;
 
-
-        case 'abt-sikap':
-            include __DIR__ . '/../app/views/pages/abt-sikap.php';
-            break;
-
-        case 'customer-support':
-            include __DIR__ . '/../app/views/pages/customer-support.php';
-            break;
-
-        case 'review-parsed-data':
+                case 'review-parsed-data':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->reviewParsedData();
@@ -867,14 +795,106 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->validateJobPostsAccess();
             break;
 
-        case 'employer-programs':
-            require_once __DIR__ . '/../app/controllers/JobValidationController.php';
-            $controller = new JobValidationController();
-            $controller->validateEmployerProgramsAccess();
+            
+
+
+        // [------------------------ NECESSARY ROUTES ----------------------]
+
+        case 'nlp-test':
+            require_once __DIR__ . '/../app/controllers/NLPController.php';
+            $controller = new NLPController();
+            $controller->collectTrainingData();
             break;
 
+        case 'download-job-attachment':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadJobAttachment();
+            break;
 
-        // FOOTER ROUTES
+        case 'view-job-attachment':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->viewJobAttachment();
+            break;
+
+        case 'download-document':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->downloadDocument();
+            break;
+
+        case 'forgot-password':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->forgotPassword();
+            break;
+
+        case 'forgot-password-request':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->forgotPasswordRequest();
+            break;
+
+        case 'verify-forgotpassword':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->verifyForgotPasswordOtp();
+            break;
+
+        case 'resend-forgotpassword':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->resendOtp();
+            break;
+
+        case 'reset-password':
+            require_once __DIR__ . '/../app/controllers/UserController.php';
+            $controller = new UserController();
+            $controller->resetPassword();
+            break;
+
+                // Logout
+        case 'logout':
+            // Start session if not started
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            // Clear all session data
+            $_SESSION = array();
+
+            // Delete the session cookie
+            if (isset($_COOKIE[session_name()])) {
+                setcookie(session_name(), '', time() - 3600, '/');
+            }
+
+            // Destroy the session
+            session_destroy();
+
+            // Redirect to login
+            header('Location: ?page=login-jobseeker');
+            exit();
+            break;
+
+        case 'abt-sikap':
+            include __DIR__ . '/../app/views/pages/abt-sikap.php';
+            break;
+
+        case 'customer-support':
+            include __DIR__ . '/../app/views/pages/customer-support.php';
+            break;
+
+        // case 'employer-programs':
+        //     require_once __DIR__ . '/../app/controllers/JobValidationController.php';
+        //     $controller = new JobValidationController();
+        //     $controller->validateEmployerProgramsAccess();
+        //     break;
+
+
+            
+        // [------------------------ FOOTER ROUTES ----------------------]
+
         case 'privacy-policy':
             include __DIR__ . '/../app/views/components/footer/privacy-policy.php';
             break;
