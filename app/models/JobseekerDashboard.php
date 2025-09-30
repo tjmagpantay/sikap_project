@@ -24,9 +24,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get comprehensive dashboard data for a jobseeker
-     */
     public function getDashboardData($jobseeker_id = null)
     {
         try {
@@ -50,9 +47,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get jobseeker statistics
-     */
     public function getJobseekerStats($jobseeker_id = null)
     {
         $stats = [
@@ -108,9 +102,6 @@ class JobseekerDashboard
         return $stats;
     }
 
-    /**
-     * Get all active jobs using the same pattern as JobPost->getAllActiveJobs()
-     */
     public function getRecommendedJobs($jobseeker_id = null, $limit = 20)
     {
         try {
@@ -174,15 +165,6 @@ class JobseekerDashboard
                 }
             }
 
-            error_log('=== JOBSEEKER DASHBOARD MODEL DEBUG ===');
-            error_log('Jobseeker ID: ' . ($jobseeker_id ?? 'not provided'));
-            error_log('Jobs found: ' . count($jobs));
-            if (!empty($jobs)) {
-                error_log('Job IDs: ' . implode(', ', array_column($jobs, 'job_id')));
-                error_log('Job Titles: ' . implode(', ', array_column($jobs, 'job_title')));
-            }
-            error_log('=== END JOBSEEKER DASHBOARD MODEL DEBUG ===');
-
             return $jobs;
         } catch (PDOException $e) {
             error_log('Error fetching recommended jobs: ' . $e->getMessage());
@@ -191,9 +173,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get recent applications for jobseeker
-     */
     public function getRecentApplications($jobseeker_id, $limit = 10)
     {
         if (!$jobseeker_id) return [];
@@ -229,9 +208,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get jobseeker profile information
-     */
     public function getJobseekerProfile($jobseeker_id)
     {
         try {
@@ -250,9 +226,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Calculate profile completion percentage
-     */
     public function getProfileCompletion($jobseeker_id)
     {
         if (!$jobseeker_id) {
@@ -325,9 +298,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Find jobseeker by user_id
-     */
     public function findJobseekerByUserId($user_id)
     {
         try {
@@ -341,9 +311,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get dashboard summary similar to employer
-     */
     public function getDashboardSummary($jobseeker_id)
     {
         try {
@@ -383,9 +350,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get jobs with filters (similar to employer functionality)
-     */
     public function getJobsWithFilters($jobseeker_id = null, $filters = [])
     {
         try {
@@ -471,9 +435,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get application count for a specific job
-     */
     public function getJobApplicationCount($job_id)
     {
         try {
@@ -491,9 +452,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get full job details with additional jobseeker-specific data
-     */
     public function getJobDetailsForJobseeker($job_id, $jobseeker_id = null)
     {
         try {
@@ -526,8 +484,6 @@ class JobseekerDashboard
                     $job['current_step'] = $applicationData['current_step'];
                     $job['applied_at'] = $applicationData['applied_at'];
 
-                    // Debug logging
-                    error_log("DEBUG - JobseekerDashboard: Found application - ID: {$applicationData['application_id']}, Status: {$applicationData['application_status']}, Finalized: {$applicationData['is_finalized']}, Step: {$applicationData['current_step']}");
                 } else {
                     $job['has_applied'] = false;
                     $job['application_id'] = null;
@@ -536,8 +492,6 @@ class JobseekerDashboard
                     $job['current_step'] = null;
                     $job['applied_at'] = null;
 
-                    // Debug logging
-                    error_log("DEBUG - JobseekerDashboard: No application found for jobseeker_id={$jobseeker_id}, job_id={$job_id}");
                 }
             } else {
                 $job['is_saved'] = false;
@@ -556,9 +510,6 @@ class JobseekerDashboard
         }
     }
 
-    /**
-     * Get empty dashboard data structure
-     */
     private function getEmptyDashboardData()
     {
         return [
