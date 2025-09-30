@@ -124,7 +124,6 @@ class JobApplication
     public function getApplicationsByJobseeker($jobseeker_id)
     {
         try {
-            error_log("DEBUG: Querying applications for jobseeker_id = " . $jobseeker_id);
 
             $sql = "SELECT ja.application_id,
                        ja.jobseeker_id,
@@ -153,8 +152,6 @@ class JobApplication
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id]);
             $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            error_log("DEBUG: Found " . count($applications) . " applications (including incomplete)");
 
             // Get interview data for finalized applications only
             for ($i = 0; $i < count($applications); $i++) {
@@ -203,8 +200,6 @@ class JobApplication
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$jobseeker_id, $status]);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            error_log("DEBUG: getApplicationsByJobseekerAndStatus - jobseeker_id: $jobseeker_id, status: $status, results: " . count($results));
 
             return $results;
         } catch (PDOException $e) {
@@ -261,7 +256,6 @@ class JobApplication
     public function getApplicationAttachments($application_id)
     {
         try {
-            // FIXED: Use the correct table name - should be 'application_attachments'
             $sql = "SELECT aa.*, aa.attachment_id, aa.file_path, aa.file_type, aa.uploaded_at
                 FROM application_attachments aa 
                 WHERE aa.application_id = ? 
@@ -270,8 +264,6 @@ class JobApplication
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$application_id]);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            error_log("DEBUG getApplicationAttachments: Found " . count($results) . " attachments for application_id: $application_id");
 
             return $results;
         } catch (PDOException $e) {
@@ -341,11 +333,6 @@ class JobApplication
             $stmt->execute([$jobseeker_id, $job_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Enhanced debugging
-            error_log("DEBUG getApplicationByJobseekerAndJob: jobseeker_id=$jobseeker_id, job_id=$job_id");
-            error_log("DEBUG getApplicationByJobseekerAndJob SQL: $sql");
-            error_log("DEBUG getApplicationByJobseekerAndJob result: " . json_encode($result));
-
             if ($result) {
                 // Make sure we're returning the right data types
                 $result['is_finalized'] = (int)$result['is_finalized'];
@@ -353,11 +340,7 @@ class JobApplication
                 $result['application_id'] = (int)$result['application_id'];
                 $result['jobseeker_id'] = (int)$result['jobseeker_id'];
                 $result['job_id'] = (int)$result['job_id'];
-
-                error_log("DEBUG: Found application - is_finalized={$result['is_finalized']}, current_step={$result['current_step']}, status={$result['application_status']}");
-            } else {
-                error_log("DEBUG: No application found for this jobseeker/job combination");
-            }
+            } 
 
             return $result;
         } catch (PDOException $e) {
@@ -392,7 +375,6 @@ class JobApplication
             $stmt = $this->db->prepare("DELETE FROM job_application_answers WHERE application_id = ?");
             $result = $stmt->execute([$application_id]);
             $deletedRows = $stmt->rowCount();
-            error_log("DEBUG: Deleted $deletedRows answers for application $application_id");
             return $result;
         } catch (PDOException $e) {
             error_log('Error deleting application answers: ' . $e->getMessage());
@@ -485,7 +467,6 @@ class JobApplication
             ");
             $result = $stmt->execute([$application_id]);
             $deletedRows = $stmt->rowCount();
-            error_log("DEBUG: Cleared $deletedRows resume attachments for application $application_id");
             return $result;
         } catch (PDOException $e) {
             error_log('Error clearing resume attachments: ' . $e->getMessage());
@@ -502,7 +483,6 @@ class JobApplication
             ");
             $result = $stmt->execute([$application_id]);
             $deletedRows = $stmt->rowCount();
-            error_log("DEBUG: Cleared $deletedRows CV attachments for application $application_id");
             return $result;
         } catch (PDOException $e) {
             error_log('Error clearing CV attachments: ' . $e->getMessage());
@@ -622,8 +602,6 @@ class JobApplication
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("DEBUG Admin Stats: " . json_encode($result));
-
             return $result ?: [
                 'total' => 0,
                 'pending' => 0,
@@ -663,8 +641,6 @@ class JobApplication
             return [];
         }
     }
-
-
 
     public function getDetailedApplicationForAdmin($application_id)
     {
@@ -776,20 +752,19 @@ class JobApplication
         }
     }
 
-    // Add this method to the JobApplication class:
     public function clearApplicationEligibility($application_id)
     {
         try {
             $stmt = $this->db->prepare("DELETE FROM job_application_eligibility WHERE application_id = ?");
             $result = $stmt->execute([$application_id]);
             $deletedRows = $stmt->rowCount();
-            error_log("DEBUG: Cleared $deletedRows eligibility records for application $application_id");
             return $result;
         } catch (PDOException $e) {
             error_log('Error clearing application eligibility: ' . $e->getMessage());
             return false;
         }
     }
+
     public function exists($applicationId)
     {
         try {
