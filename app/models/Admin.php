@@ -273,7 +273,6 @@ class Admin
         }
     }
 
-
     public function syncEmployerStatus($accreditation_id, $accreditation_status)
     {
         try {

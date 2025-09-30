@@ -25,9 +25,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get total number of jobseekers
-     */
     public function getTotalJobseekers()
     {
         try {
@@ -41,9 +38,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get total number of employers
-     */
     public function getTotalEmployers()
     {
         try {
@@ -57,17 +51,11 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get total number of users (jobseekers + employers)
-     */
     public function getTotalUsers()
     {
         return $this->getTotalJobseekers() + $this->getTotalEmployers();
     }
 
-    /**
-     * Get active job posts
-     */
     public function getActiveJobPosts()
     {
         try {
@@ -81,9 +69,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get pending accreditations
-     */
     public function getPendingAccreditations()
     {
         try {
@@ -110,9 +95,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get total applications
-     */
     public function getTotalApplications()
     {
         try {
@@ -126,9 +108,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Calculate user change percentage (30 days comparison)
-     */
     public function calculateUserChange($currentUsers)
     {
         try {
@@ -150,9 +129,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Calculate job change percentage (30 days comparison)
-     */
     public function calculateJobChange($currentJobs)
     {
         try {
@@ -173,9 +149,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Calculate application change percentage (30 days comparison)
-     */
     public function calculateApplicationChange($currentApplications)
     {
         try {
@@ -196,9 +169,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get all dashboard statistics in one method
-     */
     public function getDashboardStats()
     {
         try {
@@ -236,9 +206,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get recent activity for dashboard
-     */
     public function getRecentActivity($limit = 10)
     {
         try {
@@ -278,9 +245,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get top job categories with application counts
-     */
     public function getTopJobCategories($limit = 5)
     {
         try {
@@ -305,9 +269,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get job statistics for the last 6 months (for charts)
-     */
     public function getJobStatsForChart()
     {
         try {
@@ -398,9 +359,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * Get job category statistics for chart
-     */
     public function getJobCategoryStatsForChart($limit = 6)
     {
         try {
@@ -452,6 +410,7 @@ class AdminDashboard
             ];
         }
     }
+
     public function getReportStatistics()
     {
         try {
@@ -629,6 +588,7 @@ class AdminDashboard
             ];
         }
     }
+
     public function initializeJobCategories()
     {
         try {
@@ -669,12 +629,9 @@ class AdminDashboard
         }
     }
 
-    // Replace the getJobCategoryDistribution method:
-
     public function getAllJobCategoriesDistribution()
     {
         try {
-            // ✅ Use the SAME query structure as the working getJobCategoryStatsForChart
             $sql = "SELECT 
                     COALESCE(jc.category_name, 'Others') as category,
                     COUNT(DISTINCT jp.job_id) as job_count
@@ -691,7 +648,6 @@ class AdminDashboard
             $categories = [];
             $values = [];
 
-            // ✅ CONSISTENT SIKAP COLOR PALETTE (all 8 colors)
             $colors = [
                 '#092C4C', // primary - Dark Blue
                 '#F3AF0E', // secondary - Orange  
@@ -709,7 +665,6 @@ class AdminDashboard
                 $values[] = (int)$row['job_count'];
             }
 
-            // ✅ CRITICAL: Ensure we have ALL 8 categories (same as main-board approach)
             if (empty($categories)) {
                 // Get all categories from enum
                 $categories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
@@ -839,6 +794,7 @@ class AdminDashboard
             ];
         }
     }
+
     public function getApplicationStatusDistribution()
     {
         try {
@@ -918,9 +874,6 @@ class AdminDashboard
         }
     }
 
-    /**
-     * ✅ ENHANCED: Get detailed application statistics for reports
-     */
     public function getApplicationStatistics()
     {
         try {
