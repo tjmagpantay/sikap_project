@@ -49,7 +49,6 @@ class Jobseeker
         }
     }
 
-
     public function findByUserId($user_id)
     {
         $stmt = $this->db->prepare("
@@ -220,7 +219,6 @@ class Jobseeker
     public function saveWorkExperience($jobseeker_id, $data)
     {
         try {
-            error_log("DEBUG: saveWorkExperience called with: " . json_encode($data));
 
             $stmt = $this->db->prepare("
             INSERT INTO jobseeker_work_experience 
@@ -240,19 +238,12 @@ class Jobseeker
                 $data['responsibilities'] ?? ''
             ]);
 
-            error_log("DEBUG: saveWorkExperience result: " . ($result ? 'success' : 'failed'));
-            if (!$result) {
-                error_log("DEBUG: saveWorkExperience error: " . print_r($stmt->errorInfo(), true));
-            }
-
             return $result;
         } catch (PDOException $e) {
             error_log("Error saving work experience: " . $e->getMessage());
             return false;
         }
     }
-
-
 
     public function deleteWorkExperience($jobseeker_id, $experience_id)
     {
@@ -282,7 +273,6 @@ class Jobseeker
             return false;
         }
     }
-
 
     public function hasCurrentJob($jobseeker_id)
     {
@@ -320,7 +310,6 @@ class Jobseeker
     public function updateWorkExperience($jobseeker_id, $data, $experience_id)
     {
         try {
-            error_log("DEBUG: updateWorkExperience called with: " . json_encode($data));
 
             $stmt = $this->db->prepare("
             UPDATE jobseeker_work_experience 
@@ -343,7 +332,6 @@ class Jobseeker
                 $jobseeker_id
             ]);
 
-            error_log("DEBUG: updateWorkExperience result: " . ($result ? 'success' : 'failed'));
             return $result;
         } catch (PDOException $e) {
             error_log("Error updating work experience: " . $e->getMessage());
@@ -497,7 +485,6 @@ class Jobseeker
         }
     }
 
-    // Add a method to check if certificates exist
     public function hasCertificates($user_id)
     {
         try {
@@ -541,66 +528,6 @@ class Jobseeker
             return [];
         }
     }
-
-    // public function hasCurrentJob($jobseeker_id)
-    // {
-    //     try {
-    //         $stmt = $this->db->prepare("
-    //             SELECT COUNT(*) FROM jobseeker_work_experience 
-    //             WHERE jobseeker_id = ? AND currently_working = 'Yes'
-    //         ");
-    //         $stmt->execute([$jobseeker_id]);
-    //         return $stmt->fetchColumn() > 0;
-    //     } catch (PDOException $e) {
-    //         error_log("Error checking current job: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    // public function getCurrentJob($jobseeker_id)
-    // {
-    //     try {
-    //         $stmt = $this->db->prepare("
-    //             SELECT * FROM jobseeker_work_experience 
-    //             WHERE jobseeker_id = ? AND currently_working = 'Yes' 
-    //             LIMIT 1
-    //         ");
-    //         $stmt->execute([$jobseeker_id]);
-    //         return $stmt->fetch(PDO::FETCH_ASSOC);
-    //     } catch (PDOException $e) {
-    //         error_log("Error fetching current job: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    // public function deleteWorkExperience($jobseeker_id, $experience_id)
-    // {
-    //     try {
-    //         $stmt = $this->db->prepare("
-    //             DELETE FROM jobseeker_work_experience 
-    //             WHERE jobseeker_id = ? AND experience_id = ?
-    //         ");
-    //         return $stmt->execute([$jobseeker_id, $experience_id]);
-    //     } catch (PDOException $e) {
-    //         error_log("Error deleting work experience: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    // public function getWorkExperienceById($jobseeker_id, $experience_id)
-    // {
-    //     try {
-    //         $stmt = $this->db->prepare("
-    //             SELECT * FROM jobseeker_work_experience 
-    //             WHERE jobseeker_id = ? AND experience_id = ?
-    //         ");
-    //         $stmt->execute([$jobseeker_id, $experience_id]);
-    //         return $stmt->fetch(PDO::FETCH_ASSOC);
-    //     } catch (PDOException $e) {
-    //         error_log("Error fetching work experience by ID: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
 
     public function updateProfilePicture($user_id, $relativePath)
     {
@@ -775,8 +702,7 @@ class Jobseeker
     public function deleteCertificate($jobseeker_id, $certificate_id)
     {
         try {
-            error_log("DEBUG: Attempting to delete certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
-
+            
             // First check if the certificate exists
             $checkStmt = $this->db->prepare("
             SELECT * FROM jobseeker_certificates 
@@ -786,11 +712,8 @@ class Jobseeker
             $certificate = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$certificate) {
-                error_log("DEBUG: Certificate not found or doesn't belong to jobseeker");
                 return false;
             }
-
-            error_log("DEBUG: Certificate found: " . json_encode($certificate));
 
             // Now delete it
             $deleteStmt = $this->db->prepare("
@@ -800,9 +723,6 @@ class Jobseeker
 
             $result = $deleteStmt->execute([$certificate_id, $jobseeker_id]);
             $rowsAffected = $deleteStmt->rowCount();
-
-            error_log("DEBUG: Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
-            error_log("DEBUG: Rows affected: " . $rowsAffected);
 
             return $result && $rowsAffected > 0;
         } catch (PDOException $e) {
@@ -814,8 +734,7 @@ class Jobseeker
     public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
     {
         try {
-            error_log("DEBUG: Updating certificate ID: $certificate_id for jobseeker ID: $jobseeker_id");
-
+          
             $stmt = $this->db->prepare("
             UPDATE jobseeker_certificates 
             SET certificate_title = ?, issuing_organization = ?, date_issued = ?
@@ -831,8 +750,6 @@ class Jobseeker
             ]);
 
             $rowsAffected = $stmt->rowCount();
-            error_log("DEBUG: Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
-            error_log("DEBUG: Rows affected: " . $rowsAffected);
 
             return $result && $rowsAffected > 0;
         } catch (PDOException $e) {
@@ -856,9 +773,6 @@ class Jobseeker
         }
     }
 
-    /**
-     * Get all jobseeker data for ML recommendation system
-     */
     public function getRecommendationData($jobseeker_id)
     {
         try {
@@ -890,9 +804,6 @@ class Jobseeker
         }
     }
 
-    /**
-     * Get all skills for a jobseeker (for ML system)
-     */
     public function getJobseekerSkills($jobseeker_id)
     {
         try {
@@ -910,9 +821,6 @@ class Jobseeker
         }
     }
 
-    /**
-     * Get all work experience for a jobseeker (for ML system)
-     */
     public function getJobseekerWorkExperience($jobseeker_id)
     {
         try {
@@ -931,9 +839,6 @@ class Jobseeker
         }
     }
 
-    /**
-     * Get all education for a jobseeker (for ML system)
-     */
     public function getJobseekerEducation($jobseeker_id)
     {
         try {
@@ -951,9 +856,6 @@ class Jobseeker
         }
     }
 
-    /**
-     * Get all jobseekers for the recommendation dropdown
-     */
     public function getAllJobseekers()
     {
         try {

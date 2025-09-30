@@ -5,7 +5,6 @@ Handles all ML logic, data processing, and recommendation algorithms
 import os
 import sys
 
-# FIXED: Handle Windows encoding issues
 if os.name == 'nt':  # Windows
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
