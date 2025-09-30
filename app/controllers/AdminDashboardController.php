@@ -37,6 +37,7 @@ class AdminDashboardController
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
+
     public function viewJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -87,7 +88,6 @@ class AdminDashboardController
                 $job['employer_name'] = $company['employer_name'];
             }
 
-            // ✅ FIXED: Get application statistics with proper column names
             $statsQuery = "SELECT 
                         COUNT(*) as total_applications,
                         SUM(CASE WHEN application_status = 'pending' THEN 1 ELSE 0 END) as pending,
@@ -124,7 +124,6 @@ class AdminDashboardController
                 }
             }
 
-            // ✅ Set error/success messages
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
         } catch (Exception $e) {
@@ -133,11 +132,9 @@ class AdminDashboardController
             exit;
         }
 
-        // ✅ FIXED: Use dashboard.php layout (same as other admin pages)
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    // Event Management Methods using your existing EventProgramController
     public function events()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -189,9 +186,6 @@ class AdminDashboardController
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    /**
-     * Get dashboard data for AJAX requests
-     */
     public function getDashboardData()
     {
         // Check if user is logged in and is admin
@@ -235,7 +229,6 @@ class AdminDashboardController
 
     public function getTopJobCategories()
     {
-        // Check if user is logged in and is admin
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized']);
@@ -254,7 +247,6 @@ class AdminDashboardController
         }
     }
 
-    // FIXED: Add methods for user management with proper data loading
     public function jobseekerManagement()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -262,7 +254,6 @@ class AdminDashboardController
             exit;
         }
 
-        // ✅ Load jobseekers data using UserManagement model
         try {
             $users = $this->userManagementModel->getUsersByType('jobseeker');
         } catch (Exception $e) {
@@ -280,7 +271,6 @@ class AdminDashboardController
             exit;
         }
 
-        // ✅ Load employers data using UserManagement model
         try {
             $users = $this->userManagementModel->getUsersByType('employer');
         } catch (Exception $e) {
@@ -298,7 +288,6 @@ class AdminDashboardController
             exit;
         }
 
-        // ✅ Load jobs data using JobPost model
         try {
             // Get all jobs with employer and category information
             $jobs = $this->jobPostModel->getAllJobsForAdmin();
@@ -332,9 +321,6 @@ class AdminDashboardController
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    /**
-     * Calculate job statistics from the jobs array
-     */
     private function calculateJobStats($jobs)
     {
         $stats = [
@@ -376,9 +362,6 @@ class AdminDashboardController
         return $stats;
     }
 
-    /**
-     * Filter jobs based on search query and status
-     */
     private function filterJobs($jobs, $searchQuery, $statusFilter)
     {
         return array_filter($jobs, function ($job) use ($searchQuery, $statusFilter) {
@@ -414,9 +397,6 @@ class AdminDashboardController
         });
     }
 
-    /**
-     * Handle job status updates for admin
-     */
     public function updateJobStatus()
     {
         // Clear any existing output
@@ -476,9 +456,6 @@ class AdminDashboardController
         exit;
     }
 
-    /**
-     * Handle job deletion for admin
-     */
     public function deleteJob()
     {
         // Clear any existing output
@@ -539,10 +516,6 @@ class AdminDashboardController
         exit;
     }
 
-    /**
-     * Handle status updates for users (moved from UserManagementController)
-     * This method handles AJAX requests for updating user status
-     */
     public function updateUserStatus()
     {
         // Clear any existing output
@@ -613,9 +586,6 @@ class AdminDashboardController
         exit;
     }
 
-    /**
-     * Handle accreditations management
-     */
     public function accreditations()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -623,26 +593,16 @@ class AdminDashboardController
             exit;
         }
 
-        // ✅ Load accreditations data using Admin model
         try {
             $pendingAccreditations = $this->adminModel->getPendingAccreditations();
             $allAccreditations = $this->adminModel->getAllAccreditations();
 
-            // ✅ Set $accreditations for the view (this is what the view expects)
             $accreditations = $allAccreditations;
 
-            // ✅ Set error/success messages
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
 
-            // Debug logging
-            error_log('=== ACCREDITATIONS DEBUG ===');
-            error_log('Pending accreditations count: ' . count($pendingAccreditations));
-            error_log('All accreditations count: ' . count($allAccreditations));
-            error_log('First accreditation data: ' . json_encode($allAccreditations[0] ?? null));
-            error_log('=== END DEBUG ===');
 
-            // ✅ Calculate stats for the view
             $stats = [
                 'total' => count($allAccreditations),
                 'pending' => count(array_filter($allAccreditations, fn($a) => $a['status'] === 'pending')),
@@ -662,9 +622,6 @@ class AdminDashboardController
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    /**
-     * Review specific accreditation
-     */
     public function reviewAccreditation()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -696,7 +653,6 @@ class AdminDashboardController
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
 
-            // ✅ FIXED: Use dashboard layout instead of standalone page
             include __DIR__ . '/../views/admin/dashboard.php';
         } catch (Exception $e) {
             error_log('Error loading accreditation details: ' . $e->getMessage());
@@ -704,10 +660,6 @@ class AdminDashboardController
             exit;
         }
     }
-
-    /**
-     * Process accreditation approval/rejection
-     */
 
     public function processAccreditation()
     {
@@ -737,11 +689,9 @@ class AdminDashboardController
         }
 
         try {
-            // ✅ FIXED: Update both accreditation and employer status
             $result = $this->adminModel->updateAccreditationStatus($accreditation_id, $status, $admin_id, $notes);
 
             if ($result) {
-                // ✅ NEW: Also update the employer status to match
                 $syncResult = $this->syncEmployerStatus($accreditation_id, $status);
 
                 $statusText = ucfirst($status);
@@ -759,12 +709,10 @@ class AdminDashboardController
             $_SESSION['error'] = 'An error occurred while updating the status. Please try again.';
         }
 
-        // ✅ FIXED: Redirect back to the same review page instead of accreditations list
         header("Location: ?page=admin-review-accreditation&id={$accreditation_id}");
         exit;
     }
 
-    // ✅ NEW METHOD: Sync employer status with accreditation status
     private function syncEmployerStatus($accreditation_id, $accreditation_status)
     {
         try {
@@ -787,7 +735,6 @@ class AdminDashboardController
         }
     }
 
-    // ✅ NEW METHOD: Map statuses between the two systems
     private function mapAccreditationToEmployerStatus($accreditation_status)
     {
         switch ($accreditation_status) {
@@ -802,10 +749,6 @@ class AdminDashboardController
         }
     }
 
-    // ...rest of existing code...
-    /**
-     * Applications management
-     */
     public function applications()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -846,9 +789,6 @@ class AdminDashboardController
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    /**
-     * Reports management - displays analytics and reports dashboard
-     */
     public function reports()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -883,12 +823,6 @@ class AdminDashboardController
         include __DIR__ . '/../views/admin/dashboard.php';
     }
 
-    /**
-     * Get application status distribution data (using sample data for now)
-     */
-
-
-    // Default/Sample data methods
     private function getDefaultReportStats()
     {
         return [
@@ -913,7 +847,6 @@ class AdminDashboardController
         ];
     }
 
-
     private function getReportStats()
     {
         try {
@@ -933,23 +866,13 @@ class AdminDashboardController
         }
     }
 
-
     private function getCategoryData()
     {
         try {
             // Initialize job categories if table is empty
             $this->adminDashboardModel->initializeJobCategories();
 
-            // ✅ FIXED: Use the new method that gets ALL categories (like main-board approach)
             $data = $this->adminDashboardModel->getAllJobCategoriesDistribution();
-
-            // ✅ DEBUG: Log the data being returned
-            error_log('=== CATEGORY DATA DEBUG IN CONTROLLER ===');
-            error_log('Data returned from model: ' . json_encode($data));
-            error_log('Categories count: ' . count($data['categories'] ?? []));
-            error_log('Values count: ' . count($data['values'] ?? []));
-            error_log('Colors count: ' . count($data['colors'] ?? []));
-            error_log('=== END CATEGORY DEBUG ===');
 
             return $data;
         } catch (Exception $e) {
@@ -965,15 +888,7 @@ class AdminDashboardController
     private function getApplicationStatusData()
     {
         try {
-            // ✅ Use the new model method to get real data
             $data = $this->adminDashboardModel->getApplicationStatusDistribution();
-
-            error_log('=== APPLICATION STATUS DATA DEBUG ===');
-            error_log('Application status data from model: ' . json_encode($data));
-            error_log('Labels: ' . json_encode($data['labels'] ?? []));
-            error_log('Values: ' . json_encode($data['values'] ?? []));
-            error_log('Total applications: ' . ($data['total'] ?? 0));
-            error_log('=== END APPLICATION STATUS DEBUG ===');
 
             return $data;
         } catch (Exception $e) {
@@ -982,9 +897,6 @@ class AdminDashboardController
         }
     }
 
-    /**
-     * ✅ UPDATED: Enhanced default application status data
-     */
     private function getDefaultApplicationStatusData()
     {
         return [
@@ -995,24 +907,20 @@ class AdminDashboardController
         ];
     }
 
-
     private function getUserGrowthData()
     {
         error_log('=== getUserGrowthData METHOD CALLED ===');
 
         try {
-            // ✅ Use the AdminDashboard model method (same approach as main-board)
             $realData = $this->adminDashboardModel->getUserGrowthTrends();
 
             error_log('=== REAL DATA FROM MODEL ===');
             error_log('Real user growth data: ' . json_encode($realData));
 
-            // ✅ Check if we have valid data, otherwise use fallback
             if (!empty($realData['months']) && !empty($realData['jobseekers']) && !empty($realData['employers'])) {
                 return $realData;
             }
 
-            // ✅ Fallback data (same as main-board approach)
             $fallbackData = [
                 'months' => ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
                 'jobseekers' => [5, 8, 12, 15, 18, 22],
@@ -1072,10 +980,6 @@ class AdminDashboardController
         ];
     }
 
-
-    /**
-     * ✅ UPDATED: Simplified allReports method using same approach as main-board
-     */
     public function allReports()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -1084,37 +988,20 @@ class AdminDashboardController
         }
 
         try {
-            // ✅ Get report statistics using model methods
             $reportStats = $this->adminDashboardModel->getReportStatistics();
 
-            // ✅ Get category data using the SAME approach as main-board
             $categoryData = $this->getCategoryData();
 
-            // ✅ Get monthly data using model method
             $monthlyData = $this->adminDashboardModel->getMonthlyActivityTrends();
 
-            // ✅ Get user growth data using model method
             $userGrowthData = $this->getUserGrowthData();
 
-            // ✅ FIXED: Get real application status data
             $applicationStatusData = $this->getApplicationStatusData();
 
-            // ✅ OPTIONAL: Get detailed application statistics for additional insights
             $applicationStats = $this->adminDashboardModel->getApplicationStatistics();
 
-            // Set error/success messages
             $error = $_GET['error'] ?? '';
             $success = $_GET['success'] ?? '';
-
-            // ✅ DEBUG: Log final data before view
-            error_log('=== FINAL ALLREPORTS DATA ===');
-            error_log('Report stats: ' . json_encode($reportStats));
-            error_log('Category data: ' . json_encode($categoryData));
-            error_log('Monthly data: ' . json_encode($monthlyData));
-            error_log('User growth data: ' . json_encode($userGrowthData));
-            error_log('Application status data: ' . json_encode($applicationStatusData));
-            error_log('Application statistics: ' . json_encode($applicationStats));
-            error_log('=== END FINAL DATA ===');
         } catch (Exception $e) {
             error_log('Error in allReports: ' . $e->getMessage());
             $error = 'Failed to load report data.';
@@ -1139,6 +1026,7 @@ class AdminDashboardController
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
+
     public function notifications()
     {
         try {
@@ -1187,16 +1075,9 @@ class AdminDashboardController
                 'hasNextPage' => $hasNextPage
             ];
 
-            error_log('🔍 Admin Notifications Debug:');
-            error_log('   - User ID: ' . $_SESSION['user_id']);
-            error_log('   - Notifications count: ' . count($notifications));
-            error_log('   - Unread count: ' . $unreadCount);
-            error_log('   - Current page: ' . $currentPage);
-
-            // Load the dashboard with notifications content
             include __DIR__ . '/../views/admin/dashboard.php';
         } catch (Exception $e) {
-            error_log('❌ Error in admin notifications: ' . $e->getMessage());
+            error_log('Error in admin notifications: ' . $e->getMessage());
 
             // Fallback: Load with empty data
             $data = [
