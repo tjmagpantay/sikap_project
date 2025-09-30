@@ -3,7 +3,7 @@ require_once __DIR__ . '/../models/JobPost.php';
 require_once __DIR__ . '/../models/Jobseeker.php';
 require_once __DIR__ . '/../services/JobRecommendationService.php';
 
-class MLTrainingController
+class NLPController
 {
     private $jobPostModel;
     private $jobseekerModel;
@@ -27,7 +27,7 @@ class MLTrainingController
 
         echo "<!DOCTYPE html>";
         echo "<html><head>";
-        echo "<title>🤖 ML Training System</title>";
+        echo "<title>NLP</title>";
         echo "<style>";
         echo "body { font-family: Arial, sans-serif; margin: 20px; }";
         echo ".success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; }";
@@ -45,7 +45,7 @@ class MLTrainingController
         echo "<hr>";
 
         // Step 1: Collect all job data
-        echo "<h2>📊 Step 1: Collecting Job Data</h2>";
+        echo "<h2>Step 1: Collecting Job Data</h2>";
         $allJobs = $this->getAllJobsWithSkills();
         
         $trainingJobs = [];
@@ -88,16 +88,16 @@ class MLTrainingController
         }
 
         echo "<div class='success'>";
-        echo "<p>✅ Jobs collected: " . count($trainingJobs) . "</p>";
-        echo "<p>✅ Unique skills found: " . count($skillFrequency) . "</p>";
-        echo "<p>✅ Skill relationships discovered: " . count($jobSkillMatrix) . "</p>";
+        echo "<p>Jobs collected: " . count($trainingJobs) . "</p>";
+        echo "<p>Unique skills found: " . count($skillFrequency) . "</p>";
+        echo "<p>Skill relationships discovered: " . count($jobSkillMatrix) . "</p>";
         echo "</div>";
 
         // Step 2: Collect jobseeker data
         echo "<h2>👥 Step 2: Collecting Jobseeker Data</h2>";
         $allJobseekers = $this->getAllJobseekerData();
         echo "<div class='success'>";
-        echo "<p>✅ Jobseekers with skills: " . count($allJobseekers) . "</p>";
+        echo "<p>Jobseekers with skills: " . count($allJobseekers) . "</p>";
         echo "</div>";
 
         // Step 3: Show skill analysis
@@ -117,7 +117,7 @@ class MLTrainingController
         echo "</div>";
 
         // Step 4: Create training dataset
-        echo "<h2>🎯 Step 4: Creating Training Dataset</h2>";
+        echo "<h2>Step 4: Creating Training Dataset</h2>";
         $trainingData = [
             'jobs' => $trainingJobs,
             'jobseekers' => $allJobseekers,
@@ -133,23 +133,23 @@ class MLTrainingController
         ];
 
         echo "<div class='success'>";
-        echo "<p>✅ Training dataset created successfully</p>";
+        echo "<p>Training dataset created successfully</p>";
         echo "</div>";
 
         // Step 5: Train the model
-        echo "<h2>🚀 Step 5: Training TF-IDF Model</h2>";
+        echo "<h2>Step 5: Training TF-IDF Model</h2>";
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['train_model'])) {
             echo "<div class='info'>";
-            echo "<p>🔄 Training in progress... Please wait.</p>";
+            echo "<p>Training in progress... Please wait.</p>";
             echo "</div>";
             
             $result = $this->trainMLModel($trainingData);
             
             if ($result['success']) {
                 echo "<div class='success'>";
-                echo "<h3>🎉 Model training completed successfully!</h3>";
-                echo "<h4>📈 Training Results:</h4>";
+                echo "<h3>Model training completed successfully!</h3>";
+                echo "<h4>Training Results:</h4>";
                 echo "<ul>";
                 echo "<li><strong>Training Time:</strong> {$result['training_time']}s</li>";
                 echo "<li><strong>Skills Processed:</strong> {$result['total_skills']}</li>";
@@ -160,15 +160,15 @@ class MLTrainingController
                 echo "</div>";
                 
                 echo "<div class='info'>";
-                echo "<h3>🎯 Next Steps:</h3>";
+                echo "<h3>Next Steps:</h3>";
                 echo "<p>Your model has been trained! Now you can test it:</p>";
                 echo "<a href='?page=test-ml' class='button'>🧪 Test Trained Model</a>";
-                echo "<a href='?page=test-comparison' class='button'>📊 Compare Before/After</a>";
+                echo "<a href='?page=test-comparison' class='button'>Compare Before/After</a>";
                 echo "</div>";
                 
             } else {
                 echo "<div class='error'>";
-                echo "<h3>❌ Training failed</h3>";
+                echo "<h3>Training failed</h3>";
                 echo "<p>{$result['message']}</p>";
                 echo "<p><strong>Troubleshooting:</strong></p>";
                 echo "<ul>";
@@ -181,7 +181,7 @@ class MLTrainingController
         } else {
             // Show training form
             echo "<div class='info'>";
-            echo "<h3>📋 Ready to Train Model</h3>";
+            echo "<h3>Ready to Train Model</h3>";
             echo "<p>This will train a TF-IDF model using your job and jobseeker data to improve skill matching accuracy.</p>";
             echo "<table>";
             echo "<tr><th>Data Type</th><th>Count</th><th>Description</th></tr>";
@@ -192,7 +192,7 @@ class MLTrainingController
             echo "</table>";
             
             echo "<form method='POST'>";
-            echo "<button type='submit' name='train_model' class='button' style='font-size: 18px; padding: 15px 30px;'>🚀 Start TF-IDF Training</button>";
+            echo "<button type='submit' name='train_model' class='button' style='font-size: 18px; padding: 15px 30px;'>Start TF-IDF Training</button>";
             echo "</form>";
             echo "</div>";
         }

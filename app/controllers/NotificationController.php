@@ -30,12 +30,8 @@ class NotificationController
         $this->notificationService = new NotificationService($this->pdo);
     }
 
-    /**
-     * API endpoint for AJAX requests (replaces the api/notifications.php)
-     */
     public function apiEndpoint()
     {
-        // FIXED: Clear all output buffers to ensure clean JSON
         while (ob_get_level()) {
             ob_end_clean();
         }
@@ -70,7 +66,7 @@ class NotificationController
                 exit;
             }
 
-            error_log("🔍 API: Fetching notifications for user ID: $userId");
+
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 // Handle GET requests (fetch notifications)
@@ -79,8 +75,6 @@ class NotificationController
 
                 $notifications = $this->notificationService->getUserNotifications($userId, $limit, $offset);
                 $unreadCount = $this->notificationService->getUnreadCount($userId);
-
-                error_log("✅ API: Found " . count($notifications) . " notifications, $unreadCount unread");
 
                 // FIXED: Ensure clean JSON response
                 echo json_encode([
@@ -136,7 +130,6 @@ class NotificationController
                 ]);
             }
         } catch (Exception $e) {
-            error_log("❌ API Error: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
@@ -148,9 +141,6 @@ class NotificationController
         exit;
     }
 
-    /**
-     * Display all notifications for jobseekers
-     */
     public function viewAllJobseekerNotifications()
     {
         // Check if user is logged in
@@ -192,9 +182,6 @@ class NotificationController
         include __DIR__ . '/../views/jobseekers/notifications.php';
     }
 
-    /**
-     * Display all notifications for employers
-     */
     public function viewAllEmployerNotifications()
     {
         // UPDATED: Handle both session variable types
@@ -242,9 +229,6 @@ class NotificationController
         include __DIR__ . '/../views/employers/notifications.php';
     }
 
-    /**
-     * Display all notifications for admins
-     */
     public function viewAllAdminNotifications()
     {
         // UPDATED: Handle admin session variable
@@ -292,9 +276,6 @@ class NotificationController
         include __DIR__ . '/../views/admin/notifications.php';
     }
 
-    /**
-     * Handle notification actions from web forms (mark as read, mark all as read)
-     */
     private function handleNotificationActions($userId, $userType = null)
     {
         if ($_POST['action'] === 'mark_as_read' && isset($_POST['notification_id'])) {
@@ -333,6 +314,7 @@ class NotificationController
         }
         exit;
     }
+
     public function validateAndRedirect()
     {
         // Get the target link from GET parameter
@@ -370,10 +352,6 @@ class NotificationController
         exit;
     }
 
-
-    /**
-     * Validate if target content exists
-     */
     private function validateTargetContent($page, $params)
     {
         try {
@@ -464,8 +442,9 @@ class NotificationController
             // For unknown pages, assume they don't exist
             return false;
         } catch (Exception $e) {
-            error_log("❌ Error validating target content: " . $e->getMessage());
+            error_log("Error validating target content: " . $e->getMessage());
             return false;
         }
     }
+
 }

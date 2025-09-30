@@ -15,12 +15,6 @@ class LandingPageController
             // Get top companies based on active jobs count and verification status
             $companies = $this->jobPostModel->getAllEmployers($limit);
 
-            // Debug: Log the result
-            error_log("LandingPageController: Found " . count($companies) . " companies");
-            if (!empty($companies)) {
-                error_log("First company data: " . json_encode($companies[0]));
-            }
-
             return $companies;
         } catch (Exception $e) {
             error_log("Error fetching top companies: " . $e->getMessage());
@@ -36,12 +30,6 @@ class LandingPageController
 
             // Limit the results for landing page display
             $jobs = array_slice($jobs, 0, $limit);
-
-            // Debug: Log the result
-            error_log("LandingPageController: Found " . count($jobs) . " popular jobs");
-            if (!empty($jobs)) {
-                error_log("First job data: " . json_encode($jobs[0]));
-            }
 
             return $jobs;
         } catch (Exception $e) {

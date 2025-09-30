@@ -1,15 +1,4 @@
 <?php
-// // filepath: c:\xampp\htdocs\sikap\app\api\jobseeker_settings.php
-
-// session_start();
-// header('Content-Type: application/json');
-
-// // Check if user is logged in and is a jobseeker
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'jobseeker') {
-//     http_response_code(401);
-//     echo json_encode(['error' => 'Unauthorized']);
-//     exit;
-// }
 include_once __DIR__ . '/../models/JobseekerSettings.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Jobseeker.php';
@@ -125,4 +114,5 @@ class JobseekerSettingsController
         }
         exit;
     }
+    
 }

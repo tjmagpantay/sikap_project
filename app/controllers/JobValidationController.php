@@ -27,9 +27,6 @@ class JobValidationController
         }
     }
 
-    /**
-     * Validate and redirect to job details
-     */
     public function validateJobDetails()
     {
         // Check if job_id is provided
@@ -59,9 +56,6 @@ class JobValidationController
         exit;
     }
 
-    /**
-     * Validate and redirect to applications page
-     */
     public function validateApplicationsAccess()
     {
         // Start session if not started
@@ -80,9 +74,6 @@ class JobValidationController
         exit;
     }
 
-    /**
-     * Validate and redirect to job posts page
-     */
     public function validateJobPostsAccess()
     {
         // Start session if not started
@@ -99,9 +90,6 @@ class JobValidationController
         exit;
     }
 
-    /**
-     * Validate and redirect to employer programs page
-     */
     public function validateEmployerProgramsAccess()
     {
         // Start session if not started
@@ -117,4 +105,5 @@ class JobValidationController
         }
         exit;
     }
+    
 }

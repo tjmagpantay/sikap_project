@@ -16,7 +16,7 @@ class ReviewApplicationController
             header('Location: ?page=browse-candidates&error=Application not found');
             exit;
         }
- 
+
         $interview = $model->getInterview($application_id);
 
         // Get resignation request data
@@ -95,8 +95,6 @@ class ReviewApplicationController
             $result = $model->updateStatus($application_id, $status, 'employer', $remarks);
 
             if ($result) {
-                error_log("✅ Application status updated successfully to: $status");
-
                 // FIXED: Send notification to jobseeker about status update
                 try {
                     // Get application details for notification
@@ -121,13 +119,6 @@ class ReviewApplicationController
                         $employerModel = new Employer();
                         $companyName = $employerModel->getCompanyName($employer_id);
 
-                        error_log("🔔 DEBUG: Sending status update notification");
-                        error_log("   - Application ID: $application_id");
-                        error_log("   - New Status: $status");
-                        error_log("   - Job Title: {$application['job_title']}");
-                        error_log("   - Company: $companyName");
-                        error_log("   - Remarks: " . ($remarks ?: 'None'));
-
                         // Send notification
                         $notificationResult = $notificationService->notifyApplicationStatusUpdate(
                             $application_id,
@@ -136,18 +127,9 @@ class ReviewApplicationController
                             $companyName,
                             $remarks
                         );
-
-                        if ($notificationResult) {
-                            error_log("✅ Status update notification sent to jobseeker for application ID: $application_id");
-                        } else {
-                            error_log("❌ Failed to send status update notification to jobseeker for application ID: $application_id");
-                        }
-                    } else {
-                        error_log("❌ Could not get application details for notification");
                     }
                 } catch (Exception $e) {
-                    error_log("❌ Error sending status update notification: " . $e->getMessage());
-                    error_log("❌ Stack trace: " . $e->getTraceAsString());
+                    error_log("Error sending status update notification: " . $e->getMessage());
                     // Don't fail the status update if notification fails
                 }
 
@@ -166,8 +148,7 @@ class ReviewApplicationController
                 header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update application status.'));
             }
         } catch (Exception $e) {
-            error_log('❌ Error updating application status: ' . $e->getMessage());
-            error_log('❌ Stack trace: ' . $e->getTraceAsString());
+            error_log('Error updating application status: ' . $e->getMessage());
             header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while updating status.'));
         }
         exit;
@@ -201,8 +182,6 @@ class ReviewApplicationController
             $result = $model->scheduleInterview($application_id, $interview_date, $interview_location, $notes, $_SESSION['user_id']);
 
             if ($result) {
-                error_log("Interview scheduled successfully");
-
                 // FIXED: Send interview notification regardless of status, then update status
                 try {
                     require_once __DIR__ . '/../services/NotificationService.php';
@@ -238,8 +217,6 @@ class ReviewApplicationController
                         $statusUpdateResult = $model->updateStatus($application_id, 'shortlisted', 'employer', 'Interview scheduled');
 
                         if ($statusUpdateResult) {
-                            error_log("Application status updated to shortlisted");
-
                             // Send status update notification
                             $statusNotificationResult = $notificationService->notifyApplicationStatusUpdate(
                                 $application_id,
@@ -248,15 +225,10 @@ class ReviewApplicationController
                                 $companyName,
                                 'Interview scheduled'
                             );
-
-                            if ($statusNotificationResult) {
-                                error_log("✅ Status update notification sent to jobseeker for application ID: $application_id");
-                            }
                         }
                     }
                 } catch (Exception $e) {
                     error_log("Error sending interview notification: " . $e->getMessage());
-                    error_log("Stack trace: " . $e->getTraceAsString());
                 }
 
                 header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Interview scheduled successfully.'));
@@ -264,51 +236,116 @@ class ReviewApplicationController
                 header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to schedule interview.'));
             }
         } catch (Exception $e) {
-            error_log('❌ Error scheduling interview: ' . $e->getMessage());
-            error_log('❌ Stack trace: ' . $e->getTraceAsString());
+            error_log('Error scheduling interview: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
             header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while scheduling the interview.'));
         }
         exit;
     }
 
-private function approveResignation($application_id, $employer_id)
-{
-    try {
-        require_once __DIR__ . '/../models/ResignationRequest.php';
-        require_once __DIR__ . '/../models/JobApplication.php';
-
-        $resignationModel = new ResignationRequest();
-        $jobApplicationModel = new JobApplication();
-
-        // Get resignation request
-        $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
-        if (!$resignationRequest || $resignationRequest['request_status'] !== 'pending') {
-            header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('No pending resignation request found.'));
-            exit;
-        }
-
-        $employer_notes = trim($_POST['employer_notes']) ?: null;
-
-        // Start transaction
-        $pdo = $resignationModel->getPdo();
-        $pdo->beginTransaction();
-
+    private function approveResignation($application_id, $employer_id)
+    {
         try {
-            // Update resignation status to approved
-            $result1 = $resignationModel->updateResignationStatus(
+            require_once __DIR__ . '/../models/ResignationRequest.php';
+            require_once __DIR__ . '/../models/JobApplication.php';
+
+            $resignationModel = new ResignationRequest();
+            $jobApplicationModel = new JobApplication();
+
+            // Get resignation request
+            $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
+            if (!$resignationRequest || $resignationRequest['request_status'] !== 'pending') {
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('No pending resignation request found.'));
+                exit;
+            }
+
+            $employer_notes = trim($_POST['employer_notes']) ?: null;
+
+            // Start transaction
+            $pdo = $resignationModel->getPdo();
+            $pdo->beginTransaction();
+
+            try {
+                // Update resignation status to approved
+                $result1 = $resignationModel->updateResignationStatus(
+                    $resignationRequest['resignation_id'],
+                    'approved',
+                    $employer_notes,
+                    $_SESSION['user_id']
+                );
+
+                // Update application status to resigned
+                $result2 = $jobApplicationModel->resignFromJob($application_id, null, $employer_id);
+
+                if ($result1 && $result2) {
+                    $pdo->commit();
+
+                    // ADDED: Send resignation approval notification
+                    try {
+                        require_once __DIR__ . '/../services/NotificationService.php';
+                        require_once __DIR__ . '/../../config/sikap_db.php';
+
+                        $config = require __DIR__ . '/../../config/sikap_db.php';
+                        $notificationPdo = new PDO(
+                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            $config['db_user'],
+                            $config['db_pass']
+                        );
+                        $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        $notificationService = new NotificationService($notificationPdo);
+
+                        $notificationResult = $notificationService->notifyResignationStatusUpdate(
+                            $resignationRequest['resignation_id'],
+                            'approved',
+                            $employer_notes
+                        );
+
+                    } catch (Exception $e) {
+                        error_log("Error sending resignation approval notification: " . $e->getMessage());
+                        // Don't fail the approval if notification fails
+                    }
+
+                    header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request approved successfully. Employee status updated to resigned.'));
+                } else {
+                    $pdo->rollback();
+                    header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to approve resignation request.'));
+                }
+            } catch (Exception $e) {
+                $pdo->rollback();
+                throw $e;
+            }
+        } catch (Exception $e) {
+            error_log('Error approving resignation: ' . $e->getMessage());
+            header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while approving resignation.'));
+        }
+        exit;
+    }
+
+    private function rejectResignation($application_id, $employer_id)
+    {
+        try {
+            require_once __DIR__ . '/../models/ResignationRequest.php';
+            $resignationModel = new ResignationRequest();
+
+            // Get resignation request
+            $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
+            if (!$resignationRequest || $resignationRequest['request_status'] !== 'pending') {
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('No pending resignation request found.'));
+                exit;
+            }
+
+            $employer_notes = trim($_POST['employer_notes']) ?: null;
+
+            $result = $resignationModel->updateResignationStatus(
                 $resignationRequest['resignation_id'],
-                'approved',
+                'rejected',
                 $employer_notes,
                 $_SESSION['user_id']
             );
 
-            // Update application status to resigned
-            $result2 = $jobApplicationModel->resignFromJob($application_id, null, $employer_id);
-
-            if ($result1 && $result2) {
-                $pdo->commit();
-
-                // ADDED: Send resignation approval notification
+            if ($result) {
+                // ADDED: Send resignation rejection notification
                 try {
                     require_once __DIR__ . '/../services/NotificationService.php';
                     require_once __DIR__ . '/../../config/sikap_db.php';
@@ -323,115 +360,27 @@ private function approveResignation($application_id, $employer_id)
 
                     $notificationService = new NotificationService($notificationPdo);
 
-                    error_log("🔔 DEBUG: Sending resignation approval notification");
-                    error_log("   - Resignation ID: {$resignationRequest['resignation_id']}");
-                    error_log("   - Status: approved");
-                    error_log("   - Employer Notes: " . ($employer_notes ?: 'None'));
-
                     // Send notification
                     $notificationResult = $notificationService->notifyResignationStatusUpdate(
                         $resignationRequest['resignation_id'],
-                        'approved',
+                        'rejected',
                         $employer_notes
                     );
-
-                    if ($notificationResult) {
-                        error_log("✅ Resignation approval notification sent for resignation ID: {$resignationRequest['resignation_id']}");
-                    } else {
-                        error_log("❌ Failed to send resignation approval notification for resignation ID: {$resignationRequest['resignation_id']}");
-                    }
                 } catch (Exception $e) {
-                    error_log("❌ Error sending resignation approval notification: " . $e->getMessage());
-                    // Don't fail the approval if notification fails
+                    error_log("Error sending resignation rejection notification: " . $e->getMessage());
+                    // Don't fail the rejection if notification fails
                 }
 
-                header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request approved successfully. Employee status updated to resigned.'));
+                header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request rejected.'));
             } else {
-                $pdo->rollback();
-                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to approve resignation request.'));
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to reject resignation request.'));
             }
         } catch (Exception $e) {
-            $pdo->rollback();
-            throw $e;
+            error_log('Error rejecting resignation: ' . $e->getMessage());
+            header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while rejecting resignation.'));
         }
-    } catch (Exception $e) {
-        error_log('Error approving resignation: ' . $e->getMessage());
-        header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while approving resignation.'));
+        exit;
     }
-    exit;
-}
-
-// Update the rejectResignation method
-private function rejectResignation($application_id, $employer_id)
-{
-    try {
-        require_once __DIR__ . '/../models/ResignationRequest.php';
-        $resignationModel = new ResignationRequest();
-
-        // Get resignation request
-        $resignationRequest = $resignationModel->getResignationRequestByApplication($application_id);
-        if (!$resignationRequest || $resignationRequest['request_status'] !== 'pending') {
-            header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('No pending resignation request found.'));
-            exit;
-        }
-
-        $employer_notes = trim($_POST['employer_notes']) ?: null;
-
-        $result = $resignationModel->updateResignationStatus(
-            $resignationRequest['resignation_id'],
-            'rejected',
-            $employer_notes,
-            $_SESSION['user_id']
-        );
-
-        if ($result) {
-            // ADDED: Send resignation rejection notification
-            try {
-                require_once __DIR__ . '/../services/NotificationService.php';
-                require_once __DIR__ . '/../../config/sikap_db.php';
-
-                $config = require __DIR__ . '/../../config/sikap_db.php';
-                $notificationPdo = new PDO(
-                    "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                    $config['db_user'],
-                    $config['db_pass']
-                );
-                $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $notificationService = new NotificationService($notificationPdo);
-
-                error_log("🔔 DEBUG: Sending resignation rejection notification");
-                error_log("   - Resignation ID: {$resignationRequest['resignation_id']}");
-                error_log("   - Status: rejected");
-                error_log("   - Employer Notes: " . ($employer_notes ?: 'None'));
-
-                // Send notification
-                $notificationResult = $notificationService->notifyResignationStatusUpdate(
-                    $resignationRequest['resignation_id'],
-                    'rejected',
-                    $employer_notes
-                );
-
-                if ($notificationResult) {
-                    error_log("✅ Resignation rejection notification sent for resignation ID: {$resignationRequest['resignation_id']}");
-                } else {
-                    error_log("❌ Failed to send resignation rejection notification for resignation ID: {$resignationRequest['resignation_id']}");
-                }
-            } catch (Exception $e) {
-                error_log("❌ Error sending resignation rejection notification: " . $e->getMessage());
-                // Don't fail the rejection if notification fails
-            }
-
-            header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode('Resignation request rejected.'));
-        } else {
-            header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to reject resignation request.'));
-        }
-    } catch (Exception $e) {
-        error_log('Error rejecting resignation: ' . $e->getMessage());
-        header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('An error occurred while rejecting resignation.'));
-    }
-    exit;
-}
 
     private function setResignedStatus($application_id, $employer_id)
     {
@@ -461,13 +410,12 @@ private function rejectResignation($application_id, $employer_id)
         exit;
     }
 
-     // --- EMAIL NOTIFICATION METHOD ---
     public function sendStatusReminderEmails()
     {
         try {
             // Load mailer configuration
             $mailerConfig = require __DIR__ . '/../../config/mailer.php';
-            
+
             $model = new ReviewApplication();
 
             // Fetch all pending applications where interview passed 7+ days
@@ -493,7 +441,7 @@ private function rejectResignation($application_id, $employer_id)
 
                     // Initialize PHPMailer
                     $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
-                    
+
                     try {
                         $mailer->isSMTP();
                         $mailer->Host = $mailerConfig['host'];
@@ -502,19 +450,18 @@ private function rejectResignation($application_id, $employer_id)
                         $mailer->Password = $mailerConfig['password'];
                         $mailer->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
                         $mailer->Port = $mailerConfig['port'];
-                        
+
                         // Set sender
                         $mailer->setFrom($mailerConfig['from_email'], $mailerConfig['from_name']);
                         $mailer->addAddress($app['employer_email']);
-                        
+
                         // Content
                         $mailer->isHTML(true);
                         $mailer->Subject = $subject;
                         $mailer->Body = $body;
-                        
+
                         $mailer->send();
                         echo "Reminder email sent to {$app['employer_email']} for jobseeker {$app['jobseeker_name']}\n";
-                        
                     } catch (Exception $e) {
                         error_log("Mailer Error for {$app['employer_email']}: " . $e->getMessage());
                         echo "Failed to send email to {$app['employer_email']}: " . $e->getMessage() . "\n";
@@ -530,4 +477,5 @@ private function rejectResignation($application_id, $employer_id)
             throw $e;
         }
     }
+    
 }

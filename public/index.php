@@ -722,16 +722,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->updateSettings();
             break;
 
-        // Add this case to your existing switch statement
-        case 'test-ml':
-            require_once __DIR__ . '/../app/controllers/MLTestController.php';
-            $controller = new MLTestController();
-            $controller->testMLIntegration();
-            break;
-
-        case 'train-ml-model':
-            require_once __DIR__ . '/../app/controllers/MLTrainingController.php';
-            $controller = new MLTrainingController();
+        case 'nlp-test':
+            require_once __DIR__ . '/../app/controllers/NLPController.php';
+            $controller = new NLPController();
             $controller->collectTrainingData();
             break;
 

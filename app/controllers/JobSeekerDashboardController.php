@@ -46,8 +46,6 @@ class JobSeekerDashboardController
                 require_once __DIR__ . '/../services/JobRecommendationService.php';
                 $recommendationService = new JobRecommendationService();
 
-                error_log("🎯 Getting dashboard recommendation percentages for jobseeker {$jobseeker_id}");
-
                 // Check for cached recommendations first (same cache as browse jobs)
                 $cacheKey = "recommendations_{$jobseeker_id}_" . md5(serialize(array_column($jobs, 'job_id')));
                 $cachedRecommendations = null;
@@ -56,7 +54,6 @@ class JobSeekerDashboardController
                 $cacheFile = sys_get_temp_dir() . "/sikap_rec_" . $cacheKey . ".json";
                 if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 3600) { // Cache for 1 hour
                     $cachedRecommendations = json_decode(file_get_contents($cacheFile), true);
-                    error_log("📄 Using cached recommendations");
                 }
 
                 if ($cachedRecommendations) {
@@ -74,13 +71,10 @@ class JobSeekerDashboardController
 
                         // Cache the results (shared with browse jobs)
                         file_put_contents($cacheFile, json_encode($matchPercentages));
-                        error_log("💾 Cached recommendations for future use");
                     } else {
                         $matchPercentages = [];
                     }
                 }
-
-                error_log("📊 Found " . count($matchPercentages) . " dashboard job matches");
 
                 // Update jobs with real match percentages
                 foreach ($jobs as &$job) {
@@ -88,12 +82,10 @@ class JobSeekerDashboardController
                         // Use the real/cached recommendation percentage
                         $job['match_percentage'] = round($matchPercentages[$job['job_id']], 1);
                         $job['has_recommendation'] = true;
-                        error_log("✅ Dashboard Job {$job['job_id']}: {$job['match_percentage']}% match");
                     } else {
                         // Calculate a consistent fallback percentage
                         $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
                         $job['has_recommendation'] = false;
-                        error_log("📈 Dashboard Job {$job['job_id']}: {$job['match_percentage']}% fallback match");
                     }
                 }
 
@@ -101,10 +93,7 @@ class JobSeekerDashboardController
                 usort($jobs, function ($a, $b) {
                     return ($b['match_percentage'] ?? 0) <=> ($a['match_percentage'] ?? 0);
                 });
-
-                error_log("🔄 Sorted dashboard jobs by match percentage");
             } catch (Exception $e) {
-                error_log("❌ Error getting dashboard recommendations: " . $e->getMessage());
                 // Apply consistent fallback matching
                 foreach ($jobs as &$job) {
                     $job['match_percentage'] = $this->calculateBasicMatch($job, $jobseeker);
@@ -155,10 +144,6 @@ class JobSeekerDashboardController
         include __DIR__ . '/../views/jobseekers/dashboard.php';
     }
 
-    /**
-     * Calculate basic match percentage as fallback when ML recommendation is unavailable
-     * (Same logic as JobPostController for consistency)
-     */
     private function calculateBasicMatch($job, $jobseeker)
     {
         if (!$jobseeker) {
@@ -199,4 +184,5 @@ class JobSeekerDashboardController
         // Ensure score is within reasonable bounds with 20% minimum
         return max(15, min(95, round($matchScore, 1)));
     }
+    
 }
