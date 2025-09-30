@@ -92,7 +92,6 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/signup-jobseeker.php';
     }
 
-    // Add this new validation method
     private function validateSignupInput($data)
     {
         $errors = [];
@@ -148,8 +147,6 @@ class JobseekerController
         return $errors;
     }
 
-    //NEWWWWWWWWWWWWW -----------------------------------------------
-
     public function login()
     {
         $error = '';
@@ -188,7 +185,6 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/login-jobseeker.php';
     }
 
-    // Add this new validation method for login
     private function validateLoginInput($email, $password)
     {
         $errors = [];
@@ -296,8 +292,6 @@ class JobseekerController
         header('Location: ?page=verify-otp&resent=0');
         exit;
     }
-    //-----------------------------------------
-
 
     public function dashboard()
     {
@@ -459,10 +453,6 @@ class JobseekerController
 
     private function handleStepSubmission($step, &$error, &$success)
     {
-        error_log("=== DEBUG STEP SUBMISSION START ===");
-        error_log("DEBUG: handleStepSubmission called with step: $step");
-        error_log("DEBUG: POST data: " . json_encode($_POST));
-        error_log("DEBUG: REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
 
         $data = $_POST;
 
@@ -480,7 +470,6 @@ class JobseekerController
                 $this->handleStep4($data, $error, $success);
                 break;
             case 5:
-                error_log("DEBUG: Calling handleStep5");
                 $this->handleStep5($data, $error, $success);
                 break;
             case 6:
@@ -492,12 +481,8 @@ class JobseekerController
             default:
                 $error = 'Invalid step.';
         }
-
-        error_log("DEBUG: After handling step, error: '$error', success: '$success'");
-        error_log("=== DEBUG STEP SUBMISSION END ===");
     }
 
-    // Update the existing handleStep1 method to use the new parsing function
     private function handleStep1($data, &$error, &$success)
     {
         // Documents - Step 1
@@ -554,8 +539,6 @@ class JobseekerController
 
     private function handleStep2($data, &$error, &$success)
     {
-        // Basic Information - Step 2
-        // Personal Information - including sex (gender) as required
         $required = ['first_name', 'last_name', 'date_of_birth', 'sex', 'contact_no'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -564,11 +547,7 @@ class JobseekerController
             }
         }
 
-        // FIXED: Properly handle address field
         $address = isset($data['address']) ? trim($data['address']) : '';
-
-        // Debug logging for address
-        error_log("🔍 DEBUG Step 2: Address value: '" . $address . "'");
 
         // FIXED: Convert MM/DD/YYYY to YYYY-MM-DD for database
         $dateOfBirth = $data['date_of_birth'] ?? '';
@@ -650,13 +629,12 @@ class JobseekerController
         header('Location: ?page=complete-jobseeker-profile&step=4');
         exit;
     }
+    
     private function handleStep4($data, &$error, &$success)
     {
         // Work Experience (Combined Current + Previous) - Step 4
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
-
-        error_log("DEBUG Step4: Processing data: " . json_encode($data));
 
         // Check if we are on the current job experience
         $isCurrentJob = isset($data['currently_working']) && $data['currently_working'] === 'Yes';
@@ -669,8 +647,6 @@ class JobseekerController
             $isCurrentJob = false;
             $data['currently_working'] = 'No';
         }
-
-        error_log("DEBUG Step4: isCurrentJob = " . ($isCurrentJob ? 'true' : 'false'));
 
         // Handle delete action
         if (isset($data['delete_experience'])) {
@@ -706,8 +682,6 @@ class JobseekerController
                 'responsibilities' => trim($data['responsibilities'] ?? '')
             ];
 
-            error_log("DEBUG Step4: Updating with data: " . json_encode($workData));
-
             // Validate current job limit
             if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
                 // Check if we're updating a different experience to current
@@ -735,20 +709,14 @@ class JobseekerController
             $hasExistingExperience = !empty($this->jobseekerModel->getWorkExperience($_SESSION['user_id']));
             $isAddingNewExperience = !empty($data['job_title']) && !empty($data['company_name']);
 
-            error_log("DEBUG Step4: hasExistingExperience = " . ($hasExistingExperience ? 'true' : 'false'));
-            error_log("DEBUG Step4: isAddingNewExperience = " . ($isAddingNewExperience ? 'true' : 'false'));
-
             // If no existing experience and no new experience being added, just continue
             if (!$hasExistingExperience && !$isAddingNewExperience) {
-                error_log("DEBUG Step4: No experience, continuing to step 5");
                 header('Location: ?page=complete-jobseeker-profile&step=5');
                 exit;
             }
 
             // If adding new experience, validate and save it first
             if ($isAddingNewExperience) {
-                error_log("DEBUG Step4: Adding new experience before continuing");
-
                 // Validate current job limit for new entries
                 if ($isCurrentJob && $this->jobseekerModel->hasCurrentJob($jobseeker_id)) {
                     $_SESSION['error_message'] = 'You already have a current job. You can only have one current job at a time.';
@@ -767,8 +735,6 @@ class JobseekerController
                     'responsibilities' => trim($data['responsibilities'] ?? '')
                 ];
 
-                error_log("DEBUG Step4: Saving work data: " . json_encode($workData));
-
                 if (!$this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
                     $_SESSION['error_message'] = 'Failed to save work experience.';
                     header('Location: ?page=complete-jobseeker-profile&step=4');
@@ -785,7 +751,6 @@ class JobseekerController
 
         // Handle "Add Another" button
         if (isset($data['add_another'])) {
-            error_log("DEBUG Step4: Add another button clicked");
 
             // Validate required fields
             if (empty($data['job_title']) || empty($data['company_name'])) {
@@ -812,8 +777,6 @@ class JobseekerController
                 'responsibilities' => trim($data['responsibilities'] ?? '')
             ];
 
-            error_log("DEBUG Step4: Adding work data: " . json_encode($workData));
-
             if ($this->jobseekerModel->saveWorkExperience($jobseeker_id, $workData)) {
                 $_SESSION['success_message'] = 'Work experience added successfully!';
             } else {
@@ -824,42 +787,29 @@ class JobseekerController
             exit;
         }
     }
+    
     private function handleStep5($data, &$error, &$success)
     {
         // Skills - Step 5
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        // ENHANCED DEBUG LOGGING
-        error_log("=== DEBUG HANDLESTEP5 START ===");
-        error_log("DEBUG: handleStep5 called for jobseeker_id: $jobseeker_id");
-        error_log("DEBUG: POST data: " . json_encode($data));
-        error_log("DEBUG: submit_step5 isset: " . (isset($data['submit_step5']) ? 'YES' : 'NO'));
-        error_log("DEBUG: save_skills isset: " . (isset($data['save_skills']) ? 'YES' : 'NO'));
-        error_log("DEBUG: skills data: " . json_encode($data['skills'] ?? 'NO SKILLS'));
-
         // Handle "Next Step" button - allow continuing without skills
         if (isset($data['submit_step5'])) {
-            error_log("DEBUG: Processing submit_step5 button");
 
             // Check if user is trying to continue without adding any skills
             $hasExistingSkills = !empty($this->jobseekerModel->getSkills($_SESSION['user_id']));
             $isAddingNewSkills = !empty($data['skills']);
 
-            error_log("DEBUG: hasExistingSkills: " . ($hasExistingSkills ? 'YES' : 'NO'));
-            error_log("DEBUG: isAddingNewSkills: " . ($isAddingNewSkills ? 'YES' : 'NO'));
 
             // Process new skills if provided
             if ($isAddingNewSkills) {
-                error_log("DEBUG: Processing new skills");
                 $processedCount = 0;
 
                 // Delete existing skills before adding new ones
                 $this->jobseekerModel->deleteSkills($jobseeker_id);
-                error_log("DEBUG: Deleted existing skills for jobseeker_id: $jobseeker_id");
 
                 foreach ($data['skills'] as $index => $skillData) {
-                    error_log("DEBUG: Processing skill $index: " . json_encode($skillData));
 
                     // Only save if skill name is provided
                     if (!empty($skillData['skill_name'])) {
@@ -872,37 +822,29 @@ class JobseekerController
                         $result = $this->jobseekerModel->saveSkill($jobseeker_id, $skill);
                         if ($result) {
                             $processedCount++;
-                            error_log("DEBUG: Saved skill: " . $skill['skill_name']);
-                        } else {
-                            error_log("ERROR: Failed to save skill: " . $skill['skill_name']);
                         }
                     }
                 }
 
                 if ($processedCount > 0) {
                     $_SESSION['success_message'] = "Successfully saved $processedCount skill(s)!";
-                    error_log("DEBUG: Set success message for $processedCount skills");
                 }
             }
 
             // Clear parsed data from session since we've processed it
             unset($_SESSION['parsed_resume_data']);
             unset($_SESSION['show_parsing_results']);
-            error_log("DEBUG: Cleared parsed data from session");
 
             // Continue to next step
-            error_log("DEBUG: Redirecting to step 6");
             header('Location: ?page=complete-jobseeker-profile&step=6');
             exit;
         }
 
         // Handle "Save Skills" button
         if (isset($data['save_skills'])) {
-            error_log("DEBUG: Processing save_skills button");
 
             if (empty($data['skills'])) {
                 $error = 'Please add at least one skill to save.';
-                error_log("DEBUG: Error - no skills provided for save_skills");
                 return;
             }
 
@@ -933,12 +875,9 @@ class JobseekerController
                 $error = 'No skills were saved. Please check your input.';
             }
 
-            error_log("DEBUG: save_skills completed, staying on step 5");
             return; // Stay on the same step to show success/error message
         }
 
-        error_log("DEBUG: Neither submit_step5 nor save_skills was triggered");
-        error_log("=== DEBUG HANDLESTEP5 END ===");
     }
 
     private function processSkills($skillsData, $jobseeker_id)
@@ -971,9 +910,6 @@ class JobseekerController
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
         $jobseeker_id = $jobseeker['jobseeker_id'];
 
-        error_log("DEBUG: handleStep6 called for jobseeker_id: $jobseeker_id");
-        error_log("DEBUG: POST data: " . json_encode($data));
-
         if (isset($data['certificates']) && is_array($data['certificates'])) {
             $processedCount = 0;
             $deletedCount = 0;
@@ -981,23 +917,19 @@ class JobseekerController
             $addedCount = 0;
 
             foreach ($data['certificates'] as $index => $certData) {
-                error_log("DEBUG: Processing certificate $index: " . json_encode($certData));
 
                 // Skip completely empty certificates
                 if (empty($certData['certificate_title']) && empty($certData['certificate_id'])) {
-                    error_log("DEBUG: Skipping empty certificate at index $index");
                     continue;
                 }
 
                 // Handle deletion of existing certificates
                 if (isset($certData['certificate_id']) && isset($certData['delete']) && $certData['delete'] == '1') {
-                    error_log("DEBUG: Attempting to delete certificate ID: " . $certData['certificate_id']);
 
                     $result = $this->jobseekerModel->deleteCertificate($jobseeker_id, $certData['certificate_id']);
 
                     if ($result) {
                         $deletedCount++;
-                        error_log("DEBUG: Successfully deleted certificate ID: " . $certData['certificate_id']);
                     } else {
                         error_log("ERROR: Failed to delete certificate ID: " . $certData['certificate_id']);
                     }
@@ -1006,7 +938,6 @@ class JobseekerController
 
                 // Handle updating existing certificates
                 if (isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
-                    error_log("DEBUG: Attempting to update certificate ID: " . $certData['certificate_id']);
 
                     $updateData = [
                         'certificate_title' => trim($certData['certificate_title']),
@@ -1018,7 +949,6 @@ class JobseekerController
 
                     if ($result) {
                         $updatedCount++;
-                        error_log("DEBUG: Successfully updated certificate ID: " . $certData['certificate_id']);
                     } else {
                         error_log("ERROR: Failed to update certificate ID: " . $certData['certificate_id']);
                     }
@@ -1027,7 +957,6 @@ class JobseekerController
 
                 // Handle adding new certificates (no certificate_id)
                 if (!isset($certData['certificate_id']) && !empty($certData['certificate_title'])) {
-                    error_log("DEBUG: Attempting to add new certificate: " . $certData['certificate_title']);
 
                     $certificate = [
                         'certificate_title' => trim($certData['certificate_title']),
@@ -1039,7 +968,6 @@ class JobseekerController
 
                     if ($result) {
                         $addedCount++;
-                        error_log("DEBUG: Successfully added new certificate: " . $certificate['certificate_title']);
                     } else {
                         error_log("ERROR: Failed to add new certificate: " . $certificate['certificate_title']);
                     }
@@ -1047,8 +975,6 @@ class JobseekerController
 
                 $processedCount++;
             }
-
-            error_log("DEBUG: Processing complete. Added: $addedCount, Updated: $updatedCount, Deleted: $deletedCount");
 
             // Set success message based on operations performed
             $messages = [];
@@ -1253,8 +1179,6 @@ class JobseekerController
             $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
             $filepath = $uploadDir . $filename;
 
-            error_log("DEBUG: Attempting to upload profile photo to: $filepath");
-
             // Move uploaded file
             if (!move_uploaded_file($file['tmp_name'], $filepath)) {
                 error_log("ERROR: Failed to move profile photo file from " . $file['tmp_name'] . " to " . $filepath);
@@ -1284,11 +1208,8 @@ class JobseekerController
                 $oldPhotoPath = __DIR__ . '/../../public/' . $jobseeker['profile_picture'];
                 if (file_exists($oldPhotoPath) && is_file($oldPhotoPath)) {
                     unlink($oldPhotoPath);
-                    error_log("DEBUG: Deleted old profile photo: $oldPhotoPath");
                 }
             }
-
-            error_log("DEBUG: Profile photo uploaded and database updated successfully");
 
             // Send success response
             echo json_encode([
@@ -1663,6 +1584,7 @@ class JobseekerController
 
         include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
     }
+    
     private function loadApplicationsTab($jobseeker)
     {
         // FIXED: Load applications data properly
@@ -1760,7 +1682,6 @@ class JobseekerController
         }
     }
 
-    // Add a new method to handle parsed data review
     public function reviewParsedData()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
@@ -1793,8 +1714,6 @@ class JobseekerController
 
         include __DIR__ . '/../views/jobseekers/profile-completion/review-parsed-data.php';
     }
-
-    // Add this method to handle delete work experience
 
     public function getWorkExperienceById()
     {
@@ -2127,7 +2046,6 @@ class JobseekerController
             exit;
         }
 
-        // Optional: Log the account deletion for debugging purposes
         try {
             $jobseeker = $this->getJobseekerData();
             $jobseekerName = trim(($jobseeker['first_name'] ?? '') . ' ' . ($jobseeker['last_name'] ?? ''));
@@ -2152,4 +2070,5 @@ class JobseekerController
         }
         exit;
     }
+    
 }

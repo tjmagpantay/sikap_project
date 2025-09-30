@@ -596,14 +596,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->recommendedJobs();
             break;
 
-        // Add this case in your switch statement:
-
-        case 'recommended-jobs-debug':
-            require_once __DIR__ . '/../app/controllers/JobRecommendationController.php';
-            $controller = new JobRecommendationController();
-            $controller->recommendedJobsDebug();
-            break;
-
         case 'view-employer-profile':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
