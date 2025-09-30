@@ -44,9 +44,6 @@ class JobApplicantsController
         // Get applicants only for this employer's job
         $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id, $employer['employer_id']);
 
-        // Debug output
-        error_log("DEBUG: Job ID: $job_id, Employer ID: {$employer['employer_id']}, Applicants count: " . count($applicants));
-
         include __DIR__ . '/../views/employers/manage-applications.php';
     }
 
