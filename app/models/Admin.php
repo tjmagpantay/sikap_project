@@ -266,7 +266,6 @@ class Admin
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            error_log("DEBUG: Found " . count($results) . " total accreditations");
             return $results;
         } catch (PDOException $e) {
             error_log('Error getting all accreditations: ' . $e->getMessage());
