@@ -53,9 +53,6 @@ class JobDetailsAjaxController
                 $jobseekerId = $hasProfile ? $jobseekerData['jobseeker_id'] : null;
             }
 
-            // Debug the values
-            error_log("DEBUG JobDetailsAjax: jobId=$jobId, userId=$userId, jobseekerId=$jobseekerId, hasProfile=" . ($hasProfile ? 'true' : 'false'));
-
             // Get job details with application count and jobseeker-specific data
             $selectedJob = $this->jobseekerDashboard->getJobDetailsForJobseeker($jobId, $jobseekerId);
 
@@ -65,13 +62,6 @@ class JobDetailsAjaxController
                 exit;
             }
 
-            // Debug the application data
-            error_log("DEBUG JobDetailsAjax result: has_applied=" . ($selectedJob['has_applied'] ? 'true' : 'false') .
-                ", is_finalized=" . ($selectedJob['is_finalized'] ?? 'null') .
-                ", application_id=" . ($selectedJob['application_id'] ?? 'null') .
-                ", current_step=" . ($selectedJob['current_step'] ?? 'null'));
-
-            // Capture template output - make sure $hasProfile is available in the template
             ob_start();
             include __DIR__ . '/../views/jobseekers/job-details-ajax.php';
             $html = ob_get_clean();
