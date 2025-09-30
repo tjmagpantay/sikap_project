@@ -15,9 +15,6 @@ class JobRecommendationController
         $this->jobseekerModel = new Jobseeker();
     }
 
-    /**
-     * Main recommendations page
-     */
     public function index()
     {
         try {
@@ -78,9 +75,6 @@ class JobRecommendationController
         }
     }
 
-    /**
-     * API endpoint for AJAX requests
-     */
     public function getRecommendationsAPI()
     {
         header('Content-Type: application/json');
@@ -127,9 +121,6 @@ class JobRecommendationController
         }
     }
 
-    /**
-     * Test Flask API connection
-     */
     public function testConnection()
     {
         header('Content-Type: application/json');
@@ -178,9 +169,6 @@ class JobRecommendationController
         }
     }
 
-    /**
-     * Get jobseeker profile data for debugging
-     */
     public function getJobseekerProfile()
     {
         header('Content-Type: application/json');
@@ -211,9 +199,6 @@ class JobRecommendationController
         }
     }
 
-    /**
-     * Get recommendations for current logged-in jobseeker (for navbar route)
-     */
     public function recommendedJobs()
     {
         try {
@@ -272,154 +257,6 @@ class JobRecommendationController
         }
     }
 
-    /**
-     * Get recommendations for current logged-in jobseeker (for debug view)
-     */
-    public function recommendedJobsDebug()
-    {
-        try {
-            // Ensure user is logged in
-            if (!isset($_SESSION['user_id'])) {
-                header('Location: ?page=login-jobseeker');
-                exit;
-            }
-
-            // Get current jobseeker
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-            if (!$jobseeker) {
-                header('Location: ?page=complete-jobseeker-profile&error=profile_incomplete');
-                exit;
-            }
-
-            $jobseeker_id = $jobseeker['jobseeker_id'];
-            $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
-
-            // FIXED: Debug skill extraction using jobseekerModel instead of direct DB access
-            echo "<h3>🔍 DEBUG: Skills Analysis</h3>";
-            echo "<div style='background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px;'>";
-
-            // Get skills using the existing model method
-            $skills_debug = $this->jobseekerModel->getSkills($_SESSION['user_id']);
-
-            echo "<h4>Raw Skills from Database:</h4>";
-            echo "<pre>";
-            if ($skills_debug && !empty($skills_debug)) {
-                print_r($skills_debug);
-
-                // Show normalized skills
-                echo "\nNormalized Skills for Matching:\n";
-                $normalizedSkills = [];
-                foreach ($skills_debug as $skill) {
-                    $skillName = $skill['skill_name'];
-                    $proficiency = $skill['proficiency_level'] ?? 'N/A';
-
-                    // Show what the Python system should receive
-                    $normalized = strtolower(trim($skillName));
-                    $normalizedSkills[] = $normalized;
-
-                    echo "- {$skillName} ({$proficiency}) -> '{$normalized}'\n";
-                }
-
-                echo "\nFinal Skills String for Python: '" . implode(', ', $normalizedSkills) . "'\n";
-            } else {
-                echo "❌ NO SKILLS FOUND! This explains the poor matching.\n";
-                echo "User needs to complete their skills in Step 5 of profile completion.\n";
-            }
-            echo "</pre>";
-
-            // Get work experience for context
-            $experience_debug = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']);
-            echo "<h4>Work Experience:</h4>";
-            echo "<pre>";
-            if ($experience_debug && !empty($experience_debug)) {
-                foreach ($experience_debug as $exp) {
-                    echo "- {$exp['job_title']} at {$exp['company_name']}\n";
-                }
-            } else {
-                echo "No work experience found.\n";
-            }
-            echo "</pre>";
-
-            // Get education for context  
-            $education_debug = $this->jobseekerModel->getEducation($_SESSION['user_id']);
-            echo "<h4>Education:</h4>";
-            echo "<pre>";
-            if ($education_debug && !empty($education_debug)) {
-                foreach ($education_debug as $edu) {
-                    echo "- {$edu['education_level']} in {$edu['field_of_study']} from {$edu['school_name']}\n";
-                }
-            } else {
-                echo "No education found.\n";
-            }
-            echo "</pre>";
-
-            echo "</div>";
-
-            // Test the Python service call
-            echo "<h3>🚀 Python Recommendation Service Results:</h3>";
-            $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
-
-            $recommendations = null;
-            $error = null;
-            $success = null;
-
-            if ($result['success']) {
-                $recommendations = $result;
-                $success = "Analysis complete. Found {$result['total_found']} recommendations.";
-
-                // Additional debug info
-                echo "<div style='background: #e8f5e9; padding: 15px; margin: 10px 0; border-radius: 5px;'>";
-                echo "<h4>✅ Python Service Response:</h4>";
-                echo "<pre>";
-                echo "Total Jobs Analyzed: {$result['total_jobs_analyzed']}\n";
-                echo "Recommendations Found: {$result['total_found']}\n";
-                if (isset($result['debug_info'])) {
-                    echo "Jobseeker Skills Count: {$result['debug_info']['jobseeker_skills_count']}\n";
-                    echo "Average Skill Match: " . number_format($result['debug_info']['avg_skill_ratio'] * 100, 2) . "%\n";
-                    echo "Best Skill Match: " . number_format($result['debug_info']['best_skill_match'] * 100, 2) . "%\n";
-                }
-                echo "</pre>";
-                echo "</div>";
-            } else {
-                $error = $result['error'];
-
-                echo "<div style='background: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px;'>";
-                echo "<h4>❌ Python Service Error:</h4>";
-                echo "<pre>{$error}</pre>";
-                echo "</div>";
-            }
-
-            // Load DEBUG view
-            $this->loadView('jobseekers/my-recommendations-debug', [
-                'recommendations' => $recommendations,
-                'selectedJobseeker' => $jobseeker,
-                'jobseeker' => $jobseeker,
-                'error' => $error,
-                'success' => $success,
-                'selectedJobseekerId' => $jobseeker_id,
-                'topK' => $top_k
-            ]);
-        } catch (Exception $e) {
-            error_log('Debug Recommendations Error: ' . $e->getMessage());
-
-            echo "<div style='background: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px;'>";
-            echo "<h3>❌ Debug Error:</h3>";
-            echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
-            echo "<h4>Stack Trace:</h4>";
-            echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
-            echo "</div>";
-
-            $this->loadView('jobseekers/my-recommendations-debug', [
-                'recommendations' => null,
-                'error' => 'Debug error: ' . $e->getMessage(),
-                'jobseeker' => null
-            ]);
-        }
-    }
-
-    /**
-     * Load view with data
-     */
     private function loadView($viewPath, $data = [])
     {
         // Extract data variables for use in view
@@ -437,9 +274,6 @@ class JobRecommendationController
         include $fullViewPath;
     }
 
-    /**
-     * Handle different routes (for routing system)
-     */
     public function handleRequest()
     {
         $action = $_GET['action'] ?? 'index';
@@ -482,7 +316,6 @@ class JobRecommendationController
     }
 }
 
-// If this file is accessed directly, handle the request
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     $controller = new JobRecommendationController();
     $controller->handleRequest();
