@@ -9,7 +9,7 @@ class Mailer {
         $config = require __DIR__ . '/../../config/mailer.php';
         $mail = new PHPMailer(true);
         try {
-            // $mail->SMTPDebug = 2; // Uncomment for debugging
+            
             $mail->isSMTP();
             $mail->Host = $config['host'];
             $mail->SMTPAuth = true;
@@ -27,8 +27,6 @@ class Mailer {
             $mail->send();
             return true;
         } catch (Exception $e) {
-            // For debugging, uncomment the next line:
-            // echo "Mailer Error: {$mail->ErrorInfo}";
             return false;
         }
     }
