@@ -22,7 +22,6 @@ class EmployerSettings
         }
     }
 
-    // Get settings by employer_id
     public function getSettingsByEmployerId($employer_id)
     {
         try {
@@ -49,7 +48,6 @@ class EmployerSettings
         }
     }
 
-    // Create default settings
     public function createDefaultSettings($employer_id)
     {
         try {
@@ -73,7 +71,6 @@ class EmployerSettings
         }
     }
 
-    // Update email preferences
     public function updateEmailPreferences($employer_id, $preferences)
     {
         try {
@@ -107,7 +104,6 @@ class EmployerSettings
         }
     }
 
-    // Update visibility settings
     public function updateVisibilitySettings($employer_id, $settings)
     {
         try {
@@ -138,7 +134,6 @@ class EmployerSettings
         }
     }
 
-    // Update hiring preferences
     public function updateHiringPreferences($employer_id, $settings)
     {
         try {

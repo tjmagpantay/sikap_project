@@ -200,9 +200,6 @@ class EventProgram
         return (bool) $stmt->fetchColumn();
     }
 
-    /**
-     * Notify jobseekers about new program/event
-     */
     public function notifyJobseekersAboutNewProgram($eventId)
     {
         try {
@@ -240,11 +237,11 @@ class EventProgram
         }
     }
 
-    // ADD: Public getter for database connection
     public function getDatabase()
     {
         return $this->db;
     }
+
     public function isActiveById($eventId)
     {
         try {
@@ -262,9 +259,6 @@ class EventProgram
         }
     }
 
-    /**
-     * Check if an event exists by ID (regardless of status)
-     */
     public function exists($eventId)
     {
         try {
