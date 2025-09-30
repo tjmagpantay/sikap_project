@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\xampp\htdocs\sikap\app\services\JobRecommendationService.php
 
 require_once __DIR__ . '/../models/Jobseeker.php';
 
