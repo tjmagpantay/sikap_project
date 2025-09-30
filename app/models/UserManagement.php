@@ -1,9 +1,11 @@
 <?php
 
-class UserManagement {
+class UserManagement
+{
     private $db;
- 
-    public function __construct() {
+
+    public function __construct()
+    {
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
@@ -17,7 +19,8 @@ class UserManagement {
         }
     }
 
-    public function getUsersByType($type) {
+    public function getUsersByType($type)
+    {
         if ($type === 'employer') {
             $stmt = $this->db->prepare("
                 SELECT e.employer_id, e.user_id, e.first_name, e.middle_name, e.last_name, 
@@ -53,7 +56,8 @@ class UserManagement {
         }
     }
 
-    public function getUserById($id, $type) {
+    public function getUserById($id, $type)
+    {
         if ($type === 'employer') {
             $stmt = $this->db->prepare("
                 SELECT employer_id, user_id, first_name, middle_name, last_name, position, contact_no, company_name, about_us, created_at, updated_at, profile_completed, status
@@ -77,7 +81,9 @@ class UserManagement {
      * Get database connection
      * @return PDO
      */
-    public function getConnection() {
+
+    public function getConnection()
+    {
         return $this->db;
     }
 
@@ -87,7 +93,8 @@ class UserManagement {
      * @param string $action - 'suspend', 'unsuspend', or 'activate'
      * @return bool
      */
-    public function updateEmployerStatus($user_id, $action) {
+    public function updateEmployerStatus($user_id, $action)
+    {
         try {
             $new_status = $action === 'suspend' ? 'suspended' : 'verified';
             $stmt = $this->db->prepare("UPDATE employer SET status = ? WHERE user_id = ?");
@@ -104,11 +111,10 @@ class UserManagement {
      * @param string $status
      * @return bool
      */
-    public function updateJobseekerStatus($user_id, $status) {
+    public function updateJobseekerStatus($user_id, $status)
+    {
         try {
-            // Debug logging
-            error_log("Updating jobseeker status in database: user_id={$user_id}, status={$status}");
-            
+
             // Verify the user exists first
             $check = $this->db->prepare("SELECT jobseeker_id FROM jobseeker WHERE user_id = ?");
             $check->execute([$user_id]);
@@ -119,10 +125,10 @@ class UserManagement {
 
             $stmt = $this->db->prepare("UPDATE jobseeker SET acc_status = ? WHERE user_id = ?");
             $result = $stmt->execute([$status, $user_id]);
-            
+
             // Log the result
             error_log("Update result: " . ($result ? "success" : "failed") . ", rows affected: " . $stmt->rowCount());
-            
+
             return $result;
         } catch (Exception $e) {
             error_log("Error updating jobseeker status: " . $e->getMessage());
@@ -137,10 +143,11 @@ class UserManagement {
      * @param string $user_type - 'employer' or 'jobseeker'
      * @return bool
      */
-    public function updateUserStatus($user_id, $status, $user_type = 'employer') {
+    public function updateUserStatus($user_id, $status, $user_type = 'employer')
+    {
         try {
             $table = $user_type === 'jobseeker' ? 'jobseeker' : 'employer';
-            
+
             $stmt = $this->db->prepare("UPDATE {$table} SET status = ? WHERE user_id = ?");
             return $stmt->execute([$status, $user_id]);
         } catch (Exception $e) {
@@ -154,7 +161,8 @@ class UserManagement {
      * @param int $user_id
      * @return array|null
      */
-    public function getEmployerByUserId($user_id) {
+    public function getEmployerByUserId($user_id)
+    {
         try {
             $stmt = $this->db->prepare("
                 SELECT employer_id, user_id, first_name, middle_name, last_name, position, 
@@ -176,7 +184,8 @@ class UserManagement {
      * @param int $user_id
      * @return array|null
      */
-    public function getJobseekerByUserId($user_id) {
+    public function getJobseekerByUserId($user_id)
+    {
         try {
             $stmt = $this->db->prepare("
                 SELECT jobseeker_id, user_id, first_name, middle_name, last_name, suffix, 
@@ -198,7 +207,8 @@ class UserManagement {
      * @param string $type - 'employer' or 'jobseeker'
      * @return int
      */
-    public function getUserCountByType($type) {
+    public function getUserCountByType($type)
+    {
         try {
             $table = $type === 'jobseeker' ? 'jobseeker' : 'employer';
             $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM {$table}");
@@ -216,7 +226,8 @@ class UserManagement {
      * @param string $status - 'verified', 'suspended', 'pending', etc.
      * @return array
      */
-    public function getEmployersByStatus($status) {
+    public function getEmployersByStatus($status)
+    {
         try {
             $stmt = $this->db->prepare("
                 SELECT employer_id, user_id, first_name, middle_name, last_name, position, 
@@ -234,4 +245,3 @@ class UserManagement {
         }
     }
 }
-?>
