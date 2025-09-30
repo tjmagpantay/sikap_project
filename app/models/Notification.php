@@ -9,20 +9,10 @@ class Notification
         $this->db = $database;
     }
 
-    /**
-     * Create a new notification
-     */
     public function create($userId, $userType, $type, $title, $message, $link = null, $data = null)
     {
         try {
-            error_log("🔍 DEBUG Notification::create() called:");
-            error_log("   - user_id: $userId");
-            error_log("   - user_type: $userType");
-            error_log("   - type: $type");
-            error_log("   - title: $title");
-            error_log("   - message: $message");
-            error_log("   - link: $link");
-            error_log("   - data: " . ($data ? json_encode($data) : 'null'));
+
 
             $stmt = $this->db->prepare("
                 INSERT INTO notifications (user_id, user_type, type, title, message, link, data, created_at) 
@@ -31,37 +21,16 @@ class Notification
 
             $dataJson = $data ? json_encode($data) : null;
 
-            error_log("🔍 DEBUG: About to execute SQL INSERT");
-            error_log("   - SQL: INSERT INTO notifications (user_id, user_type, type, title, message, link, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-            error_log("   - Parameters: " . json_encode([$userId, $userType, $type, $title, $message, $link, $dataJson]));
-
             $result = $stmt->execute([$userId, $userType, $type, $title, $message, $link, $dataJson]);
-
-            if ($result) {
-                $notificationId = $this->db->lastInsertId();
-                error_log("✅ DEBUG Notification::create() SUCCESS: Inserted notification ID: $notificationId");
-            } else {
-                error_log("❌ DEBUG Notification::create() FAILED");
-                error_log("   - Error Info: " . json_encode($stmt->errorInfo()));
-            }
 
             return $result;
         } catch (Exception $e) {
-            error_log("❌ Error creating notification: " . $e->getMessage());
-            error_log("❌ Stack trace: " . $e->getTraceAsString());
-
-            // Additional database error info
-            if (isset($stmt)) {
-                error_log("❌ SQL Error Info: " . json_encode($stmt->errorInfo()));
-            }
+            error_log("Error creating notification: " . $e->getMessage());
 
             return false;
         }
     }
 
-    /**
-     * Get user notifications with user_type filtering
-     */
     public function getUserNotifications($userId, $userType, $limit = 15, $offset = 0)
     {
         try {
@@ -85,9 +54,6 @@ class Notification
         }
     }
 
-    /**
-     * Get unread count for specific user and user_type
-     */
     public function getUnreadCount($userId, $userType)
     {
         try {
@@ -104,9 +70,6 @@ class Notification
         }
     }
 
-    /**
-     * Mark notification as read
-     */
     public function markAsRead($notificationId, $userId, $userType)
     {
         try {
@@ -122,9 +85,6 @@ class Notification
         }
     }
 
-    /**
-     * Mark all notifications as read for a user
-     */
     public function markAllAsRead($userId, $userType)
     {
         try {
@@ -140,9 +100,6 @@ class Notification
         }
     }
 
-    /**
-     * Delete a notification
-     */
     public function delete($notificationId, $userId, $userType)
     {
         try {
@@ -157,9 +114,6 @@ class Notification
         }
     }
 
-    /**
-     * FIXED: Add the missing determineUserType method
-     */
     public function determineUserType($userId)
     {
         try {
@@ -191,17 +145,13 @@ class Notification
             }
 
             // Default to admin if none found (fallback for admin session)
-            error_log("⚠️ Could not determine user type for user_id: $userId, defaulting to admin");
             return 'admin';
         } catch (Exception $e) {
-            error_log("❌ Error determining user type: " . $e->getMessage());
+            error_log("Error determining user type: " . $e->getMessage());
             return 'admin';
         }
     }
 
-    /**
-     * Get all active jobseekers for notifications
-     */
     public function getActiveJobseekers()
     {
         try {
@@ -216,23 +166,13 @@ class Notification
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // DEBUG: Log the jobseekers we found
-            error_log("🔍 DEBUG getActiveJobseekers: Found " . count($results) . " active jobseekers:");
-            foreach ($results as $jobseeker) {
-                error_log("   - Jobseeker ID: {$jobseeker['jobseeker_id']}, User ID: {$jobseeker['user_id']}, Name: {$jobseeker['first_name']} {$jobseeker['last_name']}, Email: {$jobseeker['email']}");
-            }
-
             return $results;
         } catch (Exception $e) {
-            error_log("❌ Error getting active jobseekers: " . $e->getMessage());
-            error_log("❌ SQL Error: " . print_r($this->db->errorInfo(), true));
+            error_log("Error getting active jobseekers: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Get all active verified employers for notifications
-     */
     public function getActiveEmployers()
     {
         try {
@@ -251,9 +191,6 @@ class Notification
         }
     }
 
-    /**
-     * Get all active admins for notifications
-     */
     public function getActiveAdmins()
     {
         try {
@@ -267,23 +204,14 @@ class Notification
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // DEBUG: Log the admins we found
-            error_log("🔍 DEBUG getActiveAdmins: Found " . count($results) . " active admins:");
-            foreach ($results as $admin) {
-                error_log("   - Admin ID: {$admin['admin_id']}, User ID: {$admin['user_id']}, Name: {$admin['admin_name']}, Email: {$admin['email']}");
-            }
 
             return $results;
         } catch (Exception $e) {
-            error_log("❌ Error getting active admins: " . $e->getMessage());
-            error_log("❌ SQL Error: " . print_r($this->db->errorInfo(), true));
+            error_log("Error getting active admins: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Get event details for notifications
-     */
     public function getEventDetails($eventId)
     {
         try {
@@ -300,13 +228,9 @@ class Notification
         }
     }
 
-    /**
-     * Get employer details by employer_id and job_id (for job application notifications)
-     */
     public function getEmployerByJobPost($employerId, $jobId)
     {
         try {
-            error_log("🔍 DEBUG: Getting employer details for employer_id: $employerId, job_id: $jobId");
 
             $stmt = $this->db->prepare("
                 SELECT 
@@ -329,18 +253,13 @@ class Notification
             $stmt->execute([$employerId, $jobId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("🔍 DEBUG: Employer lookup query result: " . json_encode($result));
-
             return $result;
         } catch (Exception $e) {
-            error_log("❌ Error getting employer by job post: " . $e->getMessage());
+            error_log("Error getting employer by job post: " . $e->getMessage());
             return null;
         }
     }
 
-    /**
-     * Verify notification was inserted (for debugging)
-     */
     public function getLatestNotification($userId, $type)
     {
         try {
@@ -354,14 +273,11 @@ class Notification
             $stmt->execute([$userId, $type]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("❌ Error getting latest notification: " . $e->getMessage());
+            error_log("Error getting latest notification: " . $e->getMessage());
             return null;
         }
     }
 
-    /**
-     * Debug employer tables (for troubleshooting)
-     */
     public function debugEmployerData($employerId, $jobId = null)
     {
         try {
@@ -388,18 +304,14 @@ class Notification
 
             return $debug;
         } catch (Exception $e) {
-            error_log("❌ Error debugging employer data: " . $e->getMessage());
+            error_log("Error debugging employer data: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Get jobseeker details for application notifications
-     */
     public function getJobseekerDetails($applicationId)
     {
         try {
-            error_log("🔍 DEBUG: Getting jobseeker details for application_id: $applicationId");
 
             $stmt = $this->db->prepare("
                 SELECT 
@@ -417,8 +329,6 @@ class Notification
             $stmt->execute([$applicationId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("🔍 DEBUG: Jobseeker details query result: " . json_encode($result));
-
             return $result;
         } catch (Exception $e) {
             error_log("❌ Error getting jobseeker details for application: " . $e->getMessage());
@@ -428,7 +338,6 @@ class Notification
     public function getResignationRequestDetails($resignationId)
     {
         try {
-            error_log("🔍 DEBUG: Getting resignation request details for resignation_id: $resignationId");
 
             $stmt = $this->db->prepare("
             SELECT 
@@ -457,13 +366,10 @@ class Notification
             $stmt->execute([$resignationId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("🔍 DEBUG: Resignation request details query result: " . json_encode($result));
-
             return $result;
         } catch (Exception $e) {
-            error_log("❌ Error getting resignation request details: " . $e->getMessage());
+            error_log("Error getting resignation request details: " . $e->getMessage());
             return null;
         }
     }
-    
 }
