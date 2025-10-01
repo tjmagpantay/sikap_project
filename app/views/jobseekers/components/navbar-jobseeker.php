@@ -55,11 +55,12 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           <button
             @click="toggleNotifications()"
             class="relative transition-all duration-200 rounded-full hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            <!-- Notification Badge - Improved positioning and size -->
+            <!-- Notification Badge - FIXED: Moved to right side -->
             <span x-show="unreadCount > 0"
               x-text="unreadCount"
-              class="absolute -top-0.5 -left-1 flex items-center justify-center p-2 min-w-[14px] h-[14px] text-xs text-primary bg-secondary rounded-full"
-              :class="unreadCount > 99 ? 'text-[9px] px-2' : ''">
+              class="absolute -top-0.5 -right-1 flex items-center justify-center p-1 min-w-[14px] h-[14px] text-xs text-primary bg-secondary rounded-full !important"
+              :class="unreadCount > 99 ? 'text-[9px] px-2' : ''"
+              style="right: -1px !important; left: auto !important;">
             </span>
 
 

@@ -393,8 +393,9 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
 
-                                                <!-- FIXED: Better Positioned Tooltip - Now appears above -->
-                                                <div class="absolute right-0 z-50 px-3 py-2 mb-2 text-xs text-white transition-all duration-200 transform translate-y-0 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content bottom-full whitespace-nowrap">
+                                                <!-- UPDATED: Higher Positioned Tooltip with More Space -->
+                                                <div class="absolute right-0 z-50 px-3 py-2 mb-4 text-xs text-white transition-all duration-200 transform translate-y-0 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content whitespace-nowrap"
+                                                    style="bottom: calc(100% + 2px) !important; margin-bottom: 2px !important;">
                                                     <div class="text-center min-w-max">
                                                         <div class="flex items-center gap-1 font-medium text-yellow-300">
                                                             <span>Low Match</span>

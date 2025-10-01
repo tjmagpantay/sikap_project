@@ -1,9 +1,10 @@
 <!-- Profile Content (Default Tab) -->
 <div class="grid w-full grid-cols-1 gap-4 py-4 mb-8 border-t border-gray-200 md:grid-cols-2">
+
     <!-- Profile Details Header -->
     <div class="flex items-center justify-between w-full col-span-1 mb-4 md:col-span-2">
         <h4 class="text-base font-semibold text-primary">Profile Details</h4>
-        <a href="?page=complete-jobseeker-profile&step=3"
+        <a href="?page=complete-jobseeker-profile&step=2"
             class="flex items-center text-sm text-primary hover:text-primary-600">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -41,11 +42,60 @@
         <p class="text-sm"><?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?></p>
     </div>
 </div>
+
+<!-- Educational Background Card -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <h4 class="text-base font-semibold text-primary">Educational Background</h4>
+        <a href="?page=complete-jobseeker-profile&step=3"
+            class="flex items-center text-sm text-primary hover:text-primary-600">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Edit
+        </a>
+    </div>
+    <?php if (!empty($education) && is_array($education)): ?>
+        <div class="space-y-4">
+            <?php foreach ($education as $edu): ?>
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                        <div>
+                            <p class="text-xs text-gray-400">Institution Name</p>
+                            <p class="font-medium"><?php echo htmlspecialchars($edu['school_name'] ?? 'N/A'); ?></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Duration</p>
+                            <p class="font-medium">
+                                <?php
+                                $start = !empty($edu['start_date']) ? date('Y', strtotime($edu['start_date'])) : '';
+                                $end = !empty($edu['end_date']) ? date('Y', strtotime($edu['end_date'])) : '';
+                                echo $start && $end ? $start . ' - ' . $end : 'N/A';
+                                ?>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Degree/Program</p>
+                            <p class="font-medium"><?php echo htmlspecialchars($edu['education_level'] ?? 'N/A'); ?></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Field of Study</p>
+                            <p class="font-medium"><?php echo htmlspecialchars($edu['field_of_study'] ?? 'N/A'); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <p class="text-sm text-gray-500">No educational background added yet.</p>
+    <?php endif; ?>
+</div>
+
 <!-- Work Experience Card -->
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
         <h4 class="text-base font-semibold text-primary">Work Experience</h4>
-        <a href="?page=complete-jobseeker-profile&step=5"
+        <a href="?page=complete-jobseeker-profile&step=4"
             class="flex items-center text-sm text-primary hover:text-primary-600">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -91,59 +141,11 @@
     <?php endif; ?>
 </div>
 
-<!-- Educational Background Card -->
-<div class="mb-8">
-    <div class="flex items-center justify-between mb-4">
-        <h4 class="text-base font-semibold text-primary">Educational Background</h4>
-        <a href="?page=complete-jobseeker-profile&step=4"
-            class="flex items-center text-sm text-primary hover:text-primary-600">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            Edit
-        </a>
-    </div>
-    <?php if (!empty($education) && is_array($education)): ?>
-        <div class="space-y-4">
-            <?php foreach ($education as $edu): ?>
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                        <div>
-                            <p class="text-xs text-gray-400">Institution Name</p>
-                            <p class="font-medium"><?php echo htmlspecialchars($edu['school_name'] ?? 'N/A'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400">Duration</p>
-                            <p class="font-medium">
-                                <?php
-                                $start = !empty($edu['start_date']) ? date('Y', strtotime($edu['start_date'])) : '';
-                                $end = !empty($edu['end_date']) ? date('Y', strtotime($edu['end_date'])) : '';
-                                echo $start && $end ? $start . ' - ' . $end : 'N/A';
-                                ?>
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400">Degree/Program</p>
-                            <p class="font-medium"><?php echo htmlspecialchars($edu['education_level'] ?? 'N/A'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400">Field of Study</p>
-                            <p class="font-medium"><?php echo htmlspecialchars($edu['field_of_study'] ?? 'N/A'); ?></p>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p class="text-sm text-gray-500">No educational background added yet.</p>
-    <?php endif; ?>
-</div>
-
 <!-- Skills Card -->
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
         <h4 class="text-base font-semibold text-primary">Skills & Expertise</h4>
-        <a href="?page=complete-jobseeker-profile&step=6"
+        <a href="?page=complete-jobseeker-profile&step=5"
             class="flex items-center text-sm text-primary hover:text-primary-600">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -167,14 +169,12 @@
     <?php endif; ?>
 </div>
 
-
-
 <!-- Certificates Card -->
 <?php if (!empty($certificates) && is_array($certificates)): ?>
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h4 class="text-base font-semibold text-primary">Certificates & Licenses</h4>
-            <a href="?page=complete-jobseeker-profile&step=7"
+            <a href="?page=complete-jobseeker-profile&step=6"
                 class="flex items-center text-sm text-primary hover:text-primary-600">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

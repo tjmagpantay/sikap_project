@@ -38,8 +38,9 @@
             <!-- Notification Badge - Improved positioning and size -->
             <span x-show="unreadCount > 0"
               x-text="unreadCount"
-              class="absolute -top-0.5 -left-1 flex items-center justify-center p-2 min-w-[14px] h-[14px] text-xs text-primary bg-secondary rounded-full"
-              :class="unreadCount > 99 ? 'text-[9px] px-2' : ''">
+              class="absolute flex items-center justify-center p-2 min-w-[14px] h-[14px] text-xs text-primary bg-secondary rounded-full"
+              :class="unreadCount > 99 ? 'text-[9px] px-2' : ''"
+              style="top: -2px !important; right: -1px !important; left: auto !important; z-index: 10 !important;">
             </span>
 
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
