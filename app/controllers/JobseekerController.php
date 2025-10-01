@@ -485,7 +485,6 @@ class JobseekerController
 
     private function handleStep1($data, &$error, &$success)
     {
-        // Documents - Step 1
         // Get the actual jobseeker record first
         $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
 
@@ -512,12 +511,16 @@ class JobseekerController
         }
 
         $jobseeker_id = $jobseeker['jobseeker_id'];
+        $resumeUploaded = false;
 
         // Handle resume/CV upload with parsing
         if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
             // Delete existing resume first
             $this->jobseekerModel->deleteDocumentByType($jobseeker_id, 'resume');
-            $this->handleFileUploadWithParsing($_FILES['resume'], 'resume', $jobseeker_id, $error, $success);
+            $uploadResult = $this->handleFileUploadWithParsing($_FILES['resume'], 'resume', $jobseeker_id, $error, $success);
+            if ($uploadResult) {
+                $resumeUploaded = true;
+            }
         }
         if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
             // Delete existing CV first
@@ -526,12 +529,32 @@ class JobseekerController
         }
 
         if (empty($error)) {
-            // Check if we have parsing results to show
-            if (isset($_SESSION['show_parsing_results']) && $_SESSION['show_parsing_results']) {
-                // Redirect to a special review page or step 2 with parsing results
-                header('Location: ?page=complete-jobseeker-profile&step=2&parsed=1');
+            // FIXED: Set fresh upload flag every time resume is uploaded
+            if ($resumeUploaded) {
+                $_SESSION['fresh_resume_upload'] = true; // New flag for fresh uploads
+                $_SESSION['show_parsing_results'] = true;
+                // Add URL parameter to trigger modal
+                header('Location: ?page=complete-jobseeker-profile&step=2&fresh_upload=1');
             } else {
-                header('Location: ?page=complete-jobseeker-profile&step=2');
+                // Even if no new upload, but user clicked "Update & Continue", check if they have a resume
+                $existingResume = false;
+                $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']);
+                if ($documents) {
+                    foreach ($documents as $doc) {
+                        if ($doc['file_type'] === 'resume') {
+                            $existingResume = true;
+                            break;
+                        }
+                    }
+                }
+
+                // If they have an existing resume and clicked continue, show modal
+                if ($existingResume) {
+                    $_SESSION['fresh_resume_upload'] = true;
+                    header('Location: ?page=complete-jobseeker-profile&step=2&fresh_upload=1');
+                } else {
+                    header('Location: ?page=complete-jobseeker-profile&step=2');
+                }
             }
             exit;
         }
@@ -629,7 +652,7 @@ class JobseekerController
         header('Location: ?page=complete-jobseeker-profile&step=4');
         exit;
     }
-    
+
     private function handleStep4($data, &$error, &$success)
     {
         // Work Experience (Combined Current + Previous) - Step 4
@@ -787,7 +810,7 @@ class JobseekerController
             exit;
         }
     }
-    
+
     private function handleStep5($data, &$error, &$success)
     {
         // Skills - Step 5
@@ -877,7 +900,6 @@ class JobseekerController
 
             return; // Stay on the same step to show success/error message
         }
-
     }
 
     private function processSkills($skillsData, $jobseeker_id)
@@ -1584,7 +1606,7 @@ class JobseekerController
 
         include __DIR__ . '/../views/jobseekers/profile-components/documents-content.php';
     }
-    
+
     private function loadApplicationsTab($jobseeker)
     {
         // FIXED: Load applications data properly
@@ -2070,5 +2092,20 @@ class JobseekerController
         }
         exit;
     }
-    
+
+    public function clearUploadFlag()
+    {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        // Clear the fresh upload flag
+        unset($_SESSION['fresh_resume_upload']);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+    }
 }

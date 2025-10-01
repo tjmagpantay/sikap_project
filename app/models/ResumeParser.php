@@ -584,12 +584,18 @@ class ResumeParser
         foreach ($rosarioBarangays as $barangay) {
             $pattern = '/\b' . preg_quote($barangay, '/') . '\b[,\s]*(?:Rosario)?[,\s]*(?:Batangas)?/i';
             if (preg_match($pattern, $text, $match)) {
-                $fullAddress = $barangay . ', Rosario, Batangas';
-                return $fullAddress;
+                // FIXED: Only add Rosario/Batangas if explicitly mentioned in the text
+                $foundText = trim($match[0]);
+                if (stripos($foundText, 'rosario') !== false || stripos($foundText, 'batangas') !== false) {
+                    return $foundText;
+                } else {
+                    // Just return the barangay name without auto-adding location
+                    return $barangay;
+                }
             }
         }
 
-        // Pattern 2: Look for "Rosario" with any barangay
+        // Pattern 2: Look for "Rosario" with any barangay (only if explicitly mentioned)
         if (preg_match('/([A-Z][a-zA-Z\s]+),?\s*Rosario[,\s]*Batangas/i', $text, $match)) {
             return trim($match[0]);
         }
@@ -602,14 +608,25 @@ class ResumeParser
             return $address;
         }
 
-        // Pattern 4: Look for City, State pattern (general)
+        // Pattern 4: Look for City, State pattern (general) - FIXED: Don't auto-add locations
         if (preg_match('/\b([A-Z][a-zA-Z\s,]+(?:City|Municipality|Province|Batangas|Philippines))\b/i', $text, $match)) {
             return trim($match[1]);
         }
 
-        // Pattern 5: Look for any location with Batangas
+        // Pattern 5: Look for any location with Batangas (only if explicitly mentioned)
         if (preg_match('/([A-Z][a-zA-Z\s,]+Batangas[^.\n]*)/i', $text, $match)) {
             return trim($match[1]);
+        }
+
+        // Pattern 6: Generic address pattern (ADDED: For non-Rosario addresses)
+        if (preg_match('/(?:address|location|residence)[\s:]*([A-Z][a-zA-Z0-9\s,\.\#\-]+)/i', $text, $match)) {
+            $address = trim($match[1]);
+            // Clean up
+            $address = preg_replace('/^[•\-\*\+\s]+/', '', $address);
+            // Only return if it looks like a real address (has some structure)
+            if (strlen($address) > 10 && preg_match('/[0-9]|street|avenue|road|blvd|drive|city|province/', $address)) {
+                return $address;
+            }
         }
 
         return '';

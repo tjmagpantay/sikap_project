@@ -795,6 +795,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->validateJobPostsAccess();
             break;
 
+        case 'clear-upload-flag':
+            $jobseekerController->clearUploadFlag();
+            break;
+
             
 
 

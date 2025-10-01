@@ -164,9 +164,9 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                 <path d="M514.045 634.097c23.972 0 43.402 19.433 43.402 43.399v178.086c0 23.968-19.432 43.398-43.402 43.398-23.964 0-43.396-19.432-43.396-43.398V677.496c0.001-23.968 19.433-43.399 43.396-43.399z" fill="#F39A2B"></path>
                             </svg>
 
-                            <label for="resume" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/80">
+                            <label for="resume" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/90">
                                 <?php echo !empty($resumeDoc) ? 'Replace Resume' : 'Upload Resume'; ?>
-                                <input id="resume" name="resume" type="file" class="sr-only" accept=".pdf">
+                                <input id="resume" name="resume" type="file" class="sr-only " accept=".pdf">
                             </label>
                             <p class="mt-2 text-xs text-gray-500">PDF format only, max 5MB</p>
                         </div>

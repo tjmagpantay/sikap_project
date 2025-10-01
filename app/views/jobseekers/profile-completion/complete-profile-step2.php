@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__ . '/../components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../../components/navbar-top.php';
-include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
+include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
 
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
@@ -382,6 +382,44 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
     </div>
 </div>
 
+<!-- PDF Autofill Notice Modal -->
+<div id="pdf-autofill-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4 py-20">
+        <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+            <div class="px-6 py-8 lg:px-8">
+                <!-- Modal Content -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="mb-4 text-xl font-bold text-gray-900">PDF Auto-fill Notice</h3>
+                    <p class="mb-6 text-sm leading-relaxed text-gray-600">
+                        Our system has automatically filled some fields based on your uploaded resume.
+                        Please note that the <strong>accuracy of auto-filled data depends on your resume format</strong>
+                        and how clearly the information is structured in your document.
+                    </p>
+                    <p class="mb-6 text-sm text-gray-500">
+                        Please review and verify all information before proceeding to ensure accuracy.
+                    </p>
+                </div>
+
+                <!-- Action Button -->
+                <div>
+                    <button type="button" onclick="closePdfAutofillModal()"
+                        class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2">
+                        I Understand
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
     // Validation functions
     function validateName(input, fieldName) {
@@ -424,7 +462,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
         const capitalizedValue = value.split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
-        
+
         input.value = capitalizedValue;
 
         // Valid
@@ -465,7 +503,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
         const capitalizedValue = value.split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
-        
+
         input.value = capitalizedValue;
 
         // Valid
@@ -560,7 +598,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
                 }).join('');
             })
             .join(' ');
-        
+
         input.value = capitalizedValue;
 
         // Valid
@@ -610,7 +648,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
         input.style.animation = 'none';
         input.offsetHeight; // Trigger reflow
         input.style.animation = 'shake 0.5s';
-        
+
         // Make error message more visible
         errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
@@ -664,12 +702,91 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';?>
         }
     });
 
-    // Initialize character count for address
     document.addEventListener('DOMContentLoaded', function() {
+        // Check for fresh upload (when user clicks "Update & Continue" from step 1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFreshUpload = urlParams.get('fresh_upload') === '1';
+
+        // Enhanced check for when to show modal
+        const hasUploadedResume = <?php
+                                    // Check multiple conditions for resume upload
+                                    $showModal = false;
+
+                                    // 1. Check if there's a fresh upload flag (primary trigger)
+                                    if (isset($_SESSION['fresh_resume_upload']) && $_SESSION['fresh_resume_upload']) {
+                                        $showModal = true;
+                                    }
+
+                                    // 2. Check if parsed data exists (successful parsing)
+                                    if (!$showModal && (isset($_SESSION['parsed_resume_data']) || isset($_SESSION['show_parsing_results']))) {
+                                        $showModal = true;
+                                    }
+
+                                    // 3. Check if there are any documents at all (backup check)
+                                    if (!$showModal && !empty($documents)) {
+                                        foreach ($documents as $doc) {
+                                            if ($doc['file_type'] === 'resume') {
+                                                $showModal = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    echo $showModal ? 'true' : 'false';
+                                    ?>;
+
+        // Show modal if it's a fresh upload OR if conditions are met
+        if ((isFreshUpload && hasUploadedResume) || (hasUploadedResume && isFreshUpload)) {
+            console.log('Showing PDF autofill modal for fresh upload'); // Debug log
+            setTimeout(() => {
+                showPdfAutofillModal();
+            }, 500);
+        }
+
+        // Initialize character count for address
         const addressField = document.getElementById('address');
         const countSpan = document.getElementById('address_count');
         if (addressField && countSpan) {
             countSpan.textContent = addressField.value.length;
+        }
+    });
+
+    // PDF Autofill Modal Functions
+    function showPdfAutofillModal() {
+        console.log('Modal function called'); // Debug log
+        const modal = document.getElementById('pdf-autofill-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            console.log('Modal should be visible now'); // Debug log
+        } else {
+            console.error('Modal element not found'); // Debug log
+        }
+    }
+
+    function closePdfAutofillModal() {
+        const modal = document.getElementById('pdf-autofill-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+
+            // FIXED: Clear the fresh upload flag instead of using localStorage
+            // This allows the modal to show again on next upload
+            fetch('?page=clear-upload-flag', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).catch(error => {
+                console.log('Note: Could not clear upload flag, but modal closed successfully');
+            });
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePdfAutofillModal();
         }
     });
 </script>
