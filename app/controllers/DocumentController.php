@@ -433,5 +433,7 @@ class DocumentController
 
         return $content_types[$file_extension] ?? 'application/octet-stream';
     }
+
+    
       
 }

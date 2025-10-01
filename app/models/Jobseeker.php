@@ -873,4 +873,5 @@ class Jobseeker
             return [];
         }
     }
+
 }

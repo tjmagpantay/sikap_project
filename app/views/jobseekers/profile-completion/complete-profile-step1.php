@@ -133,20 +133,25 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                         <!-- Right Column - Current Resume Display -->
                         <div class="flex flex-col items-center justify-center text-center">
                             <?php if (!empty($resumeDoc)): ?>
-                                <!-- FIXED: Use the correct document viewing URL -->
                                 <a href="?page=view-document&doc_id=<?php echo htmlspecialchars($resumeDoc['document_id']); ?>" target="_blank" class="transition-transform hover:scale-105">
                                     <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-md hover:bg-red-200">
                                         <img
-                                    src="../public/assets/icons/pdf-icon.png"
-                                    alt="Icon"
-                                    class="object-cover w-8 h-8" />
+                                            src="../public/assets/icons/pdf-icon.png"
+                                            alt="Icon"
+                                            class="object-cover w-8 h-8" />
                                     </div>
-                                    <p class="mt-2 text-xs font-medium text-red-400">
-                                        <?php echo htmlspecialchars($resumeDoc['original_filename'] ?? $resumeDoc['file_name'] ?? 'Resume.pdf'); ?>
+                                    <p class="mt-2 text-xs font-medium text-red-400" id="current-resume-name">
+                                        <?php echo htmlspecialchars($resumeDoc['file_name'] ?? $resumeDoc['file_name'] ?? 'Resume.pdf'); ?>
                                     </p>
                                 </a>
                             <?php else: ?>
-                                <p class="text-sm text-gray-500">No resume uploaded yet.</p>
+                                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-gray-100 rounded-md">
+                                    <img
+                                        src="../public/assets/icons/pdf-icon.png"
+                                        alt="Icon"
+                                        class="object-cover w-8 h-8 opacity-50" />
+                                </div>
+                                <p class="mt-2 text-xs font-medium text-gray-500" id="current-resume-name">No resume uploaded yet.</p>
                             <?php endif; ?>
 
                             <p class="mt-3 text-xs text-gray-500">
@@ -189,20 +194,25 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                         <!-- Left Column - Current CV Display -->
                         <div class="flex flex-col items-center justify-center text-center">
                             <?php if (!empty($cvDoc)): ?>
-                                <!-- FIXED: Use the correct document viewing URL -->
                                 <a href="?page=view-document&doc_id=<?php echo htmlspecialchars($cvDoc['document_id']); ?>" target="_blank" class="transition-transform hover:scale-105">
                                     <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-md hover:bg-red-200">
                                         <img
-                                    src="../public/assets/icons/pdf-icon.png"
-                                    alt="Icon"
-                                    class="object-cover w-8 h-8" />
+                                            src="../public/assets/icons/pdf-icon.png"
+                                            alt="Icon"
+                                            class="object-cover w-8 h-8" />
                                     </div>
-                                    <p class="mt-2 text-xs font-medium text-red-400">
-                                        <?php echo htmlspecialchars($cvDoc['original_filename'] ?? $cvDoc['file_name'] ?? 'CV.pdf'); ?>
+                                    <p class="mt-2 text-xs font-medium text-red-400" id="current-cv-name">
+                                        <?php echo htmlspecialchars($cvDoc['file_name'] ?? $cvDoc['file_name'] ?? 'CV.pdf'); ?>
                                     </p>
                                 </a>
                             <?php else: ?>
-                                <p class="text-sm text-gray-500">No CV uploaded yet.</p>
+                                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-gray-100 rounded-md">
+                                    <img
+                                        src="../public/assets/icons/pdf-icon.png"
+                                        alt="Icon"
+                                        class="object-cover w-8 h-8 opacity-50" />
+                                </div>
+                                <p class="mt-2 text-xs font-medium text-gray-500" id="current-cv-name">No CV uploaded yet.</p>
                             <?php endif; ?>
 
                             <p class="mt-3 text-xs text-gray-500">
@@ -220,7 +230,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                 <path d="M514.045 634.097c23.972 0 43.402 19.433 43.402 43.399v178.086c0 23.968-19.432 43.398-43.402 43.398-23.964 0-43.396-19.432-43.396-43.398V677.496c0.001-23.968 19.433-43.399 43.396-43.399z" fill="#F39A2B"></path>
                             </svg>
 
-                            <label for="cv" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/80">
+                            <label for="cv" class="inline-block px-4 py-2 text-sm font-medium text-white rounded-md cursor-pointer bg-primary hover:bg-primary/90">
                                 <?php echo !empty($cvDoc) ? 'Replace CV' : 'Upload CV'; ?>
                                 <input id="cv" name="cv" type="file" class="sr-only" accept=".pdf">
                             </label>
@@ -249,3 +259,59 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const resumeInput = document.getElementById('resume');
+        const cvInput = document.getElementById('cv');
+
+        // Handle resume file selection preview
+        if (resumeInput) {
+            resumeInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                updateFilePreview(file, 'resume');
+            });
+        }
+
+        // Handle CV file selection preview
+        if (cvInput) {
+            cvInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                updateFilePreview(file, 'cv');
+            });
+        }
+
+        function updateFilePreview(file, type) {
+            const isResume = type === 'resume';
+            const currentNameElement = document.getElementById(isResume ? 'current-resume-name' : 'current-cv-name');
+            const currentContainer = currentNameElement?.closest('div');
+
+            if (file) {
+                // Store original name if not already stored
+                if (currentNameElement && !currentNameElement.getAttribute('data-original')) {
+                    currentNameElement.setAttribute('data-original', currentNameElement.textContent);
+                }
+
+                // Show new file name with preview indicator
+                if (currentNameElement) {
+                    currentNameElement.innerHTML = `<span class="font-medium text-blue-600">${file.name}</span><br><span class="text-xs italic text-gray-500">(Preview - Click "Update & Continue" to save)</span>`;
+                }
+
+            } else {
+                // Reset to original if no file selected
+                if (currentNameElement) {
+                    const original = currentNameElement.getAttribute('data-original');
+                    if (original) {
+                        currentNameElement.innerHTML = original;
+                        currentNameElement.removeAttribute('data-original');
+                    }
+                }
+
+                // Remove visual indicator
+                if (currentContainer) {
+                    currentContainer.classList.remove('border-2', 'border-blue-300', 'border-dashed', 'rounded-lg', 'p-2', 'bg-blue-50');
+                }
+            }
+        }
+    });
+</script>

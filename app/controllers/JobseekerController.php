@@ -1653,21 +1653,25 @@ class JobseekerController
         $relativePath = 'uploads/documents/' . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            // Save to database
-            $result = $this->jobseekerModel->saveDocument($jobseeker_id, $relativePath, $type, $file['name']);
+            // FIXED: Use original filename as file_name for display
+            $result = $this->jobseekerModel->saveDocument(
+                $jobseeker_id,
+                $relativePath,
+                $type,
+                $file['name'] // This becomes file_name in database (original filename)
+            );
 
             if ($result) {
                 $success = ucfirst($type) . ' uploaded successfully!';
 
-                // Attempt to parse resume if it's a PDF and type is 'resume'
-                if ($type === 'resume' && strtolower($extension) === 'pdf') {
+                // Parse PDFs only
+                if (strtolower($extension) === 'pdf') {
                     $this->attemptResumeParsing($filepath, $_SESSION['user_id'], $success);
                 }
 
                 return true;
             } else {
-                unlink($filepath); // Delete file if database save failed
-                $error = 'Database error occurred while saving file.';
+                $error = 'Failed to save file information.';
                 return false;
             }
         } else {

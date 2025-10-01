@@ -146,22 +146,22 @@ if (!empty($workExperience)) {
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2">
-                        <div class="p-3 rounded-md ">
+                        <div class="">
                             <p class="text-xs font-medium text-gray-500">Job Title</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['job_title']); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md ">
+                        <div class="">
                             <p class="text-xs font-medium text-gray-500">Company</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($currentWork['company_name']); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md ">
+                        <div class="">
                             <p class="text-xs font-medium text-gray-500">Employment Type</p>
                             <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars(ucfirst($currentWork['employment_type'])); ?></p>
                         </div>
 
-                        <div class="p-3 rounded-md ">
+                        <div class="">
                             <p class="text-xs font-medium text-gray-500">Start Date</p>
                             <p class="mt-1 text-sm font-medium text-gray-900">
                                 <?php echo $currentWork['start_date'] ? date('F Y', strtotime($currentWork['start_date'])) : 'N/A'; ?>
@@ -233,14 +233,14 @@ if (!empty($workExperience)) {
 
             <!-- Success/Error Messages -->
             <?php if (!empty($success)): ?>
-                <div class="p-4 mb-4 border border-green-200 rounded-md bg-green-50">
+                <div class="p-4 mb-4 border border-gray-200 rounded-md bg-gray-50">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-green-600"><?php echo htmlspecialchars($success); ?></p>
+                            <p class="text-sm text-primary"><?php echo htmlspecialchars($success); ?></p>
                         </div>
                     </div>
                 </div>
@@ -321,9 +321,6 @@ if (!empty($workExperience)) {
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                             oninput="validateJobTitle(this)">
                         <div id="job_title_error" class="hidden mt-1 text-xs text-red-600"></div>
-                        <div class="mt-1 text-xs text-gray-500">
-                            <span id="job_title_count">0</span>/100 characters
-                        </div>
                     </div>
                 </div>
 
@@ -340,9 +337,6 @@ if (!empty($workExperience)) {
                             class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                             oninput="validateCompanyName(this)">
                         <div id="company_name_error" class="hidden mt-1 text-xs text-red-600"></div>
-                        <div class="mt-1 text-xs text-gray-500">
-                            <span id="company_name_count">0</span>/100 characters
-                        </div>
                     </div>
                 </div>
 

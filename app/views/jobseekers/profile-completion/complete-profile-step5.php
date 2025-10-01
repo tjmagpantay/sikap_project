@@ -422,7 +422,7 @@ if (isset($_SESSION['error_message'])) {
                 @click.away="open = false"
                 class="flex items-center justify-between w-full px-2 py-2 text-xs text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                 <span x-text="selected" class="pr-1 truncate"></span>
-                <svg class="flex-shrink-0 w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="flex-shrink-0 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
@@ -445,7 +445,7 @@ if (isset($_SESSION['error_message'])) {
                         @click="selected = 'Beginner'; open = false"
                         class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-400 rounded-full"></div>
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-blue-400 rounded-full"></div>
                             <span class="truncate">Beginner</span>
                         </div>
                     </button>
@@ -461,7 +461,7 @@ if (isset($_SESSION['error_message'])) {
                         @click="selected = 'Advanced'; open = false"
                         class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-blue-400 rounded-full"></div>
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-600 rounded-full"></div>
                             <span class="truncate">Advanced</span>
                         </div>
                     </button>
@@ -469,7 +469,7 @@ if (isset($_SESSION['error_message'])) {
                         @click="selected = 'Expert'; open = false"
                         class="flex items-center w-full px-3 py-2 text-xs text-left text-gray-700 hover:bg-gray-100">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-green-400 rounded-full"></div>
+                            <div class="flex-shrink-0 w-2 h-2 mr-2 bg-red-600 rounded-full"></div>
                             <span class="truncate">Expert</span>
                         </div>
                     </button>

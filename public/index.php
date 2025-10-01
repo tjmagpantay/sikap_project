@@ -93,7 +93,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->handleCallback();
             break;
 
-            
+
 
         // [------------------------ NOTIFICATION ROUTES ----------------------]
 
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->notifications(); // Use the controller method
             break;
 
-            
+
 
         // [------------------------ ADMIN ROUTES ----------------------]
 
@@ -180,7 +180,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new AdminDashboardController();
             $controller->eventEdit(); // Use dashboard layout
             break;
-            
+
         case 'admin-event-store':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
@@ -331,7 +331,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->showSavedJobs();
             break;
 
-            
+
 
         // [------------------------ EMPLOYER ROUTES ----------------------]
 
@@ -457,7 +457,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new EmployerController();
             $controller->downloadDocument();
             break;
-            
+
         case 'employer-profile-completion-success':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
@@ -510,7 +510,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->updateSettings();
             break;
 
-            
+
 
         // [------------------------ JOBSEEKER ROUTES ----------------------]
 
@@ -558,6 +558,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         case 'jobseeker-documents':
             include __DIR__ . '/../app/views/jobseekers/profile-components/jobseeker-documents.php';
+            break;
+
+        case 'view-document':
+            require_once __DIR__ . '/../app/controllers/DocumentController.php';
+            $controller = new DocumentController();
+            $controller->viewDocument();
             break;
 
         case 'download-document':
@@ -611,7 +617,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/jobseekers/event-info-jobseeker.php';
             break;
 
-        
+
         case 'complete-jobseeker-profile':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
@@ -747,7 +753,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->deleteCertificateSimple();
             break;
 
-                case 'review-parsed-data':
+        case 'review-parsed-data':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->reviewParsedData();
@@ -799,7 +805,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $jobseekerController->clearUploadFlag();
             break;
 
-            
+
 
 
         // [------------------------ NECESSARY ROUTES ----------------------]
@@ -858,7 +864,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->resetPassword();
             break;
 
-                // Logout
+        // Logout
         case 'logout':
             // Start session if not started
             if (session_status() === PHP_SESSION_NONE) {
@@ -896,7 +902,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     break;
 
 
-            
+
         // [------------------------ FOOTER ROUTES ----------------------]
 
         case 'privacy-policy':
