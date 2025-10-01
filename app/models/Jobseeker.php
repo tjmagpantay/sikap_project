@@ -562,35 +562,72 @@ class Jobseeker
     public function calculateProfileCompletion($user_id)
     {
         try {
-            // This is a basic implementation - you can enhance it
             $jobseeker = $this->findByUserId($user_id);
             if (!$jobseeker) {
                 return 0;
             }
 
             $completionFields = 0;
-            $totalFields = 8; // Adjust based on your requirements
+            $totalRequiredFields = 7; // Only required fields for 100% completion
 
-            // Check basic info
-            if (!empty($jobseeker['first_name'])) $completionFields++;
-            if (!empty($jobseeker['last_name'])) $completionFields++;
-            if (!empty($jobseeker['date_of_birth'])) $completionFields++;
-            if (!empty($jobseeker['sex'])) $completionFields++;
-            if (!empty($jobseeker['address'])) $completionFields++;
-            if (!empty($jobseeker['contact_no'])) $completionFields++;
+            // STEP 1: Documents (Resume Required) - 1 field
+            $documents = $this->getDocuments($user_id);
+            $hasResume = false;
+            if ($documents && is_array($documents)) {
+                foreach ($documents as $doc) {
+                    if ($doc['file_type'] === 'resume') {
+                        $hasResume = true;
+                        break;
+                    }
+                }
+            }
+            if ($hasResume) $completionFields++;
 
-            // Check if has education
+            // STEP 2: Basic Personal Information (Required) - 5 fields
+            if (!empty($jobseeker['first_name']) && trim($jobseeker['first_name']) !== '') $completionFields++;
+            if (!empty($jobseeker['last_name']) && trim($jobseeker['last_name']) !== '') $completionFields++;
+            if (!empty($jobseeker['date_of_birth']) && $jobseeker['date_of_birth'] !== '0000-00-00') $completionFields++;
+            if (!empty($jobseeker['sex']) && $jobseeker['sex'] !== '') $completionFields++;
+            if (!empty($jobseeker['address']) && trim($jobseeker['address']) !== '') $completionFields++;
+            if (!empty($jobseeker['contact_no']) && trim($jobseeker['contact_no']) !== '') $completionFields++;
+
+            // STEP 3: Education (Required) - 1 field
             $education = $this->getEducation($user_id);
-            if (!empty($education)) $completionFields++;
+            if (!empty($education) && is_array($education) && count($education) > 0) {
+                // Check if there's at least one valid education entry
+                $hasValidEducation = false;
+                foreach ($education as $edu) {
+                    if (!empty($edu['degree']) || !empty($edu['institution']) || !empty($edu['field_of_study'])) {
+                        $hasValidEducation = true;
+                        break;
+                    }
+                }
+                if ($hasValidEducation) $completionFields++;
+            }
 
-            // Check if has work experience
-            $workExp = $this->getWorkExperience($user_id);
-            if (!empty($workExp)) $completionFields++;
+            // Calculate completion percentage (cap at 100%)
+            $completionPercentage = ($completionFields / $totalRequiredFields) * 100;
 
-            return round(($completionFields / $totalFields) * 100);
+            // IMPORTANT: Cap at 100% - Optional fields don't increase percentage beyond 100%
+            return min(100, round($completionPercentage));
         } catch (PDOException $e) {
             error_log("Error calculating profile completion: " . $e->getMessage());
             return 0;
+        }
+    }
+
+    public function updateProfileCompletion($user_id, $percentage)
+    {
+        try {
+            // Ensure percentage is between 0-100
+            $percentage = min(100, max(0, $percentage));
+
+            $sql = "UPDATE jobseeker SET profile_completion = ? WHERE user_id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$percentage, $user_id]);
+        } catch (PDOException $e) {
+            error_log('Error updating profile completion: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -702,7 +739,7 @@ class Jobseeker
     public function deleteCertificate($jobseeker_id, $certificate_id)
     {
         try {
-            
+
             // First check if the certificate exists
             $checkStmt = $this->db->prepare("
             SELECT * FROM jobseeker_certificates 
@@ -734,7 +771,7 @@ class Jobseeker
     public function updateCertificateById($certificate_id, $jobseeker_id, $certData)
     {
         try {
-          
+
             $stmt = $this->db->prepare("
             UPDATE jobseeker_certificates 
             SET certificate_title = ?, issuing_organization = ?, date_issued = ?
@@ -873,5 +910,4 @@ class Jobseeker
             return [];
         }
     }
-
 }

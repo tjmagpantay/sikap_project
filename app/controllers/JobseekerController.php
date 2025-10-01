@@ -451,6 +451,7 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/complete-jobseeker-profile.php';
     }
 
+
     private function handleStepSubmission($step, &$error, &$success)
     {
 
@@ -1080,6 +1081,45 @@ class JobseekerController
         include __DIR__ . '/../views/jobseekers/profile-completion/profile-completion-success.php';
     }
 
+
+    public function profile()
+    {
+        // Check authentication
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'jobseeker') {
+            header('Location: ?page=login');
+            exit;
+        }
+
+        try {
+            // Get jobseeker data
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+
+            // Get all profile data
+            $education = $this->jobseekerModel->getEducation($_SESSION['user_id']) ?: [];
+            $workExperience = $this->jobseekerModel->getWorkExperience($_SESSION['user_id']) ?: [];
+            $skills = $this->jobseekerModel->getSkills($_SESSION['user_id']) ?: [];
+            $certificates = $this->jobseekerModel->getCertificates($_SESSION['user_id']) ?: [];
+            $documents = $this->jobseekerModel->getDocuments($_SESSION['user_id']) ?: [];
+
+            // Calculate completion percentage (ensure it's never above 100%)
+            $completionPercentage = $this->jobseekerModel->calculateProfileCompletion($_SESSION['user_id']);
+            $completionPercentage = min(100, max(0, $completionPercentage)); // Force between 0-100%
+
+            // Update the profile_completion field in database
+            if ($jobseeker) {
+                $this->jobseekerModel->updateProfileCompletion($_SESSION['user_id'], $completionPercentage);
+            }
+
+            // Load the view with data
+            include __DIR__ . '/../views/jobseekers/profile-jobseeker.php';
+        } catch (Exception $e) {
+            error_log('Error loading profile: ' . $e->getMessage());
+            $_SESSION['error_message'] = 'Error loading profile data.';
+            header('Location: ?page=dashboard-jobseeker');
+            exit;
+        }
+    }
+
     public function showProfile()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
@@ -1384,7 +1424,6 @@ class JobseekerController
         return $jobseeker;
     }
 
-    // Add these new methods for AJAX operations
     public function deleteWorkExperience()
     {
         header('Content-Type: application/json');
