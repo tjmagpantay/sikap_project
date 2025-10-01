@@ -582,11 +582,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->showSettings();
             break;
 
-        case 'update-jobseeker-settings':
-            require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
-            $controller = new JobseekerSettingsController();
-            $controller->updateSettings();
-            break;
+        // case 'update-jobseeker-settings':
+        //     require_once __DIR__ . '/../app/controllers/JobseekerSettingsController.php';
+        //     $controller = new JobseekerSettingsController();
+        //     $controller->updateSettings();
+        //     break;
 
         case 'verify-otp':
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
