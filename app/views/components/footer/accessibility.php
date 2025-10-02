@@ -3,183 +3,203 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- Accessibility Section -->
+<section id="accessibility" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
-                Accessibility Statement
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Digital Inclusion</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
+                Accessibility
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
-                PESO Rosario is committed to ensuring digital accessibility for people of all abilities.
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
+                PESO Rosario is committed to ensuring that Sikap, its official digital employment platform, is accessible and inclusive for all job seekers, employers, and stakeholders, including persons with disabilities. This reflects our mission to promote equal access to employment opportunities through technology that serves the entire community.
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
-        <!-- Content Card -->
-        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Introduction -->
-            <div class="p-6 mb-8 text-sm rounded-lg bg-gray-50/50 text-grayMain">
-                <p>
-                    Sikap strives to ensure that its services are accessible to all jobseekers and employers, including those with disabilities. 
-                    We are continuously improving the user experience for everyone and applying the relevant accessibility standards.
-                </p>
-            </div>
+        <!-- Quick Navigation -->
+        <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-center text-primary">Quick Navigation</h3>
+            <nav class="flex flex-wrap justify-center gap-2">
+                <a href="#section-1" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">1. Accessibility Features</a>
+                <a href="#section-2" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">2. Compatibility</a>
+                <a href="#section-3" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">3. Known Limitations</a>
+                <a href="#section-4" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">4. Equal Access</a>
+            </nav>
+        </div>
 
-            <!-- Accessibility Features -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Current Accessibility Features</h2>
-                    
-                    <div class="mb-6">
-                        <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">Navigation</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Consistent navigation structure throughout the platform</li>
-                            <li>Clear headings and page structure</li>
-                            <li>Visible focus indicators for keyboard navigation</li>
-                            <li>Skip navigation links for screen readers</li>
+        <!-- Main Content - Full Width -->
+        <div class="space-y-6">
+            <!-- Current Accessibility Features -->
+            <div id="section-1" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">1</span>
+                    Current Accessibility Features
+                </h2>
+
+                <!-- Sub-sections in grid -->
+                <div class="grid gap-6 md:grid-cols-3">
+                    <!-- Navigation -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Navigation</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Consistent navigation across the platform</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Clear headings and logical page structure</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Visible focus indicators for keyboard navigation</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Skip navigation links for screen reader users</li>
                         </ul>
                     </div>
 
-                    <div class="mb-6">
-                        <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">Visual Design</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>High contrast color schemes</li>
-                            <li>Resizable text without loss of functionality</li>
-                            <li>Alternative text for all meaningful images</li>
-                            <li>Clear and consistent button labeling</li>
+                    <!-- Visual Design -->
+                    <div class="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Visual Design</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>High-contrast color schemes</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Text that can be resized without loss of content or functionality</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Alternative text for meaningful images</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Clear and consistent button labels</li>
                         </ul>
                     </div>
 
-                    <div>
-                        <h3 class="mb-3 text-base font-semibold text-grayMain sm:text-lg">Forms and Interactions</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Form fields with clear labels and error messages</li>
-                            <li>Extended session timeouts for users who need more time</li>
-                            <li>No time-sensitive content that automatically changes</li>
-                            <li>Error prevention on important forms and applications</li>
+                    <!-- Forms and Interactions -->
+                    <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Forms and Interactions</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Properly labeled form fields and descriptive error messages</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Extended session timeouts for users who need more time</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>No auto-refreshing or time-sensitive content</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Error prevention measures on important forms and submissions</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
             <!-- Compatibility -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Compatibility</h2>
-                    <p class="mb-4 text-sm">Sikap is designed to be compatible with:</p>
-                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                        <li>Recent versions of major screen readers</li>
-                        <li>Browser zoom up to 200%</li>
-                        <li>Keyboard-only navigation</li>
-                        <li>Mobile screen readers and accessibility tools</li>
-                    </ul>
+            <div id="section-2" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">2</span>
+                    Compatibility
+                </h2>
+                <p class="mb-4 text-sm text-gray-600">Sikap is designed to be compatible with:</p>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Current versions of major screen readers</span>
+                    </div>
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Keyboard-only navigation</span>
+                    </div>
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Mobile screen readers and accessibility tools</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Known Limitations -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Known Limitations</h2>
-                    <p class="mb-4 text-sm">
-                        While we strive for comprehensive accessibility, some current limitations include:
-                    </p>
-                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                        <li>Some older PDF documents may not be fully accessible</li>
-                        <li>Third-party content (e.g., employer-uploaded documents) may not meet accessibility standards</li>
-                        <li>Complex data visualizations in reports may have limited accessibility</li>
-                    </ul>
+            <div id="section-3" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
+                    Known Limitations
+                </h2>
+                <p class="mb-4 text-sm text-gray-600">While Sikap strives for comprehensive accessibility, certain limitations remain:</p>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg ">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Some older PDF documents may not be fully accessible</span>
+                    </div>
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg ">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Third-party content (e.g., employer-uploaded files) may not always follow accessibility standards</span>
+                    </div>
+                    <div class="flex items-start p-4 border border-gray-200 rounded-lg ">
+                        <span class="mr-3 text-gray-600">•</span>
+                        <span class="text-sm text-gray-700">Complex visual data in reports may have limited accessibility for screen readers</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Alternative Access -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Alternative Access and Support</h2>
-                    <p class="mb-4 text-sm">If you experience any difficulty accessing our services:</p>
-                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                        <li>Contact PESO Rosario's support team for immediate assistance</li>
-                        <li>Request information in alternative formats</li>
-                        <li>Schedule in-person assistance at our office</li>
-                        <li>Get help through our phone support service</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Contact -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Contact Us</h2>
-                    <p class="mb-4 text-sm">For accessibility-related assistance or to report accessibility issues:</p>
-                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                        <li>Email: <a href="mailto:pesorosariobats@gmail.com" class="font-medium text-primary hover:underline">pesorosariobats@gmail.com</a></li>
-                        <li>Phone: (319) 555-0115</li>
-                        <li>Visit: PESO Rosario Office, R6W4+7FH, Rosario - Ibaan Rd, Rosario, Batangas</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Commitment -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Our Commitment</h2>
-                    <p class="text-sm">
-                        PESO Rosario is committed to continuously improving the accessibility of Sikap. We regularly review our platform, 
-                        train our staff on accessibility issues, and welcome feedback from users to help us identify areas for improvement.
+            <!-- Equal Access to Employment -->
+            <div id="section-4" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">4</span>
+                    Equal Access to Employment
+                </h2>
+                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <p class="text-sm text-gray-600">
+                        Accessibility is central to Sikap's mission of inclusive digital employment services. By reducing digital barriers, Sikap ensures that all members of the community can participate fully in the labor market.
                     </p>
                 </div>
             </div>
 
-            <!-- Standards -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Accessibility Standards</h2>
-                    <p class="text-sm">
-                        Sikap aims to comply with WCAG 2.1 Level AA standards and follows the accessibility requirements outlined 
-                        in Republic Act No. 10524 (An Act Expanding the Positions Reserved for Persons with Disability).
-                    </p>
+            <!-- Support Information -->
+            <div class="grid gap-6 md:grid-cols-2">
+                <!-- Contact Support -->
+                <div class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                    <h3 class="mb-3 text-lg font-semibold text-primary">Need Accessibility Support?</h3>
+                    <p class="mb-4 text-sm text-gray-600">If you encounter any accessibility barriers while using Sikap:</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <span class="mr-3 text-primary">•</span>
+                            <span class="text-sm text-gray-700">Contact PESO Rosario for immediate assistance</span>
+                        </div>
+                        <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <span class="mr-3 text-primary">•</span>
+                            <span class="text-sm text-gray-700">Request alternative formats for information</span>
+                        </div>
+                        <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <span class="mr-3 text-primary">•</span>
+                            <span class="text-sm text-gray-700">Schedule in-person assistance at our office</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standards Compliance -->
+                <div class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                    <h3 class="mb-3 text-lg font-semibold text-primary">Accessibility Standards</h3>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <p class="mb-3 text-sm text-gray-600">
+                            Sikap aims to comply with <span class="font-medium">WCAG 2.1 Level AA standards</span> and follows accessibility requirements outlined in Philippine disability laws.
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            We continuously review our platform and welcome feedback to improve accessibility for all users.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Closing Note -->
-            <div class="p-6 mt-8 text-center rounded-lg bg-primary/10">
-                <p class="mb-2 text-base font-semibold text-grayMain sm:text-lg">Equal Access to Employment Opportunities</p>
-                <p class="text-sm text-gray-600">
-                    We believe that everyone deserves equal access to employment opportunities. Our commitment to accessibility reflects our 
-                    mission to serve all members of our community effectively and inclusively.
+            <!-- Contact Information -->
+            <div class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+                <h3 class="mb-3 text-lg font-semibold text-center text-primary">Contact for Accessibility Support</h3>
+                <p class="mb-4 text-sm text-center text-gray-700">
+                    For accessibility-related assistance or to report accessibility issues, please contact PESO Rosario.
                 </p>
+                <div class="text-center">
+                    <a href="mailto:pesorosariobats@gmail.com" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
+                        Contact PESO Rosario
+                    </a>
+                </div>
+            </div>
+
+            <!-- Commitment Statement -->
+            <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
+                <h2 class="mb-4 text-2xl font-bold text-primary">Commitment to Digital Inclusion</h2>
+                <p class="max-w-4xl mx-auto mb-6 text-sm leading-relaxed text-gray-700">
+                    Sikap is dedicated to creating an inclusive digital environment where all community members, regardless of ability, can access employment opportunities and participate fully in the digital economy.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Inclusive Design</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">WCAG Compliant</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Equal Access</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Community-Focused</span>
+                </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>
