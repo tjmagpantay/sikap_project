@@ -3,277 +3,279 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- Resume Writing Tips Section -->
+<section id="resume-tips" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Career Support</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
                 Resume Writing Tips
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
-                Create a compelling resume that stands out to employers and increases your chances of landing interviews
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
+                Create a compelling resume that highlights your skills and increases your chances of better job matches and landing interviews.
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
-        <!-- Main Content -->
-        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Essential Components -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Essential Resume Components</h2>
-                    
+        <!-- Quick Navigation -->
+        <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-center text-primary">Quick Navigation</h3>
+            <nav class="flex flex-wrap justify-center gap-2">
+                <a href="#section-1" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">1. Essential Components</a>
+                <a href="#section-2" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">2. Formatting Tips</a>
+                <a href="#section-3" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">3. Common Mistakes</a>
+                <a href="#section-4" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">4. Success Tips</a>
+                <a href="#section-5" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">5. Quick Checklist</a>
+            </nav>
+        </div>
+
+        <!-- Main Content - Full Width -->
+        <div class="space-y-6">
+            <!-- Essential Resume Components -->
+            <div id="section-1" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">1</span>
+                    Essential Resume Components
+                </h2>
+
+                <!-- Components Grid -->
+                <div class="space-y-6">
                     <!-- Contact Information -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-gray-800 text-md">1. Contact Information</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Full name (in a larger, clear font)</li>
-                            <li>Professional email address</li>
-                            <li>Contact number</li>
-                            <li>Location (City, Province)</li>
-                            <li>LinkedIn profile (if applicable)</li>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">1. Contact Information</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Full name (professional, easy to read)</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Professional email address</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Mobile number</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Location (City, Province)</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>LinkedIn profile (optional)</li>
                         </ul>
                     </div>
 
                     <!-- Professional Summary -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-gray-800 text-md">2. Professional Summary</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Brief 2-3 sentence overview</li>
-                            <li>Highlight key skills and experience</li>
-                            <li>Tailor to job requirements</li>
-                            <li>Use industry-relevant keywords</li>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">2. Professional Summary</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>2–3 sentence career overview</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Showcase top skills and achievements</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Tailor to the job you're applying for</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Use keywords employers search for</li>
                         </ul>
                     </div>
 
                     <!-- Work Experience -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-gray-800 text-md">3. Work Experience</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Company name and location</li>
-                            <li>Job title and dates</li>
-                            <li>Key responsibilities</li>
-                            <li>Quantifiable achievements</li>
-                            <li>Action verbs to start bullet points</li>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">3. Work Experience</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Company name and location</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Job title and employment dates</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Responsibilities + Skills applied</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Quantifiable achievements (e.g., "Improved processing efficiency by 30% using Excel skills")</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Start each bullet point with strong action verbs</li>
                         </ul>
                     </div>
 
                     <!-- Education -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-gray-800 text-md">4. Education</h3>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Degree/certificate name</li>
-                            <li>Institution name</li>
-                            <li>Graduation year</li>
-                            <li>Relevant coursework</li>
-                            <li>Academic achievements</li>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">4. Education</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Degree or certificate name</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Institution name</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Graduation year</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Relevant coursework or projects</li>
                         </ul>
                     </div>
-                    
-                    <div class="p-4 mt-4 rounded-lg text-primary bg-gray-50">
-                        <p class="text-sm font-medium">💡 Pro Tip: Keep your resume to 1-2 pages maximum. Recruiters spend an average of 6-7 seconds on initial resume screening.</p>
+
+                    <!-- Skills Section -->
+                    <div class="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">5. Skills Section ⭐ Key for Job Matching</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-yellow-600">•</span>List technical, soft, and job-specific skills</li>
+                            <li class="flex items-start"><span class="mr-2 text-yellow-600">•</span>Use industry-recognized terms (e.g., "Project Management," "Customer Service," "JavaScript")</li>
+                            <li class="flex items-start"><span class="mr-2 text-yellow-600">•</span>Keep it updated — Sikap's system uses skills to match you with the right employers</li>
+                        </ul>
                     </div>
+                </div>
+
+                <div class="p-4 mt-4 border-l-4 rounded-lg bg-primary border-primary">
+                    <p class="text-sm font-medium text-white">💡 Pro Tip: The more accurately and completely you list your skills, the higher your chances of being matched with suitable job opportunities on Sikap.</p>
                 </div>
             </div>
 
             <!-- Formatting Tips -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Formatting Tips</h2>
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <div>
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">Layout</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Use clear, professional fonts (Arial, Calibri, Times New Roman)</li>
-                                <li>Maintain consistent spacing and margins</li>
-                                <li>Keep to 1-2 pages maximum</li>
-                                <li>Use bullet points for clarity</li>
-                                <li>Include clear section headers</li>
-                            </ul>
-                        </div>
+            <div id="section-2" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">2</span>
+                    Formatting Tips
+                </h2>
 
-                        <div>
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">File Format</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Save as PDF to preserve formatting</li>
-                                <li>Use a clear file name: "YourName-Resume-JobTitle.pdf"</li>
-                                <li>Check formatting on different devices</li>
-                                <li>Keep file size under 2MB</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Common Mistakes -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-red-400 hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Common Mistakes to Avoid</h2>
-                    <div class="space-y-4">
-                        <ul class="ml-6 space-y-3 text-sm list-disc text-grayMain">
-                            <li class="text-red-600"><span class="font-medium">Spelling and grammar errors</span> - Always proofread carefully</li>
-                            <li class="text-red-600"><span class="font-medium">Including personal information</span> (age, marital status, photo)</li>
-                            <li class="text-red-600"><span class="font-medium">Using an unprofessional email address</span></li>
-                            <li class="text-red-600"><span class="font-medium">Generic objectives or summaries</span> - Customize for each job</li>
-                            <li class="text-red-600"><span class="font-medium">Lying or exaggerating experience</span></li>
-                            <li class="text-red-600"><span class="font-medium">Including irrelevant information</span></li>
-                            <li class="text-red-600"><span class="font-medium">Poor formatting or hard-to-read fonts</span></li>
-                            <li class="text-red-600"><span class="font-medium">Not tailoring resume to job description</span></li>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <!-- Layout -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Layout</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Use professional fonts (Arial, Calibri, Times New Roman)</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Keep sections clear and easy to scan</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Use bullet points for responsibilities and skills</li>
                         </ul>
                     </div>
-                    <div class="p-4 mt-4 text-red-700 rounded-lg bg-red-50">
-                        <p class="text-sm font-medium">⚠️ Note: These mistakes can immediately disqualify your application. Always have someone else review your resume before submitting.</p>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Action Verbs -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Powerful Action Verbs</h2>
-                    <div class="grid gap-4 md:grid-cols-3">
-                        <div class="p-4 rounded-lg bg-blue-50">
-                            <h3 class="mb-3 font-semibold text-primary text-md">Leadership</h3>
-                            <ul class="space-y-1 text-sm text-blue-700">
-                                <li>Managed</li>
-                                <li>Directed</li>
-                                <li>Coordinated</li>
-                                <li>Led</li>
-                                <li>Supervised</li>
-                            </ul>
-                        </div>
-                        <div class="p-4 rounded-lg bg-yellow-50">
-                            <h3 class="mb-3 font-semibold text-secondary text-md">Achievement</h3>
-                            <ul class="space-y-1 text-sm text-secondary">
-                                <li>Achieved</li>
-                                <li>Improved</li>
-                                <li>Increased</li>
-                                <li>Reduced</li>
-                                <li>Developed</li>
-                            </ul>
-                        </div>
-                        <div class="p-4 rounded-lg bg-gray-50">
-                            <h3 class="mb-3 font-semibold text-grayMain text-md">Technical</h3>
-                            <ul class="space-y-1 text-sm text-text-grayMain">
-                                <li>Implemented</li>
-                                <li>Programmed</li>
-                                <li>Designed</li>
-                                <li>Maintained</li>
-                                <li>Optimized</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="p-4 mt-4 rounded-lg text-primary bg-gray-50">
-                        <p class="text-sm font-medium">💡 Pro Tip: Start each bullet point with a strong action verb to demonstrate your impact and initiative.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Final Tips -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Final Tips for Success</h2>
-                    <div class="space-y-4 text-gray-700">
-                        <ul class="ml-6 space-y-3 text-sm list-disc text-grayMain">
-                            <li>Update your resume regularly with new skills and experiences</li>
-                            <li>Keep a master resume with all experience to customize for specific jobs</li>
-                            <li>Customize for each application by matching keywords from the job description</li>
-                            <li>Have someone proofread your resume for errors and clarity</li>
-                            <li>Use industry-specific keywords that ATS systems will recognize</li>
-                            <li>Focus on achievements and results rather than just listing duties</li>
+                    <!-- File Format -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">File Format</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Save as PDF to preserve formatting</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Filename example: Firstname-Lastname-Resume-JobTitle.pdf</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Keep file size under 5MB maximum</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Do's and Don'ts Section -->
-            <div class="p-6 rounded-lg bg-gray-50">
-                <h2 class="mb-6 text-lg font-bold text-center text-grayMain sm:text-xl">Quick Resume Checklist</h2>
+            <!-- Common Mistakes to Avoid -->
+            <div id="section-3" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
+                    Common Mistakes to Avoid
+                </h2>
+                <p class="mb-4 text-sm text-gray-600">⚠️ Mistakes that reduce your job-matching chances:</p>
+
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Forgetting to include skills or leaving them vague</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Generic summaries without keywords</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Spelling and grammar mistakes</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Overloading with irrelevant details</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Lying or exaggerating experience</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-red-200 rounded-lg bg-red-50">
+                        <span class="mr-3 text-red-600">×</span>
+                        <span class="text-sm text-gray-700">Using unprofessional email addresses</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Tips for Success -->
+            <div id="section-4" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">4</span>
+                    Final Tips for Success
+                </h2>
+
+                <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-primary">•</span>
+                        <span class="text-sm text-gray-700">Regularly update your resume with new skills</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-primary">•</span>
+                        <span class="text-sm text-gray-700">Maintain a master resume for customizing per job</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-primary">•</span>
+                        <span class="text-sm text-gray-700">Use keywords from job descriptions to match with employers</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-primary">•</span>
+                        <span class="text-sm text-gray-700">Focus on achievements and skill application, not just tasks</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 text-primary">•</span>
+                        <span class="text-sm text-gray-700">Ask someone to review your resume for clarity and errors</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Resume Checklist -->
+            <div id="section-5" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">5</span>
+                    Quick Resume Checklist
+                </h2>
+
                 <div class="grid gap-6 md:grid-cols-2">
                     <!-- Do's Section -->
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <div class="flex items-center mb-4">
-                            <div class="flex items-center justify-center w-10 h-10 p-3 mr-3 bg-blue-100 rounded-full">
-                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <h3 class="mb-4 text-lg font-semibold text-center text-gray-800">✅ Do's</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 border border-green-200 rounded-lg bg-green-50">
+                                <span class="text-sm text-gray-700">✔ Highlight skills relevant to the job</span>
                             </div>
-                            <h3 class="text-lg font-semibold text-grayMain">Do's</h3>
+                            <div class="p-3 border border-green-200 rounded-lg bg-green-50">
+                                <span class="text-sm text-gray-700">✔ Tailor your resume for each application</span>
+                            </div>
+                            <div class="p-3 border border-green-200 rounded-lg bg-green-50">
+                                <span class="text-sm text-gray-700">✔ Quantify achievements with numbers</span>
+                            </div>
+                            <div class="p-3 border border-green-200 rounded-lg bg-green-50">
+                                <span class="text-sm text-gray-700">✔ Use keywords from job descriptions</span>
+                            </div>
                         </div>
-                        <ol class="ml-2 space-y-3 text-sm list-decimal list-inside text-grayMain">
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Tailor your resume</span> for each specific job application
-                            </li>
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Quantify achievements</span> with numbers and metrics
-                            </li>
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Use keywords</span> from the job description
-                            </li>
-                            <li>
-                                <span class="font-medium">Keep it concise</span> and focused on relevant information
-                            </li>
-                        </ol>
                     </div>
-                    
+
                     <!-- Don'ts Section -->
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <div class="flex items-center mb-4">
-                            <div class="flex items-center justify-center w-10 h-10 p-3 mr-3 bg-yellow-100 rounded-full">
-                                <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <h3 class="mb-4 text-lg font-semibold text-center text-gray-800">❌ Don'ts</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 border border-red-200 rounded-lg bg-red-50">
+                                <span class="text-sm text-gray-700">✘ Leave out skills — they are critical for job matching</span>
                             </div>
-                            <h3 class="text-lg font-semibold text-grayMain">Don'ts</h3>
+                            <div class="p-3 border border-red-200 rounded-lg bg-red-50">
+                                <span class="text-sm text-gray-700">✘ Submit resumes longer than 2 pages</span>
+                            </div>
+                            <div class="p-3 border border-red-200 rounded-lg bg-red-50">
+                                <span class="text-sm text-gray-700">✘ Use flashy, unprofessional designs</span>
+                            </div>
+                            <div class="p-3 border border-red-200 rounded-lg bg-red-50">
+                                <span class="text-sm text-gray-700">✘ Write in first person ("I," "me")</span>
+                            </div>
                         </div>
-                        <ol class="ml-2 space-y-3 text-sm list-decimal list-inside text-grayMain">
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Include irrelevant personal information</span> (age, photo, etc.)
-                            </li>
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Use unprofessional fonts or colors</span> - keep it clean
-                            </li>
-                            <li class="pb-2 border-b border-gray-100">
-                                <span class="font-medium">Make it longer than 2 pages</span> unless absolutely necessary
-                            </li>
-                            <li>
-                                <span class="font-medium">Use pronouns like "I" or "me"</span> - start with action verbs
-                            </li>
-                        </ol>
                     </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+                <h3 class="mb-3 text-lg font-semibold text-center text-primary">Need Help with Your Resume?</h3>
+                <p class="mb-4 text-sm text-center text-gray-700">
+                    For assistance with resume writing or career guidance, contact PESO Rosario.
+                </p>
+                <div class="text-center">
+                    <a href="mailto:pesorosariobats@gmail.com" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
+                        Contact PESO Rosario
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer Statement -->
+            <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
+                <h2 class="mb-4 text-2xl font-bold text-primary">Boost Your Job-Matching Success</h2>
+                <p class="max-w-4xl mx-auto mb-6 text-sm leading-relaxed text-gray-700">
+                    Remember: A well-crafted, skill-focused resume doesn't just impress employers — it also boosts your job-matching accuracy on Sikap, helping you get noticed by the right companies faster.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Skill-Focused</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">AI-Optimized</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Better Matching</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Career Success</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>

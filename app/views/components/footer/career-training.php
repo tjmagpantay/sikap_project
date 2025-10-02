@@ -3,190 +3,221 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- Career Training Resources Section -->
+<section id="career-training" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Professional Development</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
                 Career Training Resources
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
-                Enhance your skills and advance your career with these training opportunities
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
+                Career training is an important part of preparing for employment. It helps jobseekers gain new skills, improve existing abilities, and become more competitive in the job market. Employers are looking for candidates who not only have education and experience but also the right set of practical and professional skills.
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
-        <!-- Main Content -->
-        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Skills Development -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Skills Development Programs</h2>
-                    
+        <!-- Quick Navigation -->
+        <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-center text-primary">Quick Navigation</h3>
+            <nav class="flex flex-wrap justify-center gap-2">
+                <a href="#section-1" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">1. Training Programs</a>
+                <a href="#section-2" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">2. Why It Matters</a>
+                <a href="#section-3" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">3. Getting Started</a>
+            </nav>
+        </div>
+
+        <!-- Main Content - Full Width -->
+        <div class="space-y-6">
+            <!-- Available Training Programs -->
+            <div id="section-1" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">1</span>
+                    Available Training Programs
+                </h2>
+                <p class="mb-6 text-sm text-gray-600">At PESO Rosario, a wide range of training programs are offered to support jobseekers in different fields. These may include:</p>
+
+                <!-- Training Categories Grid -->
+                <div class="grid gap-6 md:grid-cols-2">
                     <!-- Technical Skills -->
-                    <div class="mb-6 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
-                        <div class="p-6">
-                            <h3 class="mb-3 font-semibold text-md text-grayMain">Technical Skills Training</h3>
-                            <p class="mb-3 text-sm text-grayMain">Develop practical skills through:</p>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>TESDA certification programs</li>
-                                <li>Industry-specific workshops</li>
-                                <li>Hands-on training sessions</li>
-                                <li>Technical apprenticeships</li>
-                            </ul>
-                        </div>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Technical Skills</h3>
+                        <p class="mb-3 text-sm text-gray-600">Build practical expertise through:</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>TESDA certifications</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Apprenticeship programs</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Industry workshops</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">•</span>Hands-on training sessions</li>
+                        </ul>
                     </div>
 
-                    <!-- Soft Skills -->
-                    <div class="transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
-                        <div class="p-6">
-                            <h3 class="mb-3 font-semibold text-md text-grayMain">Professional Development</h3>
-                            <p class="mb-3 text-sm text-grayMain">Enhance your workplace skills:</p>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Communication workshops</li>
-                                <li>Leadership training</li>
-                                <li>Time management</li>
-                                <li>Problem-solving techniques</li>
-                                <li>Team collaboration</li>
-                            </ul>
-                        </div>
+                    <!-- Digital Skills -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Digital Skills</h3>
+                        <p class="mb-3 text-sm text-gray-600">From basic computer literacy to advanced areas:</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Basic computer literacy</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Digital marketing</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Data analysis</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">•</span>Web development basics</li>
+                        </ul>
                     </div>
-                </div>
-            </div>
 
-            <!-- Digital Skills -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Digital Skills Training</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <!-- Basic Digital Skills -->
-                        <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
-                            <h3 class="mb-3 font-semibold text-md text-grayMain">Basic Digital Skills</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Microsoft Office Suite</li>
-                                <li>Email and communication tools</li>
-                                <li>Internet research</li>
-                                <li>Basic data entry</li>
-                                <li>File management</li>
-                            </ul>
-                        </div>
+                    <!-- Professional Development -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Professional Development</h3>
+                        <p class="mb-3 text-sm text-gray-600">Essential workplace skills:</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Leadership training</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Teamwork and collaboration</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Communication skills</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Time management</li>
+                        </ul>
+                    </div>
 
-                        <!-- Advanced Digital Skills -->
-                        <div class="p-4 transition-all duration-300 border border-gray-200 rounded-lg group hover:border-primary">
-                            <h3 class="mb-3 font-semibold text-md text-grayMain">Advanced Digital Skills</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Digital marketing</li>
-                                <li>Web development</li>
-                                <li>Data analysis</li>
-                                <li>Graphic design</li>
-                                <li>Social media management</li>
-                            </ul>
-                        </div>
+                    <!-- Language Training -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Language Training</h3>
+                        <p class="mb-3 text-sm text-gray-600">Improve communication abilities:</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Business English</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Professional communication</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Public speaking</li>
+                            <li class="flex items-start"><span class="mr-2 text-green-600">•</span>Technical writing</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Language Training -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Language Skills</h2>
-                    <p class="mb-3 text-sm text-grayMain">Improve your language proficiency:</p>
-                    <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                        <li>Business English communication</li>
-                        <li>Technical writing</li>
-                        <li>Public speaking</li>
-                        <li>Customer service communication</li>
-                        <li>Professional email writing</li>
-                    </ul>
-                </div>
-            </div>
+            <!-- Why It Matters -->
+            <div id="section-2" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">2</span>
+                    Why Career Training Matters
+                </h2>
 
-            <!-- Training Schedule -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Upcoming Training Sessions</h2>
-                    
-                    <div class="overflow-hidden border rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Training</th>
-                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Schedule</th>
-                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Duration</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">MS Office Basics</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Monday</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">2 weeks</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Communication Skills</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Wednesday</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">3 weeks</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Digital Marketing</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">Every Friday</td>
-                                    <td class="px-6 py-4 text-sm whitespace-nowrap text-grayMain">4 weeks</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="p-4 border-l-4 rounded-lg bg-primary border-primary">
+                    <p class="text-sm font-medium text-white">
+                        💡 Key Insight: The more you develop your skills, the higher your chances of being matched to the right job opportunities through Sikap. A well-trained applicant has stronger job prospects and better chances of long-term success.
+                    </p>
+                </div>
+
+                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                    <!-- Benefits for Job Seekers -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Benefits for Job Seekers</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-primary">✓</span>Improved job matching on Sikap platform</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">✓</span>Higher chances of being hired</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">✓</span>Better salary opportunities</li>
+                            <li class="flex items-start"><span class="mr-2 text-primary">✓</span>Long-term career growth</li>
+                        </ul>
+                    </div>
+
+                    <!-- Market Competitiveness -->
+                    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h3 class="mb-3 text-base font-semibold text-gray-800">Market Competitiveness</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="mr-2 text-secondary">✓</span>Stay relevant with industry trends</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">✓</span>Meet employer skill requirements</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">✓</span>Adapt to changing job markets</li>
+                            <li class="flex items-start"><span class="mr-2 text-secondary">✓</span>Stand out from other candidates</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Registration Process -->
-            <div class="relative transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">How to Register</h2>
-                    
-                    <ol class="ml-6 space-y-2 text-sm list-decimal text-grayMain">
-                        <li>Visit PESO Rosario office or register online</li>
-                        <li>Select your preferred training program</li>
-                        <li>Submit required documents</li>
-                        <li>Pay training fee (if applicable)</li>
-                        <li>Receive confirmation and schedule</li>
-                    </ol>
-                    
-                    <div class="p-4 mt-4 rounded-lg bg-gray-50">
-                        <p class="text-sm font-medium text-primary">Note: Some programs are free of charge for qualified individuals.</p>
+            <!-- Getting Started -->
+            <div id="section-3" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
+                    Getting Started with Career Training
+                </h2>
+                
+                <p class="mb-6 text-sm text-gray-600">If you are interested in career training, you can visit the PESO Rosario office to explore the available programs. The staff will guide you on requirements, schedules, and registration.</p>
+
+                <!-- Step-by-Step Process -->
+                <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">1.</span>
+                        <span class="text-sm text-gray-700">Visit PESO Rosario office</span>
                     </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">2.</span>
+                        <span class="text-sm text-gray-700">Explore available programs</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">3.</span>
+                        <span class="text-sm text-gray-700">Get guidance on requirements</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">4.</span>
+                        <span class="text-sm text-gray-700">Review schedules and timelines</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">5.</span>
+                        <span class="text-sm text-gray-700">Complete registration process</span>
+                    </div>
+                    <div class="flex items-start p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="mr-3 font-bold text-primary">6.</span>
+                        <span class="text-sm text-gray-700">Begin your training journey</span>
+                    </div>
+                </div>
+
+                <!-- Special Note -->
+                <div class="p-4 mt-6 border-l-4 border-green-500 rounded-lg bg-green-50">
+                    <p class="text-sm font-medium text-green-800">
+                        💰 Good News: Some programs are free for qualified participants, making it easier for everyone to access opportunities for growth.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+                <h3 class="mb-3 text-lg font-semibold text-center text-primary">Ready to Start Your Training?</h3>
+                <p class="mb-4 text-sm text-center text-gray-700">
+                    Contact PESO Rosario to learn more about available training programs and enrollment requirements.
+                </p>
+                
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
+                        <p class="text-sm font-medium text-gray-800">Email</p>
+                        <a href="mailto:pesorosariobats@gmail.com" class="text-sm text-primary hover:underline">pesorosariobats@gmail.com</a>
+                    </div>
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
+                        <p class="text-sm font-medium text-gray-800">Phone</p>
+                        <p class="text-sm text-gray-600">(319) 555-0115</p>
+                    </div>
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
+                        <p class="text-sm font-medium text-gray-800">Office Hours</p>
+                        <p class="text-sm text-gray-600">Monday-Friday, 8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
+                        <p class="text-sm font-medium text-gray-800">Visit Us</p>
+                        <p class="text-sm text-gray-600">R6W4+7FH, Rosario–Ibaan Rd, Rosario, Batangas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Statement -->
+            <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
+                <h2 class="mb-4 text-2xl font-bold text-primary">Invest in Your Future</h2>
+                <p class="max-w-4xl mx-auto mb-6 text-sm leading-relaxed text-gray-700">
+                    Career training is an investment in your professional future. With the right skills and knowledge, you'll be better positioned to take advantage of job opportunities and build a successful career in today's competitive market.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Skill Development</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Career Growth</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Better Opportunities</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Professional Success</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>
