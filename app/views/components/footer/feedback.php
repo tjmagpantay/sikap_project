@@ -11,7 +11,7 @@ use PHPMailer\PHPMailer\Exception;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Load mailer configuration
     $config = require_once __DIR__ . '/../../../../config/mailer.php';
-    
+
     // Create a new PHPMailer instance
     $mail = new PHPMailer(true);
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Recipients
         $mail->setFrom($config['from_email'], $config['from_name']);
-        $mail->addAddress('peso.sikap.dev2025@gmail.com', 'PESO Development Team'); 
+        $mail->addAddress('peso.sikap.dev2025@gmail.com', 'PESO Development Team');
 
         // Get form data
         $name = $_POST['name'] ?? '';
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Content
         $mail->isHTML(true);
         $mail->Subject = "Sikap Feedback: {$feedbackType}";
-        
+
         // Create HTML message
         $htmlMessage = "
             <h2>Feedback Submission from Sikap User</h2>
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p><strong>Message:</strong></p>
             <p>" . nl2br(htmlspecialchars($message)) . "</p>
         ";
-        
+
         $mail->Body = $htmlMessage;
         $mail->AltBody = strip_tags($htmlMessage);
 
@@ -61,14 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- Feedback Section -->
+<section id="feedback" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Support Center</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
                 Share Your Feedback
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
                 Help us improve Sikap by sharing your experience, suggestions, and insights. Your feedback drives our continuous improvement efforts.
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
@@ -76,166 +78,158 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Main Content -->
         <div class="max-w-4xl mx-auto">
-            <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8">
                 <!-- Introduction -->
-                <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                    <div class="p-6">
-                        <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Your Voice Matters</h2>
-                        <p class="text-sm text-grayMain">
-                            We value your opinion and use your feedback to enhance the Sikap platform. Whether you're reporting a bug, suggesting a new feature, or sharing your overall experience, every piece of feedback helps us serve you better.
-                        </p>
-                    </div>
+                <div class="mb-8">
+                    <h2 class="mb-4 text-lg font-bold text-primary sm:text-xl">Your Voice Matters</h2>
+                    <p class="text-sm text-gray-700">
+                        We value your opinion and use your feedback to enhance the Sikap platform. Whether you're reporting a bug, suggesting a new feature, or sharing your overall experience, every piece of feedback helps us serve you better.
+                    </p>
                 </div>
 
                 <!-- Feedback Form -->
-                <div class="relative transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                    <div class="p-6">
-                        <form method="POST" class="space-y-6">
-                            <?php if (isset($success)): ?>
-                                <div class="p-4 text-green-700 rounded-lg bg-green-50">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <p class="font-medium"><?php echo $success; ?></p>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php if (isset($error)): ?>
-                                <div class="p-4 text-red-700 rounded-lg bg-red-50">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        <p class="font-medium"><?php echo $error; ?></p>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-
-                            <!-- Personal Information -->
-                            <div class="mb-6">
-                                <h3 class="mb-4 font-semibold text-blue-600 text-md">Personal Information</h3>
-                                <div class="grid gap-6 md:grid-cols-2">
-                                    <div>
-                                        <label for="name" class="block mb-2 text-sm font-medium text-gray-700">Your Name *</label>
-                                        <input type="text" id="name" name="name" required
-                                            class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                                    </div>
-
-                                    <div>
-                                        <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Your Email *</label>
-                                        <input type="email" id="email" name="email" required
-                                            class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                                    </div>
-                                </div>
+                <form method="POST" class="space-y-6">
+                    <?php if (isset($success)): ?>
+                        <div class="p-4 text-green-700 rounded-lg bg-green-50">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <p class="font-medium"><?php echo $success; ?></p>
                             </div>
+                        </div>
+                    <?php endif; ?>
 
-                            <!-- Feedback Details -->
-                            <div class="mb-6">
-                                <h3 class="mb-4 font-semibold text-blue-600 text-md">Feedback Details</h3>
-                                
-                                <!-- Feedback Type -->
-                                <div class="mb-6">
-                                    <label for="feedback_type" class="block mb-2 text-sm font-medium text-gray-700">Feedback Category *</label>
-                                    <select id="feedback_type" name="feedback_type" required
-                                        class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                                        <option value="">Select feedback category</option>
-                                        <option value="General Feedback">General Feedback</option>
-                                        <option value="Bug Report">Bug Report</option>
-                                        <option value="Feature Request">Feature Request</option>
-                                        <option value="User Experience">User Experience</option>
-                                        <option value="Performance Issue">Performance Issue</option>
-                                        <option value="Security Concern">Security Concern</option>
-                                        <option value="Accessibility">Accessibility</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-
-                                <!-- Rating System -->
-                                <div class="mb-6">
-                                    <label class="block mb-3 text-sm font-medium text-gray-700">Rate Your Overall Experience *</label>
-                                    <div class="flex flex-wrap gap-4">
-                                        <div class="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                                            <input type="radio" id="rating1" name="rating" value="1" required class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
-                                            <label for="rating1" class="ml-2 text-sm text-gray-700">1 - Very Poor</label>
-                                        </div>
-                                        <div class="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                                            <input type="radio" id="rating2" name="rating" value="2" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
-                                            <label for="rating2" class="ml-2 text-sm text-gray-700">2 - Poor</label>
-                                        </div>
-                                        <div class="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                                            <input type="radio" id="rating3" name="rating" value="3" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
-                                            <label for="rating3" class="ml-2 text-sm text-gray-700">3 - Average</label>
-                                        </div>
-                                        <div class="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                                            <input type="radio" id="rating4" name="rating" value="4" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
-                                            <label for="rating4" class="ml-2 text-sm text-gray-700">4 - Good</label>
-                                        </div>
-                                        <div class="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                                            <input type="radio" id="rating5" name="rating" value="5" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
-                                            <label for="rating5" class="ml-2 text-sm text-gray-700">5 - Excellent</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Message -->
-                                <div class="mb-6">
-                                    <label for="message" class="block mb-2 text-sm font-medium text-gray-700">Your Detailed Feedback *</label>
-                                    <textarea id="message" name="message" rows="6" required
-                                        class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm resize-none focus:ring-primary focus:border-primary"
-                                        placeholder="Please share your experience, suggestions, bug reports, or any other feedback. The more specific you are, the better we can address your concerns or implement your suggestions."></textarea>
-                                    <p class="mt-2 text-xs text-gray-500">Minimum 10 characters. Be specific about issues, steps to reproduce bugs, or detailed feature requests.</p>
-                                </div>
+                    <?php if (isset($error)): ?>
+                        <div class="p-4 text-red-700 rounded-lg bg-red-50">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="font-medium"><?php echo $error; ?></p>
                             </div>
+                        </div>
+                    <?php endif; ?>
 
-                            <!-- Submit Button -->
+                    <!-- Personal Information -->
+                    <div class="mb-6">
+                        <h3 class="mb-4 font-semibold text-primary text-md">Personal Information</h3>
+                        <div class="grid gap-6 md:grid-cols-2">
                             <div>
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center w-full px-6 py-3 text-sm font-medium text-white transition-colors rounded-lg shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
-                                    Submit Feedback
-                                </button>
+                                <label for="name" class="block mb-2 text-sm font-medium text-gray-700">Your Name *</label>
+                                <input type="text" id="name" name="name" required
+                                    class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
                             </div>
-                        </form>
+
+                            <div>
+                                <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Your Email *</label>
+                                <input type="email" id="email" name="email" required
+                                    class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                            </div>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Feedback Details -->
+                    <div class="mb-6">
+                        <h3 class="mb-4 font-semibold text-primary text-md">Feedback Details</h3>
+
+                        <!-- Feedback Type -->
+                        <div class="mb-6">
+                            <label for="feedback_type" class="block mb-2 text-sm font-medium text-gray-700">Feedback Category *</label>
+                            <select id="feedback_type" name="feedback_type" required
+                                class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                                <option value="">Select feedback category</option>
+                                <option value="General Feedback">General Feedback</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="User Experience">User Experience</option>
+                                <option value="Performance Issue">Performance Issue</option>
+                                <option value="Security Concern">Security Concern</option>
+                                <option value="Accessibility">Accessibility</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Rating System -->
+                        <div class="mb-6">
+                            <label class="block mb-3 text-sm font-medium text-gray-700">Rate Your Overall Experience *</label>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input type="radio" id="rating1" name="rating" value="1" required class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
+                                    <label for="rating1" class="ml-2 text-sm text-gray-700">1 - Very Poor</label>
+                                </div>
+                                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input type="radio" id="rating2" name="rating" value="2" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
+                                    <label for="rating2" class="ml-2 text-sm text-gray-700">2 - Poor</label>
+                                </div>
+                                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input type="radio" id="rating3" name="rating" value="3" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
+                                    <label for="rating3" class="ml-2 text-sm text-gray-700">3 - Average</label>
+                                </div>
+                                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input type="radio" id="rating4" name="rating" value="4" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
+                                    <label for="rating4" class="ml-2 text-sm text-gray-700">4 - Good</label>
+                                </div>
+                                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input type="radio" id="rating5" name="rating" value="5" class="w-4 h-4 border-gray-300 text-primary focus:ring-primary">
+                                    <label for="rating5" class="ml-2 text-sm text-gray-700">5 - Excellent</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="mb-6">
+                            <label for="message" class="block mb-2 text-sm font-medium text-gray-700">Your Detailed Feedback *</label>
+                            <textarea id="message" name="message" rows="6" required
+                                class="block w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg shadow-sm resize-none focus:ring-primary focus:border-primary"
+                                placeholder="Please share your experience, suggestions, bug reports, or any other feedback. The more specific you are, the better we can address your concerns or implement your suggestions."></textarea>
+                            <p class="mt-2 text-xs text-gray-500">Minimum 10 characters. Be specific about issues, steps to reproduce bugs, or detailed feature requests.</p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit"
+                            class="inline-flex items-center justify-center w-full px-6 py-3 text-sm font-medium text-white transition-colors rounded-lg shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            Submit Feedback
+                        </button>
+                    </div>
+                </form>
 
                 <!-- Feedback Guidelines -->
-                <div class="relative mt-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                    <div class="p-6">
-                        <h3 class="mb-4 font-semibold text-gray-800 text-md">Feedback Guidelines</h3>
-                        
-                        <div class="grid gap-6 md:grid-cols-2">
-                            <div class="p-4 rounded-lg bg-green-50">
-                                <h4 class="mb-3 font-semibold text-green-800">What to Include</h4>
-                                <ul class="ml-6 space-y-2 text-sm text-green-700 list-disc">
-                                    <li>Specific details about issues or suggestions</li>
-                                    <li>Steps to reproduce bugs or problems</li>
-                                    <li>Screenshots or examples when helpful</li>
-                                    <li>Your user type and context of use</li>
-                                    <li>Constructive suggestions for improvement</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="p-4 rounded-lg bg-blue-50">
-                                <h4 class="mb-3 font-semibold text-blue-800">Response Time</h4>
-                                <ul class="ml-6 space-y-2 text-sm text-blue-700 list-disc">
-                                    <li>General feedback: 5-7 business days</li>
-                                    <li>Bug reports: 2-3 business days</li>
-                                    <li>Critical issues: Within 24 hours</li>
-                                    <li>Feature requests: Reviewed monthly</li>
-                                    <li>Follow-up if additional info needed</li>
-                                </ul>
-                            </div>
+                <div class="p-6 mt-8 border border-gray-200 rounded-lg">
+                    <h3 class="mb-4 font-semibold text-gray-800 text-md">Feedback Guidelines</h3>
+
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="mb-3 font-semibold text-green-800">What to Include</h4>
+                            <ul class="ml-6 space-y-2 text-sm text-green-700 list-disc">
+                                <li>Specific details about issues or suggestions</li>
+                                <li>Steps to reproduce bugs or problems</li>
+                                <li>Screenshots or examples when helpful</li>
+                                <li>Your user type and context of use</li>
+                                <li>Constructive suggestions for improvement</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="mb-3 font-semibold text-blue-800">Response Time</h4>
+                            <ul class="ml-6 space-y-2 text-sm text-blue-700 list-disc">
+                                <li>General feedback: 5-7 business days</li>
+                                <li>Bug reports: 2-3 business days</li>
+                                <li>Critical issues: Within 24 hours</li>
+                                <li>Feature requests: Reviewed monthly</li>
+                                <li>Follow-up if additional info needed</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
                 <!-- Privacy and Data Usage -->
-                <div class="p-4 mt-6 text-sm text-gray-600 border-t rounded-lg bg-gray-50">
+                <div class="p-4 mt-6 text-sm text-gray-600 border border-gray-200 rounded-lg">
                     <div class="flex items-start">
                         <svg class="w-4 h-4 mt-0.5 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -249,8 +243,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Feedback Impact Section -->
-            <div class="p-6 mt-8 text-center rounded-lg bg-gray-50" data-aos="fade-up" data-aos-delay="200">
-                <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">How Your Feedback Makes a Difference</h2>
+            <div class="p-6 mt-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h2 class="mb-4 text-lg font-bold text-primary sm:text-xl">How Your Feedback Makes a Difference</h2>
                 <div class="grid gap-6 md:grid-cols-3">
                     <div class="p-4">
                         <div class="flex items-center justify-center w-12 h-12 mx-auto mb-3 text-blue-600 bg-blue-100 rounded-full">
@@ -274,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="p-4">
-                        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-3 text-purple-600 bg-purple-100 rounded-full">
+                        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-3 text-yellow-400 bg-yellow-100 rounded-full">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
@@ -287,34 +281,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </section>
-
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>

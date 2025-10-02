@@ -3,324 +3,211 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- Help Center Section -->
+<section id="help-center" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Support Center</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
                 Help Center
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
-                Comprehensive guides, tutorials, and support resources to help you make the most of Sikap platform
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
+                Guides and support to help you use the Sikap platform
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
-        <!-- Main Content -->
-        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Introduction -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Welcome to Sikap Support</h2>
-                    <p class="text-sm text-grayMain">
-                        Whether you're a job seeker looking for your next opportunity, an employer seeking qualified candidates, or a PESO staff member managing employment programs, our comprehensive help center provides step-by-step guides, troubleshooting tips, and expert support to ensure your success on the platform.
-                    </p>
+        <!-- Quick Navigation -->
+        <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-center text-primary">Quick Navigation</h3>
+            <nav class="flex flex-wrap justify-center gap-2">
+                <a href="#section-1" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">1. For Job Seekers</a>
+                <a href="#section-2" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">2. For Employers</a>
+                <a href="#section-3" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">3. Common Questions</a>
+                <a href="#section-4" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">4. Support</a>
+            </nav>
+        </div>
+
+        <!-- Main Content - Full Width -->
+        <div class="space-y-6">
+            <!-- For Job Seekers -->
+            <div id="section-1" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">1</span>
+                    For Job Seekers
+                </h2>
+
+                <!-- How to Sign In and Apply -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">How to Sign In and Apply for Jobs</h3>
+
+                    <div class="mb-4">
+                        <h4 class="mb-2 text-sm font-semibold text-primary">Getting Started</h4>
+                        <ol class="ml-6 space-y-2 text-sm text-gray-700 list-decimal">
+                            <li>Click <strong>Sign In</strong> on the navigation bar</li>
+                            <li>If you don't have an account, choose <strong>Sign Up</strong> or <strong>Sign in with Google</strong></li>
+                            <li>Complete your profile details</li>
+                            <li>Upload your resume or CV – the system will automatically parse and fill in details like name, contact info, education, and experience</li>
+                            <li>Review and complete your profile</li>
+                        </ol>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="mb-2 text-sm font-semibold text-primary">Once your profile is set up, you can:</h4>
+                        <ul class="ml-6 space-y-2 text-sm text-gray-700 list-disc">
+                            <li>Browse job listings</li>
+                            <li>Get personalized job recommendations</li>
+                            <li>Apply directly to jobs that match your qualifications</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="p-4 mt-4 border-l-4 rounded-lg bg-primary border-primary">
+                    <p class="text-sm font-medium text-white">💡 Tip: A complete profile increases your chances of being matched with the right opportunities.</p>
                 </div>
             </div>
 
-            <!-- Quick Start Guides -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Quick Start Guides</h2>
-                    
-                    <!-- Job Seekers Guide -->
-                    <div class="mb-8">
-                        <h3 class="mb-4 font-semibold text-blue-600 text-md">For Job Seekers</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="p-4 rounded-lg bg-blue-50">
-                                <h4 class="mb-3 font-medium text-blue-800">Creating Your Account</h4>
-                                <ol class="ml-6 space-y-2 text-sm text-blue-700 list-decimal">
-                                    <li>Navigate to the Sikap homepage and click "Sign Up"</li>
-                                    <li>Select "Job Seeker" registration option</li>
-                                    <li>Complete personal information form with accurate details</li>
-                                    <li>Verify your email address through the confirmation link</li>
-                                    <li>Build comprehensive profile with education and work history</li>
-                                    <li>Upload required documents and profile photo</li>
-                                </ol>
-                            </div>
+            <!-- For Employers -->
+            <div id="section-2" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">2</span>
+                    For Employers
+                </h2>
 
-                            <div class="p-4 rounded-lg bg-green-50">
-                                <h4 class="mb-3 font-medium text-green-800">Finding and Applying for Jobs</h4>
-                                <ol class="ml-6 space-y-2 text-sm text-green-700 list-decimal">
-                                    <li>Explore job listings using search filters and categories</li>
-                                    <li>Review personalized job recommendations on your dashboard</li>
-                                    <li>Read job descriptions and requirements thoroughly</li>
-                                    <li>Click "Apply Now" for positions matching your qualifications</li>
-                                    <li>Upload additional documents if required by employer</li>
-                                    <li>Monitor application status and employer responses</li>
-                                </ol>
-                            </div>
+                <!-- How to Sign In and Post Jobs -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">How to Sign In and Post Jobs</h3>
 
-                            <div class="p-4 rounded-lg bg-purple-50">
-                                <h4 class="mb-3 font-medium text-purple-800">Profile Optimization</h4>
-                                <ul class="ml-6 space-y-2 text-sm text-purple-700 list-disc">
-                                    <li>Maintain current contact information and availability</li>
-                                    <li>Regularly update skills, certifications, and training</li>
-                                    <li>Keep documents current and properly formatted</li>
-                                    <li>Set specific job preferences for better matching</li>
-                                    <li>Complete profile sections for higher visibility</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <h4 class="mb-2 text-sm font-semibold text-secondary">Getting Started</h4>
+                        <ol class="ml-6 space-y-2 text-sm text-gray-700 list-decimal">
+                            <li>Click <strong>Post a Job</strong> on the navigation bar</li>
+                            <li>If you don't have an account, select <strong>Sign Up</strong> or <strong>Continue with Google</strong></li>
+                            <li>Complete your profile and company details</li>
+                            <li>Upload all required accreditation documents</li>
+                            <li>Wait for PESO Rosario admin verification and accreditation</li>
+                        </ol>
                     </div>
 
-                    <!-- Employers Guide -->
-                    <div class="mb-6">
-                        <h3 class="mb-4 font-semibold text-green-600 text-md">For Employers</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="p-4 rounded-lg bg-green-50">
-                                <h4 class="mb-3 font-medium text-green-800">Account Setup and Verification</h4>
-                                <ol class="ml-6 space-y-2 text-sm text-green-700 list-decimal">
-                                    <li>Register employer account with company information</li>
-                                    <li>Prepare and submit all required accreditation documents</li>
-                                    <li>Await PESO Rosario verification and approval process</li>
-                                    <li>Complete detailed company profile with business overview</li>
-                                    <li>Set up company branding and contact preferences</li>
-                                </ol>
-                            </div>
-
-                            <div class="p-4 rounded-lg bg-blue-50">
-                                <h4 class="mb-3 font-medium text-blue-800">Job Posting Management</h4>
-                                <ol class="ml-6 space-y-2 text-sm text-blue-700 list-decimal">
-                                    <li>Access "Post New Job" feature from employer dashboard</li>
-                                    <li>Create detailed job descriptions with clear requirements</li>
-                                    <li>Set competitive salary ranges and benefit packages</li>
-                                    <li>Configure application deadlines and screening criteria</li>
-                                    <li>Submit posting for PESO review and approval</li>
-                                    <li>Monitor posting performance and candidate responses</li>
-                                </ol>
-                            </div>
-
-                            <div class="p-4 rounded-lg bg-yellow-50">
-                                <h4 class="mb-3 font-medium text-yellow-800">Recruitment Process</h4>
-                                <ul class="ml-6 space-y-2 text-sm text-yellow-700 list-disc">
-                                    <li>Review applications promptly within 7-day window</li>
-                                    <li>Use filtering tools to identify qualified candidates</li>
-                                    <li>Schedule interviews through platform messaging</li>
-                                    <li>Provide timely feedback and status updates</li>
-                                    <li>Complete hiring process documentation</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <h4 class="mb-2 text-sm font-semibold text-secondary">Once accredited, you can:</h4>
+                        <ul class="ml-6 space-y-2 text-sm text-gray-700 list-disc">
+                            <li>Post job vacancies</li>
+                            <li>Manage applications</li>
+                            <li>Connect with qualified candidates</li>
+                        </ul>
                     </div>
-                    
-                    <div class="p-4 mt-4 rounded-lg text-primary bg-gray-50">
-                        <p class="text-sm font-medium">📘 Pro Tip: Complete tutorials are available in your dashboard to guide you through each process step-by-step.</p>
-                    </div>
+                </div>
+
+                <div class="p-4 mt-4 border-l-4 border-yellow-400 rounded-lg bg-yellow-50">
+                    <p class="text-sm font-medium text-yellow-800">🔒 Note: Only accredited employers can post jobs to ensure authenticity and protect job seekers.</p>
                 </div>
             </div>
 
-            <!-- System Features -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Key Platform Features</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <div class="p-4 rounded-lg bg-green-50">
-                            <h3 class="mb-3 font-semibold text-green-800 text-md">Smart Job Matching</h3>
-                            <p class="text-sm text-green-700">
-                                Advanced machine learning algorithms analyze your profile, skills, experience, and preferences to deliver highly relevant job recommendations. The system continuously learns from your interactions to improve match quality over time.
-                            </p>
-                        </div>
-                        
-                        <div class="p-4 rounded-lg bg-blue-50">
-                            <h3 class="mb-3 font-semibold text-blue-800 text-md">Real-time Application Tracking</h3>
-                            <p class="text-sm text-blue-700">
-                                Monitor all application statuses with instant notifications for views, shortlists, and interview invitations. Track application history and receive automated updates throughout the hiring process.
-                            </p>
-                        </div>
+            <!-- Common Questions -->
+            <div id="section-3" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
+                    Common Questions
+                </h2>
 
-                        <div class="p-4 rounded-lg bg-purple-50">
-                            <h3 class="mb-3 font-semibold text-purple-800 text-md">Secure Document Management</h3>
-                            <p class="text-sm text-purple-700">
-                                Safely store and organize all employment documents in one place. Upload requirements once and reuse for multiple applications while maintaining complete privacy and security.
-                            </p>
-                        </div>
-
-                        <div class="p-4 rounded-lg bg-yellow-50">
-                            <h3 class="mb-3 font-semibold text-yellow-800 text-md">Integrated Chat Support</h3>
-                            <p class="text-sm text-yellow-700">
-                                Access immediate assistance through our intelligent chatbot for common questions, or connect directly with PESO staff for personalized support and guidance.
-                            </p>
-                        </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <!-- Account Issues -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-3 text-base font-semibold text-purple-800">Account Issues</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start"><span class="mr-2 text-purple-600">•</span>Use "Forgot Password" for password reset</li>
+                            <li class="flex items-start"><span class="mr-2 text-purple-600">•</span>Check spam folder for verification emails</li>
+                            <li class="flex items-start"><span class="mr-2 text-purple-600">•</span>Clear browser cache and cookies</li>
+                            <li class="flex items-start"><span class="mr-2 text-purple-600">•</span>Try different browsers or devices</li>
+                        </ul>
                     </div>
-                    
-                    <div class="p-4 mt-4 text-yellow-700 rounded-lg bg-yellow-50">
-                        <p class="text-sm font-medium">🔄 System Updates: Features are continuously improved based on user feedback and technological advances.</p>
+
+                    <!-- Document Upload -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-3 text-base font-semibold text-orange-800">Document Upload</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start"><span class="mr-2 text-orange-600">•</span>Files must be under 5MB</li>
+                            <li class="flex items-start"><span class="mr-2 text-orange-600">•</span>Use PDF, JPG, PNG, or DOC formats</li>
+                            <li class="flex items-start"><span class="mr-2 text-orange-600">•</span>Ensure clear image quality</li>
+                            <li class="flex items-start"><span class="mr-2 text-orange-600">•</span>Compress large files if needed</li>
+                        </ul>
+                    </div>
+
+                    <!-- Application Process -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-3 text-base font-semibold text-blue-800">Application Process</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Complete all required fields</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Check submission confirmation</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Monitor 7-day application window</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600">•</span>Track status in dashboard</li>
+                        </ul>
+                    </div>
+
+                    <!-- Technical Issues -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-3 text-base font-semibold text-red-800">Technical Issues</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start"><span class="mr-2 text-red-600">•</span>Check internet connection</li>
+                            <li class="flex items-start"><span class="mr-2 text-red-600">•</span>Update browser to latest version</li>
+                            <li class="flex items-start"><span class="mr-2 text-red-600">•</span>Disable browser extensions</li>
+                            <li class="flex items-start"><span class="mr-2 text-red-600">•</span>Contact support if issues persist</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Common Issues & Solutions -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Common Issues & Troubleshooting</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <div class="p-4 border rounded-lg hover:shadow-md">
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">Account Access Issues</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Use "Forgot Password" for password reset</li>
-                                <li>Check spam folder for verification emails</li>
-                                <li>Verify account activation status</li>
-                                <li>Clear browser cache and cookies</li>
-                                <li>Try different browsers or devices</li>
-                            </ul>
-                        </div>
+            <!-- Support Options -->
+            <div id="section-4" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">4</span>
+                    Get Support
+                </h2>
 
-                        <div class="p-4 border rounded-lg hover:shadow-md">
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">Document Upload Problems</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Ensure files are under 5MB size limit</li>
-                                <li>Use supported formats (PDF, JPG, PNG, DOC)</li>
-                                <li>Check document image clarity and orientation</li>
-                                <li>Compress large files before uploading</li>
-                                <li>Scan documents at recommended resolution</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-4 border rounded-lg hover:shadow-md">
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">Application Process</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Verify all required fields are completed</li>
-                                <li>Check application submission confirmation</li>
-                                <li>Monitor 7-day application window</li>
-                                <li>Review employer communication preferences</li>
-                                <li>Track multiple applications in dashboard</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-4 border rounded-lg hover:shadow-md">
-                            <h3 class="mb-3 font-semibold text-gray-800 text-md">Technical Performance</h3>
-                            <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                                <li>Ensure stable internet connection</li>
-                                <li>Update browser to latest version</li>
-                                <li>Disable browser extensions temporarily</li>
-                                <li>Use mobile app for better performance</li>
-                                <li>Report persistent errors to support team</li>
-                            </ul>
-                        </div>
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-blue-800">Email Support</h3>
+                        <p class="mb-2 text-sm text-blue-700">Detailed assistance for complex issues</p>
+                        <a href="mailto:pesorosariobats@gmail.com" class="text-sm text-blue-600 hover:underline">pesorosariobats@gmail.com</a>
                     </div>
-                    
-                    <div class="p-4 mt-4 text-red-700 rounded-lg bg-red-50">
-                        <p class="text-sm font-medium">⚠️ Technical Support: If issues persist, contact our technical team with detailed error descriptions and screenshots.</p>
+
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-green-800">Phone Support</h3>
+                        <p class="mb-2 text-sm text-green-700">Immediate assistance</p>
+                        <p class="text-sm font-medium text-green-900">(319) 555-0115</p>
                     </div>
+
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-purple-800">Office Visit</h3>
+                        <p class="mb-2 text-sm text-purple-700">Face-to-face support</p>
+                        <p class="text-sm text-purple-900">PESO Rosario Office<br>Municipal Hall</p>
+                    </div>
+                </div>
+
+                <div class="p-4 mt-4 text-center bg-white border border-gray-200 rounded-lg">
+                    <h3 class="mb-2 text-base font-semibold text-gray-800">Office Hours</h3>
+                    <p class="text-sm text-gray-700">Monday - Friday: 8:00 AM - 5:00 PM</p>
+                    <p class="text-sm text-gray-600">Closed on weekends and holidays</p>
                 </div>
             </div>
 
-            <!-- Support Categories -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Support Categories</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-3">
-                        <div class="p-4 text-center rounded-lg bg-blue-50">
-                            <h3 class="mb-2 font-semibold text-blue-800 text-md">Technical Support</h3>
-                            <p class="text-sm text-blue-700">Platform issues<br>Account problems<br>System errors</p>
-                        </div>
-                        
-                        <div class="p-4 text-center rounded-lg bg-green-50">
-                            <h3 class="mb-2 font-semibold text-green-800 text-md">User Guidance</h3>
-                            <p class="text-sm text-green-700">Feature tutorials<br>Process guidance<br>Best practices</p>
-                        </div>
-                        
-                        <div class="p-4 text-center rounded-lg bg-purple-50">
-                            <h3 class="mb-2 font-semibold text-purple-800 text-md">Program Support</h3>
-                            <p class="text-sm text-purple-700">PESO programs<br>Government initiatives<br>Policy inquiries</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact Support Options -->
-            <div class="p-6 text-center rounded-lg bg-gray-50">
-                <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Get Personalized Support</h2>
-                <p class="mb-4 text-sm text-grayMain">Choose the support method that works best for your needs:</p>
-                
-                <div class="grid gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
-                    <div class="p-4 text-center border rounded-lg hover:shadow-md">
-                        <h3 class="mb-2 font-semibold text-gray-800 text-md">Email Support</h3>
-                        <p class="mb-2 text-sm text-gray-600">Detailed assistance</p>
-                        <a href="mailto:support@peso-rosario.gov.ph" class="text-sm text-blue-600 hover:underline">support@peso-rosario.gov.ph</a>
-                    </div>
-
-                    <div class="p-4 text-center border rounded-lg hover:shadow-md">
-                        <h3 class="mb-2 font-semibold text-gray-800 text-md">Phone Support</h3>
-                        <p class="mb-2 text-sm text-gray-600">Immediate assistance</p>
-                        <p class="text-sm font-medium text-gray-900">(043) 555-0115</p>
-                    </div>
-
-                    <div class="p-4 text-center border rounded-lg hover:shadow-md">
-                        <h3 class="mb-2 font-semibold text-gray-800 text-md">In-Person Visit</h3>
-                        <p class="mb-2 text-sm text-gray-600">Face-to-face help</p>
-                        <p class="text-sm text-gray-900">PESO Rosario Office<br>Municipal Hall</p>
-                    </div>
-
-                    <div class="p-4 text-center border rounded-lg hover:shadow-md">
-                        <h3 class="mb-2 font-semibold text-gray-800 text-md">Office Hours</h3>
-                        <p class="mb-2 text-sm text-gray-600">Service availability</p>
-                        <p class="text-sm text-gray-900">Monday-Friday<br>8:00 AM - 5:00 PM</p>
-                    </div>
-                </div>
-
-                <div class="mt-6 space-x-4">
-                    <a href="/support/live-chat" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-md bg-primary hover:bg-primary-dark">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                        </svg>
-                        Start Live Chat
-                    </a>
-                    <a href="/help/tutorials" class="inline-flex items-center px-4 py-2 text-sm font-medium border rounded-md text-primary border-primary hover:bg-primary hover:text-white">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Watch Tutorials
-                    </a>
+            <!-- Footer Statement -->
+            <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
+                <h2 class="mb-4 text-2xl font-bold text-primary">We're Here to Help You Succeed</h2>
+                <p class="max-w-4xl mx-auto mb-6 text-sm leading-relaxed text-gray-700">
+                    Whether you're searching for your dream job or looking to hire the perfect candidate, our comprehensive help center and dedicated support team are here to guide you every step of the way.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Step-by-Step Guides</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Expert Support</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Quick Solutions</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Always Available</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
 
 <?php include_once __DIR__ . '/../footer.php'; ?>

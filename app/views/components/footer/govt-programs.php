@@ -39,23 +39,23 @@ include_once __DIR__ . '/../navbar.php';
                 </h2>
 
                 <!-- TUPAD Program -->
-                <div class="p-4 mb-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg ">
                     <h3 class="mb-3 text-base font-semibold text-gray-800">TUPAD (Tulong Panghanapbuhay sa Ating Disadvantaged Workers)</h3>
                     <p class="mb-3 text-sm text-gray-600">Short-term emergency employment (10–30 days) for displaced, seasonal, or underemployed workers, with minimum wage pay, insurance, and training opportunities.</p>
                     <div class="grid gap-2 md:grid-cols-2">
-                        <div class="flex items-start p-2 rounded bg-blue-50">
+                        <div class="flex items-start p-3 rounded bg-blue-50">
                             <span class="mr-2 text-blue-600">•</span>
                             <span class="text-sm text-gray-700">Short-term work opportunities (10-30 days)</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-blue-50">
+                        <div class="flex items-start p-3 rounded bg-blue-50">
                             <span class="mr-2 text-blue-600">•</span>
                             <span class="text-sm text-gray-700">Minimum wage compensation</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-blue-50">
+                        <div class="flex items-start p-3 rounded bg-blue-50">
                             <span class="mr-2 text-blue-600">•</span>
                             <span class="text-sm text-gray-700">Work insurance coverage</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-blue-50">
+                        <div class="flex items-start p-3 rounded bg-blue-50">
                             <span class="mr-2 text-blue-600">•</span>
                             <span class="text-sm text-gray-700">Skills training opportunities</span>
                         </div>
@@ -63,23 +63,23 @@ include_once __DIR__ . '/../navbar.php';
                 </div>
 
                 <!-- SPES Program -->
-                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div class="p-4 border border-gray-200 rounded-lg ">
                     <h3 class="mb-3 text-base font-semibold text-gray-800">SPES (Special Program for Employment of Students)</h3>
                     <p class="mb-3 text-sm text-gray-600">Part-time employment during summer or Christmas break for students and out-of-school youth; 40% of salary covered by DOLE and 60% by employer, plus a certificate of work experience.</p>
                     <div class="grid gap-2 md:grid-cols-2">
-                        <div class="flex items-start p-2 rounded bg-green-50">
+                        <div class="flex items-start p-3 rounded bg-green-50">
                             <span class="mr-2 text-green-600">•</span>
                             <span class="text-sm text-gray-700">Summer or Christmas break employment</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-green-50">
+                        <div class="flex items-start p-3 rounded bg-green-50">
                             <span class="mr-2 text-green-600">•</span>
                             <span class="text-sm text-gray-700">40% salary from DOLE, 60% from employer</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-green-50">
+                        <div class="flex items-start p-3 rounded bg-green-50">
                             <span class="mr-2 text-green-600">•</span>
                             <span class="text-sm text-gray-700">Work experience certificate</span>
                         </div>
-                        <div class="flex items-start p-2 rounded bg-green-50">
+                        <div class="flex items-start p-3 rounded bg-green-50">
                             <span class="mr-2 text-green-600">•</span>
                             <span class="text-sm text-gray-700">Career guidance and counseling</span>
                         </div>
@@ -99,7 +99,7 @@ include_once __DIR__ . '/../navbar.php';
                 </h2>
 
                 <!-- Technical-Vocational Training -->
-                <div class="p-4 mb-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg ">
                     <h3 class="mb-3 text-base font-semibold text-gray-800">Technical-Vocational Training</h3>
                     <p class="mb-3 text-sm text-gray-600">Free training in sectors such as:</p>
                     <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
@@ -127,7 +127,7 @@ include_once __DIR__ . '/../navbar.php';
                 </div>
 
                 <!-- TESDA Online Program -->
-                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div class="p-4 border border-gray-200 rounded-lg ">
                     <h3 class="mb-3 text-base font-semibold text-gray-800">TESDA Online Program (TOP)</h3>
                     <p class="mb-3 text-sm text-gray-600">Free online courses and certifications covering digital, industry-specific, and remote-work skills.</p>
                     <div class="grid gap-2 md:grid-cols-2">
@@ -150,8 +150,8 @@ include_once __DIR__ . '/../navbar.php';
                     </div>
                 </div>
 
-                <div class="p-4 mt-4 border-l-4 border-yellow-400 rounded-lg bg-yellow-50">
-                    <p class="text-sm font-medium text-yellow-800">💡 Pro Tip: Many TESDA programs offer free training with allowances. Ask about scholarship opportunities.</p>
+                <div class="p-4 mt-4 border-l-4 rounded-lg bg-primary">
+                    <p class="text-sm font-medium text-white">💡 Pro Tip: Many TESDA programs offer free training with allowances. Ask about scholarship opportunities.</p>
                 </div>
             </div>
 
@@ -204,41 +204,8 @@ include_once __DIR__ . '/../navbar.php';
                     </div>
                 </div>
 
-                <div class="p-4 mt-4 border-l-4 border-green-500 rounded-lg bg-green-50">
-                    <p class="text-sm font-medium text-green-800"> Note: Contact PESO Rosario for current schedules of job fairs, training programs, and orientation seminars.</p>
-                </div>
-            </div>
-
-            <!-- Contact Information -->
-            <div id="section-4" class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
-                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
-                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">4</span>
-                    Need More Information?
-                </h2>
-                <p class="mb-4 text-sm text-center text-gray-700">
-                    Contact PESO Rosario for guidance on government programs and enrollment assistance:
-                </p>
-
-                <div class="grid gap-4 md:grid-cols-3">
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Email</p>
-                        <a href="mailto:pesorosariobats@gmail.com" class="text-sm text-primary hover:underline">pesorosariobats@gmail.com</a>
-                    </div>
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Phone</p>
-                        <p class="text-sm text-gray-600">(319) 555-0115</p>
-                    </div>
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Office Hours</p>
-                        <p class="text-sm text-gray-600">Monday-Friday, 8:00 AM - 5:00 PM</p>
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Visit Us</p>
-                        <p class="text-sm text-gray-600">R6W4+7FH, Rosario–Ibaan Rd, Rosario, Batangas</p>
-                    </div>
+                <div class="p-4 mt-4 border-l-4 border-green-500 rounded-lg bg-primary">
+                    <p class="text-sm font-medium text-white"> Note: Contact PESO Rosario for current schedules of job fairs, training programs, and orientation seminars.</p>
                 </div>
             </div>
 

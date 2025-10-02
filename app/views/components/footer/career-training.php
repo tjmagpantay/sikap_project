@@ -103,7 +103,7 @@ include_once __DIR__ . '/../navbar.php';
                     </p>
                 </div>
 
-                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                <div class="grid gap-4 mt-6 md:grid-cols-2">
                     <!-- Benefits for Job Seekers -->
                     <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
                         <h3 class="mb-3 text-base font-semibold text-gray-800">Benefits for Job Seekers</h3>
@@ -134,7 +134,7 @@ include_once __DIR__ . '/../navbar.php';
                     <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
                     Getting Started with Career Training
                 </h2>
-                
+
                 <p class="mb-6 text-sm text-gray-600">If you are interested in career training, you can visit the PESO Rosario office to explore the available programs. The staff will guide you on requirements, schedules, and registration.</p>
 
                 <!-- Step-by-Step Process -->
@@ -166,8 +166,8 @@ include_once __DIR__ . '/../navbar.php';
                 </div>
 
                 <!-- Special Note -->
-                <div class="p-4 mt-6 border-l-4 border-green-500 rounded-lg bg-green-50">
-                    <p class="text-sm font-medium text-green-800">
+                <div class="p-4 mt-6 border-l-4 rounded-lg bg-primary">
+                    <p class="text-sm font-medium text-white">
                         💰 Good News: Some programs are free for qualified participants, making it easier for everyone to access opportunities for growth.
                     </p>
                 </div>
@@ -179,7 +179,7 @@ include_once __DIR__ . '/../navbar.php';
                 <p class="mb-4 text-sm text-center text-gray-700">
                     Contact PESO Rosario to learn more about available training programs and enrollment requirements.
                 </p>
-                
+
                 <div class="grid gap-4 md:grid-cols-3">
                     <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
                         <p class="text-sm font-medium text-gray-800">Email</p>
@@ -194,7 +194,7 @@ include_once __DIR__ . '/../navbar.php';
                         <p class="text-sm text-gray-600">Monday-Friday, 8:00 AM - 5:00 PM</p>
                     </div>
                 </div>
-                
+
                 <div class="mt-4">
                     <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
                         <p class="text-sm font-medium text-gray-800">Visit Us</p>

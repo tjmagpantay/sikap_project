@@ -210,28 +210,6 @@ include_once __DIR__ . '/../navbar.php';
                 </div>
             </div>
 
-            <!-- Contact Information -->
-            <div class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
-                <h3 class="mb-3 text-lg font-semibold text-center text-primary">Need Help with Job Posting?</h3>
-                <p class="mb-4 text-sm text-center text-gray-700">
-                    Contact PESO Rosario for assistance with creating effective job posts and maximizing your hiring success.
-                </p>
-                
-                <div class="grid gap-4 md:grid-cols-3">
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Email</p>
-                        <a href="mailto:pesorosariobats@gmail.com" class="text-sm text-primary hover:underline">pesorosariobats@gmail.com</a>
-                    </div>
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Phone</p>
-                        <p class="text-sm text-gray-600">(319) 555-0115</p>
-                    </div>
-                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg">
-                        <p class="text-sm font-medium text-gray-800">Office Hours</p>
-                        <p class="text-sm text-gray-600">Monday-Friday, 8:00 AM - 5:00 PM</p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Footer Statement -->
             <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">

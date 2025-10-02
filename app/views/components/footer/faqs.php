@@ -3,310 +3,267 @@ include_once __DIR__ . '/../navbar-top.php';
 include_once __DIR__ . '/../navbar.php';
 ?>
 
-<section class="px-4 py-16 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
+<!-- FAQ Section -->
+<section id="faqs" class="px-4 py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white sm:px-6 md:px-16 lg:px-24">
     <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
-        <div class="mb-12 text-center" data-aos="fade-up">
-            <h1 class="mb-4 text-3xl font-bold text-grayMain sm:text-2xl lg:text-3xl">
-                Frequently Asked Questions
+        <div class="mb-12 text-center">
+            <h6 class="mb-2 font-semibold text-md text-secondary">Support Center</h6>
+            <h1 class="mb-6 text-3xl font-bold leading-tight text-primary lg:text-4xl">
+                Frequently Asked Questions (FAQs)
             </h1>
-            <p class="max-w-3xl mx-auto mb-6 text-sm leading-relaxed text-gray-600">
-                Find answers to common questions about using Sikap platform and PESO Rosario services
+            <p class="max-w-4xl mx-auto mb-8 text-sm leading-relaxed text-gray-600">
+                Common inquiries about the Sikap platform and PESO Rosario services
             </p>
             <div class="w-20 h-1.5 mx-auto bg-primary rounded-full"></div>
         </div>
 
-        <!-- Main Content -->
-        <div class="p-6 bg-white rounded-lg shadow-lg sm:p-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Introduction -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Welcome to Sikap Support</h2>
-                    <p class="text-sm text-grayMain">
-                        Get quick answers to the most commonly asked questions about Sikap platform features, account management, job applications, and employer services. Can't find what you're looking for? Our support team is ready to help with personalized assistance.
+        <!-- Quick Navigation -->
+        <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-center text-primary">Quick Navigation</h3>
+            <nav class="flex flex-wrap justify-center gap-2">
+                <a href="#section-1" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">1. General Questions</a>
+                <a href="#section-2" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">2. For Job Seekers</a>
+                <a href="#section-3" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">3. For Employers</a>
+                <a href="#section-4" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">4. Government Programs</a>
+                <a href="#section-5" class="px-4 py-2 text-sm text-gray-600 transition-colors bg-gray-100 rounded-lg hover:bg-primary hover:text-white">5. Platform & Security</a>
+            </nav>
+        </div>
+
+        <!-- Main Content - Full Width -->
+        <div class="space-y-6">
+            <!-- General Questions -->
+            <div id="section-1" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">1</span>
+                    General Questions
+                </h2>
+
+                <!-- What is Sikap -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">What is Sikap?</h3>
+                    <p class="text-sm text-gray-700">
+                        Sikap is a web-based employment facilitation platform developed for the Public Employment Service Office (PESO) of Rosario, Batangas. It leverages machine learning (ML) to recommend jobs that align with a user's skills, qualifications, and preferences. The system streamlines recruitment by connecting verified employers with job seekers while also supporting PESO's reporting and monitoring functions.
+                    </p>
+                </div>
+
+                <!-- Who can use -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">Who can use Sikap?</h3>
+                    <p class="mb-3 text-sm text-gray-700">The platform is designed for multiple stakeholders:</p>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span><strong>Job Seekers</strong> – Residents of Rosario and nearby areas looking for verified employment opportunities</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span><strong>Employers</strong> – Registered businesses posting job vacancies and screening candidates</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span><strong>PESO Staff</strong> – Government personnel managing employment programs and labor market trends</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span><strong>Partner Organizations</strong> – Schools, training centers, and institutions collaborating with PESO Rosario</li>
+                    </ul>
+                </div>
+
+                <!-- Free to use -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">Is Sikap free to use?</h3>
+                    <p class="text-sm text-gray-700">
+                        Yes. As a public service initiative under the PESO Act of 1999 (RA 8759), Sikap is free for all users. No fees are charged to job seekers, employers, or PESO staff.
+                    </p>
+                </div>
+
+                <div class="p-4 mt-4 border-l-4 rounded-lg bg-primary border-primary">
+                    <p class="text-sm font-medium text-white">💡 Tip: A complete and well-prepared resume increases the accuracy of job matching and improves employer visibility.</p>
+                </div>
+            </div>
+
+            <!-- For Job Seekers -->
+            <div id="section-2" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">2</span>
+                    For Job Seekers
+                </h2>
+
+                <!-- Job Recommendation System -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">How does the job recommendation system work?</h3>
+                    <p class="text-sm text-gray-700">
+                        Sikap's recommendation engine applies ML-driven algorithms (content-based and collaborative filtering). It evaluates user profiles, listed skills, and job requirements to suggest positions that best match an applicant's background.
+                    </p>
+                </div>
+
+                <!-- Track Applications -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">Can I track my job applications?</h3>
+                    <p class="text-sm text-gray-700">
+                        Yes. Sikap provides status updates, including when an application has been viewed, shortlisted, or scheduled for an interview. This ensures transparency in the hiring process.
+                    </p>
+                </div>
+
+                <!-- Application Duration -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">How long does my job application stay active?</h3>
+                    <p class="text-sm text-gray-700">
+                        Applications remain active for 7 days to maintain responsiveness from employers. If no action is taken, the application is archived to keep listings updated and relevant.
                     </p>
                 </div>
             </div>
 
-            <!-- General Questions -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">General Platform Questions</h2>
-                    
-                    <!-- What is Sikap -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">What is Sikap?</h3>
-                        <p class="text-sm text-grayMain">
-                            Sikap is a cutting-edge web-based employment platform developed specifically for PESO Rosario, Batangas. It leverages advanced machine learning algorithms to provide personalized job recommendations, streamlines the recruitment process, and connects job seekers with verified employers. The platform serves as a comprehensive solution for employment facilitation, supporting both local and regional job placement efforts.
-                        </p>
-                    </div>
+            <!-- For Employers -->
+            <div id="section-3" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">3</span>
+                    For Employers
+                </h2>
 
-                    <!-- Who can use -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Who can use Sikap?</h3>
-                        <p class="mb-3 text-sm text-grayMain">Sikap is designed for multiple user types:</p>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li><span class="font-semibold">Job Seekers:</span> Residents of Rosario and nearby areas seeking verified employment opportunities</li>
-                            <li><span class="font-semibold">Employers:</span> Companies and organizations looking to post job openings and find qualified candidates</li>
-                            <li><span class="font-semibold">PESO Staff:</span> Government personnel managing employment programs and tracking labor market trends</li>
-                            <li><span class="font-semibold">Partner Organizations:</span> Institutions collaborating with PESO Rosario on employment initiatives</li>
-                        </ul>
-                    </div>
+                <!-- Employer Services -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">What services does Sikap provide for employers?</h3>
+                    <p class="mb-3 text-sm text-gray-700">Employers have access to tools that include:</p>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Posting and managing job vacancies</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Screening and filtering applicants</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Recruitment performance analytics</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Compliance and reporting features for DOLE and PESO</li>
+                    </ul>
+                </div>
 
-                    <!-- Free to use -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Is Sikap free to use?</h3>
-                        <p class="text-sm text-grayMain">
-                            Yes, Sikap is completely free for all users. As a public service platform developed under the PESO Act of 1999 (RA 8759), there are no charges for job seekers, employers, or PESO staff. This ensures equal access to employment opportunities regardless of economic status.
-                        </p>
+                <div class="p-4 mb-4 border-l-4 border-yellow-400 rounded-lg bg-yellow-50">
+                    <p class="text-sm font-medium text-yellow-800">🔐 Security Note: Employers must complete verification and accreditation before posting jobs to safeguard against fraudulent recruitment.</p>
+                </div>
+
+                <!-- Required Documents -->
+                <div class="border border-gray-200 rounded-lg">
+                    <h3 class="p-4 text-base font-semibold text-gray-800 border-b border-gray-200">What documents are required for employer accreditation?</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-3 text-left border-b">Required Document</th>
+                                    <th class="p-3 text-left border-b">Issuing Source</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Letter of Intent</td>
+                                    <td class="p-3">Company</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Company Profile</td>
+                                    <td class="p-3">Company</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Updated Business Permit</td>
+                                    <td class="p-3">City Hall (BPLIO)</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Certificate of No Pending Case</td>
+                                    <td class="p-3">SEC or DOLE</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">SEC or DOLE Registration</td>
+                                    <td class="p-3">SEC or DOLE</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Certificate of No Objection (Local Recruitment)</td>
+                                    <td class="p-3">DOLE Region IV-A</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">POEA Registration (Overseas Recruitment)</td>
+                                    <td class="p-3">POEA</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-3">Phil-JobNet Registration</td>
+                                    <td class="p-3">www.phil-jobnet.gov.ph</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    
-                    <div class="p-4 mt-4 rounded-lg text-primary bg-gray-50">
-                        <p class="text-sm font-medium">💡 Platform Tip: Create a complete profile to get better job matches and increased visibility to employers.</p>
-                    </div>
+                </div>
+
+                <div class="p-4 mt-4 border-l-4 border-red-400 rounded-lg bg-red-50">
+                    <p class="text-sm font-medium text-red-800">📋 Note: Only accredited employers can post jobs on Sikap. This ensures compliance with national labor regulations and protects job seekers.</p>
                 </div>
             </div>
 
-            <!-- Job Seeker Features -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Job Seeker Features</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <div class="p-4 rounded-lg bg-green-50">
-                            <h3 class="mb-3 font-semibold text-green-800 text-md">Smart Job Matching</h3>
-                            <p class="mb-3 text-sm text-green-700">How does the job recommendation system work?</p>
-                            <p class="text-sm text-green-700">
-                                Sikap uses advanced machine learning algorithms that analyze your profile, skills, experience, and preferences to match you with the most suitable job postings. The system employs content-based filtering and collaborative filtering techniques to ensure highly personalized and relevant job recommendations.
-                            </p>
-                        </div>
-                        
-                        <div class="p-4 rounded-lg bg-purple-50">
-                            <h3 class="mb-3 font-semibold text-purple-800 text-md">Application Tracking</h3>
-                            <p class="mb-3 text-sm text-purple-700">Can I track my job applications?</p>
-                            <p class="text-sm text-purple-700">
-                                Yes! Once registered, you can monitor all application statuses in real-time. Receive updates when your application is viewed, when you're shortlisted, or when employers schedule interviews. The system provides complete transparency throughout the hiring process.
-                            </p>
-                        </div>
-                    </div>
+            <!-- Government Employment Programs -->
+            <div id="section-4" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">4</span>
+                    Government Employment Programs
+                </h2>
 
-                    <!-- Application Duration -->
-                    <div class="mt-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Application Management</h3>
-                        <p class="mb-3 text-sm text-grayMain">How long does my job application stay active?</p>
-                        <p class="text-sm text-grayMain">
-                            Job applications remain active for 7 days to ensure timely employer responses and maintain platform efficiency. If employers don't respond within this timeframe, applications are automatically archived. This system keeps the platform current and ensures active job opportunities receive prompt attention.
-                        </p>
+                <p class="mb-4 text-sm text-gray-700">Sikap integrates monitoring and reporting for government employment initiatives managed by PESO Rosario:</p>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-blue-800">SPES</h3>
+                        <p class="text-sm text-blue-700">Special Program for the Employment of Students</p>
                     </div>
-                    
-                    <div class="p-4 mt-4 text-yellow-700 rounded-lg bg-yellow-50">
-                        <p class="text-sm font-medium">⏰ Time Management: Follow up with employers within the 7-day active period for better response rates.</p>
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-green-800">TUPAD</h3>
+                        <p class="text-sm text-green-700">Tulong Panghanapbuhay sa Disadvantaged/Displaced Workers</p>
                     </div>
+                    <div class="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="mb-2 text-base font-semibold text-purple-800">GIP</h3>
+                        <p class="text-sm text-purple-700">Government Internship Program</p>
+                    </div>
+                </div>
+
+                <p class="mt-4 text-sm text-gray-700">
+                    The system tracks participation, generates compliance-ready reports, and improves program delivery efficiency.
+                </p>
+            </div>
+
+            <!-- Platform Features & Security -->
+            <div id="section-5" class="p-6 transition-all duration-300 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary hover:shadow-md">
+                <h2 class="flex items-center mb-4 text-xl font-bold text-primary">
+                    <span class="flex items-center justify-center w-8 h-8 mr-3 text-sm font-bold text-white rounded-full bg-primary">5</span>
+                    Platform Features & Security
+                </h2>
+
+                <!-- Support Features -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">What support does Sikap provide?</h3>
+                    <p class="mb-3 text-sm text-gray-700">The platform includes:</p>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>A chatbot that provides instant assistance inquiries</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>System notifications for job updates, interview schedules, and application statuses</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Guidance for both employers and job seekers on platform usage</li>
+                    </ul>
+                </div>
+
+                <!-- Data Security -->
+                <div class="p-4 mb-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">How does Sikap ensure data security?</h3>
+                    <p class="text-sm text-gray-700">
+                        Sikap uses encryption, secure authentication (including Google login and optional 2FA), and strict access controls. Only verified users can view or modify data. The system follows international data protection standards to safeguard user privacy.
+                    </p>
+                </div>
+
+                <!-- Benefits for PESO -->
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h3 class="mb-3 text-base font-semibold text-gray-800">Benefits for PESO Rosario</h3>
+                    <p class="mb-3 text-sm text-gray-700">Through Sikap, PESO Rosario gains:</p>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Tools for job facilitation and placement</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Labor market insights through analytics dashboards</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Automated reporting functions for DOLE requirements</li>
+                        <li class="flex items-start"><span class="mr-2 text-primary">•</span>Improved efficiency in program management and service delivery</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Employer Services -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Employer Services</h2>
-                    
-                    <!-- Employer Usage -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">How can employers use Sikap?</h3>
-                        <p class="mb-3 text-sm text-grayMain">Employers have access to comprehensive recruitment tools:</p>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Post detailed job openings with specific requirements</li>
-                            <li>Screen and filter applicants based on qualifications</li>
-                            <li>Communicate directly with candidates through the platform</li>
-                            <li>Manage entire recruitment workflows and timelines</li>
-                            <li>Access analytics and reporting tools for hiring insights</li>
-                        </ul>
-                        <div class="p-4 mt-4 text-blue-700 rounded-lg bg-blue-50">
-                            <p class="text-sm font-medium">🔐 Security Note: All employers must complete verification and submit required documents before posting jobs to ensure legitimate, safe opportunities.</p>
-                        </div>
-                    </div>
-
-                    <!-- Required Documents Table -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Employer Accreditation Requirements</h3>
-                        <p class="mb-4 text-sm text-grayMain">Required documents for employer verification:</p>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm border border-gray-200 rounded-lg">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="p-3 text-left border-b">Required Document</th>
-                                        <th class="p-3 text-left border-b">Source/Where to Secure</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Letter of Intent</td>
-                                        <td class="p-3">Company</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Company Profile</td>
-                                        <td class="p-3">Company</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Updated Business Permit (1 photocopy)</td>
-                                        <td class="p-3">City Hall – BPLIO</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Certificate of No Pending Case</td>
-                                        <td class="p-3">SEC or DOLE</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">SEC or DOLE Registration</td>
-                                        <td class="p-3">SEC or DOLE</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Certificate of No Objection (local recruitment)</td>
-                                        <td class="p-3">DOLE Region IV-A</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">POEA Registration (overseas recruitment)</td>
-                                        <td class="p-3">POEA</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-3">Phil-JobNet Registration</td>
-                                        <td class="p-3">www.phil-jobnet.gov.ph</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="p-4 mt-4 text-red-700 rounded-lg bg-red-50">
-                        <p class="text-sm font-medium">📋 Documentation: Complete verification ensures all job postings are legitimate and comply with labor laws.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Government Programs -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Government Employment Programs</h2>
-                    
-                    <div class="grid gap-6 md:grid-cols-3">
-                        <div class="p-4 text-center rounded-lg bg-blue-50">
-                            <h3 class="mb-2 font-semibold text-blue-800 text-md">SPES</h3>
-                            <p class="text-sm text-blue-700">Special Program for<br>Employment of Students</p>
-                        </div>
-                        
-                        <div class="p-4 text-center rounded-lg bg-green-50">
-                            <h3 class="mb-2 font-semibold text-green-800 text-md">TUPAD</h3>
-                            <p class="text-sm text-green-700">Tulong Panghanapbuhay sa<br>Disadvantaged/Displaced Workers</p>
-                        </div>
-                        
-                        <div class="p-4 text-center rounded-lg bg-purple-50">
-                            <h3 class="mb-2 font-semibold text-purple-800 text-md">GIP</h3>
-                            <p class="text-sm text-purple-700">Government<br>Internship Program</p>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                        <p class="text-sm text-grayMain">
-                            These programs are fully integrated into Sikap for streamlined monitoring, reporting, and participant management. The platform automatically tracks program participation, generates required reports, and ensures compliance with government requirements.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Platform Features -->
-            <div class="relative mb-8 transition-all duration-300 bg-white border border-gray-200 rounded-lg group hover:border-primary hover:shadow-md">
-                <div class="p-6">
-                    <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Platform Features & Security</h2>
-                    
-                    <!-- Support Features -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Built-in Support System</h3>
-                        <p class="mb-3 text-sm text-grayMain">What if I have questions while using Sikap?</p>
-                        <p class="text-sm text-grayMain">
-                            Sikap features an intelligent chatbot that provides instant assistance with platform navigation, job applications, and general inquiries. You'll also receive email and SMS notifications for important updates, job alerts, interview schedules, and application status changes.
-                        </p>
-                    </div>
-
-                    <!-- Security -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">Data Protection & Privacy</h3>
-                        <p class="mb-3 text-sm text-grayMain">Is my personal information safe?</p>
-                        <p class="text-sm text-grayMain">
-                            Absolutely. Sikap employs enterprise-grade security measures including encrypted data transmission, secure authentication systems, and strict access controls. We follow international data protection standards and only verified users can access their personal information. Your privacy and data security are our top priorities.
-                        </p>
-                    </div>
-
-                    <!-- PESO Benefits -->
-                    <div class="mb-6">
-                        <h3 class="mb-3 font-semibold text-blue-600 text-md">PESO Rosario Benefits</h3>
-                        <p class="mb-3 text-sm text-grayMain">How does Sikap help PESO Rosario?</p>
-                        <ul class="ml-6 space-y-2 text-sm list-disc text-grayMain">
-                            <li>Advanced job facilitation and placement tools</li>
-                            <li>Comprehensive labor market analytics and insights</li>
-                            <li>Interactive dashboards for monitoring placements and performance</li>
-                            <li>Automated reporting systems reducing manual workload</li>
-                            <li>Enhanced program delivery and service efficiency</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact Support -->
-            <div class="p-6 text-center rounded-lg bg-gray-50">
-                <h2 class="mb-4 text-lg font-bold text-grayMain sm:text-xl">Need Additional Help?</h2>
-                <p class="mb-4 text-sm text-grayMain">Can't find the answer you're looking for? Our support team is here to provide personalized assistance:</p>
-                <div class="space-y-2 text-sm text-grayMain">
-                    <p>Email Support: <a href="mailto:support@peso-rosario.gov.ph" class="text-blue-600 hover:underline">support@peso-rosario.gov.ph</a></p>
-                    <p>Phone Support: (043) 555-0115</p>
-                    <p>Walk-in Support: PESO Rosario Office, Municipal Hall</p>
-                    <p>Support Hours: Monday-Friday, 8:00 AM - 5:00 PM</p>
-                    <p>Emergency Hotline: Available 24/7 for urgent platform issues</p>
-                </div>
-                <div class="mt-6 space-x-4">
-                    <a href="/support/ticket" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-md bg-primary hover:bg-primary-dark">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                        </svg>
-                        Submit Support Ticket
-                    </a>
-                    <a href="/help/live-chat" class="inline-flex items-center px-4 py-2 text-sm font-medium border rounded-md text-primary border-primary hover:bg-primary hover:text-white">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z"></path>
-                        </svg>
-                        Start Live Chat
-                    </a>
+            <!-- Footer Statement -->
+            <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
+                <h2 class="mb-4 text-2xl font-bold text-primary">Your Success is Our Priority</h2>
+                <p class="max-w-4xl mx-auto mb-6 text-sm leading-relaxed text-gray-700">
+                    We're committed to providing exceptional support and ensuring your experience with Sikap is smooth and successful. Whether you're finding your next career opportunity or building your team, we're here to help every step of the way.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">24/7 Support</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Expert Guidance</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">User-Friendly</span>
+                    <span class="px-4 py-2 text-sm font-medium text-white rounded-full bg-primary">Continuous Improvement</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- AOS Animation Library CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<!-- AOS Animation Library JS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 50,
-            delay: 100,
-            disable: 'mobile',
-            startEvent: 'DOMContentLoaded',
-            useClassNames: false,
-            disableMutationObserver: false,
-            debounceDelay: 50,
-            throttleDelay: 99,
-        });
-    });
-
-    // Refresh AOS on window resize
-    window.addEventListener('resize', function() {
-        AOS.refresh();
-    });
-</script>
-
-<?php include_once __DIR__ . '/../footer.php';
+<?php include_once __DIR__ . '/../footer.php'; ?>

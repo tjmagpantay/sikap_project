@@ -172,18 +172,6 @@ include_once __DIR__ . '/../navbar.php';
                 </div>
             </div>
 
-            <!-- Contact Information -->
-            <div class="p-6 border rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
-                <h3 class="mb-3 text-lg font-semibold text-center text-primary">Contact for Accessibility Support</h3>
-                <p class="mb-4 text-sm text-center text-gray-700">
-                    For accessibility-related assistance or to report accessibility issues, please contact PESO Rosario.
-                </p>
-                <div class="text-center">
-                    <a href="mailto:pesorosariobats@gmail.com" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-primary hover:bg-primary/90">
-                        Contact PESO Rosario
-                    </a>
-                </div>
-            </div>
 
             <!-- Commitment Statement -->
             <div class="p-8 text-center border rounded-lg bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
