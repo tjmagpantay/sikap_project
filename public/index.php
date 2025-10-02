@@ -970,9 +970,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
             break;
 
-        case 'employer-reports':
-            include __DIR__ . '/../app/views/components/footer/employer-reports.php';
-            break;
+
     }
 
 

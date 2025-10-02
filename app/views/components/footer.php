@@ -39,7 +39,6 @@
         <li><a href="?page=employer-registration" class="transition-colors hover:text-white">Registration</a></li>
         <li><a href="?page=employer-partnerships" class="transition-colors hover:text-white">Partnerships</a></li>
         <li><a href="?page=hiring-laws" class="transition-colors hover:text-white">Hiring Laws</a></li>
-        <li><a href="?page=employer-reports" class="transition-colors hover:text-white">Reports</a></li>
       </ul>
     </div>
 
