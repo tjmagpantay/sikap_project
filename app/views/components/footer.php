@@ -1,4 +1,5 @@
 <!-- footer.php -->
+ //UPDATE AND IMPORVE THE FOOTER RESPONSIVENESS
 <footer class="bg-[#092C4C] text-white pt-16 mt-20 ">
   <div class="grid grid-cols-1 gap-2 py-10 mx-auto text-sm max-w-7xl md:grid-cols-6 ">
     <div class="md:col-span-2">
