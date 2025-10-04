@@ -1,58 +1,60 @@
 <!-- footer.php -->
- //UPDATE AND IMPORVE THE FOOTER RESPONSIVENESS
+
 <footer class="bg-[#092C4C] text-white pt-16 mt-20 ">
-  <div class="grid grid-cols-1 gap-2 py-10 mx-auto text-sm max-w-7xl md:grid-cols-6 ">
-    <div class="md:col-span-2">
-      <div class="flex items-center gap-2 mb-4">
-        <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
-        <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11 ">
-        <span class="text-xl font-semibold">Sikap</span>
+  <div class="w-full px-4 py-10">
+    <div class="grid grid-cols-1 gap-6 mx-auto text-sm max-w-7xl md:grid-cols-6">
+      <div class="flex flex-col items-center md:col-span-2 sm:items-start">
+        <div class="flex items-center justify-center gap-2 mb-4 md:justify-start">
+          <img src="assets/images/peso-logo.png" alt="Logo 2" class="w-auto h-12">
+          <img src="assets/images/sikap-logo.png" alt="Logo 1" class="w-auto h-11 ">
+          <span class="text-xl font-semibold">Sikap</span>
+        </div>
+        <p class="mb-2 text-center text-gray-400 md:text-start">Call now: <span class="font-semibold text-white">(319) 555-0115</span></p>
+        <p class="text-center text-gray-400 md:text-start">R6W4+7FH, Rosario - Ibaan Rd, Rosario, Batangas</p>
       </div>
-      <p class="mb-2 text-gray-400">Call now: <span class="font-semibold text-white">(319) 555-0115</span></p>
-      <p class="text-gray-400">R6W4+7FH, Rosario - Ibaan Rd, Rosario, Batangas</p>
-    </div>
-    <div>
-      <h4 class="mb-3 font-medium">Quick Link</h4>
-      <ul class="space-y-4 text-gray-400">
-        <li class="transition-colors hover:text-white"><a href="?page=privacy-policy">Privacy Policy</a></li>
-        <li><a href="?page=terms-use" class="transition-colors hover:text-white">Terms of Use</a></li>
-        <li><a href="?page=accessibility" class="transition-colors hover:text-white">Accessibility</a></li>
-        <li><a href="?page=accreditation" class="transition-colors hover:text-white">Accreditation</a></li>
-      </ul>
-    </div>
+      <div class="flex flex-col items-center md:items-start">
+        <h4 class="mb-3 font-medium text-center md:text-start">Quick Link</h4>
+        <ul class="space-y-4 text-center text-gray-400 md:text-start">
+          <li class="transition-colors hover:text-white"><a href="?page=privacy-policy">Privacy Policy</a></li>
+          <li><a href="?page=terms-use" class="transition-colors hover:text-white">Terms of Use</a></li>
+          <li><a href="?page=accessibility" class="transition-colors hover:text-white">Accessibility</a></li>
+          <li><a href="?page=accreditation" class="transition-colors hover:text-white">Accreditation</a></li>
+        </ul>
+      </div>
 
-    <!-- Candidate -->
-    <div>
-      <h4 class="mb-3 font-medium">Candidate</h4>
-      <ul class="space-y-4 text-gray-400 hover:text-white">
-        <li><a href="?page=how-to-apply" class="transition-colors hover:text-white">How to Apply</a></li>
-        <li><a href="?page=resume-tips" class="transition-colors hover:text-white">Resume Tips</a></li>
-        <li><a href="?page=govt-programs" class="transition-colors hover:text-white">Gov't Programs</a></li>
-        <li><a href="?page=career-training" class="transition-colors hover:text-white">Career Training</a></li>
-      </ul>
-    </div>
+      <!-- Candidate -->
+      <div class="flex flex-col items-center md:items-start">
+        <h4 class="mb-3 font-medium text-center md:text-start">Candidate</h4>
+        <ul class="space-y-4 text-center text-gray-400 md:text-start">
+          <li><a href="?page=how-to-apply" class="transition-colors hover:text-white">How to Apply</a></li>
+          <li><a href="?page=resume-tips" class="transition-colors hover:text-white">Resume Tips</a></li>
+          <li><a href="?page=govt-programs" class="transition-colors hover:text-white">Gov't Programs</a></li>
+          <li><a href="?page=career-training" class="transition-colors hover:text-white">Career Training</a></li>
+        </ul>
+      </div>
 
-    <!-- Employers -->
-    <div>
-      <h4 class="mb-3 font-medium">Employers</h4>
-      <ul class="space-y-4 text-gray-400">
-        <li><a href="?page=post-guide" class="transition-colors hover:text-white">Post Guide</a></li>
-        <li><a href="?page=employer-registration" class="transition-colors hover:text-white">Registration</a></li>
-        <li><a href="?page=employer-partnerships" class="transition-colors hover:text-white">Partnerships</a></li>
-        <li><a href="?page=hiring-laws" class="transition-colors hover:text-white">Hiring Laws</a></li>
-      </ul>
-    </div>
+      <!-- Employers -->
+      <div class="flex flex-col items-center md:items-start">
+        <h4 class="mb-3 font-medium text-center md:text-start">Employers</h4>
+        <ul class="space-y-4 text-center text-gray-400 md:text-start">
+          <li><a href="?page=post-guide" class="transition-colors hover:text-white">Post Guide</a></li>
+          <li><a href="?page=employer-registration" class="transition-colors hover:text-white">Registration</a></li>
+          <li><a href="?page=employer-partnerships" class="transition-colors hover:text-white">Partnerships</a></li>
+          <li><a href="?page=hiring-laws" class="transition-colors hover:text-white">Hiring Laws</a></li>
+        </ul>
+      </div>
 
-    <!-- Support -->
-    <div>
-      <h4 class="mb-3 font-medium">Support</h4>
-      <ul class="space-y-4 text-gray-400">
-        <li><a href="?page=faqs" class="transition-colors hover:text-white">FAQs</a></li>
-        <li><a href="?page=help-center" class="transition-colors hover:text-white">Help Center</a></li>
-        <li><a href="?page=contact-support" class="transition-colors hover:text-white">Contact Support</a></li>
-        <li><a href="?page=feedback" class="transition-colors hover:text-white">Feedback</a></li>
-        <li><a href="?page=admin-login" class="transition-colors hover:text-white">Admin Login</a></li>
-      </ul>
+      <!-- Support -->
+      <div class="flex flex-col items-center md:items-start">
+        <h4 class="mb-3 font-medium text-center md:text-start">Support</h4>
+        <ul class="space-y-4 text-center text-gray-400 md:text-start">
+          <li><a href="?page=faqs" class="transition-colors hover:text-white">FAQs</a></li>
+          <li><a href="?page=help-center" class="transition-colors hover:text-white">Help Center</a></li>
+          <li><a href="?page=contact-support" class="transition-colors hover:text-white">Contact Support</a></li>
+          <li><a href="?page=feedback" class="transition-colors hover:text-white">Feedback</a></li>
+          <li><a href="?page=admin-login" class="transition-colors hover:text-white">Admin Login</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 
