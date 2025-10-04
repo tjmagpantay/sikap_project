@@ -57,12 +57,11 @@ class Employer
                 return false;
             }
 
-            // Check employer profile completion
-            $employerCompleted = !empty($employer['first_name']) &&
+            // Check personal profile completion (4 required fields)
+            $personalCompleted = !empty($employer['first_name']) &&
                 !empty($employer['last_name']) &&
-                !empty($employer['contact_no']) &&
-                !empty($employer['company_name']) &&
-                $employer['profile_completed'] == 1;
+                !empty($employer['position']) &&
+                !empty($employer['contact_no']);
 
             // Get business data
             $business = $this->getBusiness($employer_id);
@@ -70,7 +69,7 @@ class Employer
                 return false;
             }
 
-            // Check business profile completion - essential fields
+            // Check business profile completion (8 required fields)
             $businessCompleted = !empty($business['business_name']) &&
                 !empty($business['business_desc']) &&
                 !empty($business['business_type']) &&
@@ -80,7 +79,29 @@ class Employer
                 !empty($business['business_team_size']) &&
                 !empty($business['business_established_year']);
 
-            return $employerCompleted && $businessCompleted;
+            // Check all 9 required documents
+            $documents = $this->getDocuments($employer_id);
+            $requiredDocuments = [
+                'letter_of_intent',
+                'company_profile',
+                'business_permit',
+                'cert_of_no_pending_case',
+                'dole_registration',
+                'cert_no_objection',
+                'poea_reg',
+                'job_vaccancies_qual',
+                'phil_jobnet_reg'
+            ];
+
+            $allDocumentsUploaded = true;
+            foreach ($requiredDocuments as $docType) {
+                if (empty($documents[$docType])) {
+                    $allDocumentsUploaded = false;
+                    break;
+                }
+            }
+
+            return $personalCompleted && $businessCompleted && $allDocumentsUploaded;
         } catch (Exception $e) {
             error_log('Error checking business completion: ' . $e->getMessage());
             return false;
@@ -190,22 +211,67 @@ class Employer
             return 0;
         }
 
-        $completion = 0;
-        $totalFields = 7;
+        $totalItems = 0;
+        $completedItems = 0;
 
-        if (!empty($employer['first_name'])) $completion++;
-        if (!empty($employer['last_name'])) $completion++;
-        if (!empty($employer['position'])) $completion++;
-        if (!empty($employer['contact_no'])) $completion++;
-
-        $business = $this->getBusiness($employer['employer_id']);
-        if ($business) {
-            if (!empty($business['business_name'])) $completion++;
-            if (!empty($business['business_desc'])) $completion++;
-            if (!empty($business['business_industry'])) $completion++;
+        // 1. Personal Information (4 required fields)
+        $personalFields = ['first_name', 'last_name', 'position', 'contact_no'];
+        foreach ($personalFields as $field) {
+            $totalItems++;
+            if (!empty($employer[$field])) {
+                $completedItems++;
+            }
         }
 
-        return round(($completion / $totalFields) * 100);
+        // 2. Business Information (6 required fields)
+        $business = $this->getBusiness($employer['employer_id']);
+        if ($business) {
+            $businessFields = [
+                'business_name',
+                'business_desc',
+                'business_type',
+                'business_industry',
+                'business_address',
+                'business_contact',
+                'business_team_size',
+                'business_established_year'
+            ];
+
+            foreach ($businessFields as $field) {
+                $totalItems++;
+                if (!empty($business[$field])) {
+                    $completedItems++;
+                }
+            }
+        } else {
+            // If no business record exists, count all business fields as incomplete
+            $totalItems += 8;
+        }
+
+        // 3. Required Documents (9 documents)
+        $documents = $this->getDocuments($employer['employer_id']);
+        $requiredDocuments = [
+            'letter_of_intent',
+            'company_profile',
+            'business_permit',
+            'cert_of_no_pending_case',
+            'dole_registration',
+            'cert_no_objection',
+            'poea_reg',
+            'job_vaccancies_qual',
+            'phil_jobnet_reg'
+        ];
+
+        foreach ($requiredDocuments as $docType) {
+            $totalItems++;
+            if (!empty($documents[$docType])) {
+                $completedItems++;
+            }
+        }
+
+        // Note: Social media is NOT counted as it's optional
+
+        return $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
     }
 
     public function isVerified($user_id)
@@ -508,12 +574,12 @@ class Employer
                         );
 
                         if ($notificationResult) {
-                            error_log("✅ Accreditation request notification sent to admins for accreditation ID: $accreditationId");
+                            error_log("Accreditation request notification sent to admins for accreditation ID: $accreditationId");
                         } else {
-                            error_log("❌ Failed to send accreditation request notification for accreditation ID: $accreditationId");
+                            error_log("Failed to send accreditation request notification for accreditation ID: $accreditationId");
                         }
                     } catch (Exception $e) {
-                        error_log("❌ Error sending accreditation request notification: " . $e->getMessage());
+                        error_log("Error sending accreditation request notification: " . $e->getMessage());
                         // Don't fail the profile completion if notification fails
                     }
                 }
@@ -917,7 +983,7 @@ class Employer
             return 'Unknown Company';
         }
     }
-    
+
     public function updateEmployerStatus($employer_id, $status)
     {
         try {

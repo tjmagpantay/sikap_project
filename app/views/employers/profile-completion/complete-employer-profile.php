@@ -180,13 +180,13 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                 name="contact_no"
                                 type="tel"
                                 required
-                                maxlength="11"
+                                maxlength="13"
                                 value="<?php echo htmlspecialchars($employer['contact_no'] ?? $_POST['contact_no'] ?? ''); ?>"
-                                placeholder="09123456789"
+                                placeholder="09123456789 or +639123456789"
                                 class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
                                 oninput="validateField(this, 'contact_no')"
                                 onblur="validateField(this, 'contact_no')">
-                            <div class="mt-1 text-xs text-gray-500">Format: 09XXXXXXXXX (11 digits)</div>
+                            <div class="mt-1 text-xs text-gray-500">Format: 09 (11 digits) or +639 (13 digits)</div>
                             <div id="contact_no_error" class="hidden mt-1 text-xs text-red-600"></div>
                         </div>
                     </div>
@@ -329,10 +329,10 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         },
         contact_no: {
             required: true,
-            pattern: /^09\d{9}$/,
+            pattern: /^(09\d{9}|\+639\d{9})$/,
             messages: {
                 required: 'Contact number is required',
-                pattern: 'Contact number must start with 09 and be exactly 11 digits (e.g., 09123456789)'
+                pattern: 'Contact number must be in format 09XXXXXXXXX (11 digits) or +639XXXXXXXXX (13 digits)'
             }
         },
         company_name: {
@@ -458,23 +458,73 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         }
     });
 
-    // Real-time validation for contact number (prevent non-numeric input)
+    // Real-time validation for contact number (prevent invalid input)
     document.getElementById('contact_no').addEventListener('input', function(e) {
-        // Only allow numbers
-        let value = e.target.value.replace(/\D/g, '');
+        let value = e.target.value;
 
-        // Ensure it starts with 09
-        if (value.length > 0 && !value.startsWith('09')) {
-            value = '09';
-        }
+        // Remove any characters that aren't numbers, +, or -
+        value = value.replace(/[^\d+]/g, '');
 
-        // Limit to 11 digits
-        if (value.length > 11) {
-            value = value.substring(0, 11);
+        // Handle different input scenarios
+        if (value.startsWith('+639')) {
+            // International format: limit to 13 characters (+639 + 9 digits)
+            if (value.length > 13) {
+                value = value.substring(0, 13);
+            }
+        } else if (value.startsWith('+63')) {
+            // Partial international format
+            if (value.length > 13) {
+                value = value.substring(0, 13);
+            }
+        } else if (value.startsWith('+')) {
+            // Just starting with +
+            if (value.length > 13) {
+                value = value.substring(0, 13);
+            }
+        } else if (value.startsWith('09')) {
+            // Local format: limit to 11 characters (09 + 9 digits)
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+        } else if (value.length > 0 && !value.startsWith('+') && !value.startsWith('09')) {
+            // If user starts typing numbers but not 09 or +, assume they want local format
+            value = '09' + value.replace(/^0+/, '');
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
         }
 
         e.target.value = value;
         validateField(e.target, 'contact_no');
+    });
+
+    // Handle paste events for contact number
+    document.getElementById('contact_no').addEventListener('paste', function(e) {
+        setTimeout(() => {
+            let value = e.target.value;
+
+            // Clean up pasted content
+            value = value.replace(/[^\d+]/g, '');
+
+            // Normalize the format
+            if (value.startsWith('639') && !value.startsWith('+639')) {
+                value = '+' + value;
+            } else if (value.startsWith('9') && value.length === 10) {
+                value = '+63' + value;
+            } else if (value.length === 10 && !value.startsWith('0')) {
+                value = '09' + value;
+            }
+
+            // Apply length limits
+            if (value.startsWith('+639') && value.length > 13) {
+                value = value.substring(0, 13);
+            } else if (value.startsWith('09') && value.length > 11) {
+                value = value.substring(0, 11);
+            }
+
+            e.target.value = value;
+            validateField(e.target, 'contact_no');
+        }, 10);
     });
 </script>
 

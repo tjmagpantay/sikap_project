@@ -380,7 +380,6 @@ class JobPostController
                     // FIXED: Use model method to handle notifications (proper MVC pattern)
                     try {
                         $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
-
                     } catch (Exception $e) {
                         error_log("Failed to send job notifications: " . $e->getMessage());
                     }
@@ -653,7 +652,7 @@ class JobPostController
         // ENHANCED: Get real recommendation percentages if jobseeker is logged in
         if ($jobseeker_id && $recommendationService && !empty($jobs)) {
             try {
-                
+
                 // FIXED: Check for cached recommendations first
                 $cacheKey = "recommendations_{$jobseeker_id}_" . md5(serialize(array_column($jobs, 'job_id')));
                 $cachedRecommendations = null;
@@ -701,7 +700,6 @@ class JobPostController
                 usort($jobs, function ($a, $b) {
                     return ($b['match_percentage'] ?? 0) <=> ($a['match_percentage'] ?? 0);
                 });
-
             } catch (Exception $e) {
                 error_log("Error getting recommendations: " . $e->getMessage());
                 // Apply consistent fallback matching
@@ -821,7 +819,7 @@ class JobPostController
         }
 
         // Validate status
-        $allowed_statuses = ['open', 'paused', 'closed'];
+        $allowed_statuses = ['open', 'closed'];
         if (!in_array($new_status, $allowed_statuses)) {
             header('Location: ?page=manage-jobs&error=' . urlencode('Invalid status.'));
             exit;
@@ -849,13 +847,12 @@ class JobPostController
             if ($new_status === 'open') {
                 try {
                     $notificationResult = $this->jobPostModel->notifyJobPosted($job_id);
- 
                 } catch (Exception $e) {
                     error_log("Failed to send job reopened notifications: " . $e->getMessage());
                 }
             }
 
-            $action = $new_status === 'open' ? 'reopened' : $new_status;
+            $action = $new_status === 'open' ? 'reopened' : 'closed';
             header('Location: ?page=view-employer-job&id=' . $job_id . '&success=' . urlencode("Job $action successfully!"));
         } else {
             header('Location: ?page=view-employer-job&id=' . $job_id . '&error=' . urlencode('Failed to update job status.'));
@@ -943,6 +940,4 @@ class JobPostController
 
         include __DIR__ . '/../views/jobseekers/explore-companies.php';
     }
-
 }
-

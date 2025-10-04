@@ -202,7 +202,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                     echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm font-medium bg-green-100 text-green-800" style="font-size: 0.65rem;">ACTIVE</span>';
                                                     break;
                                                 case 'expired':
-                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm font-medium bg-orange-100 text-orange-800" style="font-size: 0.65rem;">EXPIRED</span>';
+                                                    echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm font-medium bg-red-50 text-red-800" style="font-size: 0.65rem;">EXPIRED</span>';
                                                     break;
                                                 case 'closed':
                                                     echo '<span class="inline-flex items-center px-2.5 py-0.5 rounded-sm  font-medium bg-red-100 text-red-800" style="font-size: 0.65rem;">CLOSED</span>';

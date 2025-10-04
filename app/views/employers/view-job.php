@@ -49,22 +49,33 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             <?php
                                             switch ($job['job_status']) {
                                                 case 'open':
-                                                    echo 'bg-gray-100 text-primary';
+                                                    echo 'bg-green-100 text-green-600';
                                                     break;
                                                 case 'closed':
                                                     echo 'bg-red-100 text-red-800';
                                                     break;
-                                                case 'paused':
-                                                    echo 'bg-yellow-100 text-primary';
-                                                    break;
                                                 case 'draft':
-                                                    echo 'bg-gray-100 text-primary';
+                                                    echo 'bg-yellow-100 text-yellow-800';
                                                     break;
                                                 default:
                                                     echo 'bg-gray-100 text-gray-800';
                                             }
                                             ?>">
-                                            <?php echo strtoupper($job['job_status']); ?>
+                                            <?php
+                                            switch ($job['job_status']) {
+                                                case 'open':
+                                                    echo 'ACTIVE';
+                                                    break;
+                                                case 'closed':
+                                                    echo 'CLOSED';
+                                                    break;
+                                                case 'draft':
+                                                    echo 'DRAFT';
+                                                    break;
+                                                default:
+                                                    echo strtoupper($job['job_status']);
+                                            }
+                                            ?>
                                         </span>
                                     </div>
                                 </div>
@@ -72,21 +83,21 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <!-- Action Buttons -->
                                 <div class="flex items-center gap-2">
                                     <?php if ($job['job_status'] == 'open'): ?>
-                                        <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=paused'"
-                                            class="flex items-center px-4 py-2 text-sm font-medium text-yellow-800 transition-colors border border-yellow-200 rounded-lg bg-yellow-50 hover:bg-yellow-100">
+                                        <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=closed'"
+                                            class="flex items-center px-4 py-2 text-sm font-medium text-red-800 transition-colors border border-red-200 rounded-lg bg-red-50 hover:bg-red-100">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Pause
+                                            Close Job
                                         </button>
-                                    <?php elseif ($job['job_status'] == 'paused'): ?>
+                                    <?php elseif ($job['job_status'] == 'closed'): ?>
                                         <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=open'"
-                                            class="flex items-center px-4 py-2 text-sm font-medium text-green-800 transition-colors border border-green-200 rounded-lg bg-green-50 hover:bg-green-100">
+                                            class="flex items-center px-4 py-2 text-sm font-medium transition-colors border border-yellow-200 rounded-lg text-secondary bg-yellow-50 hover:bg-yellow-200">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Resume
+                                            Reopen Job
                                         </button>
                                     <?php endif; ?>
 
