@@ -201,7 +201,7 @@ $statusFilter = $_GET['status'] ?? null;
                         </div>
 
                         <p class="mt-2 text-xs text-gray-500">
-                            Job posts currently accepting applications (excluding expired) 
+                            Job posts currently accepting applications (excluding expired)
                         </p>
                     </div>
 
@@ -337,20 +337,25 @@ $statusFilter = $_GET['status'] ?? null;
                                 </td>
                             </tr>
                         <?php else: ?>
-                            <?php
-                            // Use real job data from database
-                            foreach ($jobs as $job):
-                                // Calculate days remaining
+                            <?php foreach ($jobs as $job):
+                                // FIXED: Add the same status calculation logic as manage-jobs.php
+                                $actualStatus = $job['actual_status'] ?? $job['job_status'];
+                                $displayStatus = $actualStatus;
+
+                                // Calculate days remaining for deadline display
                                 $daysRemaining = 0;
+                                $isExpired = false;
                                 if (!empty($job['application_deadline'])) {
                                     $deadline = new DateTime($job['application_deadline']);
                                     $now = new DateTime();
                                     if ($deadline > $now) {
                                         $daysRemaining = $now->diff($deadline)->days;
+                                    } else {
+                                        $isExpired = true;
                                     }
                                 }
                             ?>
-                                <tr class="border-t border-gray-200 hover:bg-gray-100">
+                                <tr class="hover:bg-gray-50">
                                     <!-- Job Info Column -->
                                     <td class="px-6 py-5">
                                         <div>
@@ -364,42 +369,46 @@ $statusFilter = $_GET['status'] ?? null;
                                         </div>
                                     </td>
 
-                                    <!-- Status Column -->
+                                    <!-- Status Column - FIXED -->
                                     <td class="px-6 py-5">
                                         <div class="flex items-center">
                                             <?php
-                                            switch (trim($job['job_status'])) {
+                                            // FIXED: Use the same status logic as manage-jobs.php
+                                            switch ($displayStatus) {
                                                 case 'open':
-                                                    echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
-                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>';
-                                                    echo '<span class="text-sm font-medium text-green-600">Active</span>';
+                                                    echo '<div class="flex items-center">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </div>';
+                                                    echo '<span class="ml-2 text-sm font-medium text-gray-600">Active</span>';
+                                                    break;
+                                                case 'expired':
+                                                    echo '<div class="flex items-center">
+                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </div>';
+                                                    echo '<span class="ml-2 text-sm font-medium text-gray-600">Expired</span>';
                                                     break;
                                                 case 'closed':
-                                                    echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
-                                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </div>';
-                                                    echo '<span class="text-sm font-medium text-red-600">Closed</span>';
+                                                    echo '<div class="flex items-center">
+                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </div>';
+                                                    echo '<span class="ml-2 text-sm font-medium text-red-600">Closed</span>';
                                                     break;
                                                 case 'draft':
-                                                    echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
-                                                        <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                        </svg>
-                                                    </div>';
-                                                    echo '<span class="text-sm font-medium text-yellow-500">Draft</span>';
+                                                    echo '<div class="flex items-center">
+                                    <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>';
+                                                    echo '<span class="ml-2 text-sm font-medium text-gray-600">Draft</span>';
                                                     break;
                                                 default:
-                                                    echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
-                                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                    </div>';
-                                                    echo '<span class="text-sm font-medium text-gray-600">' . ucfirst(trim($job['job_status'])) . '</span>';
+                                                    echo '<span class="ml-2 text-sm font-medium text-gray-600">' . ucfirst($displayStatus) . '</span>';
                                             }
                                             ?>
                                         </div>
@@ -486,7 +495,6 @@ $statusFilter = $_GET['status'] ?? null;
                                 </tr>
 
                             <?php endforeach; ?>
-
                         <?php endif; ?>
 
                     </tbody>
