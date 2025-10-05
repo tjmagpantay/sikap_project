@@ -237,9 +237,6 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         placeholder="e.g., Manila, Philippines"
                         class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                     <div id="location-error" class="hidden mt-1 text-xs text-red-600"></div>
-                    <div class="mt-1 text-xs text-gray-400">
-                        Format: City, Country or City, Province
-                    </div>
                 </div>
 
                 <!-- Workplace Option -->
@@ -601,7 +598,7 @@ include_once __DIR__ . '/../components/navbar-employer.php';
             }
 
             if (!value.includes(',')) {
-                showError(location, errorElement, 'Please use format: City, Country or City, Province.');
+                showError(location, errorElement, 'Please use format: City, Province/Country (e.g., Manila, Philippines).');
                 return false;
             }
 

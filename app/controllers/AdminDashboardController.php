@@ -841,7 +841,7 @@ class AdminDashboardController
     private function getDefaultCategoryData()
     {
         return [
-            'categories' => ['Information Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Others'],
+            'categories' => ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Others'],
             'values' => [275, 200, 187, 173, 156, 90],
             'colors' => ['#092C4C', '#F3AF0E', '#3B82F6', '#10B981', '#F59E0B', '#6B7280']
         ];
@@ -878,7 +878,7 @@ class AdminDashboardController
         } catch (Exception $e) {
             error_log('Error getting category data: ' . $e->getMessage());
             return [
-                'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+                'categories' => ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
                 'values' => [0, 0, 0, 0, 0, 0, 0, 0],
                 'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#F59E0B']
             ];
@@ -1009,7 +1009,7 @@ class AdminDashboardController
             // Set fallback data
             $reportStats = $this->getDefaultReportStats();
             $categoryData = [
-                'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+                'categories' => ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
                 'values' => [0, 0, 0, 0, 0, 0, 0, 0],
                 'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#B0AEAE']
             ];

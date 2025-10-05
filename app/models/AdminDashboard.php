@@ -391,7 +391,7 @@ class AdminDashboard
 
             // Fill with default data if no results
             if (empty($categories)) {
-                $categories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'];
+                $categories = ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'];
                 $jobCounts = [0, 0, 0, 0, 0, 0];
                 $applicationCounts = [0, 0, 0, 0, 0, 0];
             }
@@ -404,7 +404,7 @@ class AdminDashboard
         } catch (PDOException $e) {
             error_log('Error getting job category stats for chart: ' . $e->getMessage());
             return [
-                'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'],
+                'categories' => ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'],
                 'job_posts' => [0, 0, 0, 0, 0, 0],
                 'applications' => [0, 0, 0, 0, 0, 0]
             ];
@@ -601,7 +601,7 @@ class AdminDashboard
             if ($count == 0) {
                 // Insert default categories based on your ENUM
                 $categories = [
-                    'IT',
+                    'Technology',
                     'Healthcare',
                     'Education',
                     'Engineering',
@@ -667,11 +667,11 @@ class AdminDashboard
 
             if (empty($categories)) {
                 // Get all categories from enum
-                $categories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
+                $categories = ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
                 $values = [0, 0, 0, 0, 0, 0, 0, 0];
             } else {
                 // Fill missing categories with 0 values to ensure all 8 are present
-                $allCategories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
+                $allCategories = ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
                 $finalCategories = [];
                 $finalValues = [];
 
@@ -706,7 +706,7 @@ class AdminDashboard
 
             // Return all 8 categories as fallback
             return [
-                'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+                'categories' => ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
                 'values' => [0, 0, 0, 0, 0, 0, 0, 0],
                 'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#B0AEAE']
             ];

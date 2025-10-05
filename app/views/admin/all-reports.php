@@ -253,7 +253,7 @@
 
     // ✅ Use same mock/fallback data approach as main-board
     const mockCategoryData = {
-        categories: ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
+        categories: ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
         values: [0, 0, 0, 0, 0, 0, 0, 0],
         colors: jobCategoryColors
     };

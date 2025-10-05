@@ -4,7 +4,7 @@ include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '../components/navbar-employer.php';
 ?>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen ">
     <div class="px-6 py-8 mx-auto max-w-7xl">
         <!-- Header with breadcrumbs -->
         <div class="flex items-center justify-between mb-6">
@@ -54,11 +54,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <!-- Circle Profile Photo -->
                                 <div class="mr-4">
                                     <?php if (!empty($application['profile_picture'])): ?>
-                                        <img src="<?php echo '/sikap/public/' . htmlspecialchars($application['profile_picture']); ?>"
-                                            alt="Profile"
-                                            class="object-cover w-16 h-16 rounded-md shadow-sm">
+                                        <div class="bg-white border-2 border-gray-200 rounded-lg profile-image-container">
+                                            <img src="<?php echo '/sikap/public/' . htmlspecialchars($application['profile_picture']); ?>"
+                                                alt="Profile"
+                                                class="object-cover">
+                                        </div>
                                     <?php else: ?>
-                                        <div class="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-md">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-lg">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
@@ -759,102 +761,27 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php endif; ?>
 
                             <!-- Application Status Management -->
-                            <div class="space-y-4 overflow-visible">
+                            <div class="space-y-4">
                                 <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Update Application Status</h4>
-                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4 overflow-visible">
-                                    <div class="overflow-visible">
+                                <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="space-y-4">
+                                    <div class="relative">
                                         <label class="block mb-2 text-sm font-medium text-gray-700">Status</label>
-                                        <div class="relative overflow-visible" x-data="{ 
-                                            open: false, 
-                                            selected: '<?php
-                                                        $statusLabels = [
-                                                            'pending' => 'Pending',
-                                                            'reviewed' => 'Reviewed',
-                                                            'shortlisted' => 'Shortlisted',
-                                                            'rejected' => 'Rejected',
-                                                            'hired' => 'Hired',
-                                                            'resigned' => 'Resigned'
-                                                        ];
-                                                        echo $statusLabels[$application['application_status']] ?? 'Pending';
-                                                        ?>', 
-                                            selectedValue: '<?php echo $application['application_status']; ?>' 
-                                        }">
-                                            <button type="button" @click="open = !open"
-                                                @click.away="open = false"
-                                                class="flex items-center justify-between w-full px-3 py-3 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                                <span x-text="selected" :class="{'text-gray-500': selected === 'Select Status', 'text-gray-900': selected !== 'Select Status'}"></span>
-                                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-primary" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="relative">
+                                            <select name="status" id="status-select"
+                                                class="block w-full px-3 py-3 pr-10 text-sm text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md shadow-sm appearance-none hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                                <option value="pending" <?php echo $application['application_status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                                <option value="reviewed" <?php echo $application['application_status'] == 'reviewed' ? 'selected' : ''; ?>>Reviewed</option>
+                                                <option value="shortlisted" <?php echo $application['application_status'] == 'shortlisted' ? 'selected' : ''; ?>>Shortlisted</option>
+                                                <option value="rejected" <?php echo $application['application_status'] == 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+                                                <option value="hired" <?php echo $application['application_status'] == 'hired' ? 'selected' : ''; ?>>Hired</option>
+                                                <option value="resigned" <?php echo $application['application_status'] == 'resigned' ? 'selected' : ''; ?>>Resigned</option>
+                                            </select>
+                                            <!-- Custom dropdown arrow
+                                            <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+                                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
-                                            </button>
-
-                                            <div x-show="open"
-                                                x-transition:enter="transition ease-out duration-100"
-                                                x-transition:enter-start="transform opacity-0 scale-95"
-                                                x-transition:enter-end="transform opacity-100 scale-100"
-                                                x-transition:leave="transition ease-in duration-75"
-                                                x-transition:leave-start="transform opacity-100 scale-100"
-                                                x-transition:leave-end="transform opacity-0 scale-95"
-                                                class="absolute left-0 z-[9999] w-full mt-2 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 border border-gray-200 max-h-64 overflow-y-auto"
-                                                style="z-index: 9999;"
-                                                x-cloak>
-                                                <div class="py-1">
-                                                    <button type="button" @click="selected = 'Pending'; selectedValue = 'pending'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-secondary" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Pending
-                                                        </div>
-                                                    </button>
-                                                    <button type="button" @click="selected = 'Reviewed'; selectedValue = 'reviewed'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Reviewed
-                                                        </div>
-                                                    </button>
-                                                    <button type="button" @click="selected = 'Shortlisted'; selectedValue = 'shortlisted'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Shortlisted
-                                                        </div>
-                                                    </button>
-                                                    <button type="button" @click="selected = 'Rejected'; selectedValue = 'rejected'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Rejected
-                                                        </div>
-                                                    </button>
-                                                    <button type="button" @click="selected = 'Hired'; selectedValue = 'hired'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            Hired
-                                                        </div>
-                                                    </button>
-                                                    <button type="button" @click="selected = 'Resigned'; selectedValue = 'resigned'; open = false"
-                                                        class="block w-full px-4 py-3 text-sm text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-primary">
-                                                        <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414L8.586 11l-3.293 3.293a1 1 0 001.414 1.414L10 12.414l3.293 3.293a1 1 0 001.414-1.414L11.414 11l3.293-3.293z" clip-rule="evenodd" />
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <input type="hidden" name="status" :value="selectedValue">
+                                            </div> -->
                                         </div>
                                     </div>
                                     <div class="flex space-x-3">
@@ -864,10 +791,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             </svg>
                                             Update Status
                                         </button>
-
                                     </div>
                                 </form>
                             </div>
+
                         </div>
 
                         <!-- Schedule Interview Tab -->
@@ -1002,3 +929,54 @@ include_once __DIR__ . '../components/navbar-employer.php';
         </div>
     </div>
 </div>
+
+<!-- Add Alpine.js at the end of the file -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+    /* Profile image styling - matching jobseeker profile */
+    .profile-image-container {
+        width: 64px !important;
+        height: 64px !important;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        /* rounded-lg */
+    }
+
+    .profile-image-container img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 100%;
+        min-height: 100%;
+        object-fit: cover;
+    }
+
+    /* Dropdown fixes */
+    .dropdown-overlay {
+        position: absolute !important;
+        z-index: 99999 !important;
+        transform: translateY(0) !important;
+    }
+
+    /* Custom select styling */
+    select {
+        background-image: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    /* Ensure parent containers don't clip the dropdown */
+    .tab-content-container {
+        overflow: visible !important;
+    }
+
+    /* Make sure tab content has enough space */
+    [x-show] {
+        overflow: visible !important;
+    }
+</style>
