@@ -2,7 +2,7 @@
     class="relative w-full px-4 py-8 sm:px-6 md:px-16 lg:px-24 min-h-[650px] flex items-center"
     style="
 background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)), 
-            url('assets/images/hero-page-bg.png');
+            url('assets/images/abt-sikap-header.png');
     background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
@@ -11,9 +11,19 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
     <div class="w-full mx-auto max-w-7xl">
         <div class="relative flex flex-col items-center justify-center w-full text-center">
             <!-- Main Header -->
-            <h1 class="max-w-3xl mb-4 text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl animate-fade-in-up" style="background: linear-gradient(to top right, #1567B2, #092C4C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Public Employment Service Office (PESO) Rosario Batangas
+            <h1 class="max-w-2xl mb-4 text-2xl font-bold leading-relaxed sm:text-3xl md:text-4xl lg:text-5xl animate-fade-in-up">
+                <span style="background: linear-gradient(to right, #1567B2, #1E88E5); 
+               -webkit-background-clip: text; 
+               -webkit-text-fill-color: transparent;">
+                    Public Employment Service Office
+                </span>
+                <span style="background: linear-gradient(to right, #FFC107, #FBC02D); 
+               -webkit-background-clip: text; 
+               -webkit-text-fill-color: transparent;">
+                    Rosario Batangas
+                </span>
             </h1>
+
 
             <!-- Sub Header -->
             <p class="max-w-2xl mb-8 text-sm md:text-sm text-primary animate-fade-in-up-delayed">
@@ -26,7 +36,7 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
                     ABOUT PESO
                 </a>
                 <a href="https://www.lgurosariobatangas.com/" target="_blank"
-                    class="px-6 py-3 text-sm font-medium transition-colors duration-300 bg-gray-100 rounded-md text-primary hover:bg-blue-800">
+                    class="px-6 py-3 text-sm font-medium transition-colors duration-300 border border-gray-100 rounded-md text-primary hover:bg-blue-800">
                     ABOUT ROSARIO
                 </a>
             </div>

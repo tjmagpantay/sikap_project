@@ -9,7 +9,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
         <!-- Job Info Card -->
         <div class="p-6 mb-4 border rounded-lg bg-blue-50">
-            
+
             <div class="flex items-start space-x-4">
                 <!-- Business Logo -->
                 <div class="flex items-center justify-center w-12 h-12 overflow-hidden border-2 rounded-lg border-primary">
@@ -187,7 +187,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                             </div>
                             <div>
                                 <span class="block mb-1 text-xs font-medium text-gray-500">Phone:</span>
-                                <p class="text-sm text-gray-700"><?php echo htmlspecialchars($jobseeker['contact_number'] ?? 'Not provided'); ?></p>
+                                <p class="text-sm text-gray-700"><?php echo htmlspecialchars($jobseeker['contact_no'] ?? 'Not provided'); ?></p>
                             </div>
                             <div>
                                 <span class="block mb-1 text-xs font-medium text-gray-500">Address:</span>
@@ -239,7 +239,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                         </div>
                     </div>
 
-                   
+
 
                     <!-- Existing Resume Documents -->
                     <?php
@@ -414,106 +414,106 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
 
 
-                <div class="mt-8 mb-6 border-t border-gray-200"> </div>
+                    <div class="mt-8 mb-6 border-t border-gray-200"> </div>
 
-                <!-- Additional Documents -->
-                <div>
-                    <label class="block mb-1 font-medium text-md text-primary">
-                        Additional Documents
-                    </label>
-                    <p class="mt-1 mb-4 text-xs text-gray-500">
-                        Upload any additional documents that support your application (certificates, portfolios, etc.)
-                    </p>
+                    <!-- Additional Documents -->
+                    <div>
+                        <label class="block mb-1 font-medium text-md text-primary">
+                            Additional Documents
+                        </label>
+                        <p class="mt-1 mb-4 text-xs text-gray-500">
+                            Upload any additional documents that support your application (certificates, portfolios, etc.)
+                        </p>
 
-                    <!-- Show existing additional attachments -->
-                    <?php
-                    $existingAdditionalAttachments = [];
-                    if (!empty($existingAttachments)) {
-                        foreach ($existingAttachments as $attachment) {
-                            if (!in_array(strtolower($attachment['file_type']), ['resume', 'cv'])) {
-                                $existingAdditionalAttachments[] = $attachment;
+                        <!-- Show existing additional attachments -->
+                        <?php
+                        $existingAdditionalAttachments = [];
+                        if (!empty($existingAttachments)) {
+                            foreach ($existingAttachments as $attachment) {
+                                if (!in_array(strtolower($attachment['file_type']), ['resume', 'cv'])) {
+                                    $existingAdditionalAttachments[] = $attachment;
+                                }
                             }
                         }
-                    }
-                    ?>
+                        ?>
 
-                    <?php if (!empty($existingAdditionalAttachments)): ?>
-                        <div class="mb-4">
-                            <h4 class="mb-3 text-sm font-medium text-gray-700">Previously uploaded documents:</h4>
-                            <div class="space-y-2">
-                                <?php foreach ($existingAdditionalAttachments as $attachment): ?>
-                                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
-                                        <div class="flex items-center space-x-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(basename($attachment['file_path'])); ?></p>
-                                                <p class="text-xs text-gray-500">
-                                                    Type: <?php echo htmlspecialchars($attachment['file_type']); ?>
-                                                    • Uploaded: <?php echo date('M j, Y', strtotime($attachment['uploaded_at'])); ?>
-                                                </p>
+                        <?php if (!empty($existingAdditionalAttachments)): ?>
+                            <div class="mb-4">
+                                <h4 class="mb-3 text-sm font-medium text-gray-700">Previously uploaded documents:</h4>
+                                <div class="space-y-2">
+                                    <?php foreach ($existingAdditionalAttachments as $attachment): ?>
+                                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                            <div class="flex items-center space-x-3">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars(basename($attachment['file_path'])); ?></p>
+                                                    <p class="text-xs text-gray-500">
+                                                        Type: <?php echo htmlspecialchars($attachment['file_type']); ?>
+                                                        • Uploaded: <?php echo date('M j, Y', strtotime($attachment['uploaded_at'])); ?>
+                                                    </p>
+                                                </div>
                                             </div>
+                                            <input type="hidden" name="existing_attachments[]" value="<?php echo htmlspecialchars($attachment['attachment_id']); ?>">
                                         </div>
-                                        <input type="hidden" name="existing_attachments[]" value="<?php echo htmlspecialchars($attachment['attachment_id']); ?>">
-                                    </div>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
-                        </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
-                    <div id="attachments-container">
-                        <div class="p-4 mb-4 border border-gray-300 border-dashed rounded-lg attachment-item">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex-1">
-                                    <input type="file" name="attachments[]"
-                                        class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
-                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <div id="attachments-container">
+                            <div class="p-4 mb-4 border border-gray-300 border-dashed rounded-lg attachment-item">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-1">
+                                        <input type="file" name="attachments[]"
+                                            class="block w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400"
+                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                    </div>
+                                    <div class="w-32">
+                                        <select name="attachment_types[]" class="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
+                                            <option value="Certificate">Certificate</option>
+                                            <option value="Portfolio">Portfolio</option>
+                                            <option value="Transcript">Transcript</option>
+                                            <option value="Others">Others</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" onclick="removeAttachment(this)"
+                                        class="text-red-600 transition-colors hover:text-red-800">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <div class="w-32">
-                                    <select name="attachment_types[]" class="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-gray-400">
-                                        <option value="Certificate">Certificate</option>
-                                        <option value="Portfolio">Portfolio</option>
-                                        <option value="Transcript">Transcript</option>
-                                        <option value="Others">Others</option>
-                                    </select>
-                                </div>
-                                <button type="button" onclick="removeAttachment(this)"
-                                    class="text-red-600 transition-colors hover:text-red-800">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
                             </div>
                         </div>
+
+                        <button type="button" onclick="addAttachment()"
+                            class="flex items-center text-sm transition-colors text-primary hover:text-blue-500">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add Another Document
+                        </button>
                     </div>
 
-                    <button type="button" onclick="addAttachment()"
-                        class="flex items-center text-sm transition-colors text-primary hover:text-blue-500">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Add Another Document
-                    </button>
-                </div>
+                    <div class="flex justify-between">
+                        <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Back to Job Details
+                        </a>
 
-                <div class="flex justify-between">
-                    <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Back to Job Details
-                    </a>
-
-                    <button type="submit"
-                        class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
-                        <?php echo ($application_id && !empty($existingAttachments)) ? 'Update & Continue' : 'Continue to Step 2'; ?>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </button>
-                </div>
+                        <button type="submit"
+                            class="inline-flex items-center px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-blue-700">
+                            <?php echo ($application_id && !empty($existingAttachments)) ? 'Update & Continue' : 'Continue to Step 2'; ?>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
             </form>
         </div>
     </div>

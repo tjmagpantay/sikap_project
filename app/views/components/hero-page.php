@@ -35,7 +35,7 @@ background: linear-gradient(0deg, rgba(122,140,160,0.4), rgba(122,140,160,0.4)),
             </div>
 
             <!-- Search Button -->
-            <button type="submit" class="w-full px-3 py-2 mt-2 text-xs rounded-md btn-primary sm:text-lg md:w-auto md:mt-0 md:ml-2 md:px-4">
+            <button type="submit" class="w-full px-4 py-3 text-xs rounded-md btn-primary sm:text-lg md:w-auto md:mt-0 md:ml-2 md:px-4">
               Find Job
             </button>
           </div>
