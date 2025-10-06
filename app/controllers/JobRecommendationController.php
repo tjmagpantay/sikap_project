@@ -257,6 +257,71 @@ class JobRecommendationController
         }
     }
 
+    // NEW METHOD: Enhanced recommendations with detailed job data
+    public function getRecommendationsWithEnhancedDisplay()
+    {
+        try {
+            $jobseeker_id = (int)$_GET['jobseeker_id'];
+            $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
+
+            // Get recommendations with new system
+            $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
+
+            if ($result['success']) {
+                // NEW: Enhanced job data processing
+                $enhancedJobs = [];
+
+                foreach ($result['recommendations'] as $recommendation) {
+                    // Merge job data with recommendation metadata
+                    $jobData = $this->getJobPostDetails($recommendation['job_id']);
+
+                    if ($jobData) {
+                        $jobData['recommendation_data'] = [
+                            'match_percentage' => $recommendation['match_percentage'],
+                            'match_quality' => $recommendation['match_quality'],
+                            'algorithm_type' => $recommendation['algorithm_type'] ?? 'enhanced',
+                            'scoring_breakdown' => $recommendation['scoring_breakdown'],
+                            'matched_skills' => $recommendation['matched_skills']
+                        ];
+                        $jobData['has_recommendation'] = true;
+                        $enhancedJobs[] = $jobData;
+                    }
+                }
+
+                // Load enhanced view
+                $this->loadView('jobseekers/enhanced-recommendations', [
+                    'jobs' => $enhancedJobs,
+                    'jobseeker' => $result['jobseeker'],
+                    'debug_info' => $result['debug_info'],
+                    'quality_metrics' => $result['quality_metrics'],
+                    'total_analyzed' => $result['total_jobs_analyzed'],
+                    'total_filtered' => $result['jobs_after_filter']
+                ]);
+            } else {
+                // Handle error
+                $this->loadView('jobseekers/recommendations-error', [
+                    'error' => $result['error']
+                ]);
+            }
+        } catch (Exception $e) {
+            error_log('Enhanced Recommendations Error: ' . $e->getMessage());
+            // Fallback to regular recommendations
+            $this->index();
+        }
+    }
+
+    private function getJobPostDetails($job_id)
+    {
+        try {
+            require_once __DIR__ . '/../models/JobPost.php';
+            $jobModel = new JobPost();
+            return $jobModel->getFullJobData($job_id);
+        } catch (Exception $e) {
+            error_log('Error getting job post details: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     private function loadView($viewPath, $data = [])
     {
         // Extract data variables for use in view

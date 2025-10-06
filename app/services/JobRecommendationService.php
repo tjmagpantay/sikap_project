@@ -5,6 +5,7 @@ require_once __DIR__ . '/../models/Jobseeker.php';
 class JobRecommendationService
 {
     private $jobseekerModel;
+    private $pythonScriptPath = __DIR__ . '/../../python/job-recommendation-system/app.py';
 
     public function __construct()
     {
@@ -17,145 +18,37 @@ class JobRecommendationService
     public function getRecommendations($jobseeker_id, $top_k = 10)
     {
         try {
-            error_log("🔍 JobRecommendationService: Getting recommendations for jobseeker {$jobseeker_id}");
-
-            $python_script = __DIR__ . '/../../python/job-recommendation-system/app.py';
-            $python_dir = dirname($python_script);
-
-            // Check if Python script exists
-            if (!file_exists($python_script)) {
-                error_log("❌ Python script not found at: {$python_script}");
-                return [
-                    'success' => false,
-                    'error' => 'Python script not found at: ' . $python_script
-                ];
-            }
-
-            // FIXED: Try different Python executables with proper path
-            $python_executables = ['python', 'python3', 'py'];
-            $working_python = null;
-
-            foreach ($python_executables as $python_exe) {
-                $test_command = "{$python_exe} --version 2>&1";
-                $version_output = shell_exec($test_command);
-
-                if ($version_output && strpos($version_output, 'Python') !== false) {
-                    $working_python = $python_exe;
-                    error_log("✅ Found working Python: {$python_exe}");
-                    break;
-                }
-            }
-
-            if (!$working_python) {
-                error_log("❌ No working Python executable found");
-                return [
-                    'success' => false,
-                    'error' => 'No working Python executable found. Tried: ' . implode(', ', $python_executables)
-                ];
-            }
-
-            // FIXED: Build command with proper directory change and error redirection
             $command = sprintf(
-                'cd /d "%s" && %s app.py recommendations %d %d',
-                $python_dir,
-                $working_python,
+                'cd "%s" && python app.py recommendations %d %d 2>&1',
+                $this->pythonScriptPath,
                 intval($jobseeker_id),
                 intval($top_k)
             );
 
-            error_log("🐍 Executing command: {$command}");
+            $output = shell_exec($command);
 
-            // FIXED: Use different execution method to capture both stdout and stderr
-            $descriptorspec = [
-                0 => ['pipe', 'r'],  // stdin
-                1 => ['pipe', 'w'],  // stdout
-                2 => ['pipe', 'w']   // stderr
-            ];
-
-            $process = proc_open($command, $descriptorspec, $pipes);
-
-            if (is_resource($process)) {
-                // Close stdin
-                fclose($pipes[0]);
-
-                // Read stdout and stderr
-                $stdout = stream_get_contents($pipes[1]);
-                $stderr = stream_get_contents($pipes[2]);
-
-                fclose($pipes[1]);
-                fclose($pipes[2]);
-
-                $return_value = proc_close($process);
-
-                error_log("📤 Python stdout: " . $stdout);
-                error_log("📤 Python stderr: " . $stderr);
-                error_log("📤 Return value: " . $return_value);
-
-                if ($return_value !== 0) {
-                    error_log("❌ Python process failed with return code: {$return_value}");
-                    return [
-                        'success' => false,
-                        'error' => 'Python process failed',
-                        'return_code' => $return_value,
-                        'stderr' => $stderr,
-                        'stdout' => $stdout
-                    ];
-                }
-
-                $output = $stdout;
-            } else {
-                error_log("❌ Failed to start Python process");
+            if ($output === null) {
                 return [
                     'success' => false,
-                    'error' => 'Failed to start Python process'
+                    'error' => 'Failed to execute Python script'
                 ];
             }
 
-            if (empty(trim($output))) {
-                error_log("❌ Python script returned empty output");
-                return [
-                    'success' => false,
-                    'error' => 'Python script returned empty output',
-                    'stderr' => $stderr ?? 'No stderr'
-                ];
-            }
-
-            // Look for JSON in the output (should be the last line)
+            // Clean output to get only JSON
             $lines = explode("\n", trim($output));
-            $json_line = '';
+            $jsonLine = end($lines);
 
-            // Get the last non-empty line (which should be the JSON)
-            for ($i = count($lines) - 1; $i >= 0; $i--) {
-                $line = trim($lines[$i]);
-                if (!empty($line) && (substr($line, 0, 1) === '{' || substr($line, 0, 1) === '[')) {
-                    $json_line = $line;
-                    break;
-                }
-            }
-
-            if (empty($json_line)) {
-                error_log("❌ No JSON found in output");
-                return [
-                    'success' => false,
-                    'error' => 'No valid JSON found in Python output',
-                    'raw_output' => $output,
-                    'all_lines' => $lines
-                ];
-            }
-
-            // Decode JSON
-            $result = json_decode($json_line, true);
+            $result = json_decode($jsonLine, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log("❌ JSON decode error: " . json_last_error_msg());
                 return [
                     'success' => false,
-                    'error' => 'Invalid JSON response: ' . json_last_error_msg(),
-                    'json_line' => $json_line
+                    'error' => 'Invalid JSON response from recommendation engine',
+                    'raw_output' => $output
                 ];
             }
 
-            // Handle Python errors
+            // UPDATED: Handle new algorithm response format
             if (isset($result['error'])) {
                 return [
                     'success' => false,
@@ -163,19 +56,28 @@ class JobRecommendationService
                 ];
             }
 
-            // Ensure success flag
-            $result['success'] = true;
-            if (!isset($result['total_found'])) {
-                $result['total_found'] = count($result['recommendations'] ?? []);
-            }
-
-            error_log("✅ Successfully processed Python response with {$result['total_found']} recommendations");
-            return $result;
+            // Format response for PHP consumption
+            return [
+                'success' => true,
+                'jobseeker' => $result['jobseeker'] ?? [],
+                'recommendations' => $result['recommendations'] ?? [],
+                'total_found' => count($result['recommendations'] ?? []),
+                'total_jobs_analyzed' => $result['total_jobs_analyzed'] ?? 0,
+                'jobs_after_filter' => $result['jobs_after_category_filter'] ?? 0,
+                'algorithm_version' => $result['algorithm_version'] ?? 'unknown',
+                'debug_info' => $result['debug_info'] ?? [],
+                // NEW: Enhanced metadata
+                'quality_metrics' => [
+                    'avg_skill_overlap' => $result['debug_info']['avg_skill_overlap'] ?? 0,
+                    'avg_skill_value' => $result['debug_info']['avg_specificity_score'] ?? 0,
+                    'best_match' => $result['debug_info']['best_overall_match'] ?? 0,
+                    'filtering_applied' => $result['debug_info']['quality_threshold_applied'] ?? false
+                ]
+            ];
         } catch (Exception $e) {
-            error_log("❌ JobRecommendationService Exception: " . $e->getMessage());
             return [
                 'success' => false,
-                'error' => 'Service error: ' . $e->getMessage()
+                'error' => 'System error: ' . $e->getMessage()
             ];
         }
     }

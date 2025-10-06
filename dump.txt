@@ -1,838 +1,2529 @@
-<?php
+"""
+Core Job Recommendation Engine for SIKAP
+Handles all ML logic, data processing, and recommendation algorithms
+"""
+import os
+import sys
 
-class AdminDashboard
-{
-    private $db;
+if os.name == 'nt':  # Windows
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
 
-    public function __construct()
-    {
-        $this->connectDatabase();
-    }
+import mysql.connector as mysql
+import pandas as pd
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import re
+from typing import Dict, List, Optional, Tuple, Any
 
-    private function connectDatabase()
-    {
-        try {
-            $config = require __DIR__ . '/../../config/sikap_db.php';
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            error_log('Database connection failed: ' . $e->getMessage());
-            throw new Exception('Database connection failed');
-        }
-    }
+# Import configuration
+from config import DB_CONFIG
 
-    /**
-     * Get total number of jobseekers
-     */
-    public function getTotalJobseekers()
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM jobseeker";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            error_log('Error getting total jobseekers: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get total number of employers
-     */
-    public function getTotalEmployers()
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM employer";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            error_log('Error getting total employers: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get total number of users (jobseekers + employers)
-     */
-    public function getTotalUsers()
-    {
-        return $this->getTotalJobseekers() + $this->getTotalEmployers();
-    }
-
-    /**
-     * Get active job posts
-     */
-    public function getActiveJobPosts()
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM job_post WHERE job_status = 'open'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            error_log('Error getting active job posts: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get pending accreditations
-     */
-    public function getPendingAccreditations()
-    {
-        try {
-            // Check if accreditation table exists
-            $sql = "SHOW TABLES LIKE 'accreditation'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) {
-                $sql = "SELECT COUNT(*) FROM accreditation WHERE status = 'pending'";
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute();
-                return $stmt->fetchColumn();
-            } else {
-                // If no accreditation table, count employers with pending status
-                $sql = "SELECT COUNT(*) FROM employer WHERE status = 'pending'";
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute();
-                return $stmt->fetchColumn();
-            }
-        } catch (PDOException $e) {
-            error_log('Error getting pending accreditations: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get total applications
-     */
-    public function getTotalApplications()
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM job_application WHERE is_finalized = 1";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            error_log('Error getting total applications: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Calculate user change percentage (30 days comparison)
-     */
-    public function calculateUserChange($currentUsers)
-    {
-        try {
-            // Get users from 30 days ago
-            $sql = "SELECT 
-                        (SELECT COUNT(*) FROM jobseeker WHERE created_at <= DATE_SUB(NOW(), INTERVAL 30 DAY)) +
-                        (SELECT COUNT(*) FROM employer WHERE created_at <= DATE_SUB(NOW(), INTERVAL 30 DAY)) as prev_users";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $prevUsers = $stmt->fetchColumn();
-
-            if ($prevUsers > 0) {
-                return round((($currentUsers - $prevUsers) / $prevUsers) * 100, 1);
-            }
-            return $currentUsers > 0 ? 100 : 0;
-        } catch (PDOException $e) {
-            error_log('Error calculating user change: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Calculate job change percentage (30 days comparison)
-     */
-    public function calculateJobChange($currentJobs)
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM job_post 
-                    WHERE job_status = 'open' 
-                    AND created_at <= DATE_SUB(NOW(), INTERVAL 30 DAY)";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $prevJobs = $stmt->fetchColumn();
-
-            if ($prevJobs > 0) {
-                return round((($currentJobs - $prevJobs) / $prevJobs) * 100, 1);
-            }
-            return $currentJobs > 0 ? 100 : 0;
-        } catch (PDOException $e) {
-            error_log('Error calculating job change: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Calculate application change percentage (30 days comparison)
-     */
-    public function calculateApplicationChange($currentApplications)
-    {
-        try {
-            $sql = "SELECT COUNT(*) FROM job_application 
-                    WHERE is_finalized = 1 
-                    AND applied_at <= DATE_SUB(NOW(), INTERVAL 30 DAY)";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $prevApplications = $stmt->fetchColumn();
-
-            if ($prevApplications > 0) {
-                return round((($currentApplications - $prevApplications) / $prevApplications) * 100, 1);
-            }
-            return $currentApplications > 0 ? 100 : 0;
-        } catch (PDOException $e) {
-            error_log('Error calculating application change: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get all dashboard statistics in one method
-     */
-    public function getDashboardStats()
-    {
-        try {
-            // Get current counts
-            $totalUsers = $this->getTotalUsers();
-            $activeJobs = $this->getActiveJobPosts();
-            $pendingAccreditations = $this->getPendingAccreditations();
-            $totalApplications = $this->getTotalApplications();
-
-            // Calculate percentage changes (30 days comparison)
-            $userChange = $this->calculateUserChange($totalUsers);
-            $jobChange = $this->calculateJobChange($activeJobs);
-            $applicationChange = $this->calculateApplicationChange($totalApplications);
-
-            return [
-                'total_users' => $totalUsers,
-                'active_jobs' => $activeJobs,
-                'pending_accreditations' => $pendingAccreditations,
-                'total_applications' => $totalApplications,
-                'user_change' => $userChange,
-                'job_change' => $jobChange,
-                'application_change' => $applicationChange
-            ];
-        } catch (Exception $e) {
-            error_log('Error getting dashboard stats: ' . $e->getMessage());
-            return [
-                'total_users' => 0,
-                'active_jobs' => 0,
-                'pending_accreditations' => 0,
-                'total_applications' => 0,
-                'user_change' => 0,
-                'job_change' => 0,
-                'application_change' => 0
-            ];
-        }
-    }
-
-    /**
-     * Get recent activity for dashboard
-     */
-    public function getRecentActivity($limit = 10)
-    {
-        try {
-            $sql = "
-                (SELECT 'job_application' as type, 
-                        CONCAT(j.first_name, ' ', j.last_name) as user_name,
-                        jp.job_title as description,
-                        ja.applied_at as created_at
-                 FROM job_application ja
-                 JOIN jobseeker j ON ja.jobseeker_id = j.jobseeker_id
-                 JOIN job_post jp ON ja.job_post_id = jp.job_post_id
-                 WHERE ja.is_finalized = 1
-                 ORDER BY ja.applied_at DESC
-                 LIMIT :limit1)
-                UNION ALL
-                (SELECT 'job_post' as type,
-                        CONCAT(e.first_name, ' ', e.last_name) as user_name,
-                        CONCAT('Posted: ', jp.job_title) as description,
-                        jp.created_at
-                 FROM job_post jp
-                 JOIN employer e ON jp.employer_id = e.employer_id
-                 ORDER BY jp.created_at DESC
-                 LIMIT :limit2)
-                ORDER BY created_at DESC
-                LIMIT :final_limit";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':limit1', $limit, PDO::PARAM_INT);
-            $stmt->bindParam(':limit2', $limit, PDO::PARAM_INT);
-            $stmt->bindParam(':final_limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error getting recent activity: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Get top job categories with application counts
-     */
-    public function getTopJobCategories($limit = 5)
-    {
-        try {
-            $sql = "SELECT jp.job_category, 
-                           COUNT(DISTINCT jp.job_post_id) as job_count,
-                           COUNT(ja.application_id) as application_count
-                    FROM job_post jp
-                    LEFT JOIN job_application ja ON jp.job_post_id = ja.job_post_id AND ja.is_finalized = 1
-                    WHERE jp.job_status = 'open'
-                    GROUP BY jp.job_category
-                    ORDER BY application_count DESC, job_count DESC
-                    LIMIT :limit";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log('Error getting top job categories: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Get job statistics for the last 6 months (for charts)
-     */
-    public function getJobStatsForChart()
-    {
-        try {
-            $sql = "SELECT 
-                        DATE_FORMAT(created_at, '%Y-%m') as month,
-                        MONTHNAME(created_at) as month_name,
-                        COUNT(*) as job_count
-                    FROM job_post 
-                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    GROUP BY DATE_FORMAT(created_at, '%Y-%m'), MONTHNAME(created_at)
-                    ORDER BY created_at ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $jobData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Get application statistics for the same period
-            $sql = "SELECT 
-                        DATE_FORMAT(applied_at, '%Y-%m') as month,
-                        MONTHNAME(applied_at) as month_name,
-                        COUNT(*) as application_count
-                    FROM job_application 
-                    WHERE applied_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    AND is_finalized = 1
-                    GROUP BY DATE_FORMAT(applied_at, '%Y-%m'), MONTHNAME(applied_at)
-                    ORDER BY applied_at ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $applicationData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Create arrays for the last 6 months
-            $months = [];
-            $jobCounts = [];
-            $applicationCounts = [];
-
-            // Generate last 6 months
-            for ($i = 5; $i >= 0; $i--) {
-                $monthKey = date('Y-m', strtotime("-$i months"));
-                $monthName = date('M', strtotime("-$i months"));
-                $months[] = $monthName;
-
-                // Find job count for this month
-                $jobCount = 0;
-                foreach ($jobData as $job) {
-                    if ($job['month'] === $monthKey) {
-                        $jobCount = $job['job_count'];
-                        break;
-                    }
+class JobRecommendationEngine:
+    """Main recommendation engine class"""
+    
+    def __init__(self):
+        """Initialize with database-driven skill normalization"""
+        self.vectorizer = None
+        self.esco_skills = {}
+        self.esco_aliases = {}
+        self.skill_aliases = {}  # Will be loaded from database
+        self.esco_skill_map = {}  # For ESCO-enhanced matching
+        self.skill_categories = {}  # For skill categorization
+        
+        # FIXED: Safe print for Windows
+        try:
+            print(f"🔧 Using database: {DB_CONFIG['host']}/{DB_CONFIG['database']}")
+        except UnicodeEncodeError:
+            print(f"Using database: {DB_CONFIG['host']}/{DB_CONFIG['database']}")
+        
+        # Load normalization data from database
+        self.load_skill_normalization_data()
+        self._load_esco_data()
+        self.load_skill_categories_from_db()
+    
+    def _get_db_connection(self):
+        """Get database connection using shared config"""
+        return mysql.connect(**DB_CONFIG)
+    
+    def _load_esco_data(self):
+        """Load ESCO skills and aliases for skill normalization"""
+        try:
+            conn = self._get_db_connection()
+            cur = conn.cursor(dictionary=True)
+            
+            # Load ESCO skills
+            try:
+                cur.execute("SELECT id, skill_name, concept_uri FROM esco_skills LIMIT 1000")
+                self.esco_skills = {
+                    row["id"]: {"name": row["skill_name"], "uri": row["concept_uri"]} 
+                    for row in cur.fetchall()
                 }
-                $jobCounts[] = $jobCount;
-
-                // Find application count for this month
-                $appCount = 0;
-                foreach ($applicationData as $app) {
-                    if ($app['month'] === $monthKey) {
-                        $appCount = $app['application_count'];
-                        break;
-                    }
+            except Exception as e:
+                print(f"⚠️ ESCO skills table issue: {e}")
+                self.esco_skills = {}
+                
+            # Load ESCO aliases
+            try:
+                cur.execute("SELECT alias, skill_id FROM esco_skill_aliases LIMIT 1000")
+                self.esco_aliases = {
+                    row["alias"].lower(): row["skill_id"] 
+                    for row in cur.fetchall()
                 }
-                $applicationCounts[] = $appCount;
-            }
-
-            // Calculate trend (comparing last 2 months)
-            $trend = 0;
-            if (count($jobCounts) >= 2) {
-                $currentMonth = end($jobCounts);
-                $previousMonth = $jobCounts[count($jobCounts) - 2];
-                if ($previousMonth > 0) {
-                    $trend = round((($currentMonth - $previousMonth) / $previousMonth) * 100, 1);
+            except Exception as e:
+                print(f"⚠️ ESCO aliases table issue: {e}")
+                self.esco_aliases = {}
+                
+            conn.close()
+            print(f"📊 Loaded {len(self.esco_skills)} ESCO skills, {len(self.esco_aliases)} aliases")
+            
+        except Exception as e:
+            print(f"⚠️ Could not load ESCO data: {e}")
+            self.esco_skills = {}
+            self.esco_aliases = {}
+    
+    def load_skill_normalization_data(self):
+        """Load skill normalization data from database"""
+        conn = self._get_db_connection()
+        try:
+            # Load skill aliases from skills_dictionary and skill_aliases
+            try:
+                alias_query = """
+                    SELECT sa.alias, sd.skill_name as standard_name
+                    FROM skill_aliases sa
+                    JOIN skills_dictionary sd ON sa.skill_id = sd.id
+                    LIMIT 500
+                """
+                alias_df = pd.read_sql(alias_query, conn)
+                
+                # Create alias mapping
+                self.skill_aliases = {}
+                for _, row in alias_df.iterrows():
+                    self.skill_aliases[row['alias'].lower().strip()] = row['standard_name'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ Skills dictionary empty or error: {e}")
+                self.skill_aliases = {}
+            
+            # Load ESCO skill aliases
+            try:
+                esco_alias_query = """
+                    SELECT esa.alias, es.skill_name as standard_name
+                    FROM esco_skill_aliases esa
+                    JOIN esco_skills es ON esa.skill_id = es.id
+                    LIMIT 500
+                """
+                esco_alias_df = pd.read_sql(esco_alias_query, conn)
+                
+                # Add ESCO aliases to mapping
+                for _, row in esco_alias_df.iterrows():
+                    self.skill_aliases[row['alias'].lower().strip()] = row['standard_name'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ ESCO aliases empty or error: {e}")
+            
+            # Load manual to ESCO mapping
+            try:
+                manual_esco_query = """
+                    SELECT sd.skill_name as manual_skill, es.skill_name as esco_skill, 
+                           mte.confidence_level
+                    FROM manual_to_esco mte
+                    JOIN skills_dictionary sd ON mte.manual_skill_id = sd.id
+                    JOIN esco_skills es ON mte.esco_skill_id = es.id
+                    WHERE mte.confidence_level >= 0.8
+                    LIMIT 200
+                """
+                manual_esco_df = pd.read_sql(manual_esco_query, conn)
+                
+                # Add manual to ESCO mapping
+                for _, row in manual_esco_df.iterrows():
+                    self.skill_aliases[row['manual_skill'].lower().strip()] = row['esco_skill'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ Manual to ESCO mapping empty or error: {e}")
+            
+            print(f"✅ Loaded {len(self.skill_aliases)} skill aliases from database")
+            
+            # Fallback to critical mappings if database is empty
+            if len(self.skill_aliases) == 0:
+                print("⚠️ Using fallback skill mappings")
+                self.skill_aliases = {
+                    'js': 'javascript',
+                    'javascript programming': 'javascript',
+                    'python programming': 'python',
+                    'sql database': 'sql',
+                    'data analysis': 'data analytics',
+                    'html5': 'html',
+                    'css3': 'css',
+                    'react.js': 'react',
+                    'node.js': 'nodejs',
+                    'vue.js': 'vue'
                 }
+            
+        except Exception as e:
+            print(f"⚠️ Error loading skill normalization data: {e}")
+            # Fallback to minimal hardcoded list for critical operations
+            self.skill_aliases = {
+                'js': 'javascript',
+                'sql database': 'sql',
+                'data analysis': 'data analytics'
             }
-
-            return [
-                'months' => $months,
-                'job_posts' => $jobCounts,
-                'applications' => $applicationCounts,
-                'trend' => $trend
-            ];
-        } catch (PDOException $e) {
-            error_log('Error getting job stats for chart: ' . $e->getMessage());
-            return [
-                'months' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'job_posts' => [0, 0, 0, 0, 0, 0],
-                'applications' => [0, 0, 0, 0, 0, 0],
-                'trend' => 0
-            ];
-        }
-    }
-
-    /**
-     * Get job category statistics for chart
-     */
-    public function getJobCategoryStatsForChart($limit = 6)
-    {
-        try {
-            $sql = "SELECT 
-                        COALESCE(jc.category_name, 'Others') as category,
-                        COUNT(DISTINCT jp.job_id) as job_count,
-                        COUNT(ja.application_id) as application_count
-                    FROM job_category jc
-                    LEFT JOIN job_post jp ON jc.job_category_id = jp.job_category_id 
-                        AND jp.created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    LEFT JOIN job_application ja ON jp.job_id = ja.job_id AND ja.is_finalized = 1
-                    GROUP BY jc.job_category_id, jc.category_name
-                    ORDER BY job_count DESC, application_count DESC
-                    LIMIT :limit";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
-            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $categories = [];
-            $jobCounts = [];
-            $applicationCounts = [];
-
-            foreach ($data as $row) {
-                $categories[] = $row['category'] ?: 'Others';
-                $jobCounts[] = (int)$row['job_count'];
-                $applicationCounts[] = (int)$row['application_count'];
-            }
-
-            // Fill with default data if no results
-            if (empty($categories)) {
-                $categories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'];
-                $jobCounts = [0, 0, 0, 0, 0, 0];
-                $applicationCounts = [0, 0, 0, 0, 0, 0];
-            }
-
-            return [
-                'categories' => $categories,
-                'job_posts' => $jobCounts,
-                'applications' => $applicationCounts
-            ];
-        } catch (PDOException $e) {
-            error_log('Error getting job category stats for chart: ' . $e->getMessage());
-            return [
-                'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'],
-                'job_posts' => [0, 0, 0, 0, 0, 0],
-                'applications' => [0, 0, 0, 0, 0, 0]
-            ];
-        }
-    }
-    public function getReportStatistics()
-    {
-        try {
-            // Get total users (jobseekers + employers)
-            $totalJobseekers = $this->getTotalJobseekers();
-            $totalEmployers = $this->getTotalEmployers();
-            $totalUsers = $totalJobseekers + $totalEmployers;
-
-            // Get active jobs
-            $sql = "SELECT COUNT(*) FROM job_post WHERE job_status = 'open'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $activeJobs = $stmt->fetchColumn();
-
-            // Get total applications
-            $sql = "SELECT COUNT(*) FROM job_application WHERE is_finalized = 1";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $totalApplications = $stmt->fetchColumn();
-
-            // Get pending applications
-            $sql = "SELECT COUNT(*) FROM job_application WHERE application_status = 'pending' AND is_finalized = 1";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $pendingApplications = $stmt->fetchColumn();
-
-            // Get total events (if events table exists)
-            $totalEvents = 0;
-            try {
-                $sql = "SHOW TABLES LIKE 'events'";
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute();
-
-                if ($stmt->rowCount() > 0) {
-                    $sql = "SELECT COUNT(*) FROM events";
-                    $stmt = $this->db->prepare($sql);
-                    $stmt->execute();
-                    $totalEvents = $stmt->fetchColumn();
+        finally:
+            conn.close()
+    
+    def fetch_job_posts(self) -> pd.DataFrame:
+        """Fetch all available job posts with BETTER skill extraction"""
+        conn = self._get_db_connection()
+        try:
+            query = """
+                SELECT 
+                    jp.job_id as id,
+                    jp.job_title as title,
+                    jp.full_description as description,
+                    jp.location,
+                    GROUP_CONCAT(DISTINCT jps.skill_name SEPARATOR ', ') as skills_text
+                FROM job_post jp 
+                LEFT JOIN job_post_skills jps ON jp.job_id = jps.job_id
+                WHERE jp.job_status = 'open'
+                GROUP BY jp.job_id, jp.job_title, jp.full_description, jp.location
+                ORDER BY jp.job_id
+            """
+            df = pd.read_sql(query, conn)
+            
+            # Debug job skills
+            print(f"📋 Fetched {len(df)} job posts")
+            for i, job in df.head(3).iterrows():
+                print(f"   Job {job['id']}: {job['title']} - Skills: {job['skills_text']}")
+            
+            return df
+            
+        except Exception as e:
+            print(f"❌ Error fetching job posts: {e}")
+            return pd.DataFrame(columns=['id', 'title', 'description', 'location', 'skills_text'])
+        finally:
+            conn.close()
+    
+    def normalize_text(self, text: str) -> str:
+        """Normalize text for TF-IDF processing"""
+        if text is None:
+            return ""
+        text = str(text).lower()
+        text = re.sub(r"[,/|]", " ", text)
+        text = re.sub(r"[^a-z0-9+\.# ]+", " ", text)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
+    
+    def normalize_skill_name_db(self, skill_text: str) -> str:
+        """Database-driven skill normalization"""
+        if not skill_text:
+            return ""
+        
+        # Convert to lowercase and clean
+        skill = str(skill_text).lower().strip()
+        
+        # Remove proficiency levels - KEY FIX
+        proficiency_levels = ['beginner', 'intermediate', 'advanced', 'expert', 'basic', 'senior', 'junior']
+        for level in proficiency_levels:
+            skill = skill.replace(f" ({level})", "").replace(f"({level})", "").replace(level, "").strip()
+        
+        # Remove extra parentheses and spaces
+        skill = re.sub(r'\s+', ' ', skill.replace("()", "")).strip()
+        
+        # Check database aliases first
+        if skill in self.skill_aliases:
+            return self.skill_aliases[skill]
+        
+        # Check partial matches in database
+        for alias, standard in self.skill_aliases.items():
+            if alias in skill or skill in alias:
+                # Only if they're reasonably similar in length
+                if abs(len(alias) - len(skill)) <= 3:
+                    return standard
+        
+        return skill.strip()
+    
+    def extract_skill_tokens_db(self, skill_text: str) -> set:
+        """Extract and normalize skill tokens using database"""
+        if not skill_text:
+            return set()
+        
+        # Split by common delimiters
+        tokens = re.split(r"[,/|;]+", str(skill_text))
+        normalized_skills = set()
+        
+        for token in tokens:
+            # Use database-driven normalization
+            normalized = self.normalize_skill_name_db(token)
+            if normalized and len(normalized) > 1:
+                normalized_skills.add(normalized)
+                
+                # Also add partial matches for compound skills
+                if ' ' in normalized:
+                    words = normalized.split()
+                    for word in words:
+                        if len(word) > 2:
+                            normalized_skills.add(word)
+        
+        return normalized_skills
+    
+    # FIXED: Add missing method
+    def extract_skill_tokens(self, skill_text: str) -> set:
+        """Extract skill tokens - calls database version"""
+        return self.extract_skill_tokens_db(skill_text)
+    
+    # FIXED: Move inside class
+    def normalize_to_esco(self, skill_text: str) -> set:
+        """Convert skills to ESCO URIs for standardized matching"""
+        if not skill_text:
+            return set()
+        
+        esco_uris = set()
+        skills = str(skill_text).split(',')
+        
+        for skill in skills:
+            skill_clean = skill.strip().lower()
+            
+            # Check if skill exists in ESCO aliases
+            if skill_clean in self.esco_aliases:
+                skill_id = self.esco_aliases[skill_clean]
+                if skill_id in self.esco_skills:
+                    esco_uris.add(self.esco_skills[skill_id]["uri"])
+            
+            # Also check direct ESCO skills
+            for skill_id, skill_data in self.esco_skills.items():
+                if skill_clean in skill_data["name"].lower():
+                    esco_uris.add(skill_data["uri"])
+        
+        return esco_uris
+    
+    def compute_tfidf_similarity(self, jobs_df: pd.DataFrame, jobseeker_query: str) -> np.ndarray:
+        """Compute TF-IDF similarity between jobseeker and jobs"""
+        # Build job documents
+        jobs_df["doc"] = (
+            jobs_df["title"].fillna("") + " " +
+            jobs_df["description"].fillna("") + " " +
+            jobs_df["location"].fillna("") + " " +
+            jobs_df["skills_text"].fillna("")
+        ).apply(self.normalize_text)
+        
+        # Normalize jobseeker query
+        normalized_query = self.normalize_text(jobseeker_query)
+        
+        # TF-IDF
+        self.vectorizer = TfidfVectorizer(ngram_range=(1,2), min_df=1, max_features=5000)
+        job_vectors = self.vectorizer.fit_transform(jobs_df["doc"].values)
+        query_vector = self.vectorizer.transform([normalized_query])
+        
+        # Compute similarities
+        similarities = cosine_similarity(query_vector, job_vectors).flatten()
+        
+        print(f"🔍 TF-IDF computed for {len(jobs_df)} jobs")
+        return similarities
+    
+    def compute_skill_overlap(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Compute skill overlap between jobseeker and jobs"""
+        js_skill_tokens = self.extract_skill_tokens(jobseeker_skills)
+        
+        def calculate_overlap(job_skills):
+            job_tokens = self.extract_skill_tokens(job_skills)
+            overlap = job_tokens & js_skill_tokens
+            ratio = len(overlap) / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            return overlap, ratio
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def compute_enhanced_skill_overlap_db(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Enhanced skill overlap using database normalization"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        
+        print(f"🔍 Jobseeker normalized skills (DB): {sorted(js_skill_tokens)}")
+        
+        def calculate_enhanced_overlap(job_skills):
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            
+            # Direct matches
+            direct_overlap = job_tokens & js_skill_tokens
+            
+            # Enhanced fuzzy matching using database relationships
+            fuzzy_matches = set()
+            for js_skill in js_skill_tokens:
+                for job_skill in job_tokens:
+                    # Check if skills are related through database mappings
+                    js_normalized = self.normalize_skill_name_db(js_skill)
+                    job_normalized = self.normalize_skill_name_db(job_skill)
+                    
+                    if js_normalized == job_normalized:
+                        fuzzy_matches.add(f"{js_skill}~{job_skill}")
+                    elif (js_skill in job_skill or job_skill in js_skill) and abs(len(js_skill) - len(job_skill)) <= 3:
+                        fuzzy_matches.add(f"{js_skill}~{job_skill}")
+            
+            # Combine matches
+            total_matches = direct_overlap | fuzzy_matches
+            
+            # Calculate ratio
+            js_match_count = len(direct_overlap) + (len(fuzzy_matches) * 0.8)
+            ratio = js_match_count / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            
+            return total_matches, min(ratio, 1.0)
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_enhanced_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def fetch_jobseeker_profile(self, jobseeker_id: int) -> Optional[pd.Series]:
+        """Fetch jobseeker profile with FIXED skill processing"""
+        conn = self._get_db_connection()
+        try:
+            # Basic info
+            jobseeker_query = """
+                SELECT 
+                    j.jobseeker_id as id,
+                    CONCAT(j.first_name, ' ', j.last_name) as full_name,
+                    COALESCE(j.address, '') as location
+                FROM jobseeker j
+                WHERE j.jobseeker_id = %s
+                LIMIT 1
+            """
+            
+            df = pd.read_sql(jobseeker_query, conn, params=(int(jobseeker_id),))
+            if df.empty:
+                return None
+                
+            profile = df.iloc[0].to_dict()
+            
+            # FIXED: Better skills query with debugging
+            skills_query = """
+                SELECT skill_name, proficiency_level 
+                FROM jobseeker_skills 
+                WHERE jobseeker_id = %s
+            """
+            skills_df = pd.read_sql(skills_query, conn, params=(int(jobseeker_id),))
+            
+            print(f"🔍 Raw skills query result: {len(skills_df)} skills found", file=sys.stderr)
+            
+            if not skills_df.empty:
+                # Extract skill names and normalize them
+                raw_skills = []
+                normalized_skills = []
+                
+                for _, skill_row in skills_df.iterrows():
+                    skill_name = skill_row['skill_name']
+                    raw_skills.append(f"{skill_name} ({skill_row['proficiency_level']})")
+                    
+                    # Normalize skill (remove proficiency)
+                    normalized = self.normalize_skill_name_db(skill_name)
+                    if normalized:
+                        normalized_skills.append(normalized)
+                
+                profile['raw_skills_text'] = ', '.join(raw_skills)
+                profile['skills_text'] = ', '.join(normalized_skills)
+                
+                print(f"   Raw skills: {profile['raw_skills_text']}", file=sys.stderr)
+                print(f"   Normalized: {profile['skills_text']}", file=sys.stderr)
+            else:
+                profile['raw_skills_text'] = ''
+                profile['skills_text'] = ''
+                print("   ⚠️ No skills found in database!", file=sys.stderr)
+            
+            # Experience
+            exp_query = """
+                SELECT GROUP_CONCAT(
+                    CONCAT(job_title, ' at ', company_name, '. ', COALESCE(responsibilities, ''))
+                    SEPARATOR '. '
+                ) as experience_text
+                FROM jobseeker_work_experience 
+                WHERE jobseeker_id = %s
+            """
+            exp_df = pd.read_sql(exp_query, conn, params=(int(jobseeker_id),))
+            profile['experience_text'] = exp_df.iloc[0]['experience_text'] if not exp_df.empty and exp_df.iloc[0]['experience_text'] else ''
+            
+            # Education
+            edu_query = """
+                SELECT GROUP_CONCAT(
+                    CONCAT(education_level, ' in ', COALESCE(field_of_study, ''), ' from ', school_name)
+                    SEPARATOR '. '
+                ) as education_text
+                FROM jobseeker_education 
+                WHERE jobseeker_id = %s
+            """
+            edu_df = pd.read_sql(edu_query, conn, params=(int(jobseeker_id),))
+            profile['education_text'] = edu_df.iloc[0]['education_text'] if not edu_df.empty and edu_df.iloc[0]['education_text'] else ''
+            
+            print(f"👤 Jobseeker {jobseeker_id}: {profile['full_name']}")
+            print(f"   Raw skills: {profile['raw_skills_text']}")
+            print(f"   Normalized: {profile['skills_text']}")
+            
+            return pd.Series(profile)
+            
+        except Exception as e:
+            print(f"❌ Error fetching jobseeker {jobseeker_id}: {e}")
+            return None
+        finally:
+            conn.close()
+    
+    def compute_esco_overlap(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Compute ESCO skill overlap"""
+        js_esco_uris = self.normalize_to_esco(jobseeker_skills)
+        
+        def calculate_esco_overlap(job_skills):
+            job_esco_uris = self.normalize_to_esco(job_skills)
+            overlap = job_esco_uris & js_esco_uris
+            ratio = len(overlap) / max(len(js_esco_uris), 1) if js_esco_uris else 0
+            return overlap, ratio
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_esco_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def compute_role_match(self, jobs_df: pd.DataFrame, jobseeker_profile: pd.Series) -> pd.Series:
+        """Compute role/title matching based on work experience job titles"""
+        experience_text = jobseeker_profile.get("experience_text", "")
+        
+        if not experience_text:
+            return pd.Series([0] * len(jobs_df))
+        
+        # Extract job titles from experience
+        experience_titles = []
+        import re
+        # Pattern to extract job titles (assumes format: "Job Title at Company")
+        title_pattern = r'([^\.]+?)\s+at\s+[^\.]+\.'
+        matches = re.findall(title_pattern, experience_text)
+        experience_titles = [title.strip().lower() for title in matches]
+        
+        def calculate_title_match(job_title):
+            if not job_title or not experience_titles:
+                return 0
+            
+            job_title_normalized = str(job_title).lower()
+            
+            # Check for exact matches or similar titles
+            for exp_title in experience_titles:
+                if exp_title in job_title_normalized or job_title_normalized in exp_title:
+                    return 1
+            return 0
+        
+        role_matches = jobs_df["title"].apply(calculate_title_match)
+        return role_matches
+    
+    def compute_weighted_skill_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """ULTRA-STRICT weighted skill matching with category enforcement"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        js_categories = self.categorize_skills_from_db(jobseeker_skills)
+        
+        print(f"🔍 Jobseeker skills: {sorted(js_skill_tokens)}")
+        print(f"🔍 Jobseeker categories: {js_categories}")
+        
+        def calculate_ultra_strict_match(job_skills):
+            if not job_skills or not js_skill_tokens:
+                return 0.0
+                
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            job_categories = self.categorize_skills_from_db(job_skills)
+            
+            # 1. EXACT SKILL MATCHES (50% weight)
+            direct_matches = js_skill_tokens & job_tokens
+            direct_score = len(direct_matches) / len(js_skill_tokens) if js_skill_tokens else 0
+            
+            # 2. CATEGORY ALIGNMENT (50% weight) - VERY STRICT
+            category_score = 0.0
+            if js_categories and job_categories:
+                shared_categories = set(js_categories.keys()) & set(job_categories.keys())
+                
+                if shared_categories:
+                    # Calculate weighted category overlap
+                    total_js_weight = sum(js_categories.values())
+                    category_overlap = 0.0
+                    
+                    for category in shared_categories:
+                        js_weight = js_categories[category]
+                        job_weight = job_categories[category]
+                        
+                        # Strong penalty for weak category presence in job
+                        category_strength = min(job_weight / max(js_weight, 1.0), 1.0)
+                        weight_contribution = js_weight / total_js_weight
+                        
+                        category_overlap += weight_contribution * category_strength
+                    
+                    category_score = category_overlap
+            
+            # 3. ULTRA-STRICT PENALTY SYSTEM
+            penalties = 0.0
+            
+            # MAJOR penalty for no category overlap
+            if not (set(js_categories.keys()) & set(job_categories.keys())):
+                penalties += 0.8  # 80% penalty!
+            
+            # MAJOR penalty for zero direct skill matches
+            if len(direct_matches) == 0:
+                penalties += 0.6  # 60% penalty!
+            
+            # Additional penalty for very few matches
+            if len(direct_matches) < 2 and len(js_skill_tokens) > 3:
+                penalties += 0.4  # 40% penalty for insufficient matches
+            
+            # 4. ULTRA-STRICT CALCULATION
+            base_score = (0.5 * direct_score) + (0.5 * category_score)
+            final_score = max(0.0, base_score - penalties)
+            
+            # HARD CAPS for unrelated categories
+            if category_score < 0.1:  # Almost no category overlap
+                final_score = min(final_score, 0.15)  # Cap at 15%!
+            elif category_score < 0.3:  # Weak category overlap
+                final_score = min(final_score, 0.35)  # Cap at 35%
+                
+            return final_score
+        
+        weighted_scores = jobs_df["skills_text"].apply(calculate_ultra_strict_match)
+        return weighted_scores
+    
+    def generate_recommendations(self, jobseeker_id: int, top_k: int = 10) -> Dict[str, Any]:
+        """ULTRA-STRICT recommendation generation with maximum accuracy"""
+        print(f"🎯 Generating ULTRA-STRICT recommendations for jobseeker {jobseeker_id}")
+        
+        try:
+            # Load enhancement data
+            self.load_skill_categories_from_db()
+            
+            # Fetch data
+            jobs_df = self.fetch_job_posts()
+            jobseeker_profile = self.fetch_jobseeker_profile(jobseeker_id)
+            
+            if jobseeker_profile is None:
+                return {"error": "Jobseeker not found"}
+            
+            if jobs_df.empty:
+                return {
+                    "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+                    "recommendations": [],
+                    "message": "No job posts available"
                 }
-            } catch (PDOException $e) {
-                // Events table doesn't exist, keep totalEvents as 0
-                error_log('Events table not found: ' . $e->getMessage());
-            }
-
-            return [
-                'total_users' => (int)$totalUsers,
-                'total_employers' => (int)$totalEmployers,
-                'total_jobseekers' => (int)$totalJobseekers,
-                'active_jobs' => (int)$activeJobs,
-                'total_applications' => (int)$totalApplications,
-                'pending_applications' => (int)$pendingApplications,
-                'total_events' => (int)$totalEvents
-            ];
-        } catch (PDOException $e) {
-            error_log('Error getting report statistics: ' . $e->getMessage());
-            // Return zeros if there's an error
-            return [
-                'total_users' => 0,
-                'total_employers' => 0,
-                'total_jobseekers' => 0,
-                'active_jobs' => 0,
-                'total_applications' => 0,
-                'pending_applications' => 0,
-                'total_events' => 0
-            ];
-        }
-    }
-
-    public function getMonthlyActivityTrends()
-    {
-        try {
-            // Get the last 6 months data
-            $months = [];
-            $monthLabels = [];
-
-            // Generate last 6 months
-            for ($i = 5; $i >= 0; $i--) {
-                $date = date('Y-m', strtotime("-$i months"));
-                $months[] = $date;
-                $monthLabels[] = date('M', strtotime("-$i months"));
-            }
-
-            // Initialize arrays for data
-            $jobPostsData = array_fill(0, 6, 0);
-            $applicationsData = array_fill(0, 6, 0);
-            $registrationsData = array_fill(0, 6, 0);
-
-            // Get Job Posts data
-            $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') as month,
-                    COUNT(*) as count
-                FROM job_post 
-                WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $jobPostResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Map job posts data to months
-            foreach ($jobPostResults as $result) {
-                $monthIndex = array_search($result['month'], $months);
-                if ($monthIndex !== false) {
-                    $jobPostsData[$monthIndex] = (int)$result['count'];
-                }
-            }
-
-            // Get Applications data
-            $sql = "SELECT 
-                    DATE_FORMAT(applied_at, '%Y-%m') as month,
-                    COUNT(*) as count
-                FROM job_application 
-                WHERE applied_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                AND is_finalized = 1
-                GROUP BY DATE_FORMAT(applied_at, '%Y-%m')
-                ORDER BY month ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $applicationResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Map applications data to months
-            foreach ($applicationResults as $result) {
-                $monthIndex = array_search($result['month'], $months);
-                if ($monthIndex !== false) {
-                    $applicationsData[$monthIndex] = (int)$result['count'];
-                }
-            }
-
-            // Get User Registrations data (Jobseekers + Employers)
-            $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') as month,
-                    COUNT(*) as count
-                FROM (
-                    SELECT created_at FROM jobseeker WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    UNION ALL
-                    SELECT created_at FROM employer WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                ) as all_users
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $registrationResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Map registrations data to months
-            foreach ($registrationResults as $result) {
-                $monthIndex = array_search($result['month'], $months);
-                if ($monthIndex !== false) {
-                    $registrationsData[$monthIndex] = (int)$result['count'];
-                }
-            }
-
-            return [
-                'months' => $monthLabels,
-                'job_posts' => $jobPostsData,
-                'applications' => $applicationsData,
-                'registrations' => $registrationsData
-            ];
-        } catch (PDOException $e) {
-            error_log('Error getting monthly activity trends: ' . $e->getMessage());
-
-            // Return fallback data with last 6 months
-            $fallbackMonths = [];
-            for ($i = 5; $i >= 0; $i--) {
-                $fallbackMonths[] = date('M', strtotime("-$i months"));
-            }
-
-            return [
-                'months' => $fallbackMonths,
-                'job_posts' => [0, 0, 0, 0, 0, 0],
-                'applications' => [0, 0, 0, 0, 0, 0],
-                'registrations' => [0, 0, 0, 0, 0, 0]
-            ];
-        }
-    }
-
-    public function initializeJobCategories()
-    {
-        try {
-            // Check if job_category table has data
-            $sql = "SELECT COUNT(*) FROM job_category";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $count = $stmt->fetchColumn();
-
-            if ($count == 0) {
-                // Insert default categories based on your ENUM
-                $categories = [
-                    'IT',
-                    'Healthcare',
-                    'Education',
-                    'Engineering',
-                    'Finance',
-                    'Marketing',
-                    'Construction',
-                    'Others'
-                ];
-
-                $sql = "INSERT INTO job_category (category_name) VALUES (?)";
-                $stmt = $this->db->prepare($sql);
-
-                foreach ($categories as $category) {
-                    $stmt->execute([$category]);
-                }
-
-                error_log('Job categories initialized successfully');
-                return true;
-            }
-
-            return true;
-        } catch (PDOException $e) {
-            error_log('Error initializing job categories: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Replace the getJobCategoryDistribution method:
-
-public function getJobCategoryDistribution($limit = 6)
-{
-    try {
-        // ✅ FIXED: Use correct column name from your working query
-        $sql = "SELECT 
-                    COALESCE(jc.category_name, 'Others') as category_name,
-                    COUNT(jp.job_id) as job_count
-                FROM job_post jp
-                LEFT JOIN job_category jc ON jp.job_category_id = jc.job_category_id
-                WHERE jp.created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                GROUP BY jc.job_category_id, jc.category_name
-                ORDER BY job_count DESC
-                LIMIT ?";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$limit]);
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $categories = [];
-        $values = [];
-
-        // ✅ CONSISTENT SIKAP COLOR PALETTE
-        $colors = [
-            '#092C4C', // primary - Dark Blue
-            '#F3AF0E', // secondary - Orange  
-            '#10B981', // success - Green
-            '#EF4444', // danger - Red
-            '#3B82F6', // info - Blue
-            '#6B7280', // gray - Gray
-            '#8B5CF6', // purple
-            '#F59E0B'  // amber
-        ];
-
-        // ✅ FIXED: Process the data correctly
-        foreach ($data as $row) {
-            $categoryName = $row['category_name'] ?: 'Others';
-            $categories[] = $categoryName;
-            $values[] = (int)$row['job_count'];
-        }
-
-        // ✅ FIXED: If no data from database, initialize with categories from enum
-        if (empty($categories)) {
-            // Get all categories from the job_category table or use enum values
-            $sql = "SELECT category_name FROM job_category ORDER BY job_category_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $allCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            if (!empty($allCategories)) {
-                $categories = $allCategories;
-                $values = array_fill(0, count($allCategories), 0);
-            } else {
-                // Final fallback with enum values from your schema
-                $categories = ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'];
-                $values = [0, 0, 0, 0, 0, 0, 0, 0];
-            }
-        }
-
-        // ✅ DEBUG: Log the data being returned
-        error_log('Job Category Distribution Data: ' . json_encode([
-            'categories' => $categories,
-            'values' => $values,
-            'total_categories' => count($categories)
-        ]));
-
-        return [
-            'categories' => $categories,
-            'values' => $values,
-            'colors' => array_slice($colors, 0, count($categories))
-        ];
-    } catch (PDOException $e) {
-        error_log('Error getting job category distribution: ' . $e->getMessage());
-
-        // Return fallback with enum values from your schema
-        return [
-            'categories' => ['IT', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing', 'Construction', 'Others'],
-            'values' => [0, 0, 0, 0, 0, 0, 0, 0],
-            'colors' => ['#092C4C', '#F3AF0E', '#10B981', '#EF4444', '#3B82F6', '#6B7280', '#8B5CF6', '#F59E0B']
-        ];
-    }
-}
-
-    public function getUserGrowthTrends()
-    {
-        try {
-            // Get the last 6 months data
-            $months = [];
-            $monthLabels = [];
-
-            // Generate last 6 months
-            for ($i = 5; $i >= 0; $i--) {
-                $date = date('Y-m', strtotime("-$i months"));
-                $months[] = $date;
-                $monthLabels[] = date('M', strtotime("-$i months"));
-            }
-
-            // Initialize arrays for data
-            $jobseekerData = array_fill(0, 6, 0);
-            $employerData = array_fill(0, 6, 0);
-
-            // Get Jobseeker registrations data
-            $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') as month,
-                    COUNT(*) as count
-                FROM jobseeker 
-                WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $jobseekerResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Map jobseeker data to months
-            foreach ($jobseekerResults as $result) {
-                $monthIndex = array_search($result['month'], $months);
-                if ($monthIndex !== false) {
-                    $jobseekerData[$monthIndex] = (int)$result['count'];
+            
+            # Build jobseeker query
+            query_parts = [
+                str(jobseeker_profile.get("location", "") or ""),
+                str(jobseeker_profile.get("skills_text", "") or ""),
+                str(jobseeker_profile.get("experience_text", "") or ""),
+                str(jobseeker_profile.get("education_text", "") or "")
+            ]
+            jobseeker_query = " ".join(query_parts)
+            
+            print("📊 Computing ULTRA-STRICT similarity metrics...")
+            
+            # 1. ULTRA-STRICT Weighted Skill Matching (DOMINANT WEIGHT)
+            weighted_skill_scores = self.compute_weighted_skill_match(
+                jobs_df, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 2. Enhanced Skill Overlap (VERY LOW WEIGHT)
+            skill_overlaps, skill_ratios = self.compute_enhanced_skill_overlap_db(
+                jobs_df, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 3. TF-IDF Similarity (MINIMAL WEIGHT)
+            tfidf_similarities = self.compute_tfidf_similarity(jobs_df, jobseeker_query)
+            
+            # Add computed metrics
+            jobs_df["weighted_skill_score"] = weighted_skill_scores
+            jobs_df["skill_overlap_ratio"] = skill_ratios
+            jobs_df["tfidf_sim"] = tfidf_similarities
+            
+            # ULTRA-STRICT SCORING - Almost entirely skill-based
+            jobs_df["final_score"] = (
+                0.85 * jobs_df["weighted_skill_score"] +  # ULTRA-DOMINANT skill matching
+                0.10 * jobs_df["skill_overlap_ratio"] +   # Minor skill overlap
+                0.05 * jobs_df["tfidf_sim"]               # Minimal TF-IDF
+            )
+            
+            # ULTRA-STRICT FILTERING - Much higher minimum score
+            MIN_SCORE = 0.25  # Increased to 25%!
+            quality_jobs = jobs_df[jobs_df["final_score"] >= MIN_SCORE]
+            
+            if quality_jobs.empty:
+                # If no good matches, show top 3 but clearly mark as poor
+                filtered_jobs = jobs_df.nlargest(min(3, len(jobs_df)), "final_score")
+                for idx in filtered_jobs.index:
+                    if jobs_df.loc[idx, "final_score"] < 0.15:
+                        jobs_df.loc[idx, "final_score"] = jobs_df.loc[idx, "final_score"] * 0.5  # Further reduce poor matches
+            else:
+                filtered_jobs = quality_jobs.sort_values("final_score", ascending=False).head(top_k)
+            
+            # Format results
+            recommendations = self._format_ultra_strict_recommendations(filtered_jobs)
+            
+            result = {
+                "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+                "recommendations": recommendations,
+                "total_jobs_analyzed": len(jobs_df),
+                "total_recommendations": len(recommendations),
+                "algorithm_version": "5.0_ultra_strict_accuracy",
+                "debug_info": {
+                    "avg_weighted_skill": float(jobs_df["weighted_skill_score"].mean()),
+                    "best_weighted_match": float(jobs_df["weighted_skill_score"].max()),
+                    "strict_matches_found": len(quality_jobs),
+                    "min_score_threshold": MIN_SCORE,
+                    "accuracy_mode": "ULTRA_STRICT"
                 }
             }
+            
+            print(f"✅ Generated {len(recommendations)} ULTRA-STRICT recommendations")
+            print(f"   Best match: {result['debug_info']['best_weighted_match']:.3f}")
+            print(f"   Strict matches: {result['debug_info']['strict_matches_found']}")
+            
+            return result
+            
+        except Exception as e:
+            print(f"❌ Error generating ultra-strict recommendations: {e}")
+            return {"error": str(e)}
 
-            // Get Employer registrations data
-            $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') as month,
-                    COUNT(*) as count
-                FROM employer 
-                WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
+    def _format_jobseeker_info(self, profile: pd.Series) -> Dict[str, Any]:
+        """Format jobseeker information for response"""
+        return {
+            "id": int(profile["id"]),
+            "name": profile["full_name"],
+            "skills_text": profile.get("skills_text", ""),
+            "raw_skills_text": profile.get("raw_skills_text", ""),  # FIXED: Add this
+            "location": profile.get("location", ""),
+        }
+    
+    def _format_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format job recommendations for response"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            # Convert ESCO URIs back to skill names for display
+            matched_esco_names = []
+            if self.esco_skills and hasattr(job, 'esco_overlap') and job["esco_overlap"]:
+                for uri in job["esco_overlap"]:
+                    for skill_data in self.esco_skills.values():
+                        if skill_data["uri"] == uri:
+                            matched_esco_names.append(skill_data["name"])
+                            break
+            
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "tfidf_sim": round(float(job["tfidf_sim"]), 4),
+                "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                "esco_overlap_ratio": round(float(job["esco_overlap_ratio"]), 3),
+                "role_match": bool(job["role_match"]),
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "matched_skills": sorted(list(job["skill_overlap"])) if job["skill_overlap"] else [],
+                "matched_esco": sorted(matched_esco_names)
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $employerResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+# FIXED: Add missing functions outside class
+def test_database_connection() -> bool:
+    """Test database connection"""
+    try:
+        conn = mysql.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        conn.close()
+        print("✅ Database connection successful")
+        return True
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
 
-            // Map employer data to months
-            foreach ($employerResults as $result) {
-                $monthIndex = array_search($result['month'], $months);
-                if ($monthIndex !== false) {
-                    $employerData[$monthIndex] = (int)$result['count'];
+def get_sample_jobseeker_ids(limit: int = 5) -> List[int]:
+    """Get sample jobseeker IDs for testing"""
+    try:
+        conn = mysql.connect(**DB_CONFIG)
+        df = pd.read_sql(f"""
+            SELECT j.jobseeker_id, j.first_name, j.last_name, 
+                   COUNT(js.skill_name) as skill_count
+            FROM jobseeker j
+            LEFT JOIN jobseeker_skills js ON j.jobseeker_id = js.jobseeker_id
+            GROUP BY j.jobseeker_id, j.first_name, j.last_name
+            HAVING skill_count > 0
+            ORDER BY skill_count DESC
+            LIMIT {limit}
+        """, conn)
+        
+        conn.close()
+        
+        if not df.empty:
+            print("📝 Sample jobseekers with skills:")
+            for _, row in df.iterrows():
+                print(f"   ID: {row['jobseeker_id']} - {row['first_name']} {row['last_name']} ({row['skill_count']} skills)")
+            
+            return df['jobseeker_id'].tolist()
+        return []
+        
+    except Exception as e:
+        print(f"❌ Error getting sample jobseekers: {e}")
+        return []
+
+# FIXED: Add main execution block
+if __name__ == "__main__":
+    print("🔍 Testing ENHANCED SIKAP Job Recommendation Engine...")
+    
+    # Test database
+    if not test_database_connection():
+        exit(1)
+    
+    # Get sample data
+    sample_ids = get_sample_jobseeker_ids(3)
+    
+    if sample_ids:
+        engine = JobRecommendationEngine()
+        for jobseeker_id in sample_ids[:1]:
+            print(f"\n🧪 Testing ENHANCED recommendations for jobseeker {jobseeker_id}")
+            result = engine.generate_recommendations(jobseeker_id, top_k=5)
+            
+            if "error" in result:
+                print(f"❌ Error: {result['error']}")
+            else:
+                print(f"✅ Generated {len(result['recommendations'])} recommendations")
+                if result['recommendations']:
+                    top_rec = result['recommendations'][0]
+                    print(f"   Top: {top_rec['title']} ({top_rec['match_percentage']}% match)")
+                    if 'debug_info' in result:
+                        print(f"   Debug: {result['debug_info']}")
+    else:
+        print("❌ No jobseekers found with skills for testing")
+
+def load_skill_categories_from_db(self):
+    """Load skill categories from database for enhanced matching"""
+    conn = self._get_db_connection()
+    try:
+        # Load skill categories
+        category_query = """
+            SELECT DISTINCT category 
+            FROM skills_dictionary 
+            WHERE category IS NOT NULL
+        """
+        categories_df = pd.read_sql(category_query, conn)
+        
+        # Load skills by category
+        skills_by_category_query = """
+            SELECT sd.skill_name, sd.category,
+                   GROUP_CONCAT(DISTINCT sa.alias SEPARATOR '|') as aliases
+            FROM skills_dictionary sd
+            LEFT JOIN skill_aliases sa ON sd.id = sa.skill_id
+            WHERE sd.category IS NOT NULL
+            GROUP BY sd.id, sd.skill_name, sd.category
+        """
+        skills_df = pd.read_sql(skills_by_category_query, conn)
+        
+        # Build category mapping
+        self.skill_categories = {}
+        for _, row in skills_df.iterrows():
+            category = row['category'].lower().replace(' & ', '_').replace(' ', '_')
+            skill = row['skill_name'].lower()
+            
+            if category not in self.skill_categories:
+                self.skill_categories[category] = set()
+            
+            self.skill_categories[category].add(skill)
+            
+            # Add aliases
+            if row['aliases']:
+                aliases = row['aliases'].split('|')
+                for alias in aliases:
+                    self.skill_categories[category].add(alias.lower().strip())
+        
+        print(f"📂 Loaded {len(self.skill_categories)} skill categories from database")
+        for cat, skills in self.skill_categories.items():
+            print(f"   {cat}: {len(skills)} skills")
+            
+    except Exception as e:
+        print(f"⚠️ Could not load categories from database: {e}")
+        self.skill_categories = {}
+    finally:
+        conn.close()
+
+def load_esco_occupation_skills(self):
+    """Load ESCO occupation-skill relationships for job title matching"""
+    conn = self._get_db_connection()
+    try:
+        esco_query = """
+            SELECT 
+                eo.occupation_name,
+                es.skill_name,
+                eos.relation_type
+            FROM esco_occupations eo
+            JOIN esco_occupation_skills eos ON eo.id = eos.occupation_id
+            JOIN esco_skills es ON eos.skill_id = es.id
+            WHERE eos.relation_type = 'essential'
+            LIMIT 5000
+        """
+        
+        esco_df = pd.read_sql(esco_query, conn)
+        
+        # Build occupation to skills mapping
+        self.esco_occupation_skills = {}
+        for _, row in esco_df.iterrows():
+            occupation = row['occupation_name'].lower()
+            skill = row['skill_name'].lower()
+            
+            if occupation not in self.esco_occupation_skills:
+                self.esco_occupation_skills[occupation] = set()
+            
+            self.esco_occupation_skills[occupation].add(skill)
+        
+        print(f"🏢 Loaded {len(self.esco_occupation_skills)} ESCO occupations with skills")
+        
+    except Exception as e:
+        print(f"⚠️ Could not load ESCO occupation skills: {e}")
+        self.esco_occupation_skills = {}
+    finally:
+        conn.close()
+
+def compute_esco_job_title_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+    """Match jobseeker skills to job titles using ESCO occupation data"""
+    js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+    
+    def calculate_esco_title_match(job_title):
+        if not job_title or not self.esco_occupation_skills:
+            return 0.0
+        
+        title_lower = str(job_title).lower()
+        best_match = 0.0
+        
+        # Find matching ESCO occupations
+        for occupation, required_skills in self.esco_occupation_skills.items():
+            # Check if job title matches occupation
+            title_similarity = 0
+            occupation_words = occupation.split()
+            title_words = title_lower.split()
+            
+            # Calculate title word overlap
+            common_words = set(occupation_words) & set(title_words)
+            if common_words:
+                title_similarity = len(common_words) / max(len(occupation_words), len(title_words))
+            
+            if title_similarity > 0.3:  # Significant title match
+                # Calculate skill match for this occupation
+                skill_overlap = js_skill_tokens & required_skills
+                skill_match = len(skill_overlap) / max(len(required_skills), 1)
+                
+                # Combined score
+                combined_score = (title_similarity * 0.4) + (skill_match * 0.6)
+                best_match = max(best_match, combined_score)
+        
+        return best_match
+    
+    esco_matches = jobs_df["title"].apply(calculate_esco_title_match)
+    return esco_matches
+
+def compute_enhanced_category_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str, jobseeker_profile: pd.Series) -> pd.Series:
+    """Enhanced category-based matching using skills and education"""
+    js_skill_categories = self.categorize_skills_from_db(jobseeker_skills)
+    
+    # Also consider education field
+    education_text = jobseeker_profile.get("education_text", "").lower()
+    education_categories = self.infer_categories_from_education(education_text)
+    
+    # Combine skill and education categories
+    combined_categories = js_skill_categories.copy()
+    for cat, weight in education_categories.items():
+        combined_categories[cat] = combined_categories.get(cat, 0) + weight
+    
+    def calculate_category_match(job_skills, job_title, job_description):
+        job_text = f"{job_skills} {job_title} {job_description}".lower()
+        job_categories = self.categorize_skills_from_db(job_text)
+        
+        if not combined_categories or not job_categories:
+            return 0.0
+        
+        # Calculate weighted category overlap
+        total_score = 0.0
+        total_weight = sum(combined_categories.values())
+        
+        for category, js_weight in combined_categories.items():
+            job_weight = job_categories.get(category, 0)
+            if job_weight > 0:
+                # Normalized category match
+                category_strength = js_weight / total_weight if total_weight > 0 else 0
+                match_strength = min(job_weight / js_weight, 1.0) if js_weight > 0 else 0
+                total_score += category_strength * match_strength
+        
+        return total_score
+    
+    category_matches = jobs_df.apply(
+        lambda job: calculate_category_match(
+            job.get("skills_text", ""), 
+            job.get("title", ""), 
+            job.get("description", "")
+        ), axis=1
+    )
+    
+    return category_matches
+
+def infer_categories_from_education(self, education_text: str) -> Dict[str, float]:
+    """Infer skill categories from education background"""
+    education_to_category = {
+        'computer science': {'it_programming': 2.0, 'data_analytics_research': 1.0},
+        'information technology': {'it_programming': 2.0},
+        'data science': {'data_analytics_research': 2.0, 'it_programming': 1.0},
+        'nursing': {'healthcare_medical': 2.0, 'soft_skills': 1.0},
+        'medicine': {'healthcare_medical': 2.0, 'science_laboratory': 1.0},
+        'engineering': {'engineering': 2.0, 'it_programming': 0.5},
+        'business': {'business_management': 2.0, 'soft_skills': 1.0},
+        'management': {'business_management': 2.0, 'soft_skills': 1.0},
+        'accounting': {'finance_banking': 2.0, 'business_management': 1.0},
+        'marketing': {'media_communications': 1.5, 'business_management': 1.0},
+        'education': {'education_training': 2.0, 'soft_skills': 1.0},
+        'psychology': {'healthcare_medical': 1.0, 'soft_skills': 2.0},
+        'design': {'design_creative': 2.0, 'it_programming': 0.5}
+    }
+    
+    inferred_categories = {}
+    
+    for edu_field, categories in education_to_category.items():
+        if edu_field in education_text:
+            for category, weight in categories.items():
+                inferred_categories[category] = inferred_categories.get(category, 0) + weight
+    
+    return inferred_categories
+
+def compute_advanced_skill_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+    """Advanced skill matching using ESCO skills and semantic similarity"""
+    js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+    
+    # Get ESCO skills for jobseeker
+    js_esco_skills = self.get_esco_skills_for_text(jobseeker_skills)
+    
+    def calculate_advanced_match(job_skills):
+        job_tokens = self.extract_skill_tokens_db(job_skills)
+        job_esco_skills = self.get_esco_skills_for_text(job_skills)
+        
+        # 1. Direct skill matches (weight: 0.4)
+        direct_matches = len(js_skill_tokens & job_tokens)
+        direct_score = direct_matches / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+        
+        # 2. ESCO skill matches (weight: 0.3)
+        esco_matches = len(js_esco_skills & job_esco_skills)
+        esco_score = esco_matches / max(len(js_esco_skills), 1) if js_esco_skills else 0
+        
+        # 3. Semantic similarity through skill aliases (weight: 0.2)
+        semantic_score = self.compute_semantic_skill_similarity(js_skill_tokens, job_tokens)
+        
+        # 4. Skill level compatibility (weight: 0.1)
+        level_score = self.compute_skill_level_compatibility(jobseeker_skills, job_skills)
+        
+        # Combined weighted score
+        final_score = (
+            0.4 * direct_score +
+            0.3 * esco_score +
+            0.2 * semantic_score +
+            0.1 * level_score
+        )
+        
+        return final_score
+    
+    advanced_scores = jobs_df["skills_text"].apply(calculate_advanced_match)
+    return advanced_scores
+
+def get_esco_skills_for_text(self, text: str) -> set:
+    """Extract ESCO skills from text"""
+    if not text or not hasattr(self, 'esco_skills'):
+        return set()
+    
+    text_lower = text.lower()
+    found_esco_skills = set()
+    
+    # Check direct ESCO skill matches
+    for skill_id, skill_data in self.esco_skills.items():
+        skill_name = skill_data["name"].lower()
+        if skill_name in text_lower:
+            found_esco_skills.add(skill_name)
+    
+    # Check ESCO aliases
+    for alias, skill_id in self.esco_aliases.items():
+        if alias in text_lower and skill_id in self.esco_skills:
+            found_esco_skills.add(self.esco_skills[skill_id]["name"].lower())
+    
+    return found_esco_skills
+
+def compute_semantic_skill_similarity(self, js_skills: set, job_skills: set) -> float:
+    """Compute semantic similarity between skills using database relationships"""
+    if not js_skills or not job_skills:
+        return 0.0
+    
+    semantic_matches = 0
+    
+    for js_skill in js_skills:
+        for job_skill in job_skills:
+            # Check if skills are semantically related through aliases
+            js_normalized = self.normalize_skill_name_db(js_skill)
+            job_normalized = self.normalize_skill_name_db(job_skill)
+            
+            if js_normalized == job_normalized:
+                semantic_matches += 1
+                break
+            elif self.are_skills_related(js_skill, job_skill):
+                semantic_matches += 0.7
+                break
+    
+    return semantic_matches / len(js_skills)
+
+def are_skills_related(self, skill1: str, skill2: str) -> bool:
+    """Check if two skills are related through database mappings"""
+    # Check if they share common aliases or normalizations
+    skill1_variants = {skill1.lower(), self.normalize_skill_name_db(skill1)}
+    skill2_variants = {skill2.lower(), self.normalize_skill_name_db(skill2)}
+    
+    # Add aliases from database
+    for alias, standard in self.skill_aliases.items():
+        if standard == skill1.lower():
+            skill1_variants.add(alias)
+        if standard == skill2.lower():
+            skill2_variants.add(alias)
+    
+    # Check for overlap
+    return bool(skill1_variants & skill2_variants)
+
+def compute_skill_level_compatibility(self, jobseeker_skills: str, job_skills: str) -> float:
+    """Compute compatibility based on skill levels (if specified)"""
+    # This is a simplified version - you can enhance based on your skill level data
+    js_has_advanced = any(level in jobseeker_skills.lower() for level in ['advanced', 'expert', 'senior'])
+    js_has_beginner = any(level in jobseeker_skills.lower() for level in ['beginner', 'basic', 'junior'])
+    
+    job_requires_advanced = any(level in job_skills.lower() for level in ['advanced', 'expert', 'senior'])
+    job_accepts_beginner = any(level in job_skills.lower() for level in ['beginner', 'basic', 'entry'])
+    
+    if job_requires_advanced and js_has_advanced:
+        return 1.0
+    elif not job_requires_advanced and not js_has_beginner:
+        return 0.8
+    elif job_accepts_beginner:
+        return 0.9
+    else:
+        return 0.5
+
+def generate_recommendations(self, jobseeker_id: int, top_k: int = 10) -> Dict[str, Any]:
+    """SIGNIFICANTLY ENHANCED recommendation generation"""
+    print(f"🎯 Generating ADVANCED recommendations for jobseeker {jobseeker_id}")
+    
+    try:
+        # Load all enhancement data
+        self.load_skill_categories_from_db()
+        self.load_esco_occupation_skills()
+        
+        # Fetch data
+        jobs_df = self.fetch_job_posts()
+        jobseeker_profile = self.fetch_jobseeker_profile(jobseeker_id)
+        
+        if jobseeker_profile is None:
+            return {"error": "Jobseeker not found"}
+        
+        if jobs_df.empty:
+            return {
+                "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+                "recommendations": [],
+                "message": "No job posts available"
+            }
+        
+        # Build jobseeker query
+        query_parts = [
+            str(jobseeker_profile.get("location", "") or ""),
+            str(jobseeker_profile.get("skills_text", "") or ""),
+            str(jobseeker_profile.get("experience_text", "") or ""),
+            str(jobseeker_profile.get("education_text", "") or "")
+        ]
+        jobseeker_query = " ".join(query_parts)
+        
+        # Compute all similarity metrics
+        print("📊 Computing ADVANCED similarity metrics...")
+        
+        # 1. Advanced Skill Matching (HIGHEST WEIGHT)
+        advanced_skill_scores = self.compute_advanced_skill_matching(
+            jobs_df, jobseeker_profile.get("skills_text", "")
+        )
+        
+        # 2. Category-based Matching (HIGH WEIGHT)
+        category_scores = self.compute_enhanced_category_matching(
+            jobs_df, jobseeker_profile.get("skills_text", ""), jobseeker_profile
+        )
+        
+        # 3. ESCO Job Title Matching (HIGH WEIGHT)
+        esco_title_scores = self.compute_esco_job_title_match(
+            jobs_df, jobseeker_profile.get("skills_text", "")
+        )
+        
+        # 4. Enhanced Skill Overlap (MEDIUM WEIGHT)
+        skill_overlaps, skill_ratios = self.compute_enhanced_skill_overlap_db(
+            jobs_df, jobseeker_profile.get("skills_text", "")
+        )
+        
+        # 5. TF-IDF Similarity (LOW WEIGHT)
+        tfidf_similarities = self.compute_tfidf_similarity(jobs_df, jobseeker_query)
+        
+        # 6. Experience-based Role Match (MEDIUM WEIGHT)
+        role_matches = self.compute_role_match(jobs_df, jobseeker_profile)
+        
+        # Add computed metrics
+        jobs_df["advanced_skill_score"] = advanced_skill_scores
+        jobs_df["category_score"] = category_scores
+        jobs_df["esco_title_score"] = esco_title_scores
+        jobs_df["skill_overlap_ratio"] = skill_ratios
+        jobs_df["tfidf_sim"] = tfidf_similarities
+        jobs_df["role_match"] = role_matches
+        
+        # ADVANCED SCORING ALGORITHM
+        jobs_df["final_score"] = (
+            0.35 * jobs_df["advanced_skill_score"] +    # Advanced skill matching (HIGHEST)
+            0.25 * jobs_df["category_score"] +          # Category alignment (HIGH)
+            0.20 * jobs_df["esco_title_score"] +        # ESCO title matching (HIGH)
+            0.10 * jobs_df["skill_overlap_ratio"] +     # Direct skill overlap (MEDIUM)
+            0.05 * jobs_df["tfidf_sim"] +               # TF-IDF similarity (LOW)
+            0.05 * jobs_df["role_match"]                # Experience match (LOW)
+        )
+        
+        # Apply quality filters
+        MIN_SCORE = 0.1
+        quality_jobs = jobs_df[jobs_df["final_score"] >= MIN_SCORE]
+        
+        if quality_jobs.empty:
+            quality_jobs = jobs_df.nlargest(min(top_k, len(jobs_df)), "final_score")
+        else:
+            quality_jobs = quality_jobs.sort_values("final_score", ascending=False).head(top_k)
+        
+        # Format results
+        recommendations = self._format_advanced_recommendations(quality_jobs)
+        
+        result = {
+            "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+            "recommendations": recommendations,
+            "total_jobs_analyzed": len(jobs_df),
+            "total_recommendations": len(recommendations),
+            "algorithm_version": "3.0_advanced_esco",
+            "debug_info": {
+                "avg_advanced_skill": float(jobs_df["advanced_skill_score"].mean()),
+                "avg_category_score": float(jobs_df["category_score"].mean()),
+                "avg_esco_title_score": float(jobs_df["esco_title_score"].mean()),
+                "best_overall_match": float(jobs_df["final_score"].max()),
+                "categories_used": len(getattr(self, 'skill_categories', {})),
+                "esco_occupations_loaded": len(getattr(self, 'esco_occupation_skills', {}))
+            }
+        }
+        
+        print(f"✅ Generated {len(recommendations)} ADVANCED recommendations")
+        print(f"   Best match: {result['debug_info']['best_overall_match']:.3f}")
+        print(f"   Categories: {result['debug_info']['categories_used']}")
+        print(f"   ESCO occupations: {result['debug_info']['esco_occupations_loaded']}")
+        
+        return result
+        
+    except Exception as e:
+        print(f"❌ Error generating advanced recommendations: {e}")
+        return {"error": str(e)}
+
+def _format_advanced_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+    """Format advanced recommendations with detailed scoring"""
+    recommendations = []
+    
+    for _, job in jobs_df.iterrows():
+        recommendation = {
+            "job_id": int(job["id"]),
+            "title": job["title"],
+            "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+            "location": job["location"],
+            "final_score": round(float(job["final_score"]), 4),
+            "match_percentage": round(float(job["final_score"]) * 100, 2),
+            "scoring_breakdown": {
+                "advanced_skill_score": round(float(job["advanced_skill_score"]), 3),
+                "category_score": round(float(job["category_score"]), 3),
+                "esco_title_score": round(float(job["esco_title_score"]), 3),
+                "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                "role_match": bool(job["role_match"])
+            },
+            "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+            "match_quality": self._determine_match_quality(float(job["final_score"]))
+        }
+        recommendations.append(recommendation)
+    
+    return recommendations
+
+def _determine_match_quality(self, score: float) -> str:
+    """Determine match quality based on score"""
+    if score >= 0.8:
+        return "Excellent"
+    elif score >= 0.6:
+        return "Very Good"
+    elif score >= 0.4:
+        return "Good"
+    elif score >= 0.2:
+        return "Fair"
+    else:
+        return "Basic"
+
+def test_enhanced_matching(self):
+    """Test the enhanced matching system"""
+    print("🧪 Testing Enhanced Job Matching Algorithm...")
+    
+    # Test with a data science jobseeker
+    result = self.generate_recommendations(1, top_k=5)  # Use actual jobseeker ID
+    
+    if "error" not in result:
+        print(f"✅ Test successful - {len(result['recommendations'])} recommendations")
+        for i, rec in enumerate(result['recommendations'][:3], 1):
+            print(f"   {i}. {rec['title']} - {rec['match_percentage']}% ({rec['match_quality']})")
+            print(f"      Advanced Skill: {rec['scoring_breakdown']['advanced_skill_score']}")
+            print(f"      Category Match: {rec['scoring_breakdown']['category_score']}")
+            print(f"      ESCO Title: {rec['scoring_breakdown']['esco_title_score']}")
+    else:
+        print(f"❌ Test failed: {result['error']}")
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+Core Job Recommendation Engine for SIKAP
+Handles all ML logic, data processing, and recommendation algorithms
+"""
+import os
+import sys
+
+if os.name == 'nt':  # Windows
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+
+import mysql.connector as mysql
+import pandas as pd
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import re
+from typing import Dict, List, Optional, Tuple, Any
+
+# Import configuration
+from config import DB_CONFIG
+
+class JobRecommendationEngine:
+    """Main recommendation engine class"""
+    
+    def __init__(self):
+        """Initialize with database-driven skill normalization"""
+        self.vectorizer = None
+        self.esco_skills = {}
+        self.esco_aliases = {}
+        self.skill_aliases = {}  # Will be loaded from database
+        self.esco_skill_map = {}  # For ESCO-enhanced matching
+        self.skill_categories = {}  # For skill categorization
+        self.esco_occupation_skills = {}  # FIXED: Initialize this
+        
+        # FIXED: Safe print for Windows
+        try:
+            print(f"🔧 Using database: {DB_CONFIG['host']}/{DB_CONFIG['database']}")
+        except UnicodeEncodeError:
+            print(f"Using database: {DB_CONFIG['host']}/{DB_CONFIG['database']}")
+        
+        # Load normalization data from database
+        self.load_skill_normalization_data()
+        self._load_esco_data()
+        self.load_skill_categories_from_db()
+    
+    def _get_db_connection(self):
+        """Get database connection using shared config"""
+        return mysql.connect(**DB_CONFIG)
+    
+    def _load_esco_data(self):
+        """Load ESCO skills and aliases for skill normalization"""
+        try:
+            conn = self._get_db_connection()
+            cur = conn.cursor(dictionary=True)
+            
+            # Load ESCO skills
+            try:
+                cur.execute("SELECT id, skill_name, concept_uri FROM esco_skills LIMIT 1000")
+                self.esco_skills = {
+                    row["id"]: {"name": row["skill_name"], "uri": row["concept_uri"]} 
+                    for row in cur.fetchall()
+                }
+            except Exception as e:
+                print(f"⚠️ ESCO skills table issue: {e}")
+                self.esco_skills = {}
+                
+            # Load ESCO aliases
+            try:
+                cur.execute("SELECT alias, skill_id FROM esco_skill_aliases LIMIT 1000")
+                self.esco_aliases = {
+                    row["alias"].lower(): row["skill_id"] 
+                    for row in cur.fetchall()
+                }
+            except Exception as e:
+                print(f"⚠️ ESCO aliases table issue: {e}")
+                self.esco_aliases = {}
+                
+            conn.close()
+            print(f"📊 Loaded {len(self.esco_skills)} ESCO skills, {len(self.esco_aliases)} aliases")
+            
+        except Exception as e:
+            print(f"⚠️ Could not load ESCO data: {e}")
+            self.esco_skills = {}
+            self.esco_aliases = {}
+    
+    def load_skill_normalization_data(self):
+        """Load skill normalization data from database"""
+        conn = self._get_db_connection()
+        try:
+            # Load skill aliases from skills_dictionary and skill_aliases
+            try:
+                alias_query = """
+                    SELECT sa.alias, sd.skill_name as standard_name
+                    FROM skill_aliases sa
+                    JOIN skills_dictionary sd ON sa.skill_id = sd.id
+                    LIMIT 500
+                """
+                alias_df = pd.read_sql(alias_query, conn)
+                
+                # Create alias mapping
+                self.skill_aliases = {}
+                for _, row in alias_df.iterrows():
+                    self.skill_aliases[row['alias'].lower().strip()] = row['standard_name'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ Skills dictionary empty or error: {e}")
+                self.skill_aliases = {}
+            
+            # Load ESCO skill aliases
+            try:
+                esco_alias_query = """
+                    SELECT esa.alias, es.skill_name as standard_name
+                    FROM esco_skill_aliases esa
+                    JOIN esco_skills es ON esa.skill_id = es.id
+                    LIMIT 500
+                """
+                esco_alias_df = pd.read_sql(esco_alias_query, conn)
+                
+                # Add ESCO aliases to mapping
+                for _, row in esco_alias_df.iterrows():
+                    self.skill_aliases[row['alias'].lower().strip()] = row['standard_name'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ ESCO aliases empty or error: {e}")
+            
+            # Load manual to ESCO mapping
+            try:
+                manual_esco_query = """
+                    SELECT sd.skill_name as manual_skill, es.skill_name as esco_skill, 
+                           mte.confidence_level
+                    FROM manual_to_esco mte
+                    JOIN skills_dictionary sd ON mte.manual_skill_id = sd.id
+                    JOIN esco_skills es ON mte.esco_skill_id = es.id
+                    WHERE mte.confidence_level >= 0.8
+                    LIMIT 200
+                """
+                manual_esco_df = pd.read_sql(manual_esco_query, conn)
+                
+                # Add manual to ESCO mapping
+                for _, row in manual_esco_df.iterrows():
+                    self.skill_aliases[row['manual_skill'].lower().strip()] = row['esco_skill'].lower().strip()
+            except Exception as e:
+                print(f"⚠️ Manual to ESCO mapping empty or error: {e}")
+            
+            print(f"✅ Loaded {len(self.skill_aliases)} skill aliases from database")
+            
+            # Fallback to critical mappings if database is empty
+            if len(self.skill_aliases) == 0:
+                print("⚠️ Using fallback skill mappings")
+                self.skill_aliases = {
+                    'js': 'javascript',
+                    'javascript programming': 'javascript',
+                    'python programming': 'python',
+                    'sql database': 'sql',
+                    'data analysis': 'data analytics',
+                    'html5': 'html',
+                    'css3': 'css',
+                    'react.js': 'react',
+                    'node.js': 'nodejs',
+                    'vue.js': 'vue'
+                }
+            
+        except Exception as e:
+            print(f"⚠️ Error loading skill normalization data: {e}")
+            # Fallback to minimal hardcoded list for critical operations
+            self.skill_aliases = {
+                'js': 'javascript',
+                'sql database': 'sql',
+                'data analysis': 'data analytics'
+            }
+        finally:
+            conn.close()
+    
+    def load_skill_categories_from_db(self):
+        """Load skill categories from database for enhanced matching"""
+        conn = self._get_db_connection()
+        try:
+            # Load skill categories
+            category_query = """
+                SELECT DISTINCT category 
+                FROM skills_dictionary 
+                WHERE category IS NOT NULL
+            """
+            categories_df = pd.read_sql(category_query, conn)
+            
+            # Load skills by category
+            skills_by_category_query = """
+                SELECT sd.skill_name, sd.category,
+                       GROUP_CONCAT(DISTINCT sa.alias SEPARATOR '|') as aliases
+                FROM skills_dictionary sd
+                LEFT JOIN skill_aliases sa ON sd.id = sa.skill_id
+                WHERE sd.category IS NOT NULL
+                GROUP BY sd.id, sd.skill_name, sd.category
+            """
+            skills_df = pd.read_sql(skills_by_category_query, conn)
+            
+            # Build category mapping
+            self.skill_categories = {}
+            for _, row in skills_df.iterrows():
+                category = row['category'].lower().replace(' & ', '_').replace(' ', '_')
+                skill = row['skill_name'].lower()
+                
+                if category not in self.skill_categories:
+                    self.skill_categories[category] = set()
+                
+                self.skill_categories[category].add(skill)
+                
+                # Add aliases
+                if row['aliases']:
+                    aliases = row['aliases'].split('|')
+                    for alias in aliases:
+                        self.skill_categories[category].add(alias.lower().strip())
+            
+            print(f"📂 Loaded {len(self.skill_categories)} skill categories from database")
+            for cat, skills in self.skill_categories.items():
+                print(f"   {cat}: {len(skills)} skills")
+                
+        except Exception as e:
+            print(f"⚠️ Could not load categories from database: {e}")
+            self.skill_categories = {}
+        finally:
+            conn.close()
+
+    def load_esco_occupation_skills(self):
+        """Load ESCO occupation-skill relationships for job title matching"""
+        conn = self._get_db_connection()
+        try:
+            esco_query = """
+                SELECT 
+                    eo.occupation_name,
+                    es.skill_name,
+                    eos.relation_type
+                FROM esco_occupations eo
+                JOIN esco_occupation_skills eos ON eo.id = eos.occupation_id
+                JOIN esco_skills es ON eos.skill_id = es.id
+                WHERE eos.relation_type = 'essential'
+                LIMIT 5000
+            """
+            
+            esco_df = pd.read_sql(esco_query, conn)
+            
+            # Build occupation to skills mapping
+            self.esco_occupation_skills = {}
+            for _, row in esco_df.iterrows():
+                occupation = row['occupation_name'].lower()
+                skill = row['skill_name'].lower()
+                
+                if occupation not in self.esco_occupation_skills:
+                    self.esco_occupation_skills[occupation] = set()
+                
+                self.esco_occupation_skills[occupation].add(skill)
+            
+            print(f"🏢 Loaded {len(self.esco_occupation_skills)} ESCO occupations with skills")
+            
+        except Exception as e:
+            print(f"⚠️ Could not load ESCO occupation skills: {e}")
+            self.esco_occupation_skills = {}
+        finally:
+            conn.close()
+
+    # FIXED: Add missing categorize_skills_from_db method
+    def categorize_skills_from_db(self, skills_text: str) -> Dict[str, int]:
+        """Categorize skills based on database categories"""
+        if not skills_text or not self.skill_categories:
+            return {}
+        
+        skills_lower = skills_text.lower()
+        skill_tokens = self.extract_skill_tokens_db(skills_text)
+        
+        categories_found = {}
+        
+        # Check each category for skill matches
+        for category, category_skills in self.skill_categories.items():
+            matches = 0
+            
+            # Direct skill matches
+            for skill_token in skill_tokens:
+                if skill_token in category_skills:
+                    matches += 1
+            
+            # Partial matches in text
+            for category_skill in category_skills:
+                if category_skill in skills_lower:
+                    matches += 1
+            
+            if matches > 0:
+                categories_found[category] = matches
+        
+        return categories_found
+
+    def fetch_job_posts(self) -> pd.DataFrame:
+        """Fetch all available job posts with BETTER skill extraction"""
+        conn = self._get_db_connection()
+        try:
+            query = """
+                SELECT 
+                    jp.job_id as id,
+                    jp.job_title as title,
+                    jp.full_description as description,
+                    jp.location,
+                    GROUP_CONCAT(DISTINCT jps.skill_name SEPARATOR ', ') as skills_text
+                FROM job_post jp 
+                LEFT JOIN job_post_skills jps ON jp.job_id = jps.job_id
+                WHERE jp.job_status = 'open'
+                GROUP BY jp.job_id, jp.job_title, jp.full_description, jp.location
+                ORDER BY jp.job_id
+            """
+            df = pd.read_sql(query, conn)
+            
+            # Debug job skills
+            print(f"📋 Fetched {len(df)} job posts")
+            for i, job in df.head(3).iterrows():
+                print(f"   Job {job['id']}: {job['title']} - Skills: {job['skills_text']}")
+            
+            return df
+            
+        except Exception as e:
+            print(f"❌ Error fetching job posts: {e}")
+            return pd.DataFrame(columns=['id', 'title', 'description', 'location', 'skills_text'])
+        finally:
+            conn.close()
+    
+    def normalize_text(self, text: str) -> str:
+        """Normalize text for TF-IDF processing"""
+        if text is None:
+            return ""
+        text = str(text).lower()
+        text = re.sub(r"[,/|]", " ", text)
+        text = re.sub(r"[^a-z0-9+\.# ]+", " ", text)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
+    
+    def normalize_skill_name_db(self, skill_text: str) -> str:
+        """Database-driven skill normalization"""
+        if not skill_text:
+            return ""
+        
+        # Convert to lowercase and clean
+        skill = str(skill_text).lower().strip()
+        
+        # Remove proficiency levels - KEY FIX
+        proficiency_levels = ['beginner', 'intermediate', 'advanced', 'expert', 'basic', 'senior', 'junior']
+        for level in proficiency_levels:
+            skill = skill.replace(f" ({level})", "").replace(f"({level})", "").replace(level, "").strip()
+        
+        # Remove extra parentheses and spaces
+        skill = re.sub(r'\s+', ' ', skill.replace("()", "")).strip()
+        
+        # Check database aliases first
+        if skill in self.skill_aliases:
+            return self.skill_aliases[skill]
+        
+        # Check partial matches in database
+        for alias, standard in self.skill_aliases.items():
+            if alias in skill or skill in alias:
+                # Only if they're reasonably similar in length
+                if abs(len(alias) - len(skill)) <= 3:
+                    return standard
+        
+        return skill.strip()
+    
+    def extract_skill_tokens_db(self, skill_text: str) -> set:
+        """Extract and normalize skill tokens using database"""
+        if not skill_text:
+            return set()
+        
+        # Split by common delimiters
+        tokens = re.split(r"[,/|;]+", str(skill_text))
+        normalized_skills = set()
+        
+        for token in tokens:
+            # Use database-driven normalization
+            normalized = self.normalize_skill_name_db(token)
+            if normalized and len(normalized) > 1:
+                normalized_skills.add(normalized)
+                
+                # Also add partial matches for compound skills
+                if ' ' in normalized:
+                    words = normalized.split()
+                    for word in words:
+                        if len(word) > 2:
+                            normalized_skills.add(word)
+        
+        return normalized_skills
+    
+    def extract_skill_tokens(self, skill_text: str) -> set:
+        """Extract skill tokens - calls database version"""
+        return self.extract_skill_tokens_db(skill_text)
+    
+    def normalize_to_esco(self, skill_text: str) -> set:
+        """Convert skills to ESCO URIs for standardized matching"""
+        if not skill_text:
+            return set()
+        
+        esco_uris = set()
+        skills = str(skill_text).split(',')
+        
+        for skill in skills:
+            skill_clean = skill.strip().lower()
+            
+            # Check if skill exists in ESCO aliases
+            if skill_clean in self.esco_aliases:
+                skill_id = self.esco_aliases[skill_clean]
+                if skill_id in self.esco_skills:
+                    esco_uris.add(self.esco_skills[skill_id]["uri"])
+            
+            # Also check direct ESCO skills
+            for skill_id, skill_data in self.esco_skills.items():
+                if skill_clean in skill_data["name"].lower():
+                    esco_uris.add(skill_data["uri"])
+        
+        return esco_uris
+
+    # FIXED: Add missing helper methods for advanced matching
+    def get_esco_skills_for_text(self, text: str) -> set:
+        """Extract ESCO skills from text"""
+        if not text or not hasattr(self, 'esco_skills'):
+            return set()
+        
+        text_lower = text.lower()
+        found_esco_skills = set()
+        
+        # Check direct ESCO skill matches
+        for skill_id, skill_data in self.esco_skills.items():
+            skill_name = skill_data["name"].lower()
+            if skill_name in text_lower:
+                found_esco_skills.add(skill_name)
+        
+        # Check ESCO aliases
+        for alias, skill_id in self.esco_aliases.items():
+            if alias in text_lower and skill_id in self.esco_skills:
+                found_esco_skills.add(self.esco_skills[skill_id]["name"].lower())
+        
+        return found_esco_skills
+
+    def compute_semantic_skill_similarity(self, js_skills: set, job_skills: set) -> float:
+        """Compute semantic similarity between skills using database relationships"""
+        if not js_skills or not job_skills:
+            return 0.0
+        
+        semantic_matches = 0
+        
+        for js_skill in js_skills:
+            for job_skill in job_skills:
+                # Check if skills are semantically related through aliases
+                js_normalized = self.normalize_skill_name_db(js_skill)
+                job_normalized = self.normalize_skill_name_db(job_skill)
+                
+                if js_normalized == job_normalized:
+                    semantic_matches += 1
+                    break
+                elif self.are_skills_related(js_skill, job_skill):
+                    semantic_matches += 0.7
+                    break
+        
+        return semantic_matches / len(js_skills)
+
+    def are_skills_related(self, skill1: str, skill2: str) -> bool:
+        """Check if two skills are related through database mappings"""
+        # Check if they share common aliases or normalizations
+        skill1_variants = {skill1.lower(), self.normalize_skill_name_db(skill1)}
+        skill2_variants = {skill2.lower(), self.normalize_skill_name_db(skill2)}
+        
+        # Add aliases from database
+        for alias, standard in self.skill_aliases.items():
+            if standard == skill1.lower():
+                skill1_variants.add(alias)
+            if standard == skill2.lower():
+                skill2_variants.add(alias)
+        
+        # Check for overlap
+        return bool(skill1_variants & skill2_variants)
+
+    def compute_skill_level_compatibility(self, jobseeker_skills: str, job_skills: str) -> float:
+        """Compute compatibility based on skill levels (if specified)"""
+        # This is a simplified version - you can enhance based on your skill level data
+        js_has_advanced = any(level in jobseeker_skills.lower() for level in ['advanced', 'expert', 'senior'])
+        js_has_beginner = any(level in jobseeker_skills.lower() for level in ['beginner', 'basic', 'junior'])
+        
+        job_requires_advanced = any(level in job_skills.lower() for level in ['advanced', 'expert', 'senior'])
+        job_accepts_beginner = any(level in job_skills.lower() for level in ['beginner', 'basic', 'entry'])
+        
+        if job_requires_advanced and js_has_advanced:
+            return 1.0
+        elif not job_requires_advanced and not js_has_beginner:
+            return 0.8
+        elif job_accepts_beginner:
+            return 0.9
+        else:
+            return 0.5
+
+    def infer_categories_from_education(self, education_text: str) -> Dict[str, float]:
+        """Infer skill categories from education background"""
+        education_to_category = {
+            'computer science': {'it_programming': 2.0, 'data_analytics_research': 1.0},
+            'information technology': {'it_programming': 2.0},
+            'data science': {'data_analytics_research': 2.0, 'it_programming': 1.0},
+            'nursing': {'healthcare_medical': 2.0, 'soft_skills': 1.0},
+            'medicine': {'healthcare_medical': 2.0, 'science_laboratory': 1.0},
+            'engineering': {'engineering': 2.0, 'it_programming': 0.5},
+            'business': {'business_management': 2.0, 'soft_skills': 1.0},
+            'management': {'business_management': 2.0, 'soft_skills': 1.0},
+            'accounting': {'finance_banking': 2.0, 'business_management': 1.0},
+            'marketing': {'media_communications': 1.5, 'business_management': 1.0},
+            'education': {'education_training': 2.0, 'soft_skills': 1.0},
+            'psychology': {'healthcare_medical': 1.0, 'soft_skills': 2.0},
+            'design': {'design_creative': 2.0, 'it_programming': 0.5}
+        }
+        
+        inferred_categories = {}
+        
+        for edu_field, categories in education_to_category.items():
+            if edu_field in education_text:
+                for category, weight in categories.items():
+                    inferred_categories[category] = inferred_categories.get(category, 0) + weight
+        
+        return inferred_categories
+    
+    def compute_tfidf_similarity(self, jobs_df: pd.DataFrame, jobseeker_query: str) -> np.ndarray:
+        """Compute TF-IDF similarity between jobseeker and jobs"""
+        # Build job documents
+        jobs_df["doc"] = (
+            jobs_df["title"].fillna("") + " " +
+            jobs_df["description"].fillna("") + " " +
+            jobs_df["location"].fillna("") + " " +
+            jobs_df["skills_text"].fillna("")
+        ).apply(self.normalize_text)
+        
+        # Normalize jobseeker query
+        normalized_query = self.normalize_text(jobseeker_query)
+        
+        # TF-IDF
+        self.vectorizer = TfidfVectorizer(ngram_range=(1,2), min_df=1, max_features=5000)
+        job_vectors = self.vectorizer.fit_transform(jobs_df["doc"].values)
+        query_vector = self.vectorizer.transform([normalized_query])
+        
+        # Compute similarities
+        similarities = cosine_similarity(query_vector, job_vectors).flatten()
+        
+        print(f"🔍 TF-IDF computed for {len(jobs_df)} jobs")
+        return similarities
+    
+    def compute_skill_overlap(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Compute skill overlap between jobseeker and jobs"""
+        js_skill_tokens = self.extract_skill_tokens(jobseeker_skills)
+        
+        def calculate_overlap(job_skills):
+            job_tokens = self.extract_skill_tokens(job_skills)
+            overlap = job_tokens & js_skill_tokens
+            ratio = len(overlap) / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            return overlap, ratio
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def compute_enhanced_skill_overlap_db(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Enhanced skill overlap using database normalization"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        
+        print(f"🔍 Jobseeker normalized skills (DB): {sorted(js_skill_tokens)}")
+        
+        def calculate_enhanced_overlap(job_skills):
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            
+            # Direct matches
+            direct_overlap = job_tokens & js_skill_tokens
+            
+            # Enhanced fuzzy matching using database relationships
+            fuzzy_matches = set()
+            for js_skill in js_skill_tokens:
+                for job_skill in job_tokens:
+                    # Check if skills are related through database mappings
+                    js_normalized = self.normalize_skill_name_db(js_skill)
+                    job_normalized = self.normalize_skill_name_db(job_skill)
+                    
+                    if js_normalized == job_normalized:
+                        fuzzy_matches.add(f"{js_skill}~{job_skill}")
+                    elif (js_skill in job_skill or job_skill in js_skill) and abs(len(js_skill) - len(job_skill)) <= 3:
+                        fuzzy_matches.add(f"{js_skill}~{job_skill}")
+            
+            # Combine matches
+            total_matches = direct_overlap | fuzzy_matches
+            
+            # Calculate ratio
+            js_match_count = len(direct_overlap) + (len(fuzzy_matches) * 0.8)
+            ratio = js_match_count / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            
+            return total_matches, min(ratio, 1.0)
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_enhanced_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def fetch_jobseeker_profile(self, jobseeker_id: int) -> Optional[pd.Series]:
+        """Fetch jobseeker profile with FIXED skill processing"""
+        conn = self._get_db_connection()
+        try:
+            # Basic info
+            jobseeker_query = """
+                SELECT 
+                    j.jobseeker_id as id,
+                    CONCAT(j.first_name, ' ', j.last_name) as full_name,
+                    COALESCE(j.address, '') as location
+                FROM jobseeker j
+                WHERE j.jobseeker_id = %s
+                LIMIT 1
+            """
+            
+            df = pd.read_sql(jobseeker_query, conn, params=(int(jobseeker_id),))
+            if df.empty:
+                return None
+                
+            profile = df.iloc[0].to_dict()
+            
+            # FIXED: Better skills query with debugging
+            skills_query = """
+                SELECT skill_name, proficiency_level 
+                FROM jobseeker_skills 
+                WHERE jobseeker_id = %s
+            """
+            skills_df = pd.read_sql(skills_query, conn, params=(int(jobseeker_id),))
+            
+            print(f"🔍 Raw skills query result: {len(skills_df)} skills found", file=sys.stderr)
+            
+            if not skills_df.empty:
+                # Extract skill names and normalize them
+                raw_skills = []
+                normalized_skills = []
+                
+                for _, skill_row in skills_df.iterrows():
+                    skill_name = skill_row['skill_name']
+                    raw_skills.append(f"{skill_name} ({skill_row['proficiency_level']})")
+                    
+                    # Normalize skill (remove proficiency)
+                    normalized = self.normalize_skill_name_db(skill_name)
+                    if normalized:
+                        normalized_skills.append(normalized)
+                
+                profile['raw_skills_text'] = ', '.join(raw_skills)
+                profile['skills_text'] = ', '.join(normalized_skills)
+                
+                print(f"   Raw skills: {profile['raw_skills_text']}", file=sys.stderr)
+                print(f"   Normalized: {profile['skills_text']}", file=sys.stderr)
+            else:
+                profile['raw_skills_text'] = ''
+                profile['skills_text'] = ''
+                print("   ⚠️ No skills found in database!", file=sys.stderr)
+            
+            # Experience
+            exp_query = """
+                SELECT GROUP_CONCAT(
+                    CONCAT(job_title, ' at ', company_name, '. ', COALESCE(responsibilities, ''))
+                    SEPARATOR '. '
+                ) as experience_text
+                FROM jobseeker_work_experience 
+                WHERE jobseeker_id = %s
+            """
+            exp_df = pd.read_sql(exp_query, conn, params=(int(jobseeker_id),))
+            profile['experience_text'] = exp_df.iloc[0]['experience_text'] if not exp_df.empty and exp_df.iloc[0]['experience_text'] else ''
+            
+            # Education
+            edu_query = """
+                SELECT GROUP_CONCAT(
+                    CONCAT(education_level, ' in ', COALESCE(field_of_study, ''), ' from ', school_name)
+                    SEPARATOR '. '
+                ) as education_text
+                FROM jobseeker_education 
+                WHERE jobseeker_id = %s
+            """
+            edu_df = pd.read_sql(edu_query, conn, params=(int(jobseeker_id),))
+            profile['education_text'] = edu_df.iloc[0]['education_text'] if not edu_df.empty and edu_df.iloc[0]['education_text'] else ''
+            
+            print(f"👤 Jobseeker {jobseeker_id}: {profile['full_name']}")
+            print(f"   Raw skills: {profile['raw_skills_text']}")
+            print(f"   Normalized: {profile['skills_text']}")
+            
+            return pd.Series(profile)
+            
+        except Exception as e:
+            print(f"❌ Error fetching jobseeker {jobseeker_id}: {e}")
+            return None
+        finally:
+            conn.close()
+    
+    def compute_esco_overlap(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> Tuple[pd.Series, pd.Series]:
+        """Compute ESCO skill overlap"""
+        js_esco_uris = self.normalize_to_esco(jobseeker_skills)
+        
+        def calculate_esco_overlap(job_skills):
+            job_esco_uris = self.normalize_to_esco(job_skills)
+            overlap = job_esco_uris & js_esco_uris
+            ratio = len(overlap) / max(len(js_esco_uris), 1) if js_esco_uris else 0
+            return overlap, ratio
+        
+        overlaps, ratios = zip(*jobs_df["skills_text"].apply(calculate_esco_overlap))
+        
+        return pd.Series(list(overlaps)), pd.Series(list(ratios))
+    
+    def compute_role_match(self, jobs_df: pd.DataFrame, jobseeker_profile: pd.Series) -> pd.Series:
+        """Compute role/title matching based on work experience job titles"""
+        experience_text = jobseeker_profile.get("experience_text", "")
+        
+        if not experience_text:
+            return pd.Series([0] * len(jobs_df))
+        
+        # Extract job titles from experience
+        experience_titles = []
+        import re
+        # Pattern to extract job titles (assumes format: "Job Title at Company")
+        title_pattern = r'([^\.]+?)\s+at\s+[^\.]+\.'
+        matches = re.findall(title_pattern, experience_text)
+        experience_titles = [title.strip().lower() for title in matches]
+        
+        def calculate_title_match(job_title):
+            if not job_title or not experience_titles:
+                return 0
+            
+            job_title_normalized = str(job_title).lower()
+            
+            # Check for exact matches or similar titles
+            for exp_title in experience_titles:
+                if exp_title in job_title_normalized or job_title_normalized in exp_title:
+                    return 1
+            return 0
+        
+        role_matches = jobs_df["title"].apply(calculate_title_match)
+        return role_matches
+
+    # FIXED: Add all advanced computation methods
+    def compute_advanced_skill_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """Advanced skill matching using ESCO skills and semantic similarity"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        
+        # Get ESCO skills for jobseeker
+        js_esco_skills = self.get_esco_skills_for_text(jobseeker_skills)
+        
+        def calculate_advanced_match(job_skills):
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            job_esco_skills = self.get_esco_skills_for_text(job_skills)
+            
+            # 1. Direct skill matches (weight: 0.4)
+            direct_matches = len(js_skill_tokens & job_tokens)
+            direct_score = direct_matches / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            
+            # 2. ESCO skill matches (weight: 0.3)
+            esco_matches = len(js_esco_skills & job_esco_skills)
+            esco_score = esco_matches / max(len(js_esco_skills), 1) if js_esco_skills else 0
+            
+            # 3. Semantic similarity through skill aliases (weight: 0.2)
+            semantic_score = self.compute_semantic_skill_similarity(js_skill_tokens, job_tokens)
+            
+            # 4. Skill level compatibility (weight: 0.1)
+            level_score = self.compute_skill_level_compatibility(jobseeker_skills, job_skills)
+            
+            # Combined weighted score
+            final_score = (
+                0.4 * direct_score +
+                0.3 * esco_score +
+                0.2 * semantic_score +
+                0.1 * level_score
+            )
+            
+            return final_score
+        
+        advanced_scores = jobs_df["skills_text"].apply(calculate_advanced_match)
+        return advanced_scores
+
+    def compute_esco_job_title_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """Match jobseeker skills to job titles using ESCO occupation data"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        
+        def calculate_esco_title_match(job_title):
+            if not job_title or not self.esco_occupation_skills:
+                return 0.0
+            
+            title_lower = str(job_title).lower()
+            best_match = 0.0
+            
+            # Find matching ESCO occupations
+            for occupation, required_skills in self.esco_occupation_skills.items():
+                # Check if job title matches occupation
+                title_similarity = 0
+                occupation_words = occupation.split()
+                title_words = title_lower.split()
+                
+                # Calculate title word overlap
+                common_words = set(occupation_words) & set(title_words)
+                if common_words:
+                    title_similarity = len(common_words) / max(len(occupation_words), len(title_words))
+            
+                if title_similarity > 0.3:  # Significant title match
+                    # Calculate skill match for this occupation
+                    skill_overlap = js_skill_tokens & required_skills
+                    skill_match = len(skill_overlap) / max(len(required_skills), 1)
+                    
+                    # Combined score
+                    combined_score = (title_similarity * 0.4) + (skill_match * 0.6)
+                    best_match = max(best_match, combined_score)
+            
+            return best_match
+        
+        esco_matches = jobs_df["title"].apply(calculate_esco_title_match)
+        return esco_matches
+
+    def compute_enhanced_category_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str, jobseeker_profile: pd.Series) -> pd.Series:
+        """Enhanced category-based matching using skills and education"""
+        js_skill_categories = self.categorize_skills_from_db(jobseeker_skills)
+        
+        # Also consider education field
+        education_text = jobseeker_profile.get("education_text", "").lower()
+        education_categories = self.infer_categories_from_education(education_text)
+        
+        # Combine skill and education categories
+        combined_categories = js_skill_categories.copy()
+        for cat, weight in education_categories.items():
+            combined_categories[cat] = combined_categories.get(cat, 0) + weight
+        
+        def calculate_category_match(job_skills, job_title, job_description):
+            job_text = f"{job_skills} {job_title} {job_description}".lower()
+            job_categories = self.categorize_skills_from_db(job_text)
+            
+            if not combined_categories or not job_categories:
+                return 0.0
+            
+            # Calculate weighted category overlap
+            total_score = 0.0
+            total_weight = sum(combined_categories.values())
+            
+            for category, js_weight in combined_categories.items():
+                job_weight = job_categories.get(category, 0)
+                if job_weight > 0:
+                    # Normalized category match
+                    category_strength = js_weight / total_weight if total_weight > 0 else 0
+                    match_strength = min(job_weight / js_weight, 1.0) if js_weight > 0 else 0
+                    total_score += category_strength * match_strength
+            
+            return total_score
+        
+        category_matches = jobs_df.apply(
+            lambda job: calculate_category_match(
+                job.get("skills_text", ""), 
+                job.get("title", ""), 
+                job.get("description", "")
+            ), axis=1
+        )
+        
+        return category_matches
+    
+    def compute_weighted_skill_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """ULTRA-STRICT weighted skill matching with category enforcement"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        js_categories = self.categorize_skills_from_db(jobseeker_skills)
+        
+        print(f"🔍 Jobseeker skills: {sorted(js_skill_tokens)}")
+        print(f"🔍 Jobseeker categories: {js_categories}")
+        
+        def calculate_ultra_strict_match(job_skills):
+            if not job_skills or not js_skill_tokens:
+                return 0.0
+                
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            job_categories = self.categorize_skills_from_db(job_skills)
+            
+            # 1. EXACT SKILL MATCHES (50% weight)
+            direct_matches = js_skill_tokens & job_tokens
+            direct_score = len(direct_matches) / len(js_skill_tokens) if js_skill_tokens else 0
+            
+            # 2. CATEGORY ALIGNMENT (50% weight) - VERY STRICT
+            category_score = 0.0
+            if js_categories and job_categories:
+                shared_categories = set(js_categories.keys()) & set(job_categories.keys())
+                
+                if shared_categories:
+                    # Calculate weighted category overlap
+                    total_js_weight = sum(js_categories.values())
+                    category_overlap = 0.0
+                    
+                    for category in shared_categories:
+                        js_weight = js_categories[category]
+                        job_weight = job_categories[category]
+                        
+                        # Strong penalty for weak category presence in job
+                        category_strength = min(job_weight / max(js_weight, 1.0), 1.0)
+                        weight_contribution = js_weight / total_js_weight
+                        
+                        category_overlap += weight_contribution * category_strength
+                    
+                    category_score = category_overlap
+            
+            # 3. ULTRA-STRICT PENALTY SYSTEM
+            penalties = 0.0
+            
+            # MAJOR penalty for no category overlap
+            if not (set(js_categories.keys()) & set(job_categories.keys())):
+                penalties += 0.8  # 80% penalty!
+            
+            # MAJOR penalty for zero direct skill matches
+            if len(direct_matches) == 0:
+                penalties += 0.6  # 60% penalty!
+            
+            # Additional penalty for very few matches
+            if len(direct_matches) < 2 and len(js_skill_tokens) > 3:
+                penalties += 0.4  # 40% penalty for insufficient matches
+            
+            # 4. ULTRA-STRICT CALCULATION
+            base_score = (0.5 * direct_score) + (0.5 * category_score)
+            final_score = max(0.0, base_score - penalties)
+            
+            # HARD CAPS for unrelated categories
+            if category_score < 0.1:  # Almost no category overlap
+                final_score = min(final_score, 0.15)  # Cap at 15%!
+            elif category_score < 0.3:  # Weak category overlap
+                final_score = min(final_score, 0.35)  # Cap at 35%
+                
+            return final_score
+        
+        weighted_scores = jobs_df["skills_text"].apply(calculate_ultra_strict_match)
+        return weighted_scores
+
+    # FIXED: Add missing formatting method
+    def _format_ultra_strict_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format ultra-strict recommendations with enhanced details"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "scoring_breakdown": {
+                    "weighted_skill_score": round(float(job["weighted_skill_score"]), 3),
+                    "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                    "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                },
+                "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+                "match_quality": self._determine_match_quality(float(job["final_score"])),
+                "strictness_level": "ULTRA_STRICT"
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+
+    def _determine_match_quality(self, score: float) -> str:
+        """Determine match quality based on score"""
+        if score >= 0.8:
+            return "Excellent"
+        elif score >= 0.6:
+            return "Very Good"
+        elif score >= 0.4:
+            return "Good"
+        elif score >= 0.2:
+            return "Fair"
+        else:
+            return "Basic"
+
+    def _format_advanced_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format advanced recommendations with detailed scoring"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "scoring_breakdown": {
+                    "advanced_skill_score": round(float(job["advanced_skill_score"]), 3),
+                    "category_score": round(float(job["category_score"]), 3),
+                    "esco_title_score": round(float(job["esco_title_score"]), 3),
+                    "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                    "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                    "role_match": bool(job["role_match"])
+                },
+                "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+                "match_quality": self._determine_match_quality(float(job["final_score"]))
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+    
+    def generate_recommendations(self, jobseeker_id: int, top_k: int = 10) -> Dict[str, Any]:
+        """ENHANCED recommendation generation with multiple algorithm options"""
+        print(f"🎯 Generating ENHANCED recommendations for jobseeker {jobseeker_id}")
+        
+        try:
+            # Load enhancement data
+            self.load_skill_categories_from_db()
+            self.load_esco_occupation_skills()
+            
+            # Fetch data
+            jobs_df = self.fetch_job_posts()
+            jobseeker_profile = self.fetch_jobseeker_profile(jobseeker_id)
+            
+            if jobseeker_profile is None:
+                return {"error": "Jobseeker not found"}
+            
+            if jobs_df.empty:
+                return {
+                    "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+                    "recommendations": [],
+                    "message": "No job posts available"
+                }
+            
+            # Build jobseeker query
+            query_parts = [
+                str(jobseeker_profile.get("location", "") or ""),
+                str(jobseeker_profile.get("skills_text", "") or ""),
+                str(jobseeker_profile.get("experience_text", "") or ""),
+                str(jobseeker_profile.get("education_text", "") or "")
+            ]
+            jobseeker_query = " ".join(query_parts)
+            
+            print("📊 Computing ENHANCED similarity metrics...")
+            
+            # Compute all available metrics
+            # 1. Advanced Skill Matching
+            advanced_skill_scores = self.compute_advanced_skill_matching(
+                jobs_df, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 2. Category-based Matching
+            category_scores = self.compute_enhanced_category_matching(
+                jobs_df, jobseeker_profile.get("skills_text", ""), jobseeker_profile
+            )
+            
+            # 3. ESCO Job Title Matching
+            esco_title_scores = self.compute_esco_job_title_match(
+                jobs_df, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 4. Enhanced Skill Overlap
+            skill_overlaps, skill_ratios = self.compute_enhanced_skill_overlap_db(
+                jobs_df, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 5. TF-IDF Similarity
+            tfidf_similarities = self.compute_tfidf_similarity(jobs_df, jobseeker_query)
+            
+            # 6. Experience-based Role Match
+            role_matches = self.compute_role_match(jobs_df, jobseeker_profile)
+            
+            # Add computed metrics
+            jobs_df["advanced_skill_score"] = advanced_skill_scores
+            jobs_df["category_score"] = category_scores
+            jobs_df["esco_title_score"] = esco_title_scores
+            jobs_df["skill_overlap"] = skill_overlaps
+            jobs_df["skill_overlap_ratio"] = skill_ratios
+            jobs_df["tfidf_sim"] = tfidf_similarities
+            jobs_df["role_match"] = role_matches
+            
+            # ENHANCED SCORING ALGORITHM - Balanced approach
+            jobs_df["final_score"] = (
+                0.35 * jobs_df["advanced_skill_score"] +    # Advanced skill matching (HIGHEST)
+                0.25 * jobs_df["category_score"] +          # Category alignment (HIGH)
+                0.20 * jobs_df["esco_title_score"] +        # ESCO title matching (HIGH)
+                0.10 * jobs_df["skill_overlap_ratio"] +     # Direct skill overlap (MEDIUM)
+                0.05 * jobs_df["tfidf_sim"] +               # TF-IDF similarity (LOW)
+                0.05 * jobs_df["role_match"]                # Experience match (LOW)
+            )
+            
+            # Apply quality filters
+            MIN_SCORE = 0.15  # Reasonable threshold
+            quality_jobs = jobs_df[jobs_df["final_score"] >= MIN_SCORE]
+            
+            if quality_jobs.empty:
+                quality_jobs = jobs_df.nlargest(min(top_k, len(jobs_df)), "final_score")
+            else:
+                quality_jobs = quality_jobs.sort_values("final_score", ascending=False).head(top_k)
+            
+            # Format results
+            recommendations = self._format_advanced_recommendations(quality_jobs)
+            
+            result = {
+                "jobseeker": self._format_jobseeker_info(jobseeker_profile),
+                "recommendations": recommendations,
+                "total_jobs_analyzed": len(jobs_df),
+                "total_recommendations": len(recommendations),
+                "algorithm_version": "4.0_enhanced_multi_layer",
+                "debug_info": {
+                    "avg_advanced_skill": float(jobs_df["advanced_skill_score"].mean()),
+                    "avg_category_score": float(jobs_df["category_score"].mean()),
+                    "avg_esco_title_score": float(jobs_df["esco_title_score"].mean()),
+                    "best_overall_match": float(jobs_df["final_score"].max()),
+                    "categories_loaded": len(self.skill_categories),
+                    "esco_occupations_loaded": len(self.esco_occupation_skills),
+                    "skill_aliases_loaded": len(self.skill_aliases)
                 }
             }
+            
+            print(f"✅ Generated {len(recommendations)} ENHANCED recommendations")
+            print(f"   Best match: {result['debug_info']['best_overall_match']:.3f}")
+            print(f"   Categories: {result['debug_info']['categories_loaded']}")
+            print(f"   ESCO occupations: {result['debug_info']['esco_occupations_loaded']}")
+            
+            return result
+            
+        except Exception as e:
+            print(f"❌ Error generating enhanced recommendations: {e}")
+            import traceback
+            traceback.print_exc()
+            return {"error": str(e)}
 
-            return [
-                'months' => $monthLabels,
-                'jobseekers' => $jobseekerData,
-                'employers' => $employerData
-            ];
-        } catch (PDOException $e) {
-            error_log('Error getting user growth trends: ' . $e->getMessage());
-
-            // Return fallback data with last 6 months
-            $fallbackMonths = [];
-            for ($i = 5; $i >= 0; $i--) {
-                $fallbackMonths[] = date('M', strtotime("-$i months"));
-            }
-
-            return [
-                'months' => $fallbackMonths,
-                'jobseekers' => [0, 0, 0, 0, 0, 0],
-                'employers' => [0, 0, 0, 0, 0, 0]
-            ];
+    def _format_jobseeker_info(self, profile: pd.Series) -> Dict[str, Any]:
+        """Format jobseeker information for response"""
+        return {
+            "id": int(profile["id"]),
+            "name": profile["full_name"],
+            "skills_text": profile.get("skills_text", ""),
+            "raw_skills_text": profile.get("raw_skills_text", ""),
+            "location": profile.get("location", ""),
         }
-    }
-}
+    
+    def _format_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format job recommendations for response"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            # Convert ESCO URIs back to skill names for display
+            matched_esco_names = []
+            if self.esco_skills and hasattr(job, 'esco_overlap') and job["esco_overlap"]:
+                for uri in job["esco_overlap"]:
+                    for skill_data in self.esco_skills.values():
+                        if skill_data["uri"] == uri:
+                            matched_esco_names.append(skill_data["name"])
+                            break
+            
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "tfidf_sim": round(float(job["tfidf_sim"]), 4),
+                "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                "esco_overlap_ratio": round(float(job.get("esco_overlap_ratio", 0)), 3),
+                "role_match": bool(job.get("role_match", False)),
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "matched_skills": sorted(list(job["skill_overlap"])) if job.get("skill_overlap") else [],
+                "matched_esco": sorted(matched_esco_names)
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+
+    # FIXED: Add test method
+    def test_enhanced_matching(self):
+        """Test the enhanced matching system"""
+        print("🧪 Testing Enhanced Job Matching Algorithm...")
+        
+        # Test with a data science jobseeker
+        result = self.generate_recommendations(1, top_k=5)  # Use actual jobseeker ID
+        
+        if "error" not in result:
+            print(f"✅ Test successful - {len(result['recommendations'])} recommendations")
+            for i, rec in enumerate(result['recommendations'][:3], 1):
+                print(f"   {i}. {rec['title']} - {rec['match_percentage']}% ({rec['match_quality']})")
+                print(f"      Advanced Skill: {rec['scoring_breakdown']['advanced_skill_score']}")
+                print(f"      Category Match: {rec['scoring_breakdown']['category_score']}")
+                print(f"      ESCO Title: {rec['scoring_breakdown']['esco_title_score']}")
+        else:
+            print(f"❌ Test failed: {result['error']}")
+
+# FIXED: Add missing functions outside class
+def test_database_connection() -> bool:
+    """Test database connection"""
+    try:
+        conn = mysql.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        conn.close()
+        print("✅ Database connection successful")
+        return True
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
+
+def get_sample_jobseeker_ids(limit: int = 5) -> List[int]:
+    """Get sample jobseeker IDs for testing"""
+    try:
+        conn = mysql.connect(**DB_CONFIG)
+        df = pd.read_sql(f"""
+            SELECT j.jobseeker_id, j.first_name, j.last_name, 
+                   COUNT(js.skill_name) as skill_count
+            FROM jobseeker j
+            LEFT JOIN jobseeker_skills js ON j.jobseeker_id = js.jobseeker_id
+            GROUP BY j.jobseeker_id, j.first_name, j.last_name
+            HAVING skill_count > 0
+            ORDER BY skill_count DESC
+            LIMIT {limit}
+        """, conn)
+        
+        conn.close()
+        
+        if not df.empty:
+            print("📝 Sample jobseekers with skills:")
+            for _, row in df.iterrows():
+                print(f"   ID: {row['jobseeker_id']} - {row['first_name']} {row['last_name']} ({row['skill_count']} skills)")
+            
+            return df['jobseeker_id'].tolist()
+        return []
+        
+    except Exception as e:
+        print(f"❌ Error getting sample jobseekers: {e}")
+        return []
+
+# FIXED: Add main execution block
+if __name__ == "__main__":
+    print("🔍 Testing ENHANCED SIKAP Job Recommendation Engine...")
+    
+    # Test database
+    if not test_database_connection():
+        exit(1)
+    
+    # Get sample data
+    sample_ids = get_sample_jobseeker_ids(3)
+    
+    if sample_ids:
+        engine = JobRecommendationEngine()
+        for jobseeker_id in sample_ids[:1]:
+            print(f"\n🧪 Testing ENHANCED recommendations for jobseeker {jobseeker_id}")
+            result = engine.generate_recommendations(jobseeker_id, top_k=5)
+            
+            if "error" in result:
+                print(f"❌ Error: {result['error']}")
+            else:
+                print(f"✅ Generated {len(result['recommendations'])} recommendations")
+                if result['recommendations']:
+                    top_rec = result['recommendations'][0]
+                    print(f"   Top: {top_rec['title']} ({top_rec['match_percentage']}% match)")
+                    if 'debug_info' in result:
+                        print(f"   Debug: {result['debug_info']}")
+    else:
+        print("❌ No jobseekers found with skills for testing")

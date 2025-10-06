@@ -808,6 +808,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 
 
+            
+
+        // TESTING ROUTES - TO BE REMOVED LATER
+
+
+
+
+            
+
         // [------------------------ NECESSARY ROUTES ----------------------]
 
         case 'nlp-test':

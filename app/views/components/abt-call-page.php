@@ -24,7 +24,7 @@
                     </div>
                     <div>
                         <h4 class="contact-info-title">Visit Our Office</h4>
-                        <p class="contact-info-text">PESO Rosario, Municipal Hall<br>Rosario, Batangas, Philippines</p>
+                        <p class="text-sm contact-info-text">PESO Rosario, Municipal Hall<br>Rosario, Batangas, Philippines</p>
                     </div>
                 </div>
 
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <h4 class="contact-info-title">Call Us</h4>
-                        <p class="contact-info-text">+63 (43) 123-4567<br>+63 (43) 765-4321</p>
+                        <p class="text-sm contact-info-text">+63 (43) 123-4567<br>+63 (43) 765-4321</p>
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@
                     </div>
                     <div>
                         <h4 class="contact-info-title">Email Us</h4>
-                        <p class="contact-info-text">info@peso-rosario.gov.ph<br>support@sikap-peso.com</p>
+                        <p class="text-sm contact-info-text">info@peso-rosario.gov.ph<br>support@sikap-peso.com</p>
                     </div>
                 </div>
 
@@ -118,17 +118,9 @@
 <style>
     /* Contact Info Items */
     .contact-info-item {
-        opacity: 0;
-        transform: translateX(-20px);
-        transition: all 0.6s ease-out;
         display: flex;
         align-items: flex-start;
         gap: 1rem;
-    }
-
-    .contact-info-item.animate-in {
-        opacity: 1;
-        transform: translateX(0);
     }
 
     /* Contact Icon */
@@ -157,31 +149,10 @@
 
     /* Contact Form Container */
     .contact-form-container {
-        opacity: 0;
-        transform: translateX(20px);
-        transition: all 0.6s ease-out 0.3s;
         padding: 2rem;
         background: white;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .contact-form-container.animate-in {
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-    /* Staggered Animation Delays */
-    .contact-info-item.animate-in:nth-child(1) {
-        transition-delay: 0ms;
-    }
-
-    .contact-info-item.animate-in:nth-child(2) {
-        transition-delay: 150ms;
-    }
-
-    .contact-info-item.animate-in:nth-child(3) {
-        transition-delay: 300ms;
     }
 
     /* Grid layout for side-by-side alignment */
@@ -198,42 +169,3 @@
         }
     }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Create intersection observer for contact section
-        const contactObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Animate contact info items
-                    const contactItems = document.querySelectorAll('.contact-info-item');
-                    contactItems.forEach((item, index) => {
-                        setTimeout(() => {
-                            item.classList.add('animate-in');
-                        }, index * 150);
-                    });
-
-                    // Animate form
-                    const formContainer = document.querySelector('.contact-form-container');
-                    if (formContainer) {
-                        setTimeout(() => {
-                            formContainer.classList.add('animate-in');
-                        }, 450);
-                    }
-
-                    // Stop observing once animated
-                    contactObserver.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.2,
-            rootMargin: '0px 0px -50px 0px'
-        });
-
-        // Start observing the contact section
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-            contactObserver.observe(contactSection);
-        }
-    });
-</script>

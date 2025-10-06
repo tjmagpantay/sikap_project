@@ -234,7 +234,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             <!-- Best Matches -->
                             <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
                                 data-filter="matches" onclick="filterJobs('matches', this)">
-                                <span>Best Matches</span>
+                                <span>Matches</span>
                             </button>
                         </div>
                     </div>
@@ -326,13 +326,30 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
                                             <span class="flex items-center gap-1 transition-all duration-300 text-primary hover:text-primary/80">
                                                 <?php
+                                                // Enhanced match percentage with ultra-accurate algorithm support
                                                 $matchPercentage = $job['match_percentage'] ?? 50;
                                                 $hasRealRecommendation = $job['has_recommendation'] ?? false;
-                                                $isLowMatch = $matchPercentage < 20;
+                                                $algorithmVersion = $job['algorithm_version'] ?? 'estimated';
+                                                $matchQuality = $job['match_quality'] ?? 'estimated';
+
+                                                // Use 20% threshold for Poor Match (same as browse-jobs)
+                                                $isLowMatch = $matchPercentage < 20; // Jobs below 20% show Poor Match with tooltip
+                                                $isGoodMatch = $matchPercentage >= 60;
+                                                $isExcellentMatch = $matchPercentage >= 80;
+
+                                                // Enhanced color coding based on match percentage
+                                                $percentageColorClass = 'text-primary';
+                                                if ($matchPercentage >= 80) {
+                                                    $percentageColorClass = 'text-green-600';
+                                                } elseif ($matchPercentage >= 60) {
+                                                    $percentageColorClass = 'text-blue-600';
+                                                } elseif ($matchPercentage < 20) {
+                                                    $percentageColorClass = 'text-red-500';
+                                                }
                                                 ?>
 
                                                 <?php if (!$isLowMatch): ?>
-                                                    Best Matches:
+                                                    Matches:
                                                     <!-- UPDATED: Real Match Percentage with Color Coding -->
                                                     <span class="text-sm font-medium transition-colors duration-300 hover:text-primary/80 <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-yellow-600' : 'text-primary') ?>">
                                                         <?= number_format($matchPercentage, 1) ?>%
@@ -578,7 +595,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     }
                 })
                 .then(response => {
-                  
+
                     // Check if response is ok
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);

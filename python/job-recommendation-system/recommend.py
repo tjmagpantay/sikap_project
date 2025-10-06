@@ -31,6 +31,8 @@ class JobRecommendationEngine:
         self.esco_aliases = {}
         self.skill_aliases = {}  # Will be loaded from database
         self.esco_skill_map = {}  # For ESCO-enhanced matching
+        self.skill_categories = {}  # For skill categorization
+        self.esco_occupation_skills = {}  # FIXED: Initialize this
         
         # FIXED: Safe print for Windows
         try:
@@ -41,6 +43,7 @@ class JobRecommendationEngine:
         # Load normalization data from database
         self.load_skill_normalization_data()
         self._load_esco_data()
+        self.load_skill_categories_from_db()
     
     def _get_db_connection(self):
         """Get database connection using shared config"""
@@ -168,6 +171,123 @@ class JobRecommendationEngine:
         finally:
             conn.close()
     
+    def load_skill_categories_from_db(self):
+        """Load skill categories from database for enhanced matching"""
+        conn = self._get_db_connection()
+        try:
+            # Load skill categories
+            category_query = """
+                SELECT DISTINCT category 
+                FROM skills_dictionary 
+                WHERE category IS NOT NULL
+            """
+            categories_df = pd.read_sql(category_query, conn)
+            
+            # Load skills by category
+            skills_by_category_query = """
+                SELECT sd.skill_name, sd.category,
+                       GROUP_CONCAT(DISTINCT sa.alias SEPARATOR '|') as aliases
+                FROM skills_dictionary sd
+                LEFT JOIN skill_aliases sa ON sd.id = sa.skill_id
+                WHERE sd.category IS NOT NULL
+                GROUP BY sd.id, sd.skill_name, sd.category
+            """
+            skills_df = pd.read_sql(skills_by_category_query, conn)
+            
+            # Build category mapping
+            self.skill_categories = {}
+            for _, row in skills_df.iterrows():
+                category = row['category'].lower().replace(' & ', '_').replace(' ', '_')
+                skill = row['skill_name'].lower()
+                
+                if category not in self.skill_categories:
+                    self.skill_categories[category] = set()
+                
+                self.skill_categories[category].add(skill)
+                
+                # Add aliases
+                if row['aliases']:
+                    aliases = row['aliases'].split('|')
+                    for alias in aliases:
+                        self.skill_categories[category].add(alias.lower().strip())
+            
+            print(f"📂 Loaded {len(self.skill_categories)} skill categories from database")
+            for cat, skills in self.skill_categories.items():
+                print(f"   {cat}: {len(skills)} skills")
+                
+        except Exception as e:
+            print(f"⚠️ Could not load categories from database: {e}")
+            self.skill_categories = {}
+        finally:
+            conn.close()
+
+    def load_esco_occupation_skills(self):
+        """Load ESCO occupation-skill relationships for job title matching"""
+        conn = self._get_db_connection()
+        try:
+            esco_query = """
+                SELECT 
+                    eo.occupation_name,
+                    es.skill_name,
+                    eos.relation_type
+                FROM esco_occupations eo
+                JOIN esco_occupation_skills eos ON eo.id = eos.occupation_id
+                JOIN esco_skills es ON eos.skill_id = es.id
+                WHERE eos.relation_type = 'essential'
+                LIMIT 5000
+            """
+            
+            esco_df = pd.read_sql(esco_query, conn)
+            
+            # Build occupation to skills mapping
+            self.esco_occupation_skills = {}
+            for _, row in esco_df.iterrows():
+                occupation = row['occupation_name'].lower()
+                skill = row['skill_name'].lower()
+                
+                if occupation not in self.esco_occupation_skills:
+                    self.esco_occupation_skills[occupation] = set()
+                
+                self.esco_occupation_skills[occupation].add(skill)
+            
+            print(f"🏢 Loaded {len(self.esco_occupation_skills)} ESCO occupations with skills")
+            
+        except Exception as e:
+            print(f"⚠️ Could not load ESCO occupation skills: {e}")
+            self.esco_occupation_skills = {}
+        finally:
+            conn.close()
+
+    # FIXED: Add missing categorize_skills_from_db method
+    def categorize_skills_from_db(self, skills_text: str) -> Dict[str, int]:
+        """Categorize skills based on database categories"""
+        if not skills_text or not self.skill_categories:
+            return {}
+        
+        skills_lower = skills_text.lower()
+        skill_tokens = self.extract_skill_tokens_db(skills_text)
+        
+        categories_found = {}
+        
+        # Check each category for skill matches
+        for category, category_skills in self.skill_categories.items():
+            matches = 0
+            
+            # Direct skill matches
+            for skill_token in skill_tokens:
+                if skill_token in category_skills:
+                    matches += 1
+            
+            # Partial matches in text
+            for category_skill in category_skills:
+                if category_skill in skills_lower:
+                    matches += 1
+            
+            if matches > 0:
+                categories_found[category] = matches
+        
+        return categories_found
+
     def fetch_job_posts(self) -> pd.DataFrame:
         """Fetch all available job posts with BETTER skill extraction"""
         conn = self._get_db_connection()
@@ -263,12 +383,10 @@ class JobRecommendationEngine:
         
         return normalized_skills
     
-    # FIXED: Add missing method
     def extract_skill_tokens(self, skill_text: str) -> set:
         """Extract skill tokens - calls database version"""
         return self.extract_skill_tokens_db(skill_text)
     
-    # FIXED: Move inside class
     def normalize_to_esco(self, skill_text: str) -> set:
         """Convert skills to ESCO URIs for standardized matching"""
         if not skill_text:
@@ -292,6 +410,127 @@ class JobRecommendationEngine:
                     esco_uris.add(skill_data["uri"])
         
         return esco_uris
+
+    # FIXED: Add missing helper methods for advanced matching
+    def get_esco_skills_for_text(self, text: str) -> set:
+        """Extract ESCO skills from text"""
+        if not text or not hasattr(self, 'esco_skills'):
+            return set()
+        
+        text_lower = text.lower()
+        found_esco_skills = set()
+        
+        # Check direct ESCO skill matches
+        for skill_id, skill_data in self.esco_skills.items():
+            skill_name = skill_data["name"].lower()
+            if skill_name in text_lower:
+                found_esco_skills.add(skill_name)
+        
+        # Check ESCO aliases
+        for alias, skill_id in self.esco_aliases.items():
+            if alias in text_lower and skill_id in self.esco_skills:
+                found_esco_skills.add(self.esco_skills[skill_id]["name"].lower())
+        
+        return found_esco_skills
+
+    def compute_semantic_skill_similarity(self, js_skills: set, job_skills: set) -> float:
+        """Compute semantic similarity between skills using database relationships"""
+        if not js_skills or not job_skills:
+            return 0.0
+        
+        semantic_matches = 0
+        
+        for js_skill in js_skills:
+            for job_skill in job_skills:
+                # Check if skills are semantically related through aliases
+                js_normalized = self.normalize_skill_name_db(js_skill)
+                job_normalized = self.normalize_skill_name_db(job_skill)
+                
+                if js_normalized == job_normalized:
+                    semantic_matches += 1
+                    break
+                elif self.are_skills_related(js_skill, job_skill):
+                    semantic_matches += 0.7
+                    break
+        
+        return semantic_matches / len(js_skills)
+
+    def are_skills_related(self, skill1: str, skill2: str) -> bool:
+        """Check if two skills are related through database mappings"""
+        # Check if they share common aliases or normalizations
+        skill1_variants = {skill1.lower(), self.normalize_skill_name_db(skill1)}
+        skill2_variants = {skill2.lower(), self.normalize_skill_name_db(skill2)}
+        
+        # Add aliases from database
+        for alias, standard in self.skill_aliases.items():
+            if standard == skill1.lower():
+                skill1_variants.add(alias)
+            if standard == skill2.lower():
+                skill2_variants.add(alias)
+        
+        # Check for overlap
+        return bool(skill1_variants & skill2_variants)
+
+    def compute_skill_level_compatibility(self, jobseeker_skills: str, job_skills: str) -> float:
+        """Compute compatibility based on skill levels (if specified)"""
+        # This is a simplified version - you can enhance based on your skill level data
+        js_has_advanced = any(level in jobseeker_skills.lower() for level in ['advanced', 'expert', 'senior'])
+        js_has_beginner = any(level in jobseeker_skills.lower() for level in ['beginner', 'basic', 'junior'])
+        
+        job_requires_advanced = any(level in job_skills.lower() for level in ['advanced', 'expert', 'senior'])
+        job_accepts_beginner = any(level in job_skills.lower() for level in ['beginner', 'basic', 'entry'])
+        
+        if job_requires_advanced and js_has_advanced:
+            return 1.0
+        elif not job_requires_advanced and not js_has_beginner:
+            return 0.8
+        elif job_accepts_beginner:
+            return 0.9
+        else:
+            return 0.5
+
+    def infer_categories_from_education(self, education_text: str) -> Dict[str, float]:
+        """Enhanced education to category mapping with more specificity"""
+        education_to_category = {
+            # Technical fields
+            'computer science': {'it_programming': 3.0, 'data_analytics_research': 2.0},
+            'information technology': {'it_programming': 3.0, 'engineering': 1.0},
+            'data science': {'data_analytics_research': 3.0, 'it_programming': 2.0},
+            'software engineering': {'it_programming': 3.0, 'engineering': 2.0},
+            'computer engineering': {'it_programming': 2.0, 'engineering': 3.0},
+            
+            # Healthcare (should NOT match with IT)
+            'nursing': {'healthcare_medical': 3.0},
+            'medicine': {'healthcare_medical': 3.0, 'science_laboratory': 1.0},
+            'medical': {'healthcare_medical': 3.0},
+            
+            # Business fields
+            'business': {'business_management': 3.0, 'soft_skills': 1.0},
+            'management': {'business_management': 3.0, 'soft_skills': 1.0},
+            'accounting': {'finance_banking': 3.0, 'business_management': 1.0},
+            'finance': {'finance_banking': 3.0, 'business_management': 1.0},
+            'marketing': {'media_communications': 2.0, 'business_management': 1.0},
+            
+            # Engineering (separate from IT)
+            'mechanical engineering': {'engineering': 3.0},
+            'civil engineering': {'engineering': 3.0},
+            'electrical engineering': {'engineering': 3.0, 'it_programming': 0.5},
+            
+            # Education and others
+            'education': {'education_training': 3.0, 'soft_skills': 1.0},
+            'psychology': {'soft_skills': 2.0, 'healthcare_medical': 0.5},
+            'design': {'design_creative': 3.0}
+        }
+        
+        education_lower = education_text.lower()
+        inferred_categories = {}
+        
+        for edu_field, categories in education_to_category.items():
+            if edu_field in education_lower:
+                for category, weight in categories.items():
+                    inferred_categories[category] = inferred_categories.get(category, 0) + weight
+        
+        return inferred_categories
     
     def compute_tfidf_similarity(self, jobs_df: pd.DataFrame, jobseeker_query: str) -> np.ndarray:
         """Compute TF-IDF similarity between jobseeker and jobs"""
@@ -503,13 +742,302 @@ class JobRecommendationEngine:
         
         role_matches = jobs_df["title"].apply(calculate_title_match)
         return role_matches
-    
-    def generate_recommendations(self, jobseeker_id: int, top_k: int = 10) -> Dict[str, Any]:
-        """Generate recommendations using database-driven skill matching"""
-        print(f"🎯 Generating ENHANCED recommendations for jobseeker {jobseeker_id}")
+
+    # FIXED: Add all advanced computation methods
+    def compute_advanced_skill_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """Advanced skill matching using ESCO skills and semantic similarity"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
         
-        # FIXED: Safer DataFrame operations
+        # Get ESCO skills for jobseeker
+        js_esco_skills = self.get_esco_skills_for_text(jobseeker_skills)
+        
+        def calculate_advanced_match(job_skills):
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            job_esco_skills = self.get_esco_skills_for_text(job_skills)
+            
+            # 1. Direct skill matches (weight: 0.4)
+            direct_matches = len(js_skill_tokens & job_tokens)
+            direct_score = direct_matches / max(len(js_skill_tokens), 1) if js_skill_tokens else 0
+            
+            # 2. ESCO skill matches (weight: 0.3)
+            esco_matches = len(js_esco_skills & job_esco_skills)
+            esco_score = esco_matches / max(len(js_esco_skills), 1) if js_esco_skills else 0
+            
+            # 3. Semantic similarity through skill aliases (weight: 0.2)
+            semantic_score = self.compute_semantic_skill_similarity(js_skill_tokens, job_tokens)
+            
+            # 4. Skill level compatibility (weight: 0.1)
+            level_score = self.compute_skill_level_compatibility(jobseeker_skills, job_skills)
+            
+            # Combined weighted score
+            final_score = (
+                0.4 * direct_score +
+                0.3 * esco_score +
+                0.2 * semantic_score +
+                0.1 * level_score
+            )
+            
+            return final_score
+        
+        advanced_scores = jobs_df["skills_text"].apply(calculate_advanced_match)
+        return advanced_scores
+
+    def compute_esco_job_title_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """Match jobseeker skills to job titles using ESCO occupation data"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        
+        def calculate_esco_title_match(job_title):
+            if not job_title or not self.esco_occupation_skills:
+                return 0.0
+            
+            title_lower = str(job_title).lower()
+            best_match = 0.0
+            
+            # Find matching ESCO occupations
+            for occupation, required_skills in self.esco_occupation_skills.items():
+                # Check if job title matches occupation
+                title_similarity = 0
+                occupation_words = occupation.split()
+                title_words = title_lower.split()
+                
+                # Calculate title word overlap
+                common_words = set(occupation_words) & set(title_words)
+                if common_words:
+                    title_similarity = len(common_words) / max(len(occupation_words), len(title_words))
+            
+                if title_similarity > 0.3:  # Significant title match
+                    # Calculate skill match for this occupation
+                    skill_overlap = js_skill_tokens & required_skills
+                    skill_match = len(skill_overlap) / max(len(required_skills), 1)
+                    
+                    # Combined score
+                    combined_score = (title_similarity * 0.4) + (skill_match * 0.6)
+                    best_match = max(best_match, combined_score)
+            
+            return best_match
+        
+        esco_matches = jobs_df["title"].apply(calculate_esco_title_match)
+        return esco_matches
+
+    def compute_enhanced_category_matching(self, jobs_df: pd.DataFrame, jobseeker_skills: str, jobseeker_profile: pd.Series) -> pd.Series:
+        """Enhanced category-based matching using skills and education"""
+        js_skill_categories = self.categorize_skills_from_db(jobseeker_skills)
+        
+        # Also consider education field
+        education_text = jobseeker_profile.get("education_text", "").lower()
+        education_categories = self.infer_categories_from_education(education_text)
+        
+        # Combine skill and education categories
+        combined_categories = js_skill_categories.copy()
+        for cat, weight in education_categories.items():
+            combined_categories[cat] = combined_categories.get(cat, 0) + weight
+        
+        def calculate_category_match(job_skills, job_title, job_description):
+            job_text = f"{job_skills} {job_title} {job_description}".lower()
+            job_categories = self.categorize_skills_from_db(job_text)
+            
+            if not combined_categories or not job_categories:
+                return 0.0
+            
+            # Calculate weighted category overlap
+            total_score = 0.0
+            total_weight = sum(combined_categories.values())
+            
+            for category, js_weight in combined_categories.items():
+                job_weight = job_categories.get(category, 0)
+                if job_weight > 0:
+                    # Normalized category match
+                    category_strength = js_weight / total_weight if total_weight > 0 else 0
+                    match_strength = min(job_weight / js_weight, 1.0) if js_weight > 0 else 0
+                    total_score += category_strength * match_strength
+            
+            return total_score
+        
+        category_matches = jobs_df.apply(
+            lambda job: calculate_category_match(
+                job.get("skills_text", ""), 
+                job.get("title", ""), 
+                job.get("description", "")
+            ), axis=1
+        )
+        
+        return category_matches
+    
+    def compute_weighted_skill_match(self, jobs_df: pd.DataFrame, jobseeker_skills: str) -> pd.Series:
+        """ULTRA-STRICT weighted skill matching with category enforcement"""
+        js_skill_tokens = self.extract_skill_tokens_db(jobseeker_skills)
+        js_categories = self.categorize_skills_from_db(jobseeker_skills)
+        
+        print(f"🔍 Jobseeker skills: {sorted(js_skill_tokens)}")
+        print(f"🔍 Jobseeker categories: {js_categories}")
+        
+        def calculate_ultra_strict_match(job_skills):
+            if not job_skills or not js_skill_tokens:
+                return 0.0
+                
+            job_tokens = self.extract_skill_tokens_db(job_skills)
+            job_categories = self.categorize_skills_from_db(job_skills)
+            
+            # 1. EXACT SKILL MATCHES (50% weight)
+            direct_matches = js_skill_tokens & job_tokens
+            direct_score = len(direct_matches) / len(js_skill_tokens) if js_skill_tokens else 0
+            
+            # 2. CATEGORY ALIGNMENT (50% weight) - VERY STRICT
+            category_score = 0.0
+            if js_categories and job_categories:
+                shared_categories = set(js_categories.keys()) & set(job_categories.keys())
+                
+                if shared_categories:
+                    # Calculate weighted category overlap
+                    total_js_weight = sum(js_categories.values())
+                    category_overlap = 0.0
+                    
+                    for category in shared_categories:
+                        js_weight = js_categories[category]
+                        job_weight = job_categories[category]
+                        
+                        # Strong penalty for weak category presence in job
+                        category_strength = min(job_weight / max(js_weight, 1.0), 1.0)
+                        weight_contribution = js_weight / total_js_weight
+                        
+                        category_overlap += weight_contribution * category_strength
+                    
+                    category_score = category_overlap
+            
+            # 3. ULTRA-STRICT PENALTY SYSTEM
+            penalties = 0.0
+            
+            # MAJOR penalty for no category overlap
+            if not (set(js_categories.keys()) & set(job_categories.keys())):
+                penalties += 0.8  # 80% penalty!
+            
+            # MAJOR penalty for zero direct skill matches
+            if len(direct_matches) == 0:
+                penalties += 0.6  # 60% penalty!
+            
+            # Additional penalty for very few matches
+            if len(direct_matches) < 2 and len(js_skill_tokens) > 3:
+                penalties += 0.4  # 40% penalty for insufficient matches
+            
+            # 4. ULTRA-STRICT CALCULATION
+            base_score = (0.5 * direct_score) + (0.5 * category_score)
+            final_score = max(0.0, base_score - penalties)
+            
+            # HARD CAPS for unrelated categories
+            if category_score < 0.1:  # Almost no category overlap
+                final_score = min(final_score, 0.15)  # Cap at 15%!
+            elif category_score < 0.3:  # Weak category overlap
+                final_score = min(final_score, 0.35)  # Cap at 35%
+                
+            return final_score
+        
+        weighted_scores = jobs_df["skills_text"].apply(calculate_ultra_strict_match)
+        return weighted_scores
+
+    # FIXED: Add missing formatting method
+    def _format_ultra_strict_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format ultra-strict recommendations with enhanced details"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "scoring_breakdown": {
+                    "weighted_skill_score": round(float(job["weighted_skill_score"]), 3),
+                    "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                    "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                },
+                "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+                "match_quality": self._determine_match_quality(float(job["final_score"])),
+                "strictness_level": "ULTRA_STRICT"
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+
+    def _determine_match_quality(self, score: float) -> str:
+        """Determine match quality based on score"""
+        if score >= 0.8:
+            return "Excellent"
+        elif score >= 0.6:
+            return "Very Good"
+        elif score >= 0.4:
+            return "Good"
+        elif score >= 0.2:
+            return "Fair"
+        else:
+            return "Basic"
+
+    def _format_advanced_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format advanced recommendations with detailed scoring"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "scoring_breakdown": {
+                    "advanced_skill_score": round(float(job["advanced_skill_score"]), 3),
+                    "category_score": round(float(job["category_score"]), 3),
+                    "esco_title_score": round(float(job["esco_title_score"]), 3),
+                    "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                    "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                    "role_match": bool(job["role_match"])
+                },
+                "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+                "match_quality": self._determine_match_quality(float(job["final_score"]))
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+
+    # ADD this NEW method inside JobRecommendationEngine class (after _format_advanced_recommendations method)
+    def _format_accuracy_focused_recommendations(self, jobs_df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Format general-purpose recommendations with detailed scoring breakdown"""
+        recommendations = []
+        
+        for _, job in jobs_df.iterrows():
+            recommendation = {
+                "job_id": int(job["id"]),
+                "title": job["title"],
+                "description": (job["description"][:200] + "...") if len(str(job["description"])) > 200 else job["description"],
+                "location": job["location"],
+                "final_score": round(float(job["final_score"]), 4),
+                "match_percentage": round(float(job["final_score"]) * 100, 2),
+                "scoring_breakdown": {
+                    "skill_value_score": round(float(job["specificity_score"]), 3),
+                    "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
+                    "category_score": round(float(job["category_score"]), 3),
+                    "advanced_skill_score": round(float(job["advanced_skill_score"]), 3),
+                    "tfidf_similarity": round(float(job["tfidf_sim"]), 3),
+                    "role_match": bool(job["role_match"])
+                },
+                "matched_skills": sorted(list(job["skill_overlap"])) if hasattr(job, "skill_overlap") and job["skill_overlap"] else [],
+                "match_quality": self._determine_match_quality(float(job["final_score"])),
+                "algorithm_type": "BALANCED_GENERAL_PURPOSE"
+            }
+            recommendations.append(recommendation)
+        
+        return recommendations
+
+    def generate_recommendations(self, jobseeker_id: int, top_k: int = 10) -> Dict[str, Any]:
+        """ULTRA-ACCURATE recommendation generation with strict filtering"""
+        print(f"🎯 Generating ULTRA-ACCURATE recommendations for jobseeker {jobseeker_id}")
+        
         try:
+            # Load enhancement data
+            self.load_skill_categories_from_db()
+            self.load_esco_occupation_skills()
+            
             # Fetch data
             jobs_df = self.fetch_job_posts()
             jobseeker_profile = self.fetch_jobseeker_profile(jobseeker_id)
@@ -524,6 +1052,20 @@ class JobRecommendationEngine:
                     "message": "No job posts available"
                 }
             
+            # STEP 1: Apply strict category filtering FIRST
+            print("🔍 STEP 1: Applying strict category filter...")
+            filtered_jobs = self.apply_strict_category_filter(jobs_df, jobseeker_profile)
+            
+            if filtered_jobs.empty:
+                print("⚠️ No jobs passed category filter - using relaxed criteria")
+                # Fallback: keep top 5 jobs by basic skill overlap
+                skill_overlaps, skill_ratios = self.compute_enhanced_skill_overlap_db(
+                    jobs_df, jobseeker_profile.get("skills_text", "")
+                )
+                jobs_df["temp_skill_ratio"] = skill_ratios
+                filtered_jobs = jobs_df.nlargest(5, "temp_skill_ratio")
+                filtered_jobs = filtered_jobs.drop(columns=["temp_skill_ratio"])
+            
             # Build jobseeker query
             query_parts = [
                 str(jobseeker_profile.get("location", "") or ""),
@@ -533,82 +1075,115 @@ class JobRecommendationEngine:
             ]
             jobseeker_query = " ".join(query_parts)
             
-            # Compute all similarity metrics
-            print("📊 Computing ENHANCED similarity metrics...")
+            print("📊 STEP 2: Computing enhanced similarity metrics...")
             
-            # 1. TF-IDF Similarity
-            tfidf_similarities = self.compute_tfidf_similarity(jobs_df, jobseeker_query)
+            # Compute metrics on filtered jobs only
+            # 1. Skill Specificity Score (NEW - HIGHEST WEIGHT)
+            specificity_scores = self.compute_skill_specificity_score(
+                filtered_jobs, jobseeker_profile.get("skills_text", "")
+            )
             
-            # 2. ENHANCED Skill Overlap
+            # 2. Enhanced Skill Overlap (HIGH WEIGHT)
             skill_overlaps, skill_ratios = self.compute_enhanced_skill_overlap_db(
-                jobs_df, jobseeker_profile.get("skills_text", "")
+                filtered_jobs, jobseeker_profile.get("skills_text", "")
             )
             
-            # 3. ESCO Overlap (if available)
-            esco_overlaps, esco_ratios = self.compute_esco_overlap(
-                jobs_df, jobseeker_profile.get("skills_text", "")
+            # 3. Category Matching (MEDIUM WEIGHT)
+            category_scores = self.compute_enhanced_category_matching(
+                filtered_jobs, jobseeker_profile.get("skills_text", ""), jobseeker_profile
             )
             
-            # 4. Experience-based Role Match
-            role_matches = self.compute_role_match(jobs_df, jobseeker_profile)
+            # 4. Advanced Skill Matching (MEDIUM WEIGHT)
+            advanced_skill_scores = self.compute_advanced_skill_matching(
+                filtered_jobs, jobseeker_profile.get("skills_text", "")
+            )
+            
+            # 5. TF-IDF Similarity (LOW WEIGHT)
+            tfidf_similarities = self.compute_tfidf_similarity(filtered_jobs, jobseeker_query)
+            
+            # 6. Role Match (LOW WEIGHT)
+            role_matches = self.compute_role_match(filtered_jobs, jobseeker_profile)
             
             # Add computed metrics
-            jobs_df["tfidf_sim"] = tfidf_similarities
-            jobs_df["skill_overlap"] = skill_overlaps
-            jobs_df["skill_overlap_ratio"] = skill_ratios
-            jobs_df["esco_overlap"] = esco_overlaps
-            jobs_df["esco_overlap_ratio"] = esco_ratios
-            jobs_df["role_match"] = role_matches
+            filtered_jobs = filtered_jobs.copy()  # Avoid SettingWithCopyWarning
+            filtered_jobs.loc[:, "specificity_score"] = specificity_scores
+            filtered_jobs.loc[:, "skill_overlap_ratio"] = skill_ratios
+            filtered_jobs.loc[:, "skill_overlap"] = skill_overlaps
+            filtered_jobs.loc[:, "category_score"] = category_scores
+            filtered_jobs.loc[:, "advanced_skill_score"] = advanced_skill_scores
+            filtered_jobs.loc[:, "tfidf_sim"] = tfidf_similarities
+            filtered_jobs.loc[:, "role_match"] = role_matches
             
-            # ENHANCED SCORING - Skills are much more important
-            jobs_df["final_score"] = (
-                0.2 * jobs_df["tfidf_sim"] +           # TF-IDF (reduced weight)
-                0.5 * jobs_df["skill_overlap_ratio"] + # Skills (MUCH higher weight)
-                0.2 * jobs_df["esco_overlap_ratio"] +  # ESCO skills
-                0.1 * jobs_df["role_match"]            # Experience-based role match
+            # BALANCED SCORING ALGORITHM (Works for all skill types)
+            filtered_jobs.loc[:, "final_score"] = (
+                0.35 * filtered_jobs["skill_overlap_ratio"] +    # Direct skill overlap (HIGHEST)
+                0.25 * filtered_jobs["specificity_score"] +      # Skill value (HIGH) 
+                0.20 * filtered_jobs["category_score"] +         # Category alignment (MEDIUM)
+                0.10 * filtered_jobs["advanced_skill_score"] +   # ESCO/semantic (LOW)
+                0.05 * filtered_jobs["tfidf_sim"] +              # Text similarity (LOW)
+                0.05 * filtered_jobs["role_match"]               # Experience match (LOW)
             )
             
-            # Lower minimum threshold since we improved matching
-            MIN_SCORE = 0.01
-            filtered_jobs = jobs_df[jobs_df["final_score"] >= MIN_SCORE]
+            # STEP 3: Apply additional quality thresholds
+            print("🎯 STEP 3: Applying quality thresholds...")
             
-            if filtered_jobs.empty:
-                filtered_jobs = jobs_df.nlargest(min(top_k, len(jobs_df)), "final_score")
+            # Balanced minimum requirements for all job types
+            MIN_SKILL_OVERLAP = 0.15     # At least 15% skill overlap (more lenient)
+            MIN_SPECIFICITY = 0.05       # At least some skill value (very lenient)
+            MIN_FINAL_SCORE = 0.10       # Overall minimum threshold (more accessible)
+            
+            quality_jobs = filtered_jobs[
+                (filtered_jobs["skill_overlap_ratio"] >= MIN_SKILL_OVERLAP) &
+                (filtered_jobs["specificity_score"] >= MIN_SPECIFICITY) &
+                (filtered_jobs["final_score"] >= MIN_FINAL_SCORE)
+            ]
+            
+            if quality_jobs.empty:
+                print("⚠️ No jobs meet strict quality criteria - using top matches")
+                quality_jobs = filtered_jobs.nlargest(min(top_k, len(filtered_jobs)), "final_score")
             else:
-                filtered_jobs = filtered_jobs.sort_values("final_score", ascending=False).head(top_k)
+                quality_jobs = quality_jobs.sort_values("final_score", ascending=False).head(top_k)
             
             # Format results
-            recommendations = self._format_recommendations(filtered_jobs)
+            recommendations = self._format_accuracy_focused_recommendations(quality_jobs)
             
             result = {
                 "jobseeker": self._format_jobseeker_info(jobseeker_profile),
                 "recommendations": recommendations,
                 "total_jobs_analyzed": len(jobs_df),
+                "jobs_after_category_filter": len(filtered_jobs),
                 "total_recommendations": len(recommendations),
+                "algorithm_version": "5.0_ultra_accurate_strict",
                 "debug_info": {
-                    "avg_tfidf": float(jobs_df["tfidf_sim"].mean()),
-                    "avg_skill_ratio": float(jobs_df["skill_overlap_ratio"].mean()),
-                    "best_skill_match": float(jobs_df["skill_overlap_ratio"].max()),
-                    "jobseeker_skills_count": len(self.extract_skill_tokens(jobseeker_profile.get("skills_text", ""))),
+                    "avg_specificity_score": float(filtered_jobs["specificity_score"].mean()),
+                    "avg_skill_overlap": float(filtered_jobs["skill_overlap_ratio"].mean()),
+                    "avg_category_score": float(filtered_jobs["category_score"].mean()),
+                    "best_overall_match": float(filtered_jobs["final_score"].max()),
+                    "quality_threshold_applied": True,
+                    "min_skill_overlap": MIN_SKILL_OVERLAP,
+                    "min_specificity": MIN_SPECIFICITY
                 }
             }
             
-            print(f"✅ Generated {len(recommendations)} ENHANCED recommendations")
-            print(f"   Best skill match: {result['debug_info']['best_skill_match']:.3f}")
-            print(f"   Avg skill match: {result['debug_info']['avg_skill_ratio']:.3f}")
+            print(f"✅ Generated {len(recommendations)} ULTRA-ACCURATE recommendations")
+            print(f"   Category filter: {len(jobs_df)} → {len(filtered_jobs)} jobs")
+            print(f"   Best match: {result['debug_info']['best_overall_match']:.3f}")
             
             return result
+            
         except Exception as e:
-            print(f"❌ Error generating recommendations: {e}")
+            print(f"❌ Error generating ultra-accurate recommendations: {e}")
+            import traceback
+            traceback.print_exc()
             return {"error": str(e)}
-    
+
     def _format_jobseeker_info(self, profile: pd.Series) -> Dict[str, Any]:
         """Format jobseeker information for response"""
         return {
             "id": int(profile["id"]),
             "name": profile["full_name"],
             "skills_text": profile.get("skills_text", ""),
-            "raw_skills_text": profile.get("raw_skills_text", ""),  # FIXED: Add this
+            "raw_skills_text": profile.get("raw_skills_text", ""),
             "location": profile.get("location", ""),
         }
     
@@ -633,16 +1208,34 @@ class JobRecommendationEngine:
                 "location": job["location"],
                 "tfidf_sim": round(float(job["tfidf_sim"]), 4),
                 "skill_overlap_ratio": round(float(job["skill_overlap_ratio"]), 3),
-                "esco_overlap_ratio": round(float(job["esco_overlap_ratio"]), 3),
-                "role_match": bool(job["role_match"]),
+                "esco_overlap_ratio": round(float(job.get("esco_overlap_ratio", 0)), 3),
+                "role_match": bool(job.get("role_match", False)),
                 "final_score": round(float(job["final_score"]), 4),
                 "match_percentage": round(float(job["final_score"]) * 100, 2),
-                "matched_skills": sorted(list(job["skill_overlap"])) if job["skill_overlap"] else [],
+                "matched_skills": sorted(list(job["skill_overlap"])) if job.get("skill_overlap") else [],
                 "matched_esco": sorted(matched_esco_names)
             }
             recommendations.append(recommendation)
         
         return recommendations
+
+    # FIXED: Add test method
+    def test_enhanced_matching(self):
+        """Test the enhanced matching system"""
+        print("🧪 Testing Enhanced Job Matching Algorithm...")
+        
+        # Test with a data science jobseeker
+        result = self.generate_recommendations(1, top_k=5)  # Use actual jobseeker ID
+        
+        if "error" not in result:
+            print(f"✅ Test successful - {len(result['recommendations'])} recommendations")
+            for i, rec in enumerate(result['recommendations'][:3], 1):
+                print(f"   {i}. {rec['title']} - {rec['match_percentage']}% ({rec['match_quality']})")
+                print(f"      Advanced Skill: {rec['scoring_breakdown']['advanced_skill_score']}")
+                print(f"      Category Match: {rec['scoring_breakdown']['category_score']}")
+                print(f"      ESCO Title: {rec['scoring_breakdown']['esco_title_score']}")
+        else:
+            print(f"❌ Test failed: {result['error']}")
 
 # FIXED: Add missing functions outside class
 def test_database_connection() -> bool:

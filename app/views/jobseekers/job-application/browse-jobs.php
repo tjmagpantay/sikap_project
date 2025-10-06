@@ -363,51 +363,80 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                     Posted <?php echo isset($currentJob['created_at']) ? date('M d, Y', strtotime($currentJob['created_at'])) : 'Recently'; ?>
                                 </span>
 
-                                <!-- ENHANCED: Real Match Percentage with Color Coding and Low Match Warning -->
+                                <!-- UPDATED: Enhanced Match Percentage with New Algorithm Support -->
                                 <div class="flex flex-col items-end">
                                     <?php
-                                    $matchPercentage = $currentJob['match_percentage'] ?? 50;
-                                    $hasRealRecommendation = $currentJob['has_recommendation'] ?? false;
-                                    $isLowMatch = $matchPercentage < 20;
+                                    // NEW: Handle both old and new algorithm responses
+                                    $matchPercentage = 50; // Default fallback
+                                    $hasRealRecommendation = false;
+                                    $algorithmType = 'estimated';
+                                    $qualityLevel = 'basic';
+
+                                    // Check if this is from the new recommendation system
+                                    if (isset($currentJob['recommendation_data'])) {
+                                        $recData = $currentJob['recommendation_data'];
+                                        $matchPercentage = $recData['match_percentage'] ?? 50;
+                                        $hasRealRecommendation = true;
+                                        $algorithmType = $recData['algorithm_type'] ?? 'enhanced';
+                                        $qualityLevel = strtolower($recData['match_quality'] ?? 'basic');
+                                    } elseif (isset($currentJob['match_percentage'])) {
+                                        // Fallback to existing match percentage
+                                        $matchPercentage = $currentJob['match_percentage'];
+                                        $hasRealRecommendation = isset($currentJob['has_recommendation']) ? $currentJob['has_recommendation'] : false;
+                                    }
+
+                                    $isLowMatch = $matchPercentage < 20; // Jobs below 20% show Poor Match with tooltip
+                                    $isGoodMatch = $matchPercentage >= 60;
+                                    $isExcellentMatch = $matchPercentage >= 80;
                                     ?>
 
                                     <div class="flex items-center gap-2 text-right">
-                                        <!-- Show Percentage Only If >= 20 -->
+                                        <!-- Enhanced Match Percentage Display -->
                                         <?php if (!$isLowMatch): ?>
-                                            <div class="text-sm font-bold <?= $matchPercentage >= 70 ? 'text-green-600' : ($matchPercentage >= 50 ? 'text-primary' : 'text-primary') ?>">
+                                            <div class="text-sm font-bold <?= $isExcellentMatch ? 'text-primary' : ($isGoodMatch ? 'text-blue-600' : 'text-primary') ?>">
                                                 <?= number_format($matchPercentage, 1) ?>%
                                             </div>
                                         <?php endif; ?>
 
-                                        <!-- Match Text -->
+                                        <!-- Simplified Match Type Indicator -->
                                         <div class="text-xs text-gray-400">
-                                            <?= $isLowMatch ? 'Poor Match' : ($hasRealRecommendation ? 'AI Match' : 'Est. Match') ?>
+                                            <?php if ($isLowMatch): ?>
+                                                <span class="text-gray-400">Poor Match</span>
+                                            <?php else: ?>
+                                                Est. Match
+                                            <?php endif; ?>
                                         </div>
 
-                                        <!-- FIXED: Low Match Warning Icon with Better Positioned Tooltip -->
+                                        <!-- Enhanced Low Match Warning -->
                                         <?php if ($isLowMatch): ?>
                                             <div class="relative tooltip-container">
-                                                <svg class="w-4 h-4 text-gray-400 transition-colors cursor-help hover:text-yellow-500"
+                                                <svg class="w-4 h-4 transition-colors text-primary cursor-help hover:text-red-500"
                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
                                                 </svg>
 
-                                                <!-- UPDATED: Higher Positioned Tooltip with More Space -->
+                                                <!-- Enhanced Tooltip with Better Advice -->
                                                 <div class="absolute right-0 z-50 px-3 py-2 mb-4 text-xs text-white transition-all duration-200 transform translate-y-0 bg-gray-900 rounded-lg shadow-xl opacity-0 pointer-events-none tooltip-content whitespace-nowrap"
                                                     style="bottom: calc(100% + 2px) !important; margin-bottom: 2px !important;">
                                                     <div class="text-center min-w-max">
-                                                        <div class="flex items-center gap-1 font-medium text-yellow-300">
-                                                            <span>Low Match</span>
+                                                        <div class="flex items-center gap-1 font-medium text-red-300">
+                                                            <span>Poor Skills Match</span>
                                                         </div>
-                                                        <div class="mt-1">No strong matches found.</div>
-                                                        <div class="text-gray-300 mt-0.5">Consider improving your profile</div>
+                                                        <div class="mt-1">Your skills don't align well with this job</div>
+                                                        <div class="text-gray-300 mt-0.5">Consider skill development or explore related roles</div>
                                                     </div>
-                                                    <!-- Tooltip Arrow - Points down from tooltip to icon -->
                                                     <div class="absolute transform -translate-x-1/2 left-1/2 top-full">
                                                         <div class="w-0 h-0 border-t-4 border-l-4 border-r-4 border-transparent border-t-gray-900"></div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- NEW: Quality Indicator for High Matches -->
+                                        <?php if ($isExcellentMatch && $hasRealRecommendation): ?>
+                                            <div class="px-2 py-1 text-xs font-medium rounded-full text-primary">
+                                                <?= ucfirst($qualityLevel) ?>
                                             </div>
                                         <?php endif; ?>
                                     </div>
