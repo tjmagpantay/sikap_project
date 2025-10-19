@@ -162,20 +162,20 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <div class="p-4 sm:p-6">
                             <!-- Job Summary -->
                             <div class="mb-8">
-                                <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Job Summary</h2>
+                                <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Job Summary</h2>
                                 <p class="text-sm text-gray-600 sm:text-base"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
                             </div>
 
                             <!-- Skills Required -->
                             <?php if (!empty($job['skills']) && is_array($job['skills'])): ?>
                                 <div class="mb-8">
-                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Skills Required</h2>
+                                    <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Skills Required</h2>
                                     <div class="flex flex-wrap gap-2">
                                         <?php
                                         $uniqueSkills = array_unique($job['skills']);
                                         foreach ($uniqueSkills as $skill):
                                         ?>
-                                            <span class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">
+                                            <span class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-md">
                                                 <?php echo htmlspecialchars($skill); ?>
                                             </span>
                                         <?php endforeach; ?>
@@ -185,7 +185,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                             <!-- Basic Information -->
                             <div class="mb-8">
-                                <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Basic Information</h2>
+                                <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Basic Information</h2>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                     <div>
                                         <div class="text-xs font-medium tracking-wide text-gray-500 uppercase">Category</div>
@@ -240,12 +240,52 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                             </div>
 
-                            <!-- Full Description -->
-                            <?php if (!empty($job['full_description']) && $job['full_description'] !== $job['job_summary']): ?>
-                                <div class="mb-8">
-                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Full Description</h2>
-                                    <div class="text-sm text-gray-600 sm:text-base">
-                                        <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
+<!-- Full Description -->
+<?php if (!empty($job['full_description']) && $job['full_description'] !== $job['job_summary']): ?>
+    <div class="mb-8">
+        <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Full Description</h2>
+        <div class="max-w-full text-sm text-gray-600 break-words sm:text-base overflow-wrap-anywhere word-break-break-all">
+            <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
+        </div>
+    </div>
+<?php endif; ?>
+                                                        
+                            <!-- Screening Questions Section -->
+                            <?php if (!empty($job['screening_questions'])): ?>
+                                <div class="mb-8 space-y-4">
+                                    <h4 class="pb-2 font-semibold text-gray-800 border-b border-gray-200 text-md">Screening Questions</h4>
+                                    <div class="space-y-4">
+                                        <?php foreach ($job['screening_questions'] as $question): ?>
+                                            <div class="p-4 border border-gray-200 rounded-lg">
+                                                <div class="mb-3">
+                                                    <h5 class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($question['question_text']); ?>
+                                                    </h5>
+                                                    <span class="inline-block px-2 py-1 mt-1 text-xs font-medium bg-gray-100 rounded text-primary">
+                                                        <?php echo htmlspecialchars(ucfirst($question['question_type'] ?? 'text')); ?>
+                                                    </span>
+                                                </div>
+                                                <?php if (!empty($question['question_option'])): ?>
+                                                    <div class="p-3 bg-white border border-gray-200 rounded-md">
+                                                        <p class="text-xs font-medium text-gray-600">Options:</p>
+                                                        <p class="text-sm text-gray-700">
+                                                            <?php echo nl2br(htmlspecialchars($question['question_option'])); ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Screening Questions</h4>
+                                    <div class="py-8 text-center">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">No Screening Questions</h3>
+                                        <p class="mt-1 text-sm text-gray-500">This job posting did not require screening questions.</p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -253,7 +293,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <!-- Job Attachments - Only show if there are attachments -->
                             <?php if (!empty($job['attachments']) && is_array($job['attachments'])): ?>
                                 <div class="mb-8">
-                                    <h2 class="mb-3 text-lg font-semibold text-gray-900 sm:text-xl">Job Attachments</h2>
+                                    <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Job Attachments</h2>
                                     <div class="space-y-3">
                                         <?php foreach ($job['attachments'] as $attachment): ?>
                                             <?php
@@ -424,3 +464,24 @@ include_once __DIR__ . '../components/navbar-employer.php';
         </div>
     </div>
 </div>
+
+<style>
+/* Force text wrapping for long strings without spaces */
+.overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+/* Ensure container doesn't overflow */
+.rounded-xl {
+    overflow: hidden;
+}
+
+/* Additional fallback for extremely long words */
+.break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+</style>

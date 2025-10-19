@@ -488,6 +488,9 @@ class JobPostController
             $job['attachments'] = $this->jobPostModel->getJobAttachments($job_id);
         }
 
+          //Get screening questions for the job
+        $job['screening_questions'] = $this->jobPostModel->getScreeningQuestions($job_id);
+
         include __DIR__ . '/../views/employers/view-job.php';
     }
 

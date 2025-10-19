@@ -17,6 +17,12 @@ class ReviewApplicationController
             exit;
         }
 
+        // Get screening answers using JobApplication model
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+        $application['screening_answers'] = $jobApplicationModel->getApplicationAnswers($application_id);
+
+
         $interview = $model->getInterview($application_id);
 
         // Get resignation request data

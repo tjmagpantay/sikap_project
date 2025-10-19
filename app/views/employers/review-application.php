@@ -73,6 +73,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <h1 class="text-lg font-semibold text-gray-900 sm:text-xl">
                                         <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>
                                     </h1>
+                                    <h5 class="text-xs text-gray-700"> Applied for: <?php echo htmlspecialchars($application['job_title']); ?></h5>
                                     <!-- Position Applied For -->
                                     <p class="text-xs text-gray-700">
                                         Applied: <?php echo htmlspecialchars(date('M j, Y', strtotime($application['applied_at']))); ?>
@@ -137,23 +138,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </span>
                             </div>
                         </div>
-
-                        <!-- Profile Completion Progress Bar -->
-                        <div class="p-3 border border-gray-300 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-gray-500">Profile Completion</span>
-                                <span class="text-xs font-bold text-primary">
-                                    <?php
-                                    $completion = $application['profile_completion_percentage'] ?? 0;
-                                    echo $completion;
-                                    ?>%
-                                </span>
-                            </div>
-                            <div class="w-full h-2 bg-gray-200 rounded-full">
-                                <div class="h-2 transition-all duration-300 rounded-full bg-primary"
-                                    style="width: <?php echo $completion; ?>%"></div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Main Content - Quick Actions -->
@@ -165,7 +149,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'resigned'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="hired">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit"
+                                        onclick="return confirmStatusChange('hired', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -178,7 +164,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] !== 'rejected' && $application['application_status'] !== 'resigned'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="rejected">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-red-700 transition-colors duration-200 bg-red-100 border border-red-300 rounded-md shadow-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <button type="submit"
+                                        onclick="return confirmStatusChange('rejected', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-red-700 transition-colors duration-200 bg-red-100 border border-red-300 rounded-md shadow-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
@@ -191,7 +179,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] === 'pending'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="reviewed">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit"
+                                        onclick="return confirmStatusChange('reviewed', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -205,7 +195,9 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if (in_array($application['application_status'], ['pending', 'reviewed'])): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="shortlisted">
-                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <button type="submit"
+                                        onclick="return confirmStatusChange('shortlisted', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
+                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
                                         </svg>
@@ -231,6 +223,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <!-- Schedule Interview Button -->
                             <?php if (
                                 $application['application_status'] !== 'resigned' &&
+                                $application['application_status'] !== 'hired' &&
+                                $application['application_status'] !== 'rejected' &&
                                 (!$resignationRequest || $resignationRequest['request_status'] === 'pending')
                             ): ?>
                                 <button @click="activeTab = 'schedule'" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
@@ -310,15 +304,18 @@ include_once __DIR__ . '../components/navbar-employer.php';
 
                     <?php elseif ($resignationRequest && $resignationRequest['request_status'] === 'approved'): ?>
                         <!-- Resignation Request Approved Message -->
-                        <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="rounded-lg">
                             <div class="flex items-start">
-                                <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-3 bg-blue-100 rounded-full">
-                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
                                 <div class="flex-1">
-                                    <h5 class="text-sm font-semibold text-grayMain">Resignation Request Approved</h5>
+                                    <div class="flex items-start justify-between">
+                                        <h5 class="text-sm font-semibold text-grayMain">Resignation Request Approved</h5>
+                                        <!-- Checkmark moved to top right as a tag -->
+                                        <div class="flex items-center justify-center flex-shrink-0 w-6 h-6 ml-3 bg-blue-100 rounded-full">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                     <p class="py-2 text-sm text-gray-600">
                                         You have successfully approved this employee's resignation request on
                                         <?php echo date('F j, Y \a\t g:i A', strtotime($resignationRequest['reviewed_at'])); ?>.
@@ -332,7 +329,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <?php endif; ?>
 
                                     <div class="py-3">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-primary">
+                                        <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-gray-100 text-primary">
                                             Employee Status: Resigned
                                         </span>
                                     </div>
@@ -608,28 +605,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                             <?php endif; ?>
 
-                            <!-- Application Eligibility Information -->
-                            <?php if (!empty($application['interested_program']) || !empty($application['priority_sector'])): ?>
-                                <div class="space-y-4">
-                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Application Preferences</h4>
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                        <?php if (!empty($application['interested_program'])): ?>
-                                            <div>
-                                                <label class="block text-xs text-gray-400">Interested Program</label>
-                                                <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['interested_program']); ?></p>
-                                            </div>
-                                        <?php endif; ?>
-                                        <?php if (!empty($application['priority_sector'])): ?>
-                                            <div>
-                                                <label class="block text-xs text-gray-400">Priority Sector</label>
-                                                <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['priority_sector']); ?></p>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-
-
                         </div>
                         <!-- Resume Tab -->
                         <div x-show="activeTab === 'resume'">
@@ -637,7 +612,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <div class="space-y-4">
                                     <h2 class="mb-4 font-semibold text-primary text-md">Resume & CV Documents</h2>
                                     <?php foreach ($application['resume_documents'] as $document): ?>
-                                        <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg ">
                                             <div class="flex items-center">
                                                 <!-- PDF Icon Container -->
                                                 <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
@@ -654,7 +629,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="flex space-x-2">
+                                            <div class="flex gap-2">
                                                 <a href="?page=download-document&doc_id=<?php echo $document['document_id']; ?>"
                                                     target="_blank"
                                                     class="px-4 py-2 text-sm font-medium transition-colors rounded-lg text-primary bg-blue-50 hover:bg-blue-100">
@@ -670,10 +645,10 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                                 <!-- Cover Letter -->
                                 <div class="py-4">
-                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Cover Letter</h4>
+                                    <h4 class="pb-2 mb-2 font-semibold border-b border-gray-200 text-md text-primary">Other Document</h4>
                                     <div class="p-6 rounded-lg bg-gray-50">
                                         <p class="text-sm leading-relaxed text-gray-900">
-                                            <?= htmlspecialchars($application['cover_letter'] ?? 'No cover letter provided.') ?>
+                                            <?= htmlspecialchars($application['cover_letter'] ?? 'No other document provided.') ?>
                                         </p>
                                     </div>
                                 </div>
@@ -688,7 +663,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php endif; ?>
                         </div>
 
-                        <!-- Application Tab -->
                         <!-- Application Tab -->
                         <div x-show="activeTab === 'application'" class="space-y-6">
                             <!-- Application Information Section -->
@@ -738,14 +712,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             <?php echo ucfirst($application['application_status']); ?>
                                         </span>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs text-gray-400">Interested Program</label>
-                                        <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['interested_program'] ?? 'None'); ?></p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs text-gray-400">Priority Sector</label>
-                                        <p class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['priority_sector'] ?? 'None'); ?></p>
-                                    </div>
                                 </div>
                             </div>
 
@@ -756,6 +722,82 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <div class="p-4 rounded-lg bg-gray-50">
                                         <h5 class="mt-1 text-sm text-gray-900"><?php echo htmlspecialchars($application['job_title']); ?></h5>
                                         <p class="text-xs text-gray-400"><?php echo nl2br(htmlspecialchars($application['job_summary'])); ?></p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Screening Questions & Answers Section -->
+                            <?php if (!empty($application['screening_answers'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b text-md text-primary">Screening Questions & Answers</h4>
+                                    <div class="space-y-4">
+                                        <?php foreach ($application['screening_answers'] as $answer): ?>
+                                            <div class="p-4 rounded-lg bg-gray-50">
+                                                <div class="mb-3">
+                                                    <h5 class="text-sm font-medium text-gray-900">
+                                                        <?php echo htmlspecialchars($answer['question_text']); ?>
+                                                    </h5>
+                                                    <span class="inline-block px-2 py-1 mt-1 text-xs font-medium bg-gray-100 rounded text-primary">
+                                                        <?php echo htmlspecialchars(ucfirst($answer['question_type'] ?? 'text')); ?>
+                                                    </span>
+                                                </div>
+                                                <div class="p-3 bg-white border rounded-md">
+                                                    <p class="text-sm text-gray-700">
+                                                        <?php echo nl2br(htmlspecialchars($answer['answer'])); ?>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b text-md text-primary">Screening Questions</h4>
+                                    <div class="py-8 text-center">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">No Screening Questions</h3>
+                                        <p class="mt-1 text-sm text-gray-500">This job posting did not require screening questions.</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Applicant Preferences Section -->
+                            <?php if (!empty($application['interested_program']) || !empty($application['priority_sector'])): ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Applicant Preferences</h4>
+                                    <div class="p-4 rounded-lg bg-gray-50">
+                                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <?php if (!empty($application['interested_program'])): ?>
+                                                <div class="flex items-start gap-3">
+                                                    <div class="flex-1">
+                                                        <label class="block text-xs text-gray-400">Interested Program</label>
+                                                        <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($application['interested_program']); ?></p>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <?php if (!empty($application['priority_sector'])): ?>
+                                                <div class="flex items-start gap-3">
+                                                    <div class="flex-1">
+                                                        <label class="block text-xs text-gray-400">Priority Sector</label>
+                                                        <p class="mt-1 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($application['priority_sector']); ?></p>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="space-y-4">
+                                    <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Applicant Preferences</h4>
+                                    <div class="py-8 text-center">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">No Preferences Specified</h3>
+                                        <p class="mt-1 text-sm text-gray-500">This applicant didn't specify any program or sector preferences.</p>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -776,16 +818,12 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                 <option value="hired" <?php echo $application['application_status'] == 'hired' ? 'selected' : ''; ?>>Hired</option>
                                                 <option value="resigned" <?php echo $application['application_status'] == 'resigned' ? 'selected' : ''; ?>>Resigned</option>
                                             </select>
-                                            <!-- Custom dropdown arrow
-                                            <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
-                                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                                </svg>
-                                            </div> -->
                                         </div>
                                     </div>
                                     <div class="flex space-x-3">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <button type="submit"
+                                            onclick="return confirmStatusChangeFromDropdown('<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
+                                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
@@ -794,7 +832,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     </div>
                                 </form>
                             </div>
-
                         </div>
 
                         <!-- Schedule Interview Tab -->
@@ -804,7 +841,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <div class="flex items-center justify-between">
                                     <h4 class="pb-2 font-semibold border-b border-gray-200 text-md text-primary">Interview Schedule</h4>
 
-                                    <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                    <?php if ($application['application_status'] === 'hired' || $application['application_status'] === 'rejected'): ?>
+                                        <!-- Status Message for Hired/Rejected -->
+                                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium 
+                                            <?php echo $application['application_status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> rounded-md">
+                                            <?php echo ucfirst($application['application_status']); ?>
+                                        </span>
+                                    <?php elseif (!empty($interview) && !empty($interview['interview_date'])): ?>
                                         <!-- Edit Button - Show only when interview exists and not editing -->
                                         <button @click="editingInterview = true"
                                             x-show="!editingInterview"
@@ -830,7 +873,29 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <?php endif; ?>
                                 </div>
 
-                                <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                <?php if ($application['application_status'] === 'hired' || $application['application_status'] === 'rejected'): ?>
+                                    <!-- Message for Hired/Rejected Applications -->
+                                    <div class="py-12 text-center">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <?php if ($application['application_status'] === 'rejected'): ?>
+                                                <!-- Simple X icon for rejected -->
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            <?php else: ?>
+                                                <!-- Simple calendar icon for hired -->
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
+                                            <?php endif; ?>
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">
+                                            <?php echo $application['application_status'] === 'rejected' ? 'Application Rejected' : 'Application Hired'; ?>
+                                        </h3>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            <?php echo $application['application_status'] === 'rejected'
+                                                ? 'Interview scheduling is not available for rejected applications.'
+                                                : 'This candidate has already been hired. Interview scheduling is no longer needed.'; ?>
+                                        </p>
+                                    </div>
+
+                                <?php elseif (!empty($interview) && !empty($interview['interview_date'])): ?>
                                     <!-- Display Existing Interview Schedule -->
                                     <div x-show="!editingInterview">
                                         <div class="p-6 bg-gray-50">
@@ -865,7 +930,6 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                 <div class="mt-6">
                                                     <label class="block mb-2 text-sm font-medium text-gray-700">Notes</label>
                                                     <div class="p-3 bg-white rounded-md shadow-sm">
-
                                                         <span class="text-sm text-gray-900">
                                                             <?php echo nl2br(htmlspecialchars($interview['notes'])); ?>
                                                         </span>
@@ -876,51 +940,53 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     </div>
                                 <?php endif; ?>
 
-                                <!-- Interview Scheduling Form (Show when no interview OR when editing) -->
-                                <div x-show="<?php echo empty($interview) || empty($interview['interview_date']) ? 'true' : 'editingInterview'; ?>">
-                                    <form method="POST" action="?page=review-application&action=scheduleInterview&application_id=<?php echo $application['application_id']; ?>" class="space-y-6">
-                                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                            <div>
-                                                <label class="block mb-2 text-sm font-medium text-gray-700">Date & Time</label>
-                                                <input type="datetime-local" name="interview_date"
-                                                    value="<?php echo htmlspecialchars($interview['interview_date'] ?? ''); ?>"
-                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-                                                    required>
+                                <!-- Interview Scheduling Form (Show when no interview OR when editing, AND status allows it) -->
+                                <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'rejected'): ?>
+                                    <div x-show="<?php echo empty($interview) || empty($interview['interview_date']) ? 'true' : 'editingInterview'; ?>">
+                                        <form method="POST" action="?page=review-application&action=scheduleInterview&application_id=<?php echo $application['application_id']; ?>" class="space-y-6">
+                                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                                <div>
+                                                    <label class="block mb-2 text-sm font-medium text-gray-700">Date & Time</label>
+                                                    <input type="datetime-local" name="interview_date"
+                                                        value="<?php echo htmlspecialchars($interview['interview_date'] ?? ''); ?>"
+                                                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                                                        required>
+                                                </div>
+                                                <div>
+                                                    <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
+                                                    <input type="text" name="interview_location"
+                                                        value="<?php echo htmlspecialchars($interview['interview_location'] ?? ''); ?>"
+                                                        class="block w-full px-3 py-2 text-xs border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-sm placeholder:text-gray-400"
+                                                        placeholder="Office address or online meeting link"
+                                                        required>
+                                                </div>
                                             </div>
+
                                             <div>
-                                                <label class="block mb-2 text-sm font-medium text-gray-700">Location</label>
-                                                <input type="text" name="interview_location"
-                                                    value="<?php echo htmlspecialchars($interview['interview_location'] ?? ''); ?>"
-                                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-xs placeholder:text-gray-400"
-                                                    placeholder="Office address or online meeting link"
-                                                    required>
+                                                <label class="block mb-2 text-sm font-medium text-gray-700">Notes (Optional)</label>
+                                                <textarea name="notes" rows="4"
+                                                    class="block w-full px-3 py-2 text-xs border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-sm placeholder:text-gray-400"
+                                                    placeholder="Add any additional instructions or requirements for the candidate"><?php echo htmlspecialchars($interview['notes'] ?? ''); ?></textarea>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            <label class="block mb-2 text-sm font-medium text-gray-700">Notes (Optional)</label>
-                                            <textarea name="notes" rows="4"
-                                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-xs placeholder:text-xs placeholder:text-gray-400"
-                                                placeholder="Add any additional instructions or requirements for the candidate"><?php echo htmlspecialchars($interview['notes'] ?? ''); ?></textarea>
-                                        </div>
-
-                                        <div class="flex gap-3">
-                                            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
-                                                </svg>
-                                                <?php echo (!empty($interview) && !empty($interview['interview_date'])) ? 'Update Interview' : 'Schedule Interview'; ?>
-                                            </button>
-
-                                            <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
-                                                <button type="button" @click="editingInterview = false"
-                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ">
-                                                    Cancel
+                                            <div class="flex gap-3">
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <?php echo (!empty($interview) && !empty($interview['interview_date'])) ? 'Update Interview' : 'Schedule Interview'; ?>
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </form>
-                                </div>
+
+                                                <?php if (!empty($interview) && !empty($interview['interview_date'])): ?>
+                                                    <button type="button" @click="editingInterview = false"
+                                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ">
+                                                        Cancel
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -980,3 +1046,205 @@ include_once __DIR__ . '../components/navbar-employer.php';
         overflow: visible !important;
     }
 </style>
+
+<script>
+// Store form reference for submission
+let pendingForm = null;
+
+// Enhanced confirmation function with modal
+function confirmStatusChange(status, applicantName) {
+    // Store the form that triggered this
+    pendingForm = event.target.closest('form');
+
+    // Configure modal content based on status
+    const modalConfig = getModalConfig(status);
+
+    // Set modal content
+    document.getElementById('modal-icon').innerHTML = modalConfig.icon;
+    document.getElementById('modal-icon').className = `flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full ${modalConfig.iconBg}`;
+    document.getElementById('modal-title').textContent = modalConfig.title;
+    document.getElementById('modal-message').innerHTML = modalConfig.message;
+    document.getElementById('modal-applicant-name').textContent = applicantName;
+
+    // Set confirm button
+    const confirmBtn = document.getElementById('confirm-status-btn');
+    confirmBtn.textContent = modalConfig.confirmText;
+    confirmBtn.className = `w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${modalConfig.confirmBtnClass}`;
+    confirmBtn.onclick = () => confirmStatusAction();
+
+    // Show modal
+    showStatusModal();
+
+    return false; // Prevent form submission
+}
+
+// Enhanced confirmation function for dropdown
+function confirmStatusChangeFromDropdown(applicantName) {
+    const statusSelect = document.getElementById('status-select');
+    const newStatus = statusSelect.value;
+
+
+    // Store the form that triggered this
+    pendingForm = event.target.closest('form');
+
+    return confirmStatusChange(newStatus, applicantName);
+}
+
+function getModalConfig(status) {
+    const configs = {
+        'hired': {
+            icon: '<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
+            iconBg: 'bg-green-100',
+            title: 'Confirm Hiring Decision',
+            message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to hire this candidate? This will set their application status to "Hired" and mark them as successfully recruited.</p>`,
+            confirmText: 'Confirm Hire',
+            confirmBtnClass: 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+        },
+        'rejected': {
+            icon: '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
+            iconBg: 'bg-red-100',
+            title: 'Confirm Rejection Decision',
+            message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to reject this application? This will set their status to "Rejected" and remove them from active consideration.</p>`,
+            confirmText: 'Confirm Rejection',
+            confirmBtnClass: 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+        },
+        'reviewed': {
+            icon: '<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
+            iconBg: 'bg-blue-100',
+            title: 'Mark as Reviewed',
+            message: `<p class="mb-6 text-sm text-gray-600">Mark this application as reviewed? This indicates that you have reviewed their application and it's ready for the next step.</p>`,
+            confirmText: 'Mark Reviewed',
+            confirmBtnClass: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+        },
+        'shortlisted': {
+            icon: '<svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" /></svg>',
+            iconBg: 'bg-yellow-100',
+            title: 'Add to Shortlist',
+            message: `<p class="mb-6 text-sm text-gray-600">Add this candidate to your shortlist? This will mark them as a potential candidate for further consideration and interviews.</p>`,
+            confirmText: 'Add to Shortlist',
+            confirmBtnClass: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+        }
+    };
+
+    return configs[status] || {
+        icon: '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+        iconBg: 'bg-gray-100',
+        title: 'Confirm Status Change',
+        message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to change this application's status?</p>`,
+        confirmText: 'Confirm',
+        confirmBtnClass: 'bg-primary hover:bg-primary-dark focus:ring-primary'
+    };
+}
+
+function showStatusModal() {
+    const modal = document.getElementById('status-change-modal');
+    if (modal) {
+        // Calculate scrollbar width to prevent content shift
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+        
+        // Store current scroll position
+        const scrollY = window.scrollY;
+        
+        // Apply styles to prevent scrolling and content shift
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.style.paddingRight = `${scrollBarWidth}px`;
+        
+        // Store scroll position for restoration
+        document.body.setAttribute('data-scroll-y', scrollY);
+        
+        modal.classList.remove('hidden');
+    }
+}
+
+function closeStatusModal() {
+    const modal = document.getElementById('status-change-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        
+        // Restore scroll position and remove fixed positioning
+        const scrollY = document.body.getAttribute('data-scroll-y');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.paddingRight = '';
+        document.body.removeAttribute('data-scroll-y');
+        
+        // Restore scroll position
+        if (scrollY) {
+            window.scrollTo(0, parseInt(scrollY));
+        }
+        
+        pendingForm = null;
+    }
+}
+
+function confirmStatusAction() {
+    if (pendingForm) {
+        pendingForm.submit();
+    }
+    closeStatusModal();
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeStatusModal();
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('status-change-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeStatusModal();
+    }
+});
+</script>
+
+<!-- Status Change Confirmation Modal -->
+<div id="status-change-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen px-4 py-12">
+        <div class="w-full max-w-md overflow-hidden bg-white shadow-xl rounded-xl" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+            <div class="px-6 py-8 lg:px-8">
+                <!-- Modal Content -->
+                <div class="text-center">
+                    <!-- Dynamic Icon -->
+                    <div id="modal-icon" class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full">
+                        <!-- Icon will be inserted by JavaScript -->
+                    </div>
+
+                    <!-- Dynamic Title -->
+                    <h3 id="modal-title" class="mb-2 text-2xl font-bold text-gray-900">
+                        <!-- Title will be inserted by JavaScript -->
+                    </h3>
+
+                    <!-- Dynamic Message -->
+                    <div id="modal-message" class="mb-6 text-sm text-gray-600">
+                        <!-- Message will be inserted by JavaScript -->
+                    </div>
+
+                    <!-- Applicant Name Card -->
+                    <div class="p-3 mb-6 border border-gray-200 rounded-lg bg-gray-50">
+                        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Applicant</p>
+                        <p id="modal-applicant-name" class="mt-1 text-sm font-semibold text-gray-900">
+                            <!-- Applicant name will be inserted by JavaScript -->
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button type="button" id="confirm-status-btn"
+                        class="w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2">
+                        <!-- Button text and styling will be set by JavaScript -->
+                    </button>
+                    <button type="button" onclick="closeStatusModal()"
+                        class="w-full px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

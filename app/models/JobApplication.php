@@ -340,7 +340,7 @@ class JobApplication
                 $result['application_id'] = (int)$result['application_id'];
                 $result['jobseeker_id'] = (int)$result['jobseeker_id'];
                 $result['job_id'] = (int)$result['job_id'];
-            } 
+            }
 
             return $result;
         } catch (PDOException $e) {
@@ -780,5 +780,6 @@ class JobApplication
             error_log("Error checking if application exists: " . $e->getMessage());
             return false;
         }
-    } 
+    }
+
 }

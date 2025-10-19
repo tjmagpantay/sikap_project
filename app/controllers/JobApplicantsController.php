@@ -44,6 +44,37 @@ class JobApplicantsController
         // Get applicants only for this employer's job
         $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id, $employer['employer_id']);
 
+        // Get applicants only for this employer's job
+        $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id, $employer['employer_id']);
+
+        // ADD: Get screening answers for each applicant
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+
+        foreach ($applicants as &$applicant) {
+            if (isset($applicant['application_id'])) {
+                // Get screening answers for this application
+                $screeningAnswers = $jobApplicationModel->getApplicationAnswers($applicant['application_id']);
+                $applicant['screening_answers'] = $screeningAnswers;
+            }
+        }
+
+        // Get applicants only for this employer's job
+        $applicants = $this->jobApplicantsModel->getApplicantsByJob($job_id, $employer['employer_id']);
+
+        // ADD: Get screening answers for each applicant
+        require_once __DIR__ . '/../models/JobApplication.php';
+        $jobApplicationModel = new JobApplication();
+
+        foreach ($applicants as &$applicant) {
+            if (isset($applicant['application_id'])) {
+                // Get screening answers for this application
+                $screeningAnswers = $jobApplicationModel->getApplicationAnswers($applicant['application_id']);
+                $applicant['screening_answers'] = $screeningAnswers;
+            }
+        }
+
+
         include __DIR__ . '/../views/employers/manage-applications.php';
     }
 
@@ -66,4 +97,7 @@ class JobApplicantsController
         $jobGroups = $this->jobApplicantsModel->getAllApplicantsGroupedByJob($employer['employer_id']);
         include __DIR__ . '/../views/employers/browse-candidates.php';
     }
+
+    
+
 }
