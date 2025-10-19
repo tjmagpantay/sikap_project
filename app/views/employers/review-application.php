@@ -210,7 +210,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                             <?php if ($application['application_status'] === 'hired'): ?>
                                 <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <button type="submit"
-                                        onclick="return confirm('Are you sure you want to set this employee as resigned? This action cannot be undone.')"
+                                        onclick="return confirmStatusChange('resigned', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
                                         class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -272,7 +272,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         class="w-full px-3 py-2 text-sm border border-orange-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 placeholder:text-orange-400"></textarea>
                                 </div>
                                 <button type="submit"
-                                    onclick="return confirm('Are you sure you want to approve this resignation request? This action cannot be undone.')"
+                                    onclick="return confirmResignationAction('approve', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
                                     class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -292,7 +292,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         class="w-full px-3 py-2 text-sm border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-red-400"></textarea>
                                 </div>
                                 <button type="submit"
-                                    onclick="return confirm('Are you sure you want to reject this resignation request?')"
+                                    onclick="return confirmResignationAction('reject', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
                                     class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-red-700 transition-colors duration-200 bg-red-100 border border-red-300 rounded-md shadow-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -844,7 +844,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <?php if ($application['application_status'] === 'hired' || $application['application_status'] === 'rejected'): ?>
                                         <!-- Status Message for Hired/Rejected -->
                                         <span class="inline-flex items-center px-3 py-1 text-xs font-medium 
-                                            <?php echo $application['application_status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> rounded-md">
+                                            <?php echo $application['application_status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-primary'; ?> rounded-md">
                                             <?php echo ucfirst($application['application_status']); ?>
                                         </span>
                                     <?php elseif (!empty($interview) && !empty($interview['interview_date'])): ?>
@@ -1048,158 +1048,194 @@ include_once __DIR__ . '../components/navbar-employer.php';
 </style>
 
 <script>
-// Store form reference for submission
-let pendingForm = null;
+    // Store form reference for submission
+    let pendingForm = null;
 
-// Enhanced confirmation function with modal
-function confirmStatusChange(status, applicantName) {
-    // Store the form that triggered this
-    pendingForm = event.target.closest('form');
+    // Enhanced confirmation function with modal
+    function confirmStatusChange(status, applicantName) {
+        // Store the form that triggered this
+        pendingForm = event.target.closest('form');
 
-    // Configure modal content based on status
-    const modalConfig = getModalConfig(status);
+        // Configure modal content based on status
+        const modalConfig = getModalConfig(status);
 
-    // Set modal content
-    document.getElementById('modal-icon').innerHTML = modalConfig.icon;
-    document.getElementById('modal-icon').className = `flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full ${modalConfig.iconBg}`;
-    document.getElementById('modal-title').textContent = modalConfig.title;
-    document.getElementById('modal-message').innerHTML = modalConfig.message;
-    document.getElementById('modal-applicant-name').textContent = applicantName;
+        // Set modal content (removed icon and applicant name references)
+        document.getElementById('modal-title').textContent = modalConfig.title;
+        document.getElementById('modal-message').innerHTML = modalConfig.message;
 
-    // Set confirm button
-    const confirmBtn = document.getElementById('confirm-status-btn');
-    confirmBtn.textContent = modalConfig.confirmText;
-    confirmBtn.className = `w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${modalConfig.confirmBtnClass}`;
-    confirmBtn.onclick = () => confirmStatusAction();
+        // Set confirm button
+        const confirmBtn = document.getElementById('confirm-status-btn');
+        confirmBtn.textContent = modalConfig.confirmText;
+        confirmBtn.className = `w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${modalConfig.confirmBtnClass}`;
+        confirmBtn.onclick = () => confirmStatusAction();
 
-    // Show modal
-    showStatusModal();
+        // Show modal
+        showStatusModal();
 
-    return false; // Prevent form submission
-}
+        return false; // Prevent form submission
+    }
 
-// Enhanced confirmation function for dropdown
-function confirmStatusChangeFromDropdown(applicantName) {
-    const statusSelect = document.getElementById('status-select');
-    const newStatus = statusSelect.value;
+    // Enhanced confirmation function for dropdown
+    function confirmStatusChangeFromDropdown(applicantName) {
+        const statusSelect = document.getElementById('status-select');
+        const newStatus = statusSelect.value;
 
+        // Store the form that triggered this
+        pendingForm = event.target.closest('form');
 
-    // Store the form that triggered this
-    pendingForm = event.target.closest('form');
+        return confirmStatusChange(newStatus, applicantName);
+    }
 
-    return confirmStatusChange(newStatus, applicantName);
-}
+    function getModalConfig(status) {
+        const configs = {
+            'hired': {
+                title: 'Confirm Hiring Decision',
+                message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to hire this candidate? This will set their application status to "Hired" and mark them as successfully recruited.</p>`,
+                confirmText: 'Confirm Hire',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            },
+            'rejected': {
+                title: 'Confirm Rejection Decision',
+                message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to reject this application? This will set their status to "Rejected" and remove them from active consideration.</p>`,
+                confirmText: 'Confirm Rejection',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            },
+            'reviewed': {
+                title: 'Mark as Reviewed',
+                message: `<p class="mb-6 text-sm text-gray-600">Mark this application as reviewed? This indicates that you have reviewed their application and it's ready for the next step.</p>`,
+                confirmText: 'Mark Reviewed',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            },
+            'shortlisted': {
+                title: 'Add to Shortlist',
+                message: `<p class="mb-6 text-sm text-gray-600">Add this candidate to your shortlist? This will mark them as a potential candidate for further consideration and interviews.</p>`,
+                confirmText: 'Add to Shortlist',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            },
+            'resigned': {
+                title: 'Set Employee as Resigned',
+                message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to set this employee as resigned? This will change their status to "Resigned" and mark them as no longer active. <strong>This action cannot be undone.</strong></p>`,
+                confirmText: 'Set Resigned',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            }
+        };
 
-function getModalConfig(status) {
-    const configs = {
-        'hired': {
-            icon: '<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
-            iconBg: 'bg-green-100',
-            title: 'Confirm Hiring Decision',
-            message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to hire this candidate? This will set their application status to "Hired" and mark them as successfully recruited.</p>`,
-            confirmText: 'Confirm Hire',
-            confirmBtnClass: 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
-        },
-        'rejected': {
-            icon: '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
-            iconBg: 'bg-red-100',
-            title: 'Confirm Rejection Decision',
-            message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to reject this application? This will set their status to "Rejected" and remove them from active consideration.</p>`,
-            confirmText: 'Confirm Rejection',
-            confirmBtnClass: 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
-        },
-        'reviewed': {
-            icon: '<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
-            iconBg: 'bg-blue-100',
-            title: 'Mark as Reviewed',
-            message: `<p class="mb-6 text-sm text-gray-600">Mark this application as reviewed? This indicates that you have reviewed their application and it's ready for the next step.</p>`,
-            confirmText: 'Mark Reviewed',
-            confirmBtnClass: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-        },
-        'shortlisted': {
-            icon: '<svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" /></svg>',
-            iconBg: 'bg-yellow-100',
-            title: 'Add to Shortlist',
-            message: `<p class="mb-6 text-sm text-gray-600">Add this candidate to your shortlist? This will mark them as a potential candidate for further consideration and interviews.</p>`,
-            confirmText: 'Add to Shortlist',
-            confirmBtnClass: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+        return configs[status] || {
+            title: 'Confirm Status Change',
+            message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to change this application's status?</p>`,
+            confirmText: 'Confirm',
+            confirmBtnClass: 'bg-primary hover:bg-primary-dark focus:ring-primary'
+        };
+    }
+
+    function confirmResignationAction(action, applicantName) {
+        // Store the form that triggered this
+        pendingForm = event.target.closest('form');
+
+        let config;
+        if (action === 'approve') {
+            config = {
+                title: 'Approve Resignation Request',
+                message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to approve this employee's resignation request? This will change their status to "Resigned" and they will no longer be considered an active employee. <strong>This action cannot be undone.</strong></p>`,
+                confirmText: 'Approve Resignation',
+                confirmBtnClass: 'bg-primary hover:bg-blue-700 focus:ring-blue-500'
+            };
+        } else {
+            // Check if rejection reason is provided
+            const textarea = event.target.closest('form').querySelector('textarea[name="employer_notes"]');
+            if (!textarea.value.trim()) {
+                alert('Please provide a reason for rejection before proceeding.');
+                return false;
+            }
+
+            config = {
+                title: 'Reject Resignation Request',
+                message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to reject this employee's resignation request? They will remain an active employee and the resignation request will be marked as rejected.</p>`,
+                confirmText: 'Reject Request',
+                confirmBtnClass: 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+            };
         }
-    };
 
-    return configs[status] || {
-        icon: '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-        iconBg: 'bg-gray-100',
-        title: 'Confirm Status Change',
-        message: `<p class="mb-6 text-sm text-gray-600">Are you sure you want to change this application's status?</p>`,
-        confirmText: 'Confirm',
-        confirmBtnClass: 'bg-primary hover:bg-primary-dark focus:ring-primary'
-    };
-}
+        // Set modal content
+        document.getElementById('modal-title').textContent = config.title;
+        document.getElementById('modal-message').innerHTML = config.message;
 
-function showStatusModal() {
-    const modal = document.getElementById('status-change-modal');
-    if (modal) {
-        // Calculate scrollbar width to prevent content shift
-        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-        
-        // Store current scroll position
-        const scrollY = window.scrollY;
-        
-        // Apply styles to prevent scrolling and content shift
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
-        document.body.style.paddingRight = `${scrollBarWidth}px`;
-        
-        // Store scroll position for restoration
-        document.body.setAttribute('data-scroll-y', scrollY);
-        
-        modal.classList.remove('hidden');
+        // Set confirm button
+        const confirmBtn = document.getElementById('confirm-status-btn');
+        confirmBtn.textContent = config.confirmText;
+        confirmBtn.className = `w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${config.confirmBtnClass}`;
+        confirmBtn.onclick = () => confirmStatusAction();
+
+        // Show modal
+        showStatusModal();
+
+        return false; // Prevent form submission
     }
-}
 
-function closeStatusModal() {
-    const modal = document.getElementById('status-change-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        
-        // Restore scroll position and remove fixed positioning
-        const scrollY = document.body.getAttribute('data-scroll-y');
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.style.paddingRight = '';
-        document.body.removeAttribute('data-scroll-y');
-        
-        // Restore scroll position
-        if (scrollY) {
-            window.scrollTo(0, parseInt(scrollY));
+    function showStatusModal() {
+        const modal = document.getElementById('status-change-modal');
+        if (modal) {
+            // Calculate scrollbar width to prevent content shift
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+            // Store current scroll position
+            const scrollY = window.scrollY;
+
+            // Apply styles to prevent scrolling and content shift
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.paddingRight = `${scrollBarWidth}px`;
+
+            // Store scroll position for restoration
+            document.body.setAttribute('data-scroll-y', scrollY);
+
+            modal.classList.remove('hidden');
         }
-        
-        pendingForm = null;
     }
-}
 
-function confirmStatusAction() {
-    if (pendingForm) {
-        pendingForm.submit();
+    function closeStatusModal() {
+        const modal = document.getElementById('status-change-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+
+            // Restore scroll position and remove fixed positioning
+            const scrollY = document.body.getAttribute('data-scroll-y');
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.paddingRight = '';
+            document.body.removeAttribute('data-scroll-y');
+
+            // Restore scroll position
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY));
+            }
+
+            pendingForm = null;
+        }
     }
-    closeStatusModal();
-}
 
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
+    function confirmStatusAction() {
+        if (pendingForm) {
+            pendingForm.submit();
+        }
         closeStatusModal();
     }
-});
 
-// Close modal when clicking outside
-document.getElementById('status-change-modal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeStatusModal();
-    }
-});
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeStatusModal();
+        }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('status-change-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeStatusModal();
+        }
+    });
 </script>
 
 <!-- Status Change Confirmation Modal -->
@@ -1209,11 +1245,6 @@ document.getElementById('status-change-modal')?.addEventListener('click', functi
             <div class="px-6 py-8 lg:px-8">
                 <!-- Modal Content -->
                 <div class="text-center">
-                    <!-- Dynamic Icon -->
-                    <div id="modal-icon" class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full">
-                        <!-- Icon will be inserted by JavaScript -->
-                    </div>
-
                     <!-- Dynamic Title -->
                     <h3 id="modal-title" class="mb-2 text-2xl font-bold text-gray-900">
                         <!-- Title will be inserted by JavaScript -->
@@ -1222,14 +1253,6 @@ document.getElementById('status-change-modal')?.addEventListener('click', functi
                     <!-- Dynamic Message -->
                     <div id="modal-message" class="mb-6 text-sm text-gray-600">
                         <!-- Message will be inserted by JavaScript -->
-                    </div>
-
-                    <!-- Applicant Name Card -->
-                    <div class="p-3 mb-6 border border-gray-200 rounded-lg bg-gray-50">
-                        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Applicant</p>
-                        <p id="modal-applicant-name" class="mt-1 text-sm font-semibold text-gray-900">
-                            <!-- Applicant name will be inserted by JavaScript -->
-                        </p>
                     </div>
                 </div>
 

@@ -124,20 +124,20 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                     </td>
                                     <!-- Status -->
                                     <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-md
                                         <?php
                                         switch ($app['application_status']) {
                                             case 'pending':
-                                                echo 'text-amber-800 bg-amber-100 border border-amber-200';
+                                                echo 'text-gray-800 bg-gray-100 border border-gray-200';
                                                 break;
                                             case 'accepted':
-                                                echo 'text-green-800 bg-green-100 border border-green-200';
+                                                echo 'text-gray-800 bg-gray-100 border border-gray-200';
                                                 break;
                                             case 'rejected':
-                                                echo 'text-red-800 bg-red-100 border border-red-200';
+                                                echo 'text-gray-800 bg-gray-100 border border-gray-200';
                                                 break;
                                             case 'reviewing':
-                                                echo 'text-blue-800 bg-blue-100 border border-blue-200';
+                                                echo 'text-gray-800 bg-gray-100 border border-gray-200';
                                                 break;
                                             default:
                                                 echo 'text-gray-800 bg-gray-100 border border-gray-200';
