@@ -78,6 +78,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/view-all-companies.php';
             break;
 
+        case '404':
+            http_response_code(404);
+            include __DIR__ . '/../app/views/pages/404.php';
+            break;
+
+        case '500':
+            http_response_code(500);
+            include __DIR__ . '/../app/views/pages/500.php';
+            break;
+
 
 
         // [------------------------ LOGIN AND OAUTH ----------------------]
@@ -990,6 +1000,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
         case 'hiring-laws':
             include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
+            break;
+
+        default:
+            // Set 404 header
+            http_response_code(404);
+            include __DIR__ . '/../app/views/pages/404.php';
             break;
     }
 

@@ -23,3 +23,19 @@ RewriteRule ^ index.php [QSA,L]
     Order allow,deny
     Deny from all
 </Files>
+
+# Custom Error Pages
+ErrorDocument 404 /sikap/public/index.php?page=404
+ErrorDocument 500 /sikap/public/index.php?page=500
+
+# Prevent direct access to sensitive files
+<Files "*.php">
+    Order Deny,Allow
+    Allow from all
+</Files>
+
+# Block access to config files
+<Files "config.php">
+    Order Deny,Allow
+    Deny from all
+</Files>

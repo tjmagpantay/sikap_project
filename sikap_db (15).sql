@@ -513,7 +513,7 @@ CREATE TABLE `job_application_status_logs` (
 
 CREATE TABLE `job_category` (
   `job_category_id` int(11) NOT NULL,
-  `category_name` enum('IT','Healthcare','Education','Engineering','Finance','Marketing','Construction','Others') NOT NULL
+  `category_name` enum('Technology','Healthcare','Education','Engineering','Finance','Marketing','Construction','Others') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

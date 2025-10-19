@@ -199,31 +199,31 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </div>
 
             <!-- Danger Zone -->
-            <div class="p-6 bg-white border-l-4 border-red-400 rounded-lg shadow">
+            <div class="p-6 bg-white border-l-4 border-blue-400 rounded-lg shadow">
                 <div class="mb-6">
-                    <h3 class="text-lg font-medium text-red-900">Danger Zone</h3>
-                    <p class="mt-1 text-sm text-red-700">These actions cannot be undone and will affect your company account</p>
+                    <h3 class="text-lg font-medium text-blue-900">Danger Zone</h3>
+                    <p class="mt-1 text-sm text-blue-700">These actions cannot be undone and will affect your company account</p>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-blue-50">
                         <div>
-                            <h4 class="text-sm font-medium text-red-900">Deactivate Company Account</h4>
-                            <p class="text-xs text-red-600">Temporarily disable your account and hide all job posts (can be reactivated)</p>
+                            <h4 class="text-sm font-medium text-blue-900">Deactivate Company Account</h4>
+                            <p class="text-xs text-blue-600">Temporarily disable your account and hide all job posts (can be reactivated)</p>
                         </div>
                         <button onclick="showDeactivationModal()"
-                            class="px-4 py-2 text-sm font-medium text-red-700 transition-colors bg-white border border-red-300 rounded-md hover:bg-red-100">
+                            class="px-4 py-2 text-sm font-medium text-white transition-colors border border-blue-300 rounded-md bg-primary hover:bg-blue-100">
                             Deactivate
                         </button>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 rounded-lg bg-red-50">
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-blue-50">
                         <div>
-                            <h4 class="text-sm font-medium text-red-900">Delete Company Account</h4>
-                            <p class="text-xs text-red-600">Permanently delete your company account, job posts, and all associated data</p>
+                            <h4 class="text-sm font-medium text-blue-900">Delete Company Account</h4>
+                            <p class="text-xs text-blue-600">Permanently delete your company account, job posts, and all associated data</p>
                         </div>
                         <button onclick="showDeletionModal()"
-                            class="px-4 py-2 text-sm font-medium text-white transition-colors bg-red-600 rounded-md hover:bg-red-700">
+                            class="px-4 py-2 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-blue-700">
                             Delete Account
                         </button>
                     </div>

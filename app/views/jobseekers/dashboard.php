@@ -53,7 +53,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     <!-- Filter Dropdowns Container - Takes remaining 2/3 space -->
                     <div class="flex flex-col w-full gap-4 lg:flex-row lg:w-2/3 lg:min-w-0">
 
-                        <!-- Location Filter - Updated for Rosario priority with real-time filtering -->
+                        <!-- Location Filter - FIXED for immediate filtering -->
                         <div class="flex-1 hidden sm:block">
                             <div class="relative w-full" x-data="{ open: false, selected: 'Location' }">
                                 <button @click="open = !open"
@@ -95,7 +95,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             </div>
                         </div>
 
-                        <!-- Industry Filter - Hidden on screens below 640px (sm) -->
+                        <!-- Industry Filter - FIXED to use applyAllFilters() -->
                         <div class="flex-1 hidden sm:block">
                             <div class="relative w-full" x-data="{ open: false, selected: 'Industry' }">
                                 <button @click="open = !open"
@@ -133,32 +133,32 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             Education
                                         </button>
+                                        <button @click="selected = 'Engineering'; open = false; filterByIndustry('engineering')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Engineering
+                                        </button>
                                         <button @click="selected = 'Finance'; open = false; filterByIndustry('finance')"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             Finance
                                         </button>
-                                        <button @click="selected = 'Retail'; open = false; filterByIndustry('retail')"
+                                        <button @click="selected = 'Marketing'; open = false; filterByIndustry('marketing')"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Retail
-                                        </button>
-                                        <button @click="selected = 'Manufacturing'; open = false; filterByIndustry('manufacturing')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Manufacturing
-                                        </button>
-                                        <button @click="selected = 'Hospitality'; open = false; filterByIndustry('hospitality')"
-                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                                            Hospitality
+                                            Marketing
                                         </button>
                                         <button @click="selected = 'Construction'; open = false; filterByIndustry('construction')"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             Construction
+                                        </button>
+                                        <button @click="selected = 'Others'; open = false; filterByIndustry('')"
+                                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                            Others
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Workplace Filter - Hidden on screens below 640px (sm) -->
+                        <!-- Workplace Filter - UPDATED for immediate filtering -->
                         <div class="flex-1 hidden sm:block">
                             <div class="relative w-full" x-data="{ open: false, selected: 'Workplace' }">
                                 <button @click="open = !open"
@@ -180,19 +180,19 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                     x-transition:leave-end="transform opacity-0 scale-95"
                                     class="absolute left-0 z-50 w-full mt-2 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                     <div class="py-1">
-                                        <button @click="selected = 'Workplace'; open = false; filterByWorkplace('')"
+                                        <button @click="selected = 'Workplace'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             All Types
                                         </button>
-                                        <button @click="selected = 'On-site'; open = false; filterByWorkplace('on-site')"
+                                        <button @click="selected = 'On-site'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             On-site
                                         </button>
-                                        <button @click="selected = 'Remote'; open = false; filterByWorkplace('remote')"
+                                        <button @click="selected = 'Remote'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             Remote
                                         </button>
-                                        <button @click="selected = 'Hybrid'; open = false; filterByWorkplace('hybrid')"
+                                        <button @click="selected = 'Hybrid'; open = false; applyAllFilters()"
                                             class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
                                             Hybrid
                                         </button>
@@ -201,12 +201,12 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             </div>
                         </div>
 
-                        <!-- Apply Filter Button with Dynamic Text -->
+                        <!-- Clear Filter Button with Dynamic Text -->
                         <div class="hidden sm:block sm:w-auto lg:flex-shrink-0 lg:self-stretch">
-                            <button type="button" id="filterButton"
-                                class="w-full h-full px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap sm:w-auto"
-                                onclick="handleFilterButtonClick()">
-                                Apply Filter
+                            <button type="button" id="clearFilters"
+                                class="w-full h-full px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-gray-600 focus:ring-2 focus:ring-gray-500/50 hover:shadow-md whitespace-nowrap sm:w-auto"
+                                onclick="clearAllFilters()">
+                                Clear Filters
                             </button>
                         </div>
                     </div>
@@ -222,7 +222,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     <div>
                         <p class="mb-2 text-lg font-semibold text-grayMain">Jobs you might like</p>
                     </div>
-                    <div class="flex items-start w-full mb-2 border-b border-gray-200">
+                    <div class="flex items-start w-full mb-4 border-b border-gray-200">
                         <div class="flex items-center w-full p-1 space-x-1 rounded-lg bg-gray-50">
                             <!-- Most Recent - Static Button -->
                             <button class="relative flex-1 px-4 py-3 text-sm font-medium text-white transition-all duration-200 ease-in-out rounded-md shadow-sm bg-primary">
@@ -600,128 +600,14 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             }, 3000);
         }
 
-        // Filter functions for the new dropdown system
-        function filterByLocation(location) {
-            applyAllFilters();
-        }
-
-        function filterByJobType(jobType) {
-            applyAllFilters();
-        }
-
-        function filterByIndustry(industry) {
-            applyAllFilters();
-        }
-
-        function filterByWorkplace(workplace) {
-            applyAllFilters();
-        }
-
         // Apply all filters function
         function applyAllFilters() {
             const searchTerm = document.getElementById('jobSearch').value.toLowerCase().trim();
 
             // Get selected values from dropdowns (only on desktop where dropdowns are visible)
             const selectedLocation = window.innerWidth >= 640 ? getDropdownValue('Location') : '';
-            const selectedJobType = '';
             const selectedIndustry = window.innerWidth >= 640 ? getDropdownValue('Industry') : '';
             const selectedWorkplace = window.innerWidth >= 640 ? getDropdownValue('Workplace') : '';
-
-            const jobCards = document.querySelectorAll('.left-job-card');
-            let visibleCount = 0;
-            let firstVisibleCard = null;
-
-            jobCards.forEach(card => {
-                let shouldShow = true;
-
-                // Search filter (job title, company name)
-                if (searchTerm) {
-                    const jobTitle = card.querySelector('h3').textContent.toLowerCase();
-                    const companyName = card.querySelector('p').textContent.toLowerCase();
-                    if (!jobTitle.includes(searchTerm) && !companyName.includes(searchTerm)) {
-                        shouldShow = false;
-                    }
-                }
-
-                // Location filter (only on desktop)
-                if (selectedLocation && selectedLocation !== 'Location' && shouldShow && window.innerWidth >= 640) {
-                    const locationText = card.querySelector('.text-gray-600').textContent.toLowerCase();
-                    if (!locationText.includes(selectedLocation.toLowerCase())) {
-                        shouldShow = false;
-                    }
-                }
-
-                // Industry filter (only on desktop)
-                if (selectedIndustry && selectedIndustry !== 'Industry' && shouldShow && window.innerWidth >= 640) {
-                    const categoryElements = card.querySelectorAll('.text-primary');
-                    let hasMatchingCategory = false;
-                    categoryElements.forEach(element => {
-                        if (element.textContent.toLowerCase().includes(selectedIndustry.toLowerCase())) {
-                            hasMatchingCategory = true;
-                        }
-                    });
-                    if (!hasMatchingCategory) {
-                        shouldShow = false;
-                    }
-                }
-
-                // Show/hide card
-                if (shouldShow) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                    if (!firstVisibleCard) {
-                        firstVisibleCard = card;
-                    }
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Update job count
-            updateJobCount(visibleCount);
-
-            // Show message if no results
-            showNoResultsMessage(visibleCount === 0);
-
-            // Auto-load first visible job after filtering (only on desktop)
-            if (firstVisibleCard && window.innerWidth >= 1024) {
-                const jobId = firstVisibleCard.getAttribute('data-job-id');
-                loadJobDetails(jobId, firstVisibleCard, true);
-            }
-        }
-
-        // Helper function to get selected value from dropdown
-        function getDropdownValue(defaultValue) {
-            const dropdowns = document.querySelectorAll(`[x-data*="'${defaultValue}'"]`);
-            for (let dropdown of dropdowns) {
-                const button = dropdown.querySelector('button span');
-                if (button && button.textContent.trim() !== defaultValue) {
-                    return button.textContent.trim();
-                }
-            }
-            return '';
-        }
-
-        function filterByLocation(location) {
-            console.log('Filtering by location:', location);
-            applyAllFilters();
-        }
-
-        // Updated applyAllFilters function with Rosario priority
-        function applyAllFilters() {
-            const searchTerm = document.getElementById('jobSearch').value.toLowerCase().trim();
-
-            // Get selected values from dropdowns (only on desktop where dropdowns are visible)
-            const selectedLocation = window.innerWidth >= 640 ? getDropdownValue('Location') : '';
-            const selectedIndustry = window.innerWidth >= 640 ? getDropdownValue('Industry') : '';
-            const selectedWorkplace = window.innerWidth >= 640 ? getDropdownValue('Workplace') : '';
-
-            console.log('Applying filters:', {
-                searchTerm,
-                selectedLocation,
-                selectedIndustry,
-                selectedWorkplace
-            });
 
             const jobCards = document.querySelectorAll('.left-job-card');
             let visibleCount = 0;
@@ -855,6 +741,18 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                 const jobId = firstVisibleCard.getAttribute('data-job-id');
                 loadJobDetails(jobId, firstVisibleCard, true);
             }
+        }
+
+        // Helper function to get selected value from dropdown
+        function getDropdownValue(defaultValue) {
+            const dropdowns = document.querySelectorAll(`[x-data*="'${defaultValue}'"]`);
+            for (let dropdown of dropdowns) {
+                const button = dropdown.querySelector('button span');
+                if (button && button.textContent.trim() !== defaultValue) {
+                    return button.textContent.trim();
+                }
+            }
+            return '';
         }
 
         // Update the clearAllFilters function to handle Rosario priority
