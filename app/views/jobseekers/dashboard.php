@@ -201,11 +201,11 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             </div>
                         </div>
 
-                        <!-- Apply Filter Button -->
+                        <!-- Apply Filter Button with Dynamic Text -->
                         <div class="hidden sm:block sm:w-auto lg:flex-shrink-0 lg:self-stretch">
-
-                            <button type="button" id="clearFilters"
-                                class="w-full h-full px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap sm:w-auto">
+                            <button type="button" id="filterButton"
+                                class="w-full h-full px-6 py-3 text-sm font-medium text-white transition-all rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 hover:shadow-md whitespace-nowrap sm:w-auto"
+                                onclick="handleFilterButtonClick()">
                                 Apply Filter
                             </button>
                         </div>
@@ -222,19 +222,11 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     <div>
                         <p class="mb-2 text-lg font-semibold text-grayMain">Jobs you might like</p>
                     </div>
-                    <!-- Filter Buttons -->
                     <div class="flex items-start w-full mb-2 border-b border-gray-200">
                         <div class="flex items-center w-full p-1 space-x-1 rounded-lg bg-gray-50">
-                            <!-- Most Recent -->
-                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
-                                data-filter="recent" onclick="filterJobs('recent', this)">
+                            <!-- Most Recent - Static Button -->
+                            <button class="relative flex-1 px-4 py-3 text-sm font-medium text-white transition-all duration-200 ease-in-out rounded-md shadow-sm bg-primary">
                                 <span>Most Recent</span>
-                            </button>
-
-                            <!-- Best Matches -->
-                            <button class="relative flex-1 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 ease-in-out rounded-md hover:text-gray-900 hover:bg-white/50"
-                                data-filter="matches" onclick="filterJobs('matches', this)">
-                                <span>Matches</span>
                             </button>
                         </div>
                     </div>
@@ -245,7 +237,12 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                         <?php if (!empty($jobs)): ?>
                             <div class="space-y-4">
                                 <?php
-                                $displayedJobs = array_slice($jobs, 0, 5); // Limit to 5 jobs
+                                // Sort jobs by creation date (most recent first)
+                                usort($jobs, function ($a, $b) {
+                                    return strtotime($b['created_at']) - strtotime($a['created_at']);
+                                });
+
+                                $displayedJobs = array_slice($jobs, 0, 5); // Limit to 5 jobs after sorting
                                 $totalJobs = count($jobs);
                                 ?>
 
@@ -258,7 +255,7 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                         data-match-percentage="<?php echo $job['match_percentage'] ?? 0; ?>"
                                         style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
-                                        <!-- Row 1: Business Profile + Job Title + Business Name + Urgent Tag -->
+                                        <!-- Row 1: Business Profile + Job Title + Business Name -->
                                         <div class="flex items-start justify-between gap-2">
                                             <div class="flex items-center flex-1 gap-2">
                                                 <!-- Business Profile Image -->
@@ -279,12 +276,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                                 </div>
                                             </div>
 
-                                            <!-- Right side: Save button + Urgent Tag -->
-                                            <div class="flex items-center flex-shrink-0 gap-2 mt-2">
-                                                <span class="px-2 py-1 text-xs font-medium text-white transition-all duration-300 rounded-sm bg-primary hover:bg-primary/90 hover:shadow-sm">
-                                                    Urgent
-                                                </span>
-                                            </div>
                                         </div>
 
                                         <!-- Row 2: Location with Icon -->
@@ -431,89 +422,10 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             }
         }
 
-        // Updated job filtering function - Only Most Recent and Best Matches
-        function filterJobs(filterType, buttonElement) {
-
-            // Update active filter button - Remove active styles from all buttons
-            document.querySelectorAll('[data-filter]').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
-                btn.classList.add('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
-            });
-
-            // Set active button with primary background and white text
-            buttonElement.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
-            buttonElement.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
-
-            // Get all job cards
-            const jobCards = document.querySelectorAll('.left-job-card');
-            let sortedCards = Array.from(jobCards);
-
-            if (filterType === 'recent') {
-                // Sort by most recent (posted date)
-                sortedCards.sort((a, b) => {
-                    const dateA = parseInt(a.dataset.postedDate || 0);
-                    const dateB = parseInt(b.dataset.postedDate || 0);
-                    return dateB - dateA; // Most recent first
-                });
-            } else if (filterType === 'matches') {
-                // Sort by best matches (match percentage)
-                sortedCards.sort((a, b) => {
-                    const matchA = parseFloat(a.dataset.matchPercentage || 0);
-                    const matchB = parseFloat(b.dataset.matchPercentage || 0);
-                    return matchB - matchA; // Highest match first
-                });
-            }
-
-            // Show only top 5 jobs
-            const visibleCards = sortedCards.slice(0, 5);
-
-            // Hide all cards first
-            jobCards.forEach(card => {
-                card.style.display = 'none';
-                card.style.order = 'unset';
-            });
-
-            // Show and reorder filtered cards
-            visibleCards.forEach((card, index) => {
-                card.style.display = 'block';
-                card.style.order = index;
-                // Add slight animation
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(10px)';
-                    setTimeout(() => {
-                        card.style.transition = 'all 0.3s ease';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 50);
-                }, index * 50);
-            });
-
-            // Update job count
-            updateJobCount(visibleCards.length);
-
-            // Auto-select first visible job (only on desktop)
-            if (visibleCards.length > 0 && window.innerWidth >= 1024) {
-                const firstJobId = visibleCards[0].getAttribute('data-job-id');
-                loadJobDetails(firstJobId, visibleCards[0], true);
-            }
-        }
-
         // Initialize with "Most Recent" as default - Updated to match your working code
         document.addEventListener('DOMContentLoaded', function() {
 
-            // Set "Most Recent" as default active with proper styling
-            const recentButton = document.querySelector('[data-filter="recent"]');
-            if (recentButton) {
-                // Set initial active state
-                recentButton.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-white/50');
-                recentButton.classList.add('bg-primary', 'text-white', 'shadow-sm', 'ring-1', 'ring-gray-200');
-
-                // Then run the filter
-                filterJobs('recent', recentButton);
-            }
-
-            // FIXED: Auto-load first job on desktop - with better error handling
+            // Auto-load first job on desktop - with better error handling
             if (window.innerWidth >= 1024) {
                 setTimeout(() => {
                     const firstJobCard = document.querySelector('.left-job-card[data-job-id]');
@@ -686,63 +598,6 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                     }
                 }, 300);
             }, 3000);
-        }
-
-        // Filter functionality
-        function filterJobs(filterType, button) {
-            // Update button states
-            const filterButtons = document.querySelectorAll('[data-filter]');
-            filterButtons.forEach(btn => {
-                btn.classList.remove('active-filter');
-                btn.classList.add('text-gray-400');
-            });
-
-            // Set active button
-            button.classList.remove('text-gray-400');
-            button.classList.add('active-filter');
-
-            // Get all job cards
-            const jobCards = document.querySelectorAll('.left-job-card');
-
-            // Show all jobs first
-            jobCards.forEach(card => {
-                card.style.display = 'block';
-            });
-
-            // Apply filter logic
-            if (filterType === 'recent') {
-                // Sort by most recent (this is a simple example - you might want to implement server-side sorting)
-                const jobContainer = document.querySelector('.space-y-4');
-                const cards = Array.from(jobCards);
-
-                // For demo purposes, we'll just reverse the order
-                cards.reverse().forEach(card => {
-                    jobContainer.appendChild(card);
-                });
-
-            } else if (filterType === 'matches') {
-                // Hide jobs that don't match (this is a placeholder - implement your matching logic)
-                jobCards.forEach((card, index) => {
-                    // Example: show only every other job as "best match"
-                    if (index % 3 !== 0) {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-
-            // Update job count
-            const visibleJobs = document.querySelectorAll('.left-job-card[style="display: block"], .left-job-card:not([style*="display: none"])').length;
-            const jobCountElement = document.querySelector('.text-gray-400');
-            if (jobCountElement && filterType === 'all') {
-                jobCountElement.textContent = `(${visibleJobs} jobs)`;
-            }
-
-            // Auto-load first visible job after filtering
-            const firstVisibleJob = document.querySelector('.job-card[style="display: block"], .left-job-card:not([style*="display: none"])');
-            if (firstVisibleJob) {
-                const jobId = firstVisibleJob.getAttribute('data-job-id');
-                loadJobDetails(jobId, firstVisibleJob, true);
-            }
         }
 
         // Filter functions for the new dropdown system
