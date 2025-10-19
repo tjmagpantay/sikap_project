@@ -462,7 +462,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                         <?php
                                                         switch ($app['application_status']) {
                                                             case 'pending':
-                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-yellow-500 rounded-full">
+                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-1 border-yellow-500 rounded-full">
                                                                         <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
@@ -470,7 +470,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                 echo '<span class="text-sm font-medium text-yellow-600">Pending</span>';
                                                                 break;
                                                             case 'accepted':
-                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-green-600 rounded-full">
+                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-1 border-green-600 rounded-full">
                                                                         <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                                         </svg>
@@ -478,7 +478,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                 echo '<span class="text-sm font-medium text-green-600">Accepted</span>';
                                                                 break;
                                                             case 'rejected':
-                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-red-600 rounded-full">
+                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-1 border-red-600 rounded-full">
                                                                         <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                                         </svg>
@@ -486,7 +486,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                 echo '<span class="text-sm font-medium text-red-600">Rejected</span>';
                                                                 break;
                                                             default:
-                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-3 border-2 border-gray-400 rounded-full">
+                                                                echo '<div class="flex items-center justify-center w-6 h-6 mr-1 border-gray-400 rounded-full ">
                                                                         <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
