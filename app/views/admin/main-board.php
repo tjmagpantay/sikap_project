@@ -69,7 +69,7 @@
                     </p>
                 </div>
                 <div class="pt-3">
-                    <span class="flex items-center text-sm font-medium text-secondary">
+                    <span class="flex items-center text-sm font-medium text-secondary ">
                         Manage Users
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -273,13 +273,6 @@
     const primaryColorAlpha = 'rgba(9, 44, 76, 0.1)'; // Primary with transparency
     const secondaryColor = '#F3AF0E'; // Your secondary color (amber/yellow)
     const secondaryColorAlpha = 'rgba(243, 175, 14, 0.1)'; // Secondary with transparency
-
-    // Mock data for now - replace with real data from PHP
-    const mockJobStatsData = {
-        months: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        job_posts: [45, 52, 38, 67, 49, 58],
-        applications: [186, 305, 237, 173, 209, 214]
-    };
 
     // Use real data if available, otherwise use mock data
     const jobStatsData = <?php echo isset($jobStatsChart) ? json_encode($jobStatsChart) : 'mockJobStatsData'; ?>;

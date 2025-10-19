@@ -81,7 +81,7 @@ include_once __DIR__ . '/components/admin_auth_check.php';
                     include __DIR__ . '/events/edit.php';
                     break;
                 case 'admin-settings':
-                    include __DIR__ . '/settings.php';
+                    include __DIR__ . '/settings-admin.php';
                     break;
                 default:
                     include __DIR__ . '/main-board.php';

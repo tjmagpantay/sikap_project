@@ -93,23 +93,29 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-md">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0v2m-8-2v2m0 0v6a2 2 0 002 2h4a2 2 0 002-2V8H8z"></path>
+                        <!-- Check Icon -->
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Active Jobs</p>
-                    <p class="text-2xl font-semibold text-gray-900"><?php echo number_format($reportStats['active_jobs'] ?? 0); ?></p>
+                    <p class="text-2xl font-semibold text-gray-900">
+                        <?php echo number_format($reportStats['active_jobs'] ?? 0); ?>
+                    </p>
                 </div>
             </div>
         </div>
+
+
 
         <!-- Total Applications -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-12 h-12 bg-purple-600 rounded-md">
+                    <div class="flex items-center justify-center w-12 h-12 bg-red-500 rounded-md">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>

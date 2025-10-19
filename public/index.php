@@ -319,6 +319,18 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->publicView();
             break;
 
+        case 'admin-settings':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->settings();
+            break;
+
+        case 'admin-change-password':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->changePassword();
+            break;
+
         // Admin Accreditation Routes
         case 'upload-business-logo':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
@@ -330,6 +342,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller = new SaveJobController();
             $controller->showSavedJobs();
             break;
+
 
 
 
@@ -808,14 +821,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 
 
-            
+
 
         // TESTING ROUTES - TO BE REMOVED LATER
 
 
 
 
-            
+
 
         // [------------------------ NECESSARY ROUTES ----------------------]
 
@@ -978,8 +991,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
         case 'hiring-laws':
             include __DIR__ . '/../app/views/components/footer/hiring-laws.php';
             break;
-
-
     }
 
 

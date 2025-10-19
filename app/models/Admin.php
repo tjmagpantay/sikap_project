@@ -302,4 +302,62 @@ class Admin
             return false;
         }
     }
+
+
+    public function getAdminProfile($user_id)
+    {
+        try {
+            $sql = "SELECT a.*, u.email 
+                FROM admin a 
+                JOIN users u ON a.user_id = u.user_id 
+                WHERE u.user_id = ?";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$user_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting admin profile: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function changePassword($user_id, $currentPassword, $newPassword)
+    {
+        try {
+            // Get current password from database
+            $stmt = $this->db->prepare("SELECT password FROM users WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                return ['success' => false, 'message' => 'User not found'];
+            }
+
+            // Verify current password
+            if (!password_verify($currentPassword, $user['password'])) {
+                return ['success' => false, 'message' => 'Current password is incorrect'];
+            }
+
+            // Check if new password is different from current
+            if (password_verify($newPassword, $user['password'])) {
+                return ['success' => false, 'message' => 'New password must be different from current password'];
+            }
+
+            // Hash new password
+            $hashedNewPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+            // Update password in database
+            $stmt = $this->db->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+            $result = $stmt->execute([$hashedNewPassword, $user_id]);
+
+            if ($result) {
+                return ['success' => true, 'message' => 'Password updated successfully'];
+            } else {
+                return ['success' => false, 'message' => 'Failed to update password'];
+            }
+        } catch (PDOException $e) {
+            error_log("Admin Change Password Error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'An error occurred while updating password'];
+        }
+    }
 }

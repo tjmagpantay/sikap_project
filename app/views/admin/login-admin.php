@@ -77,7 +77,6 @@ include_once __DIR__ . '/components/navbar-admin.php';
             <?php if ($isLocked): ?>
                 <div class="p-3 mt-4 border border-yellow-200 rounded-md bg-yellow-50">
                     <div class="flex items-center">
-                        <i class="mr-2 text-yellow-600 fas fa-lock"></i>
                         <p class="text-sm text-yellow-700">
                             Account temporarily locked due to multiple failed attempts. Try again in 5 minutes.
                         </p>
@@ -301,3 +300,35 @@ include_once __DIR__ . '/components/navbar-admin.php';
         }
     });
 </script>
+
+<style>
+/* Simple Admin Login SweetAlert Styles */
+.admin-login-popup {
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    padding: 24px 16px !important;
+}
+
+.swal2-title {
+    font-size: 1.125rem !important; /* text-lg */
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.swal2-html-container {
+    font-size: 0.875rem !important; /* text-sm */
+    color: #6b7280 !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-confirm {
+    background-color: #092C4C !important;
+    padding: 8px 16px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+.swal2-confirm:hover {
+    background-color: rgba(9, 44, 76, 0.9) !important;
+}
+</style>

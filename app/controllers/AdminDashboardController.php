@@ -1118,4 +1118,103 @@ class AdminDashboardController
 
         exit;
     }
+
+    public function settings()
+    {
+        // Check if user is logged in and is admin
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        try {
+            // Get admin data using the model
+            $admin = $this->adminModel->getAdminProfile($_SESSION['user_id']);
+
+            if (!$admin) {
+                // Fallback if admin data not found
+                $admin = [
+                    'admin_name' => $_SESSION['admin_name'] ?? 'Admin User',
+                    'email' => $_SESSION['email'] ?? 'admin@example.com',
+                    'createdAt' => date('Y-m-d H:i:s'),
+                    'updatedAt' => date('Y-m-d H:i:s')
+                ];
+            }
+
+            // Set error/success messages
+            $error = $_GET['error'] ?? '';
+            $success = $_GET['success'] ?? '';
+        } catch (Exception $e) {
+            error_log('Error in admin settings: ' . $e->getMessage());
+
+            // Fallback admin data
+            $admin = [
+                'admin_name' => $_SESSION['admin_name'] ?? 'Admin User',
+                'email' => $_SESSION['email'] ?? 'admin@example.com',
+                'createdAt' => date('Y-m-d H:i:s'),
+                'updatedAt' => date('Y-m-d H:i:s')
+            ];
+
+            $error = 'Error loading admin data';
+            $success = '';
+        }
+
+        include __DIR__ . '/../views/admin/dashboard.php';
+    }
+
+    public function changePassword()
+    {
+        // This method handles the AJAX password change request
+        header('Content-Type: application/json');
+
+        // Check if user is logged in and is admin
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $currentPassword = $_POST['current_password'] ?? '';
+                $newPassword = $_POST['new_password'] ?? '';
+                $confirmPassword = $_POST['confirm_password'] ?? '';
+
+                // Validation
+                if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                    echo json_encode(['success' => false, 'message' => 'All fields are required']);
+                    exit;
+                }
+
+                if ($newPassword !== $confirmPassword) {
+                    echo json_encode(['success' => false, 'message' => 'New passwords do not match']);
+                    exit;
+                }
+
+                if (strlen($newPassword) < 8) {
+                    echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters long']);
+                    exit;
+                }
+
+                if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+                    echo json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, and one number']);
+                    exit;
+                }
+
+                // Use the admin model to handle password change
+                $result = $this->adminModel->changePassword($_SESSION['user_id'], $currentPassword, $newPassword);
+
+                if ($result['success']) {
+                    echo json_encode(['success' => true, 'message' => $result['message']]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => $result['message']]);
+                }
+            } catch (Exception $e) {
+                error_log("Admin Change Password Error: " . $e->getMessage());
+                echo json_encode(['success' => false, 'message' => 'An error occurred while updating password']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        }
+        exit;
+    }
 }

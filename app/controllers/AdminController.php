@@ -36,9 +36,16 @@ class AdminController
                 include __DIR__ . '/../views/admin/login-admin.php';
                 echo "<script>
                 Swal.fire({
-                    icon: 'error',
                     title: 'Access Blocked',
-                    text: '" . addslashes($popupMessage) . "'
+                    text: '" . addslashes($popupMessage) . "',
+                    confirmButtonText: 'Understood',
+                    confirmButtonColor: '#092C4C',
+                    customClass: {
+                        title: 'text-lg font-semibold',
+                        confirmButton: 'bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm',
+                        popup: 'admin-login-popup rounded-xl shadow-lg',
+                        htmlContainer: 'text-sm leading-relaxed'
+                    }
                 });
             </script>";
                 return;
@@ -81,15 +88,23 @@ class AdminController
 
         include __DIR__ . '/../views/admin/login-admin.php';
 
+        // Replace the existing SweetAlert code with this version (no icon):
+
         if (!empty($popupMessage)) {
             echo "<script>
             Swal.fire({
-                icon: 'error',
                 title: 'Login Failed',
                 text: '" . addslashes($popupMessage) . "',
-                confirmButtonColor: '#2563eb'
+                confirmButtonText: 'Try Again',
+                confirmButtonColor: '#092C4C',
+                customClass: {
+                    title: 'text-lg font-semibold',
+                    confirmButton: 'bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm',
+                    popup: 'admin-login-popup rounded-xl shadow-lg',
+                    htmlContainer: 'text-sm leading-relaxed'
+                }
             });
-        </script>";
+            </script>";
         }
     }
 
@@ -220,12 +235,11 @@ class AdminController
                             $status,
                             $notes
                         );
-
                     } catch (Exception $e) {
                         error_log("Error sending accreditation status notification: " . $e->getMessage());
                         // Don't fail the status update if notification fails
                     }
-                } 
+                }
 
                 if ($syncResult) {
                     $_SESSION['success'] = "Accreditation status successfully updated to {$statusText}. Employer status has been synchronized and notification sent.";
@@ -549,6 +563,77 @@ class AdminController
         }
     }
 
+    // Add these methods to your existing AdminController class
+
+    public function settings()
+    {
+        // Check admin authentication
+        if (!$this->isAdminLoggedIn()) {
+            header('Location: ?page=admin-login');
+            exit;
+        }
+
+        // Get admin data using the model
+        $admin = $this->adminModel->getAdminProfile($_SESSION['user_id']);
+
+        include __DIR__ . '/../views/admin/settings-admin.php';
+    }
+
+    public function changePassword()
+    {
+        // This method handles the AJAX password change request
+        header('Content-Type: application/json');
+
+        // Check if user is logged in and is admin
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $currentPassword = $_POST['current_password'] ?? '';
+                $newPassword = $_POST['new_password'] ?? '';
+                $confirmPassword = $_POST['confirm_password'] ?? '';
+
+                // Validation
+                if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                    echo json_encode(['success' => false, 'message' => 'All fields are required']);
+                    exit;
+                }
+
+                if ($newPassword !== $confirmPassword) {
+                    echo json_encode(['success' => false, 'message' => 'New passwords do not match']);
+                    exit;
+                }
+
+                if (strlen($newPassword) < 8) {
+                    echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters long']);
+                    exit;
+                }
+
+                if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+                    echo json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, and one number']);
+                    exit;
+                }
+
+                // Use the admin model to handle password change
+                $result = $this->adminModel->changePassword($_SESSION['user_id'], $currentPassword, $newPassword);
+
+                if ($result['success']) {
+                    echo json_encode(['success' => true, 'message' => $result['message']]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => $result['message']]);
+                }
+            } catch (Exception $e) {
+                error_log("Admin Change Password Error: " . $e->getMessage());
+                echo json_encode(['success' => false, 'message' => 'An error occurred while updating password']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        }
+        exit;
+    }
     private function isAdminLoggedIn()
     {
         return isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin';

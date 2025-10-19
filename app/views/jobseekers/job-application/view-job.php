@@ -62,7 +62,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                         }
                                         ?>
                                         <a href="?page=view-employer-profile&employer_id=<?php echo $job['employer_id']; ?>&job_id=<?php echo $job['job_id']; ?>&job_title=<?php echo urlencode($job['job_title']); ?>"
-                                            class="text-sm transition-colors  text-primary hover:text-secondary hover:underline">
+                                            class="text-sm transition-colors text-primary hover:text-secondary hover:underline">
                                             <?php echo htmlspecialchars($companyName); ?>
                                         </a>
                                         <!-- Company Stats -->
@@ -755,8 +755,8 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                                 </p>
                                             </div>
                                         <?php elseif ($applicationStatus === 'rejected'): ?>
-                                            <div class="p-3 mb-4 border border-red-200 rounded-lg bg-red-50">
-                                                <p class="text-xs text-red-800">
+                                            <div class="p-3 mb-4 border border-gray-200 rounded-lg ">
+                                                <p class="text-xs text-gray-600">
 
                                                     Thank you for your interest. Unfortunately, you were not selected for this position. Keep applying to other opportunities!
                                                 </p>
@@ -782,7 +782,7 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
                                                         echo 'text-white bg-primary';
                                                         break;
                                                     case 'rejected':
-                                                        echo 'text-red-600 bg-red-100 hover:bg-red-200';
+                                                        echo 'text-white bg-primary';
                                                         break;
                                                     default:
                                                         echo 'text-gray-600 bg-gray-100 hover:bg-gray-200';
@@ -889,11 +889,6 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php'; ?>
 
                         <!-- Quick Actions -->
                         <div class="space-y-3">
-                            <button onclick="window.print()"
-                                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                                <i class="mr-2 fas fa-print"></i>
-                                Print Job Details
-                            </button>
 
                             <button onclick="navigator.share ? navigator.share({title: '<?php echo htmlspecialchars($job['job_title']); ?>', url: window.location.href}) : alert('Share feature not supported')"
                                 class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-md hover:bg-gray-50">
