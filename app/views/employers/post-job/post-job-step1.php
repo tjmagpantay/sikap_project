@@ -389,11 +389,11 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                         <input id="pay_range" name="pay_range" type="text"
                             maxlength="50"
                             value="<?php echo htmlspecialchars($jobData['pay_range'] ?? $_POST['pay_range'] ?? ''); ?>"
-                            placeholder="e.g., 20000 - 40000"
+                            placeholder="e.g., 20,000 - 40,000"
                             class="w-full h-12 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                         <div id="pay-range-error" class="hidden mt-1 text-xs text-red-600"></div>
                         <div class="mt-1 text-xs text-gray-400">
-                            Format: minimum - maximum (numbers only)
+                            Format: minimum - maximum 
                         </div>
                     </div>
                 </div>
@@ -726,17 +726,30 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     return false;
                 }
 
-                // Check format: number - number
-                const rangeRegex = /^\d+\s*-\s*\d+$/;
+                // Updated regex to accept both comma and non-comma values
+                // Matches patterns like: 20000-40000, 20,000-40,000, 20000 - 40000, 20,000 - 40,000
+                const rangeRegex = /^[\d,]+\s*-\s*[\d,]+$/;
 
                 if (!rangeRegex.test(payRangeValue)) {
-                    showError(payRange, errorElement, 'Pay range format should be: minimum - maximum (e.g., 20000 - 40000)');
+                    showError(payRange, errorElement, 'Pay range format should be: minimum - maximum (e.g., 20000 - 40000 or 20,000 - 40,000)');
                     return false;
                 }
 
-                const parts = payRangeValue.split('-').map(part => parseInt(part.trim()));
+                // Extract numbers by removing commas and splitting by dash
+                const parts = payRangeValue.split('-').map(part => {
+                    // Remove commas and any spaces, then convert to integer
+                    const cleanNumber = part.trim().replace(/,/g, '');
+                    return parseInt(cleanNumber);
+                });
+
                 const min = parts[0];
                 const max = parts[1];
+
+                // Check if both parts are valid numbers
+                if (isNaN(min) || isNaN(max)) {
+                    showError(payRange, errorElement, 'Please enter valid numbers for pay range.');
+                    return false;
+                }
 
                 if (min >= max) {
                     showError(payRange, errorElement, 'Maximum pay must be greater than minimum pay.');
