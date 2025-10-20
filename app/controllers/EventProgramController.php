@@ -19,34 +19,17 @@ class EventProgramController
 
     private function checkAdminAuth()
     {
-        // Support both session variable names
-        $isAdminLoggedIn = (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) ||
-            (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin');
-
-        if (!$isAdminLoggedIn) {
+        if (!isset($_SESSION['admin_id'])) {
             header('Location: index.php?page=admin-login');
             exit;
         }
     }
 
-    public function index()
-    {
-        $this->checkAdminAuth(); // Replace the old auth check
-        $events = $this->model->getAllEvents();
-        include __DIR__ . '/../views/admin/events/event.php';
-    }
-
-    public function create()
-    {
-        $this->checkAdminAuth(); // Replace the old auth check
-        include __DIR__ . '/../views/admin/events/create.php';
-    }
-
     public function store()
     {
-        // Validate inputs
+        // Validate inputs (description optional)
         if (
-            empty($_POST['title']) || empty($_POST['description']) ||
+            empty($_POST['title']) ||
             empty($_POST['type']) || empty($_POST['time_start']) ||
             empty($_POST['time_end']) || empty($_POST['status'])
         ) {
@@ -82,57 +65,55 @@ class EventProgramController
         // Only allow valid types
         $valid_types = ['program', 'jobfair', 'local recruitment'];
         $type = in_array($_POST['type'], $valid_types) ? $_POST['type'] : 'program';
+        $title = trim($_POST['title']);
+        $description = isset($_POST['description']) ? trim($_POST['description']) : '';
+        $status = trim($_POST['status']);
+
+        // Normalize datetime-local values (YYYY-MM-DDTHH:MM) to MySQL DATETIME
+        $timeStartRaw = trim($_POST['time_start']);
+        $timeEndRaw = trim($_POST['time_end']);
+        $time_start = str_replace('T', ' ', $timeStartRaw);
+        $time_end = str_replace('T', ' ', $timeEndRaw);
+        // append seconds if missing
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_start)) $time_start .= ':00';
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_end)) $time_end .= ':00';
+
         $eventId = $this->model->createEvent(
-            $_POST['title'],
-            $_POST['description'],
+            $title,
+            $description,
             $type,
             $image_path,
-            $_POST['time_start'],
-            $_POST['time_end'],
-            $_POST['status']
+            $time_start,
+            $time_end,
+            $status
         );
 
         if ($eventId) {
-            // Event was created successfully
+            // Event created successfully; send notifications only on create when status is 'show'
             error_log("✅ Event created successfully with ID: " . $eventId);
 
-            error_log("🔍 EventProgramController: Created event ID: $eventId, Status: " . $_POST['status']);
-
-            // Trigger notifications if event is visible
-            if ($_POST['status'] === 'show') {
+            if ($status === 'show') {
                 try {
                     // Notify jobseekers
-                    error_log("🔔 EventProgramController: Starting jobseeker notifications for event ID: $eventId");
                     $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($eventId);
-
                     if ($jobseekerNotificationResult) {
-                        error_log("✅ Jobseeker program notifications sent for event ID: $eventId");
+                        error_log("✅ Jobseeker notifications sent for event ID: $eventId");
                     } else {
-                        error_log("⚠️ Jobseeker program notifications may have failed for event ID: $eventId");
+                        error_log("⚠️ Failed to send jobseeker notifications for event ID: $eventId");
                     }
 
-                    // Notify employers using the model method
-                    error_log("🔔 EventProgramController: Starting employer notifications for event ID: $eventId");
-
-                    // Check if the method exists first
-                    if (!method_exists($this->model, 'notifyEmployersAboutNewProgram')) {
-                        error_log("❌ EventProgramController: Method notifyEmployersAboutNewProgram does not exist in EventProgram model");
-                    } else {
-                        error_log("✅ EventProgramController: Method notifyEmployersAboutNewProgram exists, calling it...");
+                    // Notify employers
+                    if (method_exists($this->model, 'notifyEmployersAboutNewProgram')) {
                         $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($eventId);
-
                         if ($employerNotificationResult) {
-                            error_log("✅ Employer program notifications sent for event ID: $eventId");
+                            error_log("✅ Employer notifications sent for event ID: $eventId");
                         } else {
-                            error_log("⚠️ Employer program notifications may have failed for event ID: $eventId");
+                            error_log("⚠️ Failed to send employer notifications for event ID: $eventId");
                         }
                     }
                 } catch (Exception $e) {
-                    error_log("❌ EventProgramController: Failed to send program notifications: " . $e->getMessage());
-                    error_log("❌ EventProgramController: Stack trace: " . $e->getTraceAsString());
+                    error_log("❌ Failed to send notifications for event ID $eventId: " . $e->getMessage());
                 }
-            } else {
-                error_log("ℹ️ EventProgramController: Event status is '{$_POST['status']}', not sending notifications");
             }
 
             header('Location: index.php?page=admin-events&success=Event created successfully');
@@ -154,9 +135,9 @@ class EventProgramController
 
     public function update($id)
     {
-        // Validate inputs
+        // Validate inputs for update (description optional)
         if (
-            empty($_POST['title']) || empty($_POST['description']) ||
+            empty($_POST['title']) ||
             empty($_POST['type']) || empty($_POST['time_start']) ||
             empty($_POST['time_end']) || empty($_POST['status'])
         ) {
@@ -203,16 +184,35 @@ class EventProgramController
         // Only allow valid types
         $valid_types = ['program', 'jobfair', 'local recruitment'];
         $type = in_array($_POST['type'], $valid_types) ? $_POST['type'] : 'program';
+        $title = trim($_POST['title']);
+        $description = isset($_POST['description']) ? trim($_POST['description']) : $event['description'];
+        $status = trim($_POST['status']);
+
+        // Normalize datetimes
+        $timeStartRaw = trim($_POST['time_start']);
+        $timeEndRaw = trim($_POST['time_end']);
+        $time_start = str_replace('T', ' ', $timeStartRaw);
+        $time_end = str_replace('T', ' ', $timeEndRaw);
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_start)) $time_start .= ':00';
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_end)) $time_end .= ':00';
+
+        // Log incoming values to help debugging (development only)
+        error_log("🔧 EventProgramController::update - incoming: id=$id, title='" . $title . "', type='" . $type . "', status='" . $status . "', time_start='" . $time_start . "', time_end='" . $time_end . "'");
+
         $success = $this->model->updateEvent(
             $id,
-            $_POST['title'],
-            $_POST['description'],
+            $title,
+            $description,
             $type,
             $image_path,
-            $_POST['time_start'],
-            $_POST['time_end'],
-            $_POST['status']
+            $time_start,
+            $time_end,
+            $status
         );
+
+        error_log("🔧 EventProgramController::update - model->updateEvent returned: " . var_export($success, true));
+        $after = $this->model->getEventById($id);
+        error_log("🔍 EventProgramController::update - DB row after update: " . json_encode($after));
 
         if ($success) {
             // Trigger notifications if event status changed to 'show'

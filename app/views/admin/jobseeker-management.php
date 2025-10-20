@@ -102,7 +102,7 @@
                     id="searchInput"
                     placeholder="Search"
                     class="w-full px-4 py-3 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"
-                    onkeyup="filterNavigation()">
+                    oninput="applyFilters()">
                 <svg class="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 pointer-events-none right-3 top-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -113,9 +113,9 @@
 
         <!-- Status Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Status' }">
-            <button @click="open = !open"
+                <button @click="open = !open"
                 class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <span x-text="selected" class="truncate"></span>
+                <span x-text="selected" data-default="All Status" class="truncate"></span>
                 <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
             </button>
             <div x-show="open" @click.away="open = false"
@@ -133,9 +133,9 @@
 
         <!-- Location Filter (Expanded width) -->
         <div class="relative flex-1 min-w-32" x-data="{ open: false, selected: 'All Locations' }">
-            <button @click="open = !open"
+                <button @click="open = !open"
                 class="flex items-center justify-between w-full px-4 py-3 text-sm border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <span x-text="selected" class="truncate"></span>
+                <span x-text="selected" data-default="All Locations" class="truncate"></span>
                 <i class="flex-shrink-0 ml-2 text-gray-400 fas fa-chevron-down" :class="{ 'rotate-180': open }"></i>
             </button>
             <div x-show="open" @click.away="open = false"
@@ -307,28 +307,48 @@
     let currentPage = 1;
     const itemsPerPage = 10;
     let filteredRows = [];
+    const currentFilters = {
+        search: '',
+        status: '',
+        location: ''
+    };
 
     // Apply all filters
     function applyFilters() {
-        console.log('Running search...');
-        const rows = document.querySelectorAll('#jobseekersTableBody tr');
+        const rows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
+
+        // Update current search from input
         const searchInput = document.getElementById('searchInput');
-        const searchTerm = searchInput?.value.toLowerCase() || '';
+        currentFilters.search = searchInput?.value.toLowerCase().trim() || '';
 
-        filteredRows = [];
-
-        rows.forEach(row => {
+        filteredRows = rows.filter(row => {
             const cells = row.querySelectorAll('td');
-            const rowText = Array.from(cells)
-                .slice(0, -1) // Exclude the last cell (actions)
-                .map(cell => cell.textContent.toLowerCase())
-                .join(' ');
+            if (!cells || cells.length === 0) return false;
 
-            const showRow = searchTerm === '' || rowText.includes(searchTerm);
+            // Build searchable text from first 5 columns (exclude actions)
+            const rowText = Array.from(cells).slice(0, 6).map(cell => cell.textContent.toLowerCase()).join(' ');
 
-            if (showRow) {
-                filteredRows.push(row);
+            // Search match
+            const matchesSearch = !currentFilters.search || rowText.includes(currentFilters.search);
+
+            // Status filter (td 6)
+            const statusCell = row.querySelector('td:nth-child(6)');
+            const statusText = statusCell ? statusCell.textContent.trim().toLowerCase() : '';
+            const matchesStatus = !currentFilters.status || statusText.includes(currentFilters.status);
+
+            // Location filter (td 4)
+            const addressCell = row.querySelector('td:nth-child(4)');
+            const addressText = addressCell ? addressCell.textContent.toLowerCase() : '';
+            let matchesLocation = true;
+            if (currentFilters.location) {
+                if (currentFilters.location === 'rosario') {
+                    matchesLocation = addressText.includes('rosario');
+                } else if (currentFilters.location === 'others') {
+                    matchesLocation = !addressText.includes('rosario');
+                }
             }
+
+            return matchesSearch && matchesStatus && matchesLocation;
         });
 
         // Reset to page 1 when filtering
@@ -515,37 +535,50 @@
 
     // Filter by status
     function filterByStatus(status) {
-        const rows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
-
-        filteredRows = rows.filter(row => {
-            const statusCell = row.querySelector('td:nth-child(6)');
-            const currentStatus = statusCell.textContent.trim().toLowerCase();
-
-            return !status || currentStatus.includes(status.toLowerCase());
-        });
-
-        currentPage = 1;
-        updatePagination();
-        updateCounts();
+        currentFilters.status = status ? status.toLowerCase() : '';
+        applyFilters();
     }
 
     // Filter by location
     function filterByLocation(location) {
-        const rows = Array.from(document.querySelectorAll('#jobseekersTableBody tr'));
+        // location expected values: 'all', 'rosario', 'others'
+        if (!location || location === 'all') {
+            currentFilters.location = '';
+        } else if (location === 'rosario') {
+            currentFilters.location = 'rosario';
+        } else if (location === 'others') {
+            currentFilters.location = 'others';
+        }
+        applyFilters();
+    }
 
-        filteredRows = rows.filter(row => {
-            const addressCell = row.querySelector('td:nth-child(4)');
-            const address = addressCell.textContent.toLowerCase();
+    function clearAllFilters() {
+        // Clear search input
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
 
-            if (location === 'all') return true;
-            if (location === 'rosario') return address.includes('rosario');
-            if (location === 'others') return !address.includes('rosario');
-            return true;
-        });
+        // Reset filters
+        currentFilters.search = '';
+        currentFilters.status = '';
+        currentFilters.location = '';
+
+        // Reset dropdown UI (Alpine.js) if present
+        setTimeout(() => {
+            const dropdowns = document.querySelectorAll('[x-data]');
+            dropdowns.forEach(dd => {
+                if (dd._x_dataStack && dd._x_dataStack[0]) {
+                    if (dd._x_dataStack[0].selected && dd._x_dataStack[0].selected.includes('Status')) dd._x_dataStack[0].selected = 'All Status';
+                    if (dd._x_dataStack[0].selected && dd._x_dataStack[0].selected.includes('Location')) dd._x_dataStack[0].selected = 'All Locations';
+                }
+            });
+            // Also reset any visible span labels that use x-text by checking data-default
+            document.querySelectorAll('[data-default]').forEach(span => {
+                span.textContent = span.getAttribute('data-default');
+            });
+        }, 50);
 
         currentPage = 1;
-        updatePagination();
-        updateCounts();
+        applyFilters();
     }
 
     // Update jobseeker status

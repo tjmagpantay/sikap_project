@@ -11,10 +11,10 @@
             <?php echo htmlspecialchars($_GET['error']); ?>
         </div>
     <?php endif; ?>
-
+ 
     <!-- Form Container -->
     <div class="max-w-3xl p-6 bg-white rounded-lg shadow">
-        <form action="index.php?page=admin-event-edit&id=<?php echo $event['event_id']; ?>"
+        <form action="index.php?page=admin-event-update&id=<?php echo $event['event_id']; ?>"
             method="POST"
             enctype="multipart/form-data"
             id="event-form">
@@ -78,7 +78,7 @@
                                 </button>
                             </div>
                         </div>
-                        <input type="hidden" id="type" name="type" :value="selectedValue">
+                        <input type="hidden" id="type" name="type" :value="selectedValue" value="<?php echo htmlspecialchars($event['type']); ?>">
                     </div>
                     <div id="type-error" class="hidden mt-1 text-xs text-red-600"></div>
                 </div>
@@ -116,7 +116,7 @@
                                 </button>
                             </div>
                         </div>
-                        <input type="hidden" id="status" name="status" :value="selectedValue">
+                        <input type="hidden" id="status" name="status" :value="selectedValue" value="<?php echo htmlspecialchars($event['status']); ?>">
                     </div>
                     <div id="status-error" class="hidden mt-1 text-xs text-red-600"></div>
                 </div>
