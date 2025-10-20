@@ -1,4 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="/sikap/public/assets/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./assets/images/sikap-logo.png">
+    <title>Admin Registration - SIKAP</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="font-inter">
+
 <div class="flex flex-col justify-center min-h-screen py-12 bg-gray-900 sm:px-6 lg:px-8">
+    <!-- Developer Warning Banner -->
+    <div class="mb-4 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="px-4 py-3 text-yellow-800 border border-yellow-300 rounded-md bg-yellow-50">
+            <div class="flex items-center">
+                <i class="mr-2 fas fa-exclamation-triangle"></i>
+                <span class="text-sm font-medium">Developer Access Only</span>
+            </div>
+            <p class="mt-1 text-xs">This page is restricted to development environments only.</p>
+        </div>
+    </div>
+
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
             <div class="flex justify-center mb-4">
@@ -15,24 +40,6 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-            <?php if (!empty($error)): ?>
-                <div class="px-4 py-3 mb-4 text-red-600 border border-red-200 rounded-md bg-red-50">
-                    <div class="flex items-center">
-                        <i class="mr-2 fas fa-exclamation-triangle"></i>
-                        <?php echo htmlspecialchars($error); ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($success)): ?>
-                <div class="px-4 py-3 mb-4 text-green-600 border border-green-200 rounded-md bg-green-50">
-                    <div class="flex items-center">
-                        <i class="mr-2 fas fa-check-circle"></i>
-                        <?php echo htmlspecialchars($success); ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-
             <form class="space-y-6" method="POST" action="?page=admin-signup">
                 <div>
                     <label for="admin_name" class="block text-sm font-medium text-gray-700">
@@ -68,10 +75,13 @@
                     <div class="relative mt-1">
                         <input id="password" name="password" type="password" required
                             placeholder="Create admin password"
-                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            class="block w-full px-3 py-2 pr-10 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                         <button type="button" onclick="togglePassword('password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye" id="toggleIcon1"></i>
                         </button>
+                    </div>
+                    <div class="mt-1 text-xs text-gray-500">
+                        Password must be at least 8 characters with uppercase, lowercase, and number
                     </div>
                 </div>
 
@@ -83,7 +93,7 @@
                     <div class="relative mt-1">
                         <input id="confirm_password" name="confirm_password" type="password" required
                             placeholder="Confirm admin password"
-                            class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            class="block w-full px-3 py-2 pr-10 placeholder-gray-400 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-green-500 focus:border-green-500">
                         <button type="button" onclick="togglePassword('confirm_password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye" id="toggleIcon2"></i>
                         </button>
@@ -142,4 +152,32 @@
             this.setCustomValidity('');
         }
     });
+
+    // Show success/error messages
+    <?php if (!empty($error)): ?>
+        Swal.fire({
+            title: 'Registration Failed',
+            text: '<?php echo addslashes($error); ?>',
+            icon: 'error',
+            confirmButtonText: 'Try Again',
+            confirmButtonColor: '#dc2626'
+        });
+    <?php endif; ?>
+
+    <?php if (!empty($success)): ?>
+        Swal.fire({
+            title: 'Success!',
+            text: '<?php echo addslashes($success); ?>',
+            icon: 'success',
+            confirmButtonText: 'Go to Login',
+            confirmButtonColor: '#16a34a'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '?page=admin-login';
+            }
+        });
+    <?php endif; ?>
 </script>
+
+</body>
+</html>

@@ -360,4 +360,41 @@ class Admin
             return ['success' => false, 'message' => 'An error occurred while updating password'];
         }
     }
+
+
+    public function createAdmin($adminName, $email, $password)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // First create user record
+            require_once __DIR__ . '/User.php';
+            $userModel = new User();
+
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            // Create user with role_id = 1 (admin role)
+            $userId = $userModel->createWithRole($email, $hashedPassword, 1, 'active');
+
+            if (!$userId) {
+                throw new Exception('Failed to create user record');
+            }
+
+            // FIXED: Remove email column and use correct column names from your DB schema
+            $sql = "INSERT INTO admin (user_id, admin_name, createdAt, updatedAt) VALUES (?, ?, NOW(), NOW())";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$userId, $adminName]);
+
+            if (!$result) {
+                throw new Exception('Failed to create admin record');
+            }
+
+            $this->db->commit();
+            return ['success' => true, 'message' => 'Admin account created successfully'];
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log("Error creating admin: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Failed to create admin account: ' . $e->getMessage()];
+        }
+    }
 }

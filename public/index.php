@@ -341,6 +341,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $controller->changePassword();
             break;
 
+        case 'admin-signup':
+            require_once __DIR__ . '/../app/controllers/AdminController.php';
+            $controller = new AdminController();
+            $controller->signup();
+            break;
+
+
         // Admin Accreditation Routes
         case 'upload-business-logo':
             require_once __DIR__ . '/../app/controllers/EmployerController.php';

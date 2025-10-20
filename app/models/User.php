@@ -5,6 +5,7 @@ class User
 {
     private $db;
 
+    // Add role constants
     const ROLE_ADMIN = 1;
     const ROLE_EMPLOYER = 2;
     const ROLE_JOBSEEKER = 3;
@@ -53,6 +54,40 @@ class User
             return $user_id;
         } catch (Exception $e) {
             $this->db->rollback();
+            return false;
+        }
+    }
+
+    public function createWithRole($email, $password, $role_id, $status = 'active')
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Create user record
+            $sql = "INSERT INTO users (email, password, status, created_at) VALUES (?, ?, ?, NOW())";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$email, $password, $status]);
+
+            if (!$result) {
+                throw new Exception('Failed to create user');
+            }
+
+            $userId = $this->db->lastInsertId();
+
+            // Create user_role record
+            $sql = "INSERT INTO user_roles (user_id, role_id, created_at) VALUES (?, ?, NOW())";
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$userId, $role_id]);
+
+            if (!$result) {
+                throw new Exception('Failed to assign user role');
+            }
+
+            $this->db->commit();
+            return $userId;
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log("Error creating user with role: " . $e->getMessage());
             return false;
         }
     }

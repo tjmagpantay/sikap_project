@@ -17,6 +17,82 @@ class AdminController
         $this->jobPostModel = new JobPost();
     }
 
+    public function signup()
+    {
+        // Developer access control - only allow on localhost or specific IPs
+        $allowedIPs = ['127.0.0.1', '::1', 'localhost'];
+        $clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        // Check if accessing from allowed environment
+        if (!in_array($clientIP, $allowedIPs) && !$this->isDevelopmentEnvironment()) {
+            http_response_code(403);
+            echo "<h1>403 Forbidden</h1><p>Admin registration is restricted to developers only.</p>";
+            exit;
+        }
+
+        $error = '';
+        $success = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $adminName = trim($_POST['admin_name'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            // Validation
+            if (empty($adminName) || empty($email) || empty($password) || empty($confirmPassword)) {
+                $error = 'Please fill in all fields.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error = 'Please enter a valid email address.';
+            } elseif (strlen($password) < 8) {
+                $error = 'Password must be at least 8 characters long.';
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $password)) {
+                $error = 'Password must contain at least one uppercase letter, one lowercase letter, and one number.';
+            } elseif ($password !== $confirmPassword) {
+                $error = 'Passwords do not match.';
+            } else {
+                // Check if email already exists - FIXED: Use correct method name
+                require_once __DIR__ . '/../models/User.php';
+                $userModel = new User();
+                $existingUser = $userModel->findByEmail($email); // Fixed: was findByEmail
+
+                if ($existingUser) {
+                    $error = 'Email already exists in the system.';
+                } else {
+                    // Create the admin account
+                    $result = $this->adminModel->createAdmin($adminName, $email, $password);
+
+                    if ($result['success']) {
+                        $success = 'Admin account created successfully! You can now login.';
+                        // Clear form data
+                        $_POST = [];
+                    } else {
+                        $error = $result['message'] ?? 'Failed to create admin account.';
+                    }
+                }
+            }
+        }
+
+        include __DIR__ . '/../views/admin/signup-admin.php';
+    }
+
+    private function isDevelopmentEnvironment()
+    {
+        // Check for development environment indicators
+        $devIndicators = [
+            $_SERVER['SERVER_NAME'] === 'localhost',
+            $_SERVER['HTTP_HOST'] === 'localhost',
+            strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0,
+            $_SERVER['SERVER_NAME'] === '127.0.0.1',
+            isset($_SERVER['XAMPP_ROOT']), // XAMPP indicator
+            isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development'
+        ];
+
+        return in_array(true, $devIndicators);
+    }
+
+    // ...existing code...
+
     public function login()
     {
         if (!isset($_SESSION['login_attempts'])) {
