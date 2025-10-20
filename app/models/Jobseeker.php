@@ -49,6 +49,34 @@ class Jobseeker
         }
     }
 
+    public function hasPassword($user_id)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT password, auth_method
+            FROM users 
+            WHERE user_id = ?
+        ");
+            $stmt->execute([$user_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$result) {
+                return false;
+            }
+
+            // If it's a Google user, they don't have a "real" password
+            if ($result['auth_method'] === 'google') {
+                return false;
+            }
+
+            // Check if password exists and is not empty
+            return !empty($result['password']);
+        } catch (PDOException $e) {
+            error_log('Error checking password status: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function findByUserId($user_id)
     {
         $stmt = $this->db->prepare("

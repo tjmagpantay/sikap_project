@@ -360,7 +360,13 @@ $statusFilter = $_GET['status'] ?? null;
                                     <td class="px-6 py-5">
                                         <div>
                                             <div class="mb-1 text-sm font-medium text-gray-900">
-                                                <?php echo htmlspecialchars($job['job_title']); ?>
+                                                <!-- Enhanced title with forced wrapping like view-job.php -->
+                                                <div class="max-w-full overflow-hidden">
+                                                    <div class="max-w-full break-words overflow-wrap-anywhere word-break-break-all"
+                                                        title="<?php echo htmlspecialchars($job['job_title']); ?>">
+                                                        <?php echo htmlspecialchars($job['job_title']); ?>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="text-xs text-gray-500">
                                                 <?php echo ucfirst(str_replace('_', ' ', $job['job_type'])); ?>
@@ -520,9 +526,12 @@ $statusFilter = $_GET['status'] ?? null;
                         <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
                             <!-- Card Header -->
                             <div class="flex items-start justify-between p-4 pb-2">
-                                <div class="flex-1">
+                                <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
                                     <h3 class="text-lg font-semibold leading-tight text-gray-900">
-                                        <?php echo htmlspecialchars($job['job_title']); ?>
+                                        <!-- Enhanced title with truncation -->
+                                        <span class="block truncate" title="<?php echo htmlspecialchars($job['job_title']); ?>">
+                                            <?php echo htmlspecialchars($job['job_title']); ?>
+                                        </span>
                                     </h3>
                                     <p class="mt-1 text-sm text-gray-500">
                                         <?php echo ucfirst(str_replace('_', ' ', $job['job_type'])); ?>
@@ -622,107 +631,151 @@ $statusFilter = $_GET['status'] ?? null;
                                     </a>
                                 </div>
                             </div>
+                        <?php endforeach; ?>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+                    <?php endif; ?>
 
-            <!-- Empty State for Mobile -->
-            <?php if (empty($jobs)): ?>
-                <div class="px-6 py-16 text-center lg:hidden">
-                    <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full">
-                            <i class="text-2xl text-gray-400 fas fa-briefcase"></i>
-                        </div>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">No job posts yet</h3>
-                        <p class="max-w-sm mt-2 text-sm text-gray-500">
-                            Create your first job post to start attracting qualified candidates to your company.
-                        </p>
-                        <div class="mt-6">
-                            <a href="?page=post-job"
-                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                <i class="mr-2 fas fa-plus"></i>
-                                Post Your First Job
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200">
-                <?php if ($totalJobCount > 5): ?>
-                    <div class="flex flex-col items-center justify-center sm:flex-row">
-                        <!-- Pagination controls -->
-                        <nav class="flex mb-4 space-x-1 sm:mb-0" aria-label="Pagination">
-                            <!-- Previous Page -->
-                            <?php if ($hasPrevPage): ?>
-                                <a href="?page=dashboard&p=<?php echo $currentPage - 1; ?><?php echo $statusFilter ? '&status=' . $statusFilter : ''; ?>"
-                                    class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </a>
-                            <?php else: ?>
-                                <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </span>
-                            <?php endif; ?>
-
-                            <!-- Page Numbers -->
-                            <?php
-                            $startPage = max(1, $currentPage - 2);
-                            $endPage = min($totalPages, $currentPage + 2);
-
-                            // Preserve URL parameters
-                            $urlParams = $statusFilter ? '&status=' . urlencode($statusFilter) : '';
-
-                            for ($i = $startPage; $i <= $endPage; $i++):
-                            ?>
-                                <?php if ($i == $currentPage): ?>
-                                    <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white rounded bg-primary">
-                                        <?php echo sprintf('%02d', $i); ?>
-                                    </span>
-                                <?php else: ?>
-                                    <a href="?page=dashboard&p=<?php echo $i; ?><?php echo $urlParams; ?>"
-                                        class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 transition-colors duration-200 rounded hover:bg-gray-100">
-                                        <?php echo sprintf('%02d', $i); ?>
+                    <!-- Empty State for Mobile -->
+                    <?php if (empty($jobs)): ?>
+                        <div class="px-6 py-16 text-center lg:hidden">
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full">
+                                    <i class="text-2xl text-gray-400 fas fa-briefcase"></i>
+                                </div>
+                                <h3 class="mt-4 text-lg font-medium text-gray-900">No job posts yet</h3>
+                                <p class="max-w-sm mt-2 text-sm text-gray-500">
+                                    Create your first job post to start attracting qualified candidates to your company.
+                                </p>
+                                <div class="mt-6">
+                                    <a href="?page=post-job"
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <i class="mr-2 fas fa-plus"></i>
+                                        Post Your First Job
                                     </a>
-                                <?php endif; ?>
-                            <?php endfor; ?>
-
-                            <!-- Next Page -->
-                            <?php if ($hasNextPage): ?>
-                                <a href="?page=dashboard&p=<?php echo $currentPage + 1; ?><?php echo $urlParams; ?>"
-                                    class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
-                            <?php else: ?>
-                                <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </span>
-                            <?php endif; ?>
-                        </nav>
-
-                        <div class="text-sm text-center text-gray-700 sm:text-right sm:ml-4">
-                            Showing <?php echo (($currentPage - 1) * 5) + 1; ?> to <?php echo min($currentPage * 5, $totalJobCount); ?> of <?php echo $totalJobCount; ?> results
+                                </div>
+                            </div>
                         </div>
+                    <?php endif; ?>
+
+                    <!-- Pagination -->
+                    <div class="px-6 py-4 border-t border-gray-200">
+                        <?php if ($totalJobCount > 5): ?>
+                            <div class="flex flex-col items-center justify-center sm:flex-row">
+                                <!-- Pagination controls -->
+                                <nav class="flex mb-4 space-x-1 sm:mb-0" aria-label="Pagination">
+                                    <!-- Previous Page -->
+                                    <?php if ($hasPrevPage): ?>
+                                        <a href="?page=dashboard&p=<?php echo $currentPage - 1; ?><?php echo $statusFilter ? '&status=' . $statusFilter : ''; ?>"
+                                            class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </span>
+                                    <?php endif; ?>
+
+                                    <!-- Page Numbers -->
+                                    <?php
+                                    $startPage = max(1, $currentPage - 2);
+                                    $endPage = min($totalPages, $currentPage + 2);
+
+                                    // Preserve URL parameters
+                                    $urlParams = $statusFilter ? '&status=' . urlencode($statusFilter) : '';
+
+                                    for ($i = $startPage; $i <= $endPage; $i++):
+                                    ?>
+                                        <?php if ($i == $currentPage): ?>
+                                            <span class="flex items-center justify-center w-8 h-8 text-sm font-medium text-white rounded bg-primary">
+                                                <?php echo sprintf('%02d', $i); ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <a href="?page=dashboard&p=<?php echo $i; ?><?php echo $urlParams; ?>"
+                                                class="flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-700 transition-colors duration-200 rounded hover:bg-gray-100">
+                                                <?php echo sprintf('%02d', $i); ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+
+                                    <!-- Next Page -->
+                                    <?php if ($hasNextPage): ?>
+                                        <a href="?page=dashboard&p=<?php echo $currentPage + 1; ?><?php echo $urlParams; ?>"
+                                            class="flex items-center justify-center w-8 h-8 text-gray-700 transition-colors duration-200 rounded hover:text-gray-900 hover:bg-gray-100">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="flex items-center justify-center w-8 h-8 text-gray-400 opacity-50">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </span>
+                                    <?php endif; ?>
+                                </nav>
+
+                                <div class="text-sm text-center text-gray-700 sm:text-right sm:ml-4">
+                                    Showing <?php echo (($currentPage - 1) * 5) + 1; ?> to <?php echo min($currentPage * 5, $totalJobCount); ?> of <?php echo $totalJobCount; ?> results
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-sm text-center text-gray-500">
+                                Showing all <?php echo $totalJobCount; ?> job<?php echo $totalJobCount != 1 ? 's' : ''; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
-                <?php else: ?>
-                    <div class="text-sm text-center text-gray-500">
-                        Showing all <?php echo $totalJobCount; ?> job<?php echo $totalJobCount != 1 ? 's' : ''; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
+                </div>
         </div>
     </div>
-</div>
 
-<!-- Alpine.js -->
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+
+    <style>
+        /* Force text wrapping for long strings without spaces - Same as view-job.php */
+        .overflow-wrap-anywhere {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        /* Ensure container doesn't overflow */
+        .rounded-lg {
+            overflow: hidden;
+        }
+
+        /* Additional fallback for extremely long words */
+        .break-words {
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Prevent horizontal scrolling */
+        .word-break-break-all {
+            word-break: break-all;
+        }
+
+        /* Ensure max-width is respected */
+        .max-w-full {
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        /* Force table column width constraints */
+        .table-fixed {
+            table-layout: fixed;
+        }
+
+        /* Specific fix for table cells */
+        .table-fixed td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+    </style>

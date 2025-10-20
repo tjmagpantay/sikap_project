@@ -68,6 +68,24 @@ include_once __DIR__ . '/components/navbar-employer.php';
                     </button>
                 </div>
 
+                <!-- Information Message -->
+                <div class="pt-4 mt-4 ">
+                    <div class="p-4 rounded-lg bg-blue-50">
+                        <div class="flex items-start ">
+                            <div class="flex-shrink-0">
+                                <i class="w-5 h-5 text-blue-400 fas fa-info-circle"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-blue-800">Password Guidelines</h4>
+                                <p class="mt-1 text-sm text-blue-700">
+                                    For users who signed up with Google: You don’t have a password yet. Please go to Forgot Password to verify your account, receive an OTP, and set your password.
+                                    For all users: Use a strong password with at least 8 characters, including uppercase and lowercase letters, and numbers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Password Change Form (Hidden by default) -->
                 <div id="password-form" class="hidden pt-6 mt-4 border-t border-gray-200">
                     <form id="change-password-form" class="max-w-md mt-2 space-y-4">
