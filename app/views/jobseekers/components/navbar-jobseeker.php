@@ -595,8 +595,6 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           this.loading = true;
           this.error = null;
 
-          console.log('🔔 Jobseeker: Fetching notifications...');
-
           // FIXED: Use MVC controller endpoint instead of API folder
           const response = await fetch('?page=notifications-api&limit=5');
 
@@ -605,18 +603,14 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           }
 
           const data = await response.json();
-          console.log('✅ Jobseeker notifications data:', data);
 
           if (data.notifications) {
             this.notifications = data.notifications;
             this.unreadCount = data.unread_count || 0;
-            console.log(`📬 Jobseeker loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
           } else if (data.error) {
-            console.error('❌ API Error:', data.error);
             this.error = data.error;
           }
         } catch (error) {
-          console.error('❌ Error fetching notifications:', error);
           this.error = 'Failed to load notifications';
         } finally {
           this.loading = false;
@@ -625,7 +619,6 @@ if (!isset($jobseeker) || empty($jobseeker)) {
 
       async markAsRead(notificationId) {
         try {
-          console.log('📖 Marking notification as read:', notificationId);
 
           // FIXED: Use MVC controller endpoint
           const response = await fetch('?page=notifications-api', {
@@ -640,23 +633,20 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           });
 
           const data = await response.json();
-          console.log('Mark as read response:', data);
 
           if (data.success) {
-            console.log('✅ Successfully marked as read');
             await this.fetchNotifications();
           } else {
-            console.error('❌ Failed to mark as read:', data);
+            console.error(' Failed to mark as read:', data);
           }
         } catch (error) {
-          console.error('❌ Error marking notification as read:', error);
+          console.error(' Error marking notification as read:', error);
         }
       },
 
       async markAllAsRead() {
         try {
-          console.log('📖 Marking all notifications as read');
-
+          
           // FIXED: Use MVC controller endpoint
           const response = await fetch('?page=notifications-api', {
             method: 'POST',
@@ -669,21 +659,18 @@ if (!isset($jobseeker) || empty($jobseeker)) {
           });
 
           const data = await response.json();
-          console.log('Mark all as read response:', data);
 
           if (data.success) {
-            console.log('✅ Successfully marked all as read');
             await this.fetchNotifications();
           } else {
-            console.error('❌ Failed to mark all as read:', data);
+            console.error('Failed to mark all as read:', data);
           }
         } catch (error) {
-          console.error('❌ Error marking all notifications as read:', error);
+          console.error('Error marking all notifications as read:', error);
         }
       },
 
       async handleNotificationClick(notification) {
-        console.log('🔗 Clicked notification:', notification);
 
         // Mark as read if unread
         if (notification.status === 'unread') {

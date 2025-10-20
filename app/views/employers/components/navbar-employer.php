@@ -469,8 +469,6 @@
           this.loading = true;
           this.error = null;
 
-          console.log('🔔 Employer: Fetching notifications...');
-
           const response = await fetch('?page=notifications-api&limit=5');
 
           if (!response.ok) {
@@ -478,18 +476,16 @@
           }
 
           const data = await response.json();
-          console.log('✅ Employer notifications data:', data);
 
           if (data.success && data.notifications) {
             this.notifications = data.notifications;
             this.unreadCount = data.unread_count || 0;
-            console.log(`📬 Employer loaded ${this.notifications.length} notifications, ${this.unreadCount} unread`);
           } else if (data.error) {
-            console.error('❌ Employer API Error:', data.error);
+            console.error('Employer API Error:', data.error);
             this.error = data.error;
           }
         } catch (error) {
-          console.error('❌ Employer error fetching notifications:', error);
+          console.error('Employer error fetching notifications:', error);
           this.error = 'Failed to load notifications';
         } finally {
           this.loading = false;
@@ -498,7 +494,7 @@
 
       async markAsRead(notificationId) {
         try {
-          console.log('📖 Employer marking notification as read:', notificationId);
+          console.log('Employer marking notification as read:', notificationId);
 
           const response = await fetch('?page=notifications-api', {
             method: 'POST',
@@ -515,19 +511,19 @@
           console.log('Employer mark as read response:', data);
 
           if (data.success) {
-            console.log('✅ Employer successfully marked as read');
+            console.log('Employer successfully marked as read');
             await this.fetchNotifications();
           } else {
-            console.error('❌ Employer failed to mark as read:', data);
+            console.error('Employer failed to mark as read:', data);
           }
         } catch (error) {
-          console.error('❌ Employer error marking notification as read:', error);
+          console.error('Employer error marking notification as read:', error);
         }
       },
 
       async markAllAsRead() {
         try {
-          console.log('📖 Employer marking all notifications as read');
+          console.log('Employer marking all notifications as read');
 
           const response = await fetch('?page=notifications-api', {
             method: 'POST',
@@ -543,18 +539,17 @@
           console.log('Employer mark all as read response:', data);
 
           if (data.success) {
-            console.log('✅ Employer successfully marked all as read');
+            console.log('Employer successfully marked all as read');
             await this.fetchNotifications();
           } else {
-            console.error('❌ Employer failed to mark all as read:', data);
+            console.error('Employer failed to mark all as read:', data);
           }
         } catch (error) {
-          console.error('❌ Employer error marking all notifications as read:', error);
+          console.error('Employer error marking all notifications as read:', error);
         }
       },
 
       async handleNotificationClick(notification) {
-        console.log('🔗 Clicked notification:', notification);
 
         // Mark as read if unread
         if (notification.status === 'unread') {

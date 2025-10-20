@@ -20,7 +20,7 @@ class JobRecommendationService
         try {
             $command = sprintf(
                 'cd "%s" && python app.py recommendations %d %d 2>&1',
-                $this->pythonScriptPath,
+                dirname($this->pythonScriptPath),
                 intval($jobseeker_id),
                 intval($top_k)
             );
@@ -43,12 +43,10 @@ class JobRecommendationService
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return [
                     'success' => false,
-                    'error' => 'Invalid JSON response from recommendation engine',
-                    'raw_output' => $output
+                    'error' => 'Invalid JSON response from recommendation engine'
                 ];
             }
 
-            // UPDATED: Handle new algorithm response format
             if (isset($result['error'])) {
                 return [
                     'success' => false,
@@ -66,7 +64,6 @@ class JobRecommendationService
                 'jobs_after_filter' => $result['jobs_after_category_filter'] ?? 0,
                 'algorithm_version' => $result['algorithm_version'] ?? 'unknown',
                 'debug_info' => $result['debug_info'] ?? [],
-                // NEW: Enhanced metadata
                 'quality_metrics' => [
                     'avg_skill_overlap' => $result['debug_info']['avg_skill_overlap'] ?? 0,
                     'avg_skill_value' => $result['debug_info']['avg_specificity_score'] ?? 0,
@@ -83,7 +80,7 @@ class JobRecommendationService
     }
 
     /**
-     * Test Flask API connection (alternative approach - not used currently)
+     * Test Flask API connection
      */
     public function testFlaskConnection()
     {
@@ -148,9 +145,7 @@ class JobRecommendationService
     public function testPythonScript()
     {
         try {
-            $python_script = __DIR__ . '/../../python/job-recommendation-system/app.py';
-            $command = "python \"{$python_script}\" test 2>&1";
-
+            $command = "python \"{$this->pythonScriptPath}\" test 2>&1";
             $output = shell_exec($command);
 
             if ($output === null) {
@@ -168,8 +163,7 @@ class JobRecommendationService
 
             return [
                 'success' => false,
-                'error' => 'Python script returned invalid JSON',
-                'output' => $output
+                'error' => 'Python script returned invalid JSON'
             ];
         } catch (Exception $e) {
             return [
@@ -185,15 +179,11 @@ class JobRecommendationService
     public function testConnection()
     {
         try {
-            error_log("🔍 Testing Python script connection...");
-
-            $python_script = __DIR__ . '/../../python/job-recommendation-system/app.py';
-
             // Check if Python script exists
-            if (!file_exists($python_script)) {
+            if (!file_exists($this->pythonScriptPath)) {
                 return [
                     'success' => false,
-                    'message' => 'Python script not found at: ' . $python_script
+                    'message' => 'Python script not found'
                 ];
             }
 
@@ -214,24 +204,23 @@ class JobRecommendationService
             if (!$working_python) {
                 return [
                     'success' => false,
-                    'message' => 'No working Python executable found. Tried: ' . implode(', ', $python_executables)
+                    'message' => 'No working Python executable found'
                 ];
             }
 
             // Test Python script
             $command = sprintf(
                 'cd "%s" && %s app.py test 2>&1',
-                dirname($python_script),
+                dirname($this->pythonScriptPath),
                 $working_python
             );
 
-            error_log("🐍 Testing with command: {$command}");
             $output = shell_exec($command);
 
             if ($output === null) {
                 return [
                     'success' => false,
-                    'message' => 'Python script execution failed - shell_exec returned null'
+                    'message' => 'Python script execution failed'
                 ];
             }
 
@@ -250,8 +239,7 @@ class JobRecommendationService
             if (empty($json_line)) {
                 return [
                     'success' => false,
-                    'message' => 'No valid JSON response from Python script',
-                    'raw_output' => $output
+                    'message' => 'No valid JSON response from Python script'
                 ];
             }
 
@@ -260,8 +248,7 @@ class JobRecommendationService
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return [
                     'success' => false,
-                    'message' => 'Invalid JSON response from Python script',
-                    'json_error' => json_last_error_msg()
+                    'message' => 'Invalid JSON response from Python script'
                 ];
             }
 
@@ -275,12 +262,10 @@ class JobRecommendationService
             } else {
                 return [
                     'success' => false,
-                    'message' => 'Python script test failed: ' . ($result['message'] ?? 'Unknown error'),
-                    'python_response' => $result
+                    'message' => 'Python script test failed: ' . ($result['message'] ?? 'Unknown error')
                 ];
             }
         } catch (Exception $e) {
-            error_log("❌ TestConnection Exception: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Connection test error: ' . $e->getMessage()
