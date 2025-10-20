@@ -12,7 +12,7 @@
                 Create New Event
             </a>
         </div>
-    </div>
+    </div> 
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-4">
@@ -214,7 +214,7 @@
                         class="px-4 py-3 text-sm font-medium text-gray-600 transition-colors duration-200 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         Clear
                     </button>
-                    <button onclick="exportResults('csv')"
+                    <button onclick="exportResults('pdf')"
                         class="px-4 py-3 text-sm font-medium text-white transition-colors duration-200 border rounded-md bg-primary border-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Export
                     </button>
@@ -724,48 +724,95 @@
         }, 100);
     }
 
-    // Export functionality
+    // Export functionality: print-to-PDF with styled layout similar to employers report
     function exportResults(format) {
-        const visibleData = filteredRows.map(row => {
+        if (format !== 'pdf') return;
+
+        const printWindow = window.open('', '', 'height=700,width=900');
+        if (!printWindow) {
+            alert('Unable to open print window. Please allow popups for this site.');
+            return;
+        }
+
+        printWindow.document.write('<html><head><title>SIKAP - Events Report</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write(`
+            body { font-family: Arial, Helvetica, sans-serif; margin: 20px; color: #111; }
+            .header { margin-bottom: 16px; text-align: center; }
+            .header h1 { margin: 0; color: #092C4C; font-size: 18px; }
+            .header .date { color: #666; font-size: 12px; margin: 4px 0 0; }
+            table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; vertical-align: top; }
+            th { background-color: #f8fafc; color: #111; font-weight: 600; }
+            .status-show { color: #065f46; font-weight: 600; }
+            .status-hide { color: #374151; font-weight: 600; }
+            .pin-1 { color: #0f172a; }
+        `);
+        printWindow.document.write('</style></head><body>');
+
+        printWindow.document.write(`
+            <div class="header">
+                <h1>SIKAP - Events Report</h1>
+                <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+                <p class="date">Total Results: ${filteredRows.length} events</p>
+            </div>
+        `);
+
+        printWindow.document.write('<table><thead><tr>');
+        const headers = ['Event', 'Type', 'Schedule', 'Status', 'Pin'];
+        headers.forEach(header => {
+            printWindow.document.write(`<th>${header}</th>`);
+        });
+        printWindow.document.write('</tr></thead><tbody>');
+
+        // Use visible filteredRows and extract text from cells (first 5 columns)
+        filteredRows.forEach(row => {
             const cells = row.querySelectorAll('td');
-            return {
-                title: row.getAttribute('data-title'),
-                type: row.getAttribute('data-type'),
-                status: row.getAttribute('data-status'),
-                timeStatus: row.getAttribute('data-time-status'),
-                pinStatus: row.getAttribute('data-pin-status') === '1' ? 'Pinned' : 'Not Pinned'
-            };
+            printWindow.document.write('<tr>');
+
+            // Event (cell 0)
+            const eventText = cells[0] ? cells[0].textContent.trim().replace(/\s+/g, ' ') : '';
+            printWindow.document.write(`<td>${escapeHtml(eventText)}</td>`);
+
+            // Type (cell 1)
+            const typeText = cells[1] ? cells[1].textContent.trim() : '';
+            printWindow.document.write(`<td>${escapeHtml(typeText)}</td>`);
+
+            // Schedule (cell 2)
+            const scheduleText = cells[2] ? cells[2].textContent.trim().replace(/\s+/g, ' ') : '';
+            printWindow.document.write(`<td>${escapeHtml(scheduleText)}</td>`);
+
+            // Status (cell 3)
+            const statusText = cells[3] ? cells[3].textContent.trim() : '';
+            const statusClass = statusText.toLowerCase().includes('show') ? 'status-show' : 'status-hide';
+            printWindow.document.write(`<td class="${statusClass}">${escapeHtml(statusText)}</td>`);
+
+            // Pin (cell 4)
+            const pinText = cells[4] ? cells[4].textContent.trim() : '';
+            const pinClass = (pinText.toLowerCase().includes('pin') || pinText === '1') ? 'pin-1' : '';
+            printWindow.document.write(`<td class="${pinClass}">${escapeHtml(pinText)}</td>`);
+
+            printWindow.document.write('</tr>');
         });
 
-        if (format === 'csv') {
-            exportToCSV(visibleData);
-        }
+        printWindow.document.write('</tbody></table>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+        };
     }
 
-    function exportToCSV(data) {
-        const headers = ['Title', 'Type', 'Status', 'Time Status', 'Pin Status'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => [
-                `"${row.title}"`,
-                `"${row.type}"`,
-                `"${row.status}"`,
-                `"${row.timeStatus}"`,
-                `"${row.pinStatus}"`
-            ].join(','))
-        ].join('\n');
-
-        const blob = new Blob([csvContent], {
-            type: 'text/csv'
-        });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `events_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+    // Utility to escape HTML entities
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     // Event listeners
