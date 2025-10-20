@@ -8,9 +8,9 @@ include_once __DIR__ . '/../components/navbar-employer.php';
 
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-4xl">
-        <div class="text-center">
+        <div
             <h2 class="mt-2 text-3xl font-extrabold text-center text-grayMain">
-                Review & Publish Job Post
+            Review & Publish Job Post
             </h2>
             <p class="mt-2 text-sm text-center text-gray-500">
                 Review all information before publishing your job posting
@@ -226,14 +226,18 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                     <?php if (!empty($fullJobData['job_summary'])): ?>
                         <div class="p-3 bg-white rounded-md">
                             <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Summary</span>
-                            <p class="mt-1 text-sm text-grayMain"><?php echo nl2br(htmlspecialchars($fullJobData['job_summary'])); ?></p>
+                            <div class="max-w-full mt-1 text-sm break-words text-grayMain overflow-wrap-anywhere word-break-break-all">
+                                <?php echo nl2br(htmlspecialchars($fullJobData['job_summary'])); ?>
+                            </div>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($fullJobData['full_description'])): ?>
                         <div class="p-3 mt-3 bg-white rounded-md">
                             <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Full Description</span>
-                            <div class="mt-1 text-sm whitespace-pre-line text-grayMain"><?php echo htmlspecialchars($fullJobData['full_description']); ?></div>
+                            <div class="max-w-full mt-1 text-sm break-words whitespace-pre-line text-grayMain overflow-wrap-anywhere word-break-break-all">
+                                <?php echo htmlspecialchars($fullJobData['full_description']); ?>
+                            </div>
                         </div>
                     <?php else: ?>
                         <p class="p-3 text-sm text-gray-600 bg-white rounded-md">No detailed description provided.</p>
@@ -364,16 +368,20 @@ include_once __DIR__ . '/../components/navbar-employer.php';
                                     <div class="grid grid-cols-1 gap-2">
                                         <div>
                                             <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Question <?php echo $index + 1; ?></span>
-                                            <p class="mt-1 text-sm text-grayMain"><?php echo htmlspecialchars($question['question_text']); ?></p>
+                                            <div class="max-w-full mt-1 text-sm break-words text-grayMain overflow-wrap-anywhere word-break-break-all">
+                                                <?php echo htmlspecialchars($question['question_text']); ?>
+                                            </div>
                                         </div>
                                         <div>
                                             <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">Type</span>
-                                            <p class="mt-1 text-sm text-grayMain">
+                                            <div class="max-w-full mt-1 text-sm break-words text-grayMain overflow-wrap-anywhere">
                                                 <?php echo ucfirst($question['question_type']); ?>
                                                 <?php if (!empty($question['question_option'])): ?>
-                                                    <span class="ml-2 text-xs text-gray-500">Options: <?php echo htmlspecialchars($question['question_option']); ?></span>
+                                                    <span class="ml-2 text-xs text-gray-500 break-words overflow-wrap-anywhere">
+                                                        Options: <?php echo htmlspecialchars($question['question_option']); ?>
+                                                    </span>
                                                 <?php endif; ?>
-                                            </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -449,3 +457,42 @@ include_once __DIR__ . '/../components/navbar-employer.php';
         }
     });
 </script>
+
+<style>
+    /* Force text wrapping for long strings without spaces */
+    .overflow-wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+    }
+
+    /* Ensure container doesn't overflow */
+    .rounded-lg {
+        overflow: hidden;
+    }
+
+    /* Additional fallback for extremely long words */
+    .break-words {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent horizontal scrolling */
+    .word-break-break-all {
+        word-break: break-all;
+    }
+
+    /* Ensure max-width is respected */
+    .max-w-full {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Specific fix for pre-line content */
+    .whitespace-pre-line {
+        white-space: pre-line;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+</style>
