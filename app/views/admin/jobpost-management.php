@@ -360,11 +360,10 @@
                                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                             <div class="flex items-center justify-end">
                                                 <!-- Actions Dropdown -->
-                                                <div class="relative" x-data="{ open: false }" x-init="$refs.button" @click.away="open = false">
+                                                <div class="relative" x-data="{ open: false }" @click.away="open = false">
 
                                                     <!-- Dropdown Trigger Button -->
                                                     <button @click="open = !open"
-                                                        x-ref="button"
                                                         class="inline-flex items-center px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                                                         :class="{ 'bg-gray-100': open }"
                                                         type="button">
@@ -375,7 +374,7 @@
                                                         </svg>
                                                     </button>
 
-                                                    <!-- Dropdown Menu -->
+                                                    <!-- Dropdown Menu - FIXED VERSION -->
                                                     <div x-show="open"
                                                         x-transition:enter="transition ease-out duration-100"
                                                         x-transition:enter-start="transform opacity-0 scale-95"
@@ -383,8 +382,47 @@
                                                         x-transition:leave="transition ease-in duration-75"
                                                         x-transition:leave-start="transform opacity-100 scale-100"
                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                        class="absolute right-0 z-50 w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                                        style="top: 100%; min-width: 180px;"
+                                                        class="absolute right-0 z-[9999] w-48 mt-2 origin-top-right bg-white rounded-md shadow-xl border border-gray-200"
+                                                        style="display: none; min-width: 180px;"
+                                                        x-init="
+                    $watch('open', value => {
+                        if (value) {
+                            $nextTick(() => {
+                                const button = $el.previousElementSibling;
+                                const dropdown = $el;
+                                const rect = button.getBoundingClientRect();
+                                const dropdownRect = dropdown.getBoundingClientRect();
+                                const viewportHeight = window.innerHeight;
+                                const spaceBelow = viewportHeight - rect.bottom - 10;
+                                const spaceAbove = rect.top - 10;
+                                
+                                // Reset positioning
+                                dropdown.style.position = 'absolute';
+                                dropdown.style.top = '';
+                                dropdown.style.bottom = '';
+                                dropdown.style.right = '0';
+                                dropdown.style.left = '';
+                                
+                                // Check if dropdown would be cut off at bottom
+                                if (spaceBelow < 280 && spaceAbove > spaceBelow) {
+                                    // Position above the button
+                                    dropdown.style.bottom = '100%';
+                                    dropdown.style.top = 'auto';
+                                    dropdown.style.marginBottom = '8px';
+                                    dropdown.style.marginTop = '0';
+                                    dropdown.style.transformOrigin = 'bottom right';
+                                } else {
+                                    // Position below the button (default)
+                                    dropdown.style.top = '100%';
+                                    dropdown.style.bottom = 'auto';
+                                    dropdown.style.marginTop = '8px';
+                                    dropdown.style.marginBottom = '0';
+                                    dropdown.style.transformOrigin = 'top right';
+                                }
+                            });
+                        }
+                    })
+                "
                                                         @keydown.escape.prevent.stop="open = false">
 
                                                         <div class="py-1" role="menu" aria-orientation="vertical">
@@ -402,7 +440,19 @@
                                                             <hr class="my-1">
 
                                                             <!-- Status Actions -->
-    
+                                                            <?php if ($job['job_status'] === 'open'): ?>
+                                                                <!-- No "Activate" button needed since it's already open -->
+                                                            <?php else: ?>
+                                                                <button type="button"
+                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'open'); this.closest('[x-data]').__x.$data.open = false;"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                    </svg>
+                                                                    Activate
+                                                                </button>
+                                                            <?php endif; ?>
 
                                                             <?php if ($job['job_status'] !== 'paused'): ?>
                                                                 <button type="button"
@@ -445,6 +495,7 @@
                                                 </div>
                                             </div>
                                         </td>
+
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
