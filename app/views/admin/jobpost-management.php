@@ -360,7 +360,7 @@
                                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                             <div class="flex items-center justify-end">
                                                 <!-- Actions Dropdown -->
-                                                <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                                <div class="relative" x-data="{ open: false }" @click.away="open = false" :class="{ 'z-[10000]': open }">
 
                                                     <!-- Dropdown Trigger Button -->
                                                     <button @click="open = !open"
@@ -374,7 +374,7 @@
                                                         </svg>
                                                     </button>
 
-                                                    <!-- Dropdown Menu - FIXED VERSION -->
+                                                    <!-- Dropdown Menu - ENHANCED FOR BOTH TOP AND BOTTOM SCENARIOS -->
                                                     <div x-show="open"
                                                         x-transition:enter="transition ease-out duration-100"
                                                         x-transition:enter-start="transform opacity-0 scale-95"
@@ -382,19 +382,35 @@
                                                         x-transition:leave="transition ease-in duration-75"
                                                         x-transition:leave-start="transform opacity-100 scale-100"
                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                        class="absolute right-0 z-[9999] w-48 mt-2 origin-top-right bg-white rounded-md shadow-xl border border-gray-200"
+                                                        class="absolute right-0 z-[99999] w-48 mt-2 origin-top-right bg-white rounded-md shadow-2xl border border-gray-200"
                                                         style="display: none; min-width: 180px;"
                                                         x-init="
                     $watch('open', value => {
                         if (value) {
+                            // Add higher z-index to parent table row when dropdown is open
+                            const tableRow = $el.closest('tr');
+                            if (tableRow) {
+                                tableRow.style.position = 'relative';
+                                tableRow.style.zIndex = '99998';
+                            }
+                            
                             $nextTick(() => {
                                 const button = $el.previousElementSibling;
                                 const dropdown = $el;
                                 const rect = button.getBoundingClientRect();
-                                const dropdownRect = dropdown.getBoundingClientRect();
                                 const viewportHeight = window.innerHeight;
                                 const spaceBelow = viewportHeight - rect.bottom - 10;
                                 const spaceAbove = rect.top - 10;
+                                
+                                // Get table boundaries to avoid cutting off dropdown
+                                const table = $el.closest('table');
+                                const tableHeader = table ? table.querySelector('thead') : null;
+                                const headerHeight = tableHeader ? tableHeader.offsetHeight : 60;
+                                const tableRect = table ? table.getBoundingClientRect() : null;
+                                
+                                // Calculate available spaces considering table boundaries
+                                const availableSpaceAbove = tableRect ? rect.top - tableRect.top - headerHeight - 20 : spaceAbove;
+                                const availableSpaceBelow = tableRect ? Math.min(spaceBelow, tableRect.bottom - rect.bottom - 10) : spaceBelow;
                                 
                                 // Reset positioning
                                 dropdown.style.position = 'absolute';
@@ -402,24 +418,68 @@
                                 dropdown.style.bottom = '';
                                 dropdown.style.right = '0';
                                 dropdown.style.left = '';
+                                dropdown.style.zIndex = '99999';
                                 
-                                // Check if dropdown would be cut off at bottom
-                                if (spaceBelow < 280 && spaceAbove > spaceBelow) {
+                                // Enhanced decision logic for positioning
+                                const dropdownHeight = 250; // Reduced height since we removed Pause
+                                const preferBelow = availableSpaceBelow >= dropdownHeight;
+                                const canShowAbove = availableSpaceAbove >= dropdownHeight;
+                                
+                                // Decision matrix:
+                                // 1. If enough space below within table bounds -> show below
+                                // 2. If not enough space below BUT enough space above -> show above  
+                                // 3. If neither has enough space -> use the larger available space
+                                let showBelow = true;
+                                
+                                if (!preferBelow) {
+                                    if (canShowAbove) {
+                                        showBelow = false;
+                                    } else {
+                                        // Use whichever side has more space
+                                        showBelow = availableSpaceBelow >= availableSpaceAbove;
+                                    }
+                                }
+                                
+                                if (showBelow) {
+                                    // Position below the button
+                                    dropdown.style.top = '100%';
+                                    dropdown.style.bottom = 'auto';
+                                    dropdown.style.marginTop = '8px';
+                                    dropdown.style.marginBottom = '0';
+                                    dropdown.style.transformOrigin = 'top right';
+                                    
+                                    // If dropdown would extend beyond viewport, add max-height and scroll
+                                    if (availableSpaceBelow < dropdownHeight) {
+                                        dropdown.style.maxHeight = Math.max(150, availableSpaceBelow - 20) + 'px';
+                                        dropdown.style.overflowY = 'auto';
+                                    }
+                                } else {
                                     // Position above the button
                                     dropdown.style.bottom = '100%';
                                     dropdown.style.top = 'auto';
                                     dropdown.style.marginBottom = '8px';
                                     dropdown.style.marginTop = '0';
                                     dropdown.style.transformOrigin = 'bottom right';
-                                } else {
-                                    // Position below the button (default)
-                                    dropdown.style.top = '100%';
-                                    dropdown.style.bottom = 'auto';
-                                    dropdown.style.marginTop = '8px';
-                                    dropdown.style.marginBottom = '0';
-                                    dropdown.style.transformOrigin = 'top right';
+                                    
+                                    // If dropdown would extend beyond table header, add max-height and scroll
+                                    if (availableSpaceAbove < dropdownHeight) {
+                                        dropdown.style.maxHeight = Math.max(150, availableSpaceAbove - 20) + 'px';
+                                        dropdown.style.overflowY = 'auto';
+                                    }
                                 }
                             });
+                        } else {
+                            // Remove z-index from parent table row when dropdown closes
+                            const tableRow = $el.closest('tr');
+                            if (tableRow) {
+                                tableRow.style.position = '';
+                                tableRow.style.zIndex = '';
+                            }
+                            
+                            // Reset dropdown styling
+                            const dropdown = $el;
+                            dropdown.style.maxHeight = '';
+                            dropdown.style.overflowY = '';
                         }
                     })
                 "
@@ -451,18 +511,6 @@
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                                     </svg>
                                                                     Activate
-                                                                </button>
-                                                            <?php endif; ?>
-
-                                                            <?php if ($job['job_status'] !== 'paused'): ?>
-                                                                <button type="button"
-                                                                    onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'paused'); this.closest('[x-data]').__x.$data.open = false;"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-left text-yellow-700 hover:bg-yellow-50"
-                                                                    role="menuitem">
-                                                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                                    </svg>
-                                                                    Pause
                                                                 </button>
                                                             <?php endif; ?>
 
@@ -877,7 +925,21 @@
 
     // Job status management - FIXED for admin
     function changeJobStatus(jobId, status) {
-        if (confirm(`Are you sure you want to ${status} this job?`)) {
+        let confirmMessage;
+        switch (status) {
+            case 'open':
+                confirmMessage = 'Are you sure you want to open this job for applications?';
+                break;
+            case 'closed':
+                confirmMessage = 'Are you sure you want to close this job? No new applications will be accepted.';
+                break;
+            default:
+                confirmMessage = `Are you sure you want to change the status to ${status}?`;
+        }
+
+        if (confirm(confirmMessage)) {
+            showLoadingMessage('Updating job status...');
+
             const formData = new FormData();
             formData.append('job_id', jobId);
             formData.append('status', status);
@@ -889,34 +951,55 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
                 .then(async response => {
                     const text = await response.text();
+
                     try {
                         return JSON.parse(text);
                     } catch (e) {
-                        throw new Error('Invalid JSON response: ' + text);
+                        console.error('JSON parse error:', e);
+
+                        // Check if response contains success indicators
+                        if (text.includes('success') || text.includes('updated') || text.includes(status + 'd')) {
+                            return {
+                                success: true,
+                                message: `Job ${status}d successfully`
+                            };
+                        } else {
+                            throw new Error('Invalid server response format');
+                        }
                     }
                 })
                 .then(data => {
-                    if (data.success) {
-                        // Reload page to show updated status
-                        location.reload();
+                    hideLoadingMessage();
+
+                    if (data.success === true || data.success === 'true' || data.status === 'success') {
+                        showSuccessMessage(`Job ${status}d successfully!`);
+
+                        // Reload page to reflect changes
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     } else {
-                        throw new Error(data.error || 'Failed to update status');
+                        throw new Error(data.error || data.message || `Failed to ${status} job`);
                     }
                 })
                 .catch(error => {
+                    hideLoadingMessage();
                     console.error('Error:', error);
-                    alert('Error: ' + error.message);
+                    showErrorMessage('Error: ' + error.message);
                 });
         }
     }
 
     function deleteJob(jobId) {
-        if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+        if (confirm('Are you sure you want to delete this job? This action cannot be undone and will remove all associated applications.')) {
+            showLoadingMessage('Deleting job...');
+
             const formData = new FormData();
             formData.append('job_id', jobId);
 
@@ -927,29 +1010,131 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
                 .then(async response => {
                     const text = await response.text();
+
                     try {
                         return JSON.parse(text);
                     } catch (e) {
-                        throw new Error('Invalid JSON response: ' + text);
+                        console.error('JSON parse error:', e);
+
+                        // Check if response contains success indicators
+                        if (text.includes('success') || text.includes('deleted') || text.includes('removed')) {
+                            return {
+                                success: true,
+                                message: 'Job deleted successfully'
+                            };
+                        } else {
+                            throw new Error('Invalid server response format');
+                        }
                     }
                 })
                 .then(data => {
-                    if (data.success) {
+                    hideLoadingMessage();
+
+                    if (data.success === true || data.success === 'true' || data.status === 'success') {
+                        showSuccessMessage('Job deleted successfully!');
+
                         // Reload page to show updated list
-                        location.reload();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     } else {
-                        throw new Error(data.error || 'Failed to delete job');
+                        throw new Error(data.error || data.message || 'Failed to delete job');
                     }
                 })
                 .catch(error => {
+                    hideLoadingMessage();
                     console.error('Error:', error);
-                    alert('Error: ' + error.message);
+                    showErrorMessage('Error: ' + error.message);
                 });
         }
+    }
+
+    // Utility functions for messages
+    function showLoadingMessage(message) {
+        const existingMessages = document.querySelectorAll('.loading-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'loading-message fixed top-4 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded z-50 shadow-lg';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+    }
+
+    function hideLoadingMessage() {
+        const loadingMessages = document.querySelectorAll('.loading-message');
+        loadingMessages.forEach(msg => {
+            msg.style.opacity = '0';
+            setTimeout(() => msg.remove(), 300);
+        });
+    }
+
+    function showSuccessMessage(message) {
+        const existingMessages = document.querySelectorAll('.success-message, .error-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'success-message fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50 shadow-lg';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    function showErrorMessage(message) {
+        const existingMessages = document.querySelectorAll('.error-message, .success-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'error-message fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 shadow-lg';
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                ${message}
+            </div>
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 300);
+        }, 5000);
     }
 </script>

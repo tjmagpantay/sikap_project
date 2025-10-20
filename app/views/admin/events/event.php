@@ -342,7 +342,7 @@
                                     <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                         <div class="flex items-center justify-end">
                                             <!-- Actions Dropdown -->
-                                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                            <div class="relative" x-data="{ open: false }" @click.away="open = false" :class="{ 'z-[10000]': open }">
 
                                                 <!-- Dropdown Trigger Button -->
                                                 <button @click="open = !open"
@@ -356,7 +356,7 @@
                                                     </svg>
                                                 </button>
 
-                                                <!-- Dropdown Menu - FIXED VERSION -->
+                                                <!-- Dropdown Menu - ENHANCED FOR BOTH TOP AND BOTTOM SCENARIOS -->
                                                 <div x-show="open"
                                                     x-transition:enter="transition ease-out duration-100"
                                                     x-transition:enter-start="transform opacity-0 scale-95"
@@ -364,11 +364,18 @@
                                                     x-transition:leave="transition ease-in duration-75"
                                                     x-transition:leave-start="transform opacity-100 scale-100"
                                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="absolute right-0 z-[9999] w-48 mt-2 origin-top-right bg-white rounded-md shadow-xl border border-gray-200"
+                                                    class="absolute right-0 z-[99999] w-48 mt-2 origin-top-right bg-white rounded-md shadow-2xl border border-gray-200"
                                                     style="display: none; min-width: 180px;"
                                                     x-init="
                     $watch('open', value => {
                         if (value) {
+                            // Add higher z-index to parent table row when dropdown is open
+                            const tableRow = $el.closest('tr');
+                            if (tableRow) {
+                                tableRow.style.position = 'relative';
+                                tableRow.style.zIndex = '99998';
+                            }
+                            
                             $nextTick(() => {
                                 const button = $el.previousElementSibling;
                                 const dropdown = $el;
@@ -377,30 +384,84 @@
                                 const spaceBelow = viewportHeight - rect.bottom - 10;
                                 const spaceAbove = rect.top - 10;
                                 
+                                // Get table boundaries to avoid cutting off dropdown
+                                const table = $el.closest('table');
+                                const tableHeader = table ? table.querySelector('thead') : null;
+                                const headerHeight = tableHeader ? tableHeader.offsetHeight : 60;
+                                const tableRect = table ? table.getBoundingClientRect() : null;
+                                
+                                // Calculate available spaces considering table boundaries
+                                const availableSpaceAbove = tableRect ? rect.top - tableRect.top - headerHeight - 20 : spaceAbove;
+                                const availableSpaceBelow = tableRect ? Math.min(spaceBelow, tableRect.bottom - rect.bottom - 10) : spaceBelow;
+                                
                                 // Reset positioning
                                 dropdown.style.position = 'absolute';
                                 dropdown.style.top = '';
                                 dropdown.style.bottom = '';
                                 dropdown.style.right = '0';
                                 dropdown.style.left = '';
+                                dropdown.style.zIndex = '99999';
                                 
-                                // Check if dropdown would be cut off at bottom
-                                if (spaceBelow < 300 && spaceAbove > spaceBelow) {
+                                // Enhanced decision logic for positioning
+                                const dropdownHeight = 300; // Estimated dropdown height
+                                const preferBelow = availableSpaceBelow >= dropdownHeight;
+                                const canShowAbove = availableSpaceAbove >= dropdownHeight;
+                                
+                                // Decision matrix:
+                                // 1. If enough space below within table bounds -> show below
+                                // 2. If not enough space below BUT enough space above -> show above  
+                                // 3. If neither has enough space -> use the larger available space
+                                let showBelow = true;
+                                
+                                if (!preferBelow) {
+                                    if (canShowAbove) {
+                                        showBelow = false;
+                                    } else {
+                                        // Use whichever side has more space
+                                        showBelow = availableSpaceBelow >= availableSpaceAbove;
+                                    }
+                                }
+                                
+                                if (showBelow) {
+                                    // Position below the button
+                                    dropdown.style.top = '100%';
+                                    dropdown.style.bottom = 'auto';
+                                    dropdown.style.marginTop = '8px';
+                                    dropdown.style.marginBottom = '0';
+                                    dropdown.style.transformOrigin = 'top right';
+                                    
+                                    // If dropdown would extend beyond viewport, add max-height and scroll
+                                    if (availableSpaceBelow < dropdownHeight) {
+                                        dropdown.style.maxHeight = Math.max(200, availableSpaceBelow - 20) + 'px';
+                                        dropdown.style.overflowY = 'auto';
+                                    }
+                                } else {
                                     // Position above the button
                                     dropdown.style.bottom = '100%';
                                     dropdown.style.top = 'auto';
                                     dropdown.style.marginBottom = '8px';
                                     dropdown.style.marginTop = '0';
                                     dropdown.style.transformOrigin = 'bottom right';
-                                } else {
-                                    // Position below the button (default)
-                                    dropdown.style.top = '100%';
-                                    dropdown.style.bottom = 'auto';
-                                    dropdown.style.marginTop = '8px';
-                                    dropdown.style.marginBottom = '0';
-                                    dropdown.style.transformOrigin = 'top right';
+                                    
+                                    // If dropdown would extend beyond table header, add max-height and scroll
+                                    if (availableSpaceAbove < dropdownHeight) {
+                                        dropdown.style.maxHeight = Math.max(200, availableSpaceAbove - 20) + 'px';
+                                        dropdown.style.overflowY = 'auto';
+                                    }
                                 }
                             });
+                        } else {
+                            // Remove z-index from parent table row when dropdown closes
+                            const tableRow = $el.closest('tr');
+                            if (tableRow) {
+                                tableRow.style.position = '';
+                                tableRow.style.zIndex = '';
+                            }
+                            
+                            // Reset dropdown styling
+                            const dropdown = $el;
+                            dropdown.style.maxHeight = '';
+                            dropdown.style.overflowY = '';
                         }
                     })
                 "

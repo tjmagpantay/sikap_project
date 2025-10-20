@@ -36,7 +36,6 @@ if (!isset($job) || empty($job)) {
                 $statusClasses = [
                     'open' => 'bg-green-100 text-green-800',
                     'closed' => 'bg-red-100 text-red-800',
-                    'paused' => 'bg-yellow-100 text-yellow-800',
                     'draft' => 'bg-gray-100 text-gray-800',
                 ];
                 $statusClass = $statusClasses[$job['job_status'] ?? 'draft'] ?? 'bg-gray-100 text-gray-800';
@@ -66,15 +65,6 @@ if (!isset($job) || empty($job)) {
                             class="absolute right-0 z-50 w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <div class="py-1">
                                 
-                                <?php if ($job['job_status'] !== 'paused'): ?>
-                                    <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'paused'); this.closest('[x-data]').__x.$data.open = false;"
-                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-yellow-700 transition-colors hover:bg-yellow-50">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Pause Job
-                                    </button>
-                                <?php endif; ?>
                                 <?php if ($job['job_status'] !== 'closed'): ?>
                                     <button onclick="changeJobStatus(<?php echo $job['job_id']; ?>, 'closed'); this.closest('[x-data]').__x.$data.open = false;"
                                         class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-gray-50">
@@ -489,9 +479,6 @@ if (!isset($job) || empty($job)) {
         switch (status) {
             case 'open':
                 confirmMessage = 'Are you sure you want to open this job for applications?';
-                break;
-            case 'paused':
-                confirmMessage = 'Are you sure you want to pause this job? New applications will be disabled.';
                 break;
             case 'closed':
                 confirmMessage = 'Are you sure you want to close this job? No new applications will be accepted.';
