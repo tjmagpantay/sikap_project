@@ -185,7 +185,8 @@
                         <div class="py-1">
                             <button @click="selected = 'Status'; open = false; filterByStatus('')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Status</button>
                             <button @click="selected = 'Visible'; open = false; filterByStatus('show')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Visible (Show)</button>
-                            <button @click="selected = 'Hidden'; open = false; filterByStatus('hide')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hidden (Hide)</button>
+                            <button @click="selected = 'Hidden'; open = false; filterByStatus('hidden')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hidden (Hide)</button>
+                            <button @click="selected = 'Draft'; open = false; filterByStatus('draft')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Draft</button>
                         </div>
                     </div>
                 </div>
@@ -264,7 +265,7 @@
                                 <tr class="event-row hover:bg-gray-50"
                                     data-title="<?php echo htmlspecialchars(strtolower($event['title'])); ?>"
                                     data-type="<?php echo htmlspecialchars($event['type']); ?>"
-                                    data-status="<?php echo htmlspecialchars($event['status']); ?>"
+                                    data-status="<?php echo $event['status'] === 'hide' ? 'hidden' : htmlspecialchars($event['status']); ?>"
                                     data-time-status="<?php echo htmlspecialchars($timeStatus); ?>"
                                     data-pin-status="<?php echo htmlspecialchars($event['pinned'] ?? '0'); ?>">
 
@@ -314,10 +315,13 @@
 
                                     <!-- Status -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-md 
-                                            <?php echo $event['status'] === 'show' ? 'bg-gray-100 text-primary' : 'bg-red-100 text-red-800'; ?>">
-                                            <?php echo $event['status'] === 'show' ? 'Visible' : 'Hidden'; ?>
-                                        </span>
+                                        <?php if ($event['status'] === 'show'): ?>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 rounded-md text-primary">Visible</span>
+                                        <?php elseif ($event['status'] === 'hide'): ?>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-md">Hidden</span>
+                                        <?php else: ?>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-md">Draft</span>
+                                        <?php endif; ?>
                                     </td>
 
                                     <!-- Pin Status -->
@@ -634,6 +638,8 @@
     }
 
     function filterByStatus(status) {
+        // Normalize older/DB values that may be 'hide'
+        if (status === 'hide') status = 'hidden';
         currentFilters.status = status;
         applyFilters();
     }
@@ -736,7 +742,7 @@
 
         printWindow.document.write('<html><head><title>SIKAP - Events Report</title>');
         printWindow.document.write('<style>');
-        printWindow.document.write(`
+            printWindow.document.write(`
             body { font-family: Arial, Helvetica, sans-serif; margin: 20px; color: #111; }
             .header { margin-bottom: 16px; text-align: center; }
             .header h1 { margin: 0; color: #092C4C; font-size: 18px; }
@@ -746,6 +752,7 @@
             th { background-color: #f8fafc; color: #111; font-weight: 600; }
             .status-show { color: #065f46; font-weight: 600; }
             .status-hide { color: #374151; font-weight: 600; }
+            .status-draft { color: #92400e; font-weight: 600; }
             .pin-1 { color: #0f172a; }
         `);
         printWindow.document.write('</style></head><body>');
@@ -784,7 +791,13 @@
 
             // Status (cell 3)
             const statusText = cells[3] ? cells[3].textContent.trim() : '';
-            const statusClass = statusText.toLowerCase().includes('show') ? 'status-show' : 'status-hide';
+            let statusClass = 'status-hide';
+            if (statusText) {
+                const st = statusText.toLowerCase();
+                if (st.includes('show') || st.includes('visible')) statusClass = 'status-show';
+                else if (st.includes('draft')) statusClass = 'status-draft';
+                else statusClass = 'status-hide';
+            }
             printWindow.document.write(`<td class="${statusClass}">${escapeHtml(statusText)}</td>`);
 
             // Pin (cell 4)

@@ -26,8 +26,11 @@ class EventProgram
         if (empty($title)) {
             $errors[] = "Title is required";
         }
-        if (empty($description)) {
-            $errors[] = "Description is required";
+        // description optional; validate length if provided
+        if (!is_null($description) && $description !== '') {
+            if (strlen($description) > 1000) {
+                $errors[] = "Description cannot exceed 1000 characters";
+            }
         }
         if (!in_array($type, ['program', 'jobfair', 'local recruitment'])) {
             $errors[] = "Invalid event type";
@@ -102,12 +105,22 @@ class EventProgram
 
     public function updateEvent($id, $title, $description, $type, $image, $time_start, $time_end, $status)
     {
-        $stmt = $this->db->prepare("
+        try {
+            $stmt = $this->db->prepare("
             UPDATE {$this->table}
             SET title = ?, description = ?, type = ?, image = ?, time_start = ?, time_end = ?, status = ?
             WHERE event_id = ?
         ");
-        return $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status, $id]);
+            $result = $stmt->execute([$title, $description, $type, $image, $time_start, $time_end, $status, $id]);
+            if (!$result) {
+                $errorInfo = $stmt->errorInfo();
+                error_log("❌ EventProgram::updateEvent failed for id=$id: " . json_encode($errorInfo));
+            }
+            return $result;
+        } catch (Exception $e) {
+            error_log("❌ EventProgram::updateEvent exception for id=$id: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function deleteEvent($id)
