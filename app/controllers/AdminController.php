@@ -3,7 +3,7 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Admin.php';
 require_once __DIR__ . '/../models/Employer.php';
 require_once __DIR__ . '/../models/JobPost.php';
- 
+
 class AdminController
 {
     private $adminModel;
@@ -16,6 +16,82 @@ class AdminController
         $this->employerModel = new Employer();
         $this->jobPostModel = new JobPost();
     }
+
+    public function signup()
+    {
+        // Developer access control - only allow on localhost or specific IPs
+        $allowedIPs = ['127.0.0.1', '::1', 'localhost'];
+        $clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        // Check if accessing from allowed environment
+        if (!in_array($clientIP, $allowedIPs) && !$this->isDevelopmentEnvironment()) {
+            http_response_code(403);
+            echo "<h1>403 Forbidden</h1><p>Admin registration is restricted to developers only.</p>";
+            exit;
+        }
+
+        $error = '';
+        $success = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $adminName = trim($_POST['admin_name'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            // Validation
+            if (empty($adminName) || empty($email) || empty($password) || empty($confirmPassword)) {
+                $error = 'Please fill in all fields.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error = 'Please enter a valid email address.';
+            } elseif (strlen($password) < 8) {
+                $error = 'Password must be at least 8 characters long.';
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $password)) {
+                $error = 'Password must contain at least one uppercase letter, one lowercase letter, and one number.';
+            } elseif ($password !== $confirmPassword) {
+                $error = 'Passwords do not match.';
+            } else {
+                // Check if email already exists - FIXED: Use correct method name
+                require_once __DIR__ . '/../models/User.php';
+                $userModel = new User();
+                $existingUser = $userModel->findByEmail($email); // Fixed: was findByEmail
+
+                if ($existingUser) {
+                    $error = 'Email already exists in the system.';
+                } else {
+                    // Create the admin account
+                    $result = $this->adminModel->createAdmin($adminName, $email, $password);
+
+                    if ($result['success']) {
+                        $success = 'Admin account created successfully! You can now login.';
+                        // Clear form data
+                        $_POST = [];
+                    } else {
+                        $error = $result['message'] ?? 'Failed to create admin account.';
+                    }
+                }
+            }
+        }
+
+        include __DIR__ . '/../views/admin/signup-admin.php';
+    }
+
+    private function isDevelopmentEnvironment()
+    {
+        // Check for development environment indicators
+        $devIndicators = [
+            $_SERVER['SERVER_NAME'] === 'localhost',
+            $_SERVER['HTTP_HOST'] === 'localhost',
+            strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0,
+            $_SERVER['SERVER_NAME'] === '127.0.0.1',
+            isset($_SERVER['XAMPP_ROOT']), // XAMPP indicator
+            isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development'
+        ];
+
+        return in_array(true, $devIndicators);
+    }
+
+    // ...existing code...
 
     public function login()
     {
@@ -596,42 +672,38 @@ class AdminController
                 $newPassword = $_POST['new_password'] ?? '';
                 $confirmPassword = $_POST['confirm_password'] ?? '';
 
-                // Server-side validation
+                // Validation
                 if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
                     echo json_encode(['success' => false, 'message' => 'All fields are required']);
                     exit;
                 }
 
-                // Password length validation
-                if (strlen($newPassword) < 8) {
-                    echo json_encode(['success' => false, 'message' => 'New password must be at least 8 characters long']);
-                    exit;
-                }
-
-                // Password complexity validation
-                if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
-                    echo json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, and one number']);
-                    exit;
-                }
-
-                // Password match validation
                 if ($newPassword !== $confirmPassword) {
                     echo json_encode(['success' => false, 'message' => 'New passwords do not match']);
                     exit;
                 }
 
-                // Use the Admin model to change the password
+                if (strlen($newPassword) < 8) {
+                    echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters long']);
+                    exit;
+                }
+
+                if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+                    echo json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, and one number']);
+                    exit;
+                }
+
+                // Use the admin model to handle password change
                 $result = $this->adminModel->changePassword($_SESSION['user_id'], $currentPassword, $newPassword);
 
-                // Always return success if the model operation succeeds
-                if ($result) {
-                    echo json_encode(['success' => true, 'message' => 'Password changed successfully']);
+                if ($result['success']) {
+                    echo json_encode(['success' => true, 'message' => $result['message']]);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+                    echo json_encode(['success' => false, 'message' => $result['message']]);
                 }
             } catch (Exception $e) {
                 error_log("Admin Change Password Error: " . $e->getMessage());
-                echo json_encode(['success' => false, 'message' => 'Failed to update password']);
+                echo json_encode(['success' => false, 'message' => 'An error occurred while updating password']);
             }
         } else {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
