@@ -440,6 +440,29 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             $controller->view($_GET['application_id'] ?? null);
             break;
+        case 'accept-application':
+            require_once __DIR__ . '/../app/controllers/ReviewApplicationController.php';
+            $controller = new ReviewApplicationController();
+            $controller->acceptApplication($_GET['application_id'] ?? null);
+            break;
+
+        case 'reject-application':
+            require_once __DIR__ . '/../app/controllers/ReviewApplicationController.php';
+            $controller = new ReviewApplicationController();
+            $controller->rejectApplication($_GET['application_id'] ?? null);
+            break;
+
+        case 'view-candidate':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->viewCandidateProfile($_GET['candidate_id'] ?? null);
+            break;
+
+        case 'browse-candidates':
+            require_once __DIR__ . '/../app/controllers/JobApplicantsController.php';
+            $controller = new JobApplicantsController();
+            $controller->browseAllCandidates();
+            break;
 
         case 'complete-employer-profile':
             // Call the controller method to properly set variables

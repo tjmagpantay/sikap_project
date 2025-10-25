@@ -276,9 +276,13 @@
                                         <!-- Job Title -->
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                        <?php echo htmlspecialchars($job['job_title'] ?? 'Untitled Job'); ?>
+                                                <div class="flex-1 min-w-0">
+                                                    <!-- Enhanced title with forced wrapping and width constraint -->
+                                                    <div class="text-sm font-medium text-gray-900 max-w-[200px]">
+                                                        <div class="max-w-full break-words truncate overflow-wrap-anywhere word-break-break-all"
+                                                            title="<?php echo htmlspecialchars($job['job_title'] ?? 'Untitled Job'); ?>">
+                                                            <?php echo htmlspecialchars($job['job_title'] ?? 'Untitled Job'); ?>
+                                                        </div>
                                                     </div>
                                                     <div class="text-xs text-gray-500">
                                                         ID: <?php echo htmlspecialchars($job['job_id'] ?? 'N/A'); ?>
@@ -1138,3 +1142,139 @@
         }, 5000);
     }
 </script>
+
+<style>
+    /* Force text wrapping for long strings without spaces - Enhanced for tables */
+    .overflow-wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+    }
+
+    /* Ensure container doesn't overflow */
+    .rounded-lg {
+        overflow: hidden;
+    }
+
+    /* Additional fallback for extremely long words */
+    .break-words {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent horizontal scrolling */
+    .word-break-break-all {
+        word-break: break-all;
+    }
+
+    /* Ensure max-width is respected */
+    .max-w-full {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Force table layout for consistent column widths */
+    table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    /* Specific column width constraints */
+    table th:nth-child(1),
+    table td:nth-child(1) {
+        width: 200px;
+        /* Job Title */
+        max-width: 200px;
+    }
+
+    table th:nth-child(2),
+    table td:nth-child(2) {
+        width: 150px;
+        /* Company */
+        max-width: 150px;
+    }
+
+    table th:nth-child(3),
+    table td:nth-child(3) {
+        width: 120px;
+        /* Category */
+        max-width: 120px;
+    }
+
+    table th:nth-child(4),
+    table td:nth-child(4) {
+        width: 120px;
+        /* Location */
+        max-width: 120px;
+    }
+
+    table th:nth-child(5),
+    table td:nth-child(5) {
+        width: 100px;
+        /* Status */
+        max-width: 100px;
+    }
+
+    table th:nth-child(6),
+    table td:nth-child(6) {
+        width: 100px;
+        /* Created */
+        max-width: 100px;
+    }
+
+    table th:nth-child(7),
+    table td:nth-child(7) {
+        width: 110px;
+        /* Deadline */
+        max-width: 110px;
+    }
+
+    table th:nth-child(8),
+    table td:nth-child(8) {
+        width: 120px;
+        /* Actions */
+        max-width: 120px;
+    }
+
+    /* Force table cells to respect width constraints */
+    .table-fixed td {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        overflow: hidden;
+    }
+
+    /* Ensure flex items in cells don't overflow */
+    .min-w-0 {
+        min-width: 0 !important;
+    }
+
+    /* Truncate class for job titles */
+    .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Additional safety for very long job titles */
+    .max-w-\[200px\] {
+        max-width: 200px !important;
+    }
+
+    /* Ensure dropdown doesn't cause horizontal scroll */
+    .relative {
+        position: relative;
+    }
+
+    /* Table container safety */
+    .overflow-x-auto {
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+
+    /* Prevent table from expanding beyond container */
+    .divide-y.divide-gray-200 {
+        table-layout: fixed;
+    }
+</style>

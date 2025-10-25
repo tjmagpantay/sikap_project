@@ -512,17 +512,18 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                             Review
                                                         </a>
 
-                                                        <!-- Three Dots Menu -->
-                                                        <div class="relative" x-data="{ open: false }">
+                                                        <!-- Enhanced Three Dots Menu with Better Positioning -->
+                                                        <div class="relative" x-data="{ open: false }" @click.away="open = false" :class="{ 'z-[10000]': open }">
                                                             <button @click="open = !open"
-                                                                @click.away="open = false"
-                                                                class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                                                class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                                                :class="{ 'bg-gray-100': open }"
+                                                                type="button">
                                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                                                                 </svg>
                                                             </button>
 
-                                                            <!-- Dropdown Menu -->
+                                                            <!-- Enhanced Dropdown Menu -->
                                                             <div x-show="open"
                                                                 x-transition:enter="transition ease-out duration-100"
                                                                 x-transition:enter-start="transform opacity-0 scale-95"
@@ -530,24 +531,61 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                 x-transition:leave="transition ease-in duration-75"
                                                                 x-transition:leave-start="transform opacity-100 scale-100"
                                                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                                                class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                                                x-cloak>
-                                                                <div class="py-1">
+                                                                class="absolute right-0 z-[99999] w-48 mt-2 bg-white rounded-md shadow-2xl border border-gray-200"
+                                                                style="display: none; min-width: 180px;"
+                                                                x-init="
+                                                                    $watch('open', value => {
+                                                                        if (value) {
+                                                                            const tableRow = $el.closest('tr');
+                                                                            if (tableRow) {
+                                                                                tableRow.style.position = 'relative';
+                                                                                tableRow.style.zIndex = '99998';
+                                                                            }
+                                                                        } else {
+                                                                            const tableRow = $el.closest('tr');
+                                                                            if (tableRow) {
+                                                                                tableRow.style.position = '';
+                                                                                tableRow.style.zIndex = '';
+                                                                            }
+                                                                        }
+                                                                    })
+                                                                "
+                                                                @keydown.escape.prevent.stop="open = false">
+
+                                                                <div class="py-1" role="menu" aria-orientation="vertical">
+                                                                    
+                                                                    <!-- Quick Actions for Pending Applications -->
                                                                     <?php if ($app['application_status'] == 'pending'): ?>
-                                                                        <a href="?page=accept-application&application_id=<?php echo $app['application_id']; ?>"
-                                                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                                            <i class="mr-3 text-green-400 fas fa-check"></i>
+                                                                        <a href="?page=accept-application&application_id=<?php echo $app['application_id']; ?>&redirect=browse-candidates"
+                                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50"
+                                                                            role="menuitem"
+                                                                            onclick="return confirm('Accept this application?')">
+                                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                            </svg>
                                                                             Accept Application
                                                                         </a>
-                                                                        <a href="?page=reject-application&application_id=<?php echo $app['application_id']; ?>"
-                                                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                                            <i class="mr-3 text-red-400 fas fa-times"></i>
+                                                                        
+                                                                        <a href="?page=reject-application&application_id=<?php echo $app['application_id']; ?>&redirect=browse-candidates"
+                                                                            class="flex items-center w-full px-4 py-2 text-sm text-left text-red-700 hover:bg-red-50"
+                                                                            role="menuitem"
+                                                                            onclick="return confirm('Reject this application?')">
+                                                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                            </svg>
                                                                             Reject Application
                                                                         </a>
+
+                                                                        <hr class="my-1">
                                                                     <?php endif; ?>
+
+                                                                    <!-- View Profile Action -->
                                                                     <a href="?page=view-candidate&candidate_id=<?php echo $app['jobseeker_id']; ?>"
-                                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                                        <i class="mr-3 text-blue-400 fas fa-user"></i>
+                                                                        class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                                                                        role="menuitem">
+                                                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                                        </svg>
                                                                         View Profile
                                                                     </a>
                                                                 </div>
@@ -739,7 +777,6 @@ include_once __DIR__ . '/components/navbar-employer.php';
             </a>
         <?php endforeach; ?>
     </div>
-</div>
 </div>
 </div>
 </div>

@@ -14,16 +14,23 @@ include_once __DIR__ . '../components/navbar-employer.php';
                     <a href="?page=employer-dashboard" class="text-gray-500 transition-colors hover:text-primary">
                         Dashboard
                     </a>
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="flex-shrink-0 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                     <a href="?page=manage-jobs" class="text-gray-500 transition-colors hover:text-primary">
                         Job Management
                     </a>
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="flex-shrink-0 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    <span class="font-medium text-primary"><?php echo htmlspecialchars($job['job_title'] ?? 'Job Details'); ?></span>
+                    <!-- Enhanced job title breadcrumb with truncation -->
+                    <span class="flex-1 min-w-0 font-medium text-primary">
+                        <span class="block max-w-full truncate"
+                            style="max-width: 300px;"
+                            title="<?php echo htmlspecialchars($job['job_title'] ?? 'Job Details'); ?>">
+                            <?php echo htmlspecialchars($job['job_title'] ?? 'Job Details'); ?>
+                        </span>
+                    </span>
                 </div>
             </nav>
 
@@ -36,8 +43,14 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <!-- Job Header with Gray Background -->
                         <div class="p-4 border-b border-gray-200 sm:p-6 bg-gray-50">
                             <div class="flex items-start justify-between mb-6">
-                                <div>
-                                    <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl"><?php echo htmlspecialchars($job['job_title']); ?></h1>
+                                <div class="flex-1 min-w-0 pr-4"> <!-- Added flex-1 min-w-0 and padding-right -->
+                                    <!-- Enhanced title with truncation -->
+                                    <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">
+                                        <div class="max-w-full break-words truncate overflow-wrap-anywhere word-break-break-all"
+                                            title="<?php echo htmlspecialchars($job['job_title']); ?>">
+                                            <?php echo htmlspecialchars($job['job_title']); ?>
+                                        </div>
+                                    </h1>
                                     <div class="flex items-center gap-3 mt-2">
                                         <!-- Employment Type Badge -->
                                         <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-gray-100 rounded-sm text-primary">
@@ -80,8 +93,8 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="flex items-center gap-2">
+                                <!-- Action Buttons - now with flex-shrink-0 -->
+                                <div class="flex items-center flex-shrink-0 gap-2">
                                     <?php if ($job['job_status'] == 'open'): ?>
                                         <button onclick="window.location.href='?page=toggle-job-status&id=<?php echo $job['job_id']; ?>&status=closed'"
                                             class="flex items-center px-4 py-2 text-sm font-medium text-red-800 transition-colors border border-red-200 rounded-lg bg-red-50 hover:bg-red-100">
@@ -161,9 +174,13 @@ include_once __DIR__ . '../components/navbar-employer.php';
                         <!-- Main Content -->
                         <div class="p-4 sm:p-6">
                             <!-- Job Summary -->
-                            <div class="mb-8">
+                            <div class="mb-8" style="max-width: 100%; overflow: hidden;">
                                 <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Job Summary</h2>
-                                <p class="text-sm text-gray-600 sm:text-base"><?php echo nl2br(htmlspecialchars($job['job_summary'])); ?></p>
+                                <!-- Enhanced job summary with stricter width control -->
+                                <div class="text-sm text-gray-600 break-words sm:text-base overflow-wrap-anywhere word-break-break-all"
+                                    style="max-width: 100%; width: 100%; overflow: hidden; display: block; word-wrap: break-word;">
+                                    <?php echo nl2br(htmlspecialchars($job['job_summary'])); ?>
+                                </div>
                             </div>
 
                             <!-- Skills Required -->
@@ -240,16 +257,17 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 </div>
                             </div>
 
-<!-- Full Description -->
-<?php if (!empty($job['full_description']) && $job['full_description'] !== $job['job_summary']): ?>
-    <div class="mb-8">
-        <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Full Description</h2>
-        <div class="max-w-full text-sm text-gray-600 break-words sm:text-base overflow-wrap-anywhere word-break-break-all">
-            <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
-        </div>
-    </div>
-<?php endif; ?>
-                                                        
+                            <!-- Full Description -->
+                            <?php if (!empty($job['full_description']) && $job['full_description'] !== $job['job_summary']): ?>
+                                <div class="mb-8" style="max-width: 100%; overflow: hidden;">
+                                    <h2 class="mb-3 font-semibold text-gray-800 text-md sm:text-xl">Full Description</h2>
+                                    <div class="text-sm text-gray-600 break-words sm:text-base overflow-wrap-anywhere word-break-break-all"
+                                        style="max-width: 100%; width: 100%; overflow: hidden; display: block; word-wrap: break-word;">
+                                        <?php echo nl2br(htmlspecialchars($job['full_description'])); ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
                             <!-- Screening Questions Section -->
                             <?php if (!empty($job['screening_questions'])): ?>
                                 <div class="mb-8 space-y-4">
@@ -466,22 +484,235 @@ include_once __DIR__ . '../components/navbar-employer.php';
 </div>
 
 <style>
-/* Force text wrapping for long strings without spaces */
-.overflow-wrap-anywhere {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    hyphens: auto;
-}
+    /* Force text wrapping for long strings without spaces - Enhanced */
+    .overflow-wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+    }
 
-/* Ensure container doesn't overflow */
-.rounded-xl {
-    overflow: hidden;
-}
+    /* Ensure container doesn't overflow */
+    .rounded-xl {
+        overflow: hidden;
+    }
 
-/* Additional fallback for extremely long words */
-.break-words {
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
+    /* Additional fallback for extremely long words */
+    .break-words {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent horizontal scrolling */
+    .word-break-break-all {
+        word-break: break-all;
+    }
+
+    /* Enhanced max-width constraints - CRITICAL for layout */
+    .max-w-full {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Enhanced truncation for job titles */
+    .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Ensure flex items don't overflow - ENHANCED */
+    .min-w-0 {
+        min-width: 0 !important;
+        flex-shrink: 1 !important;
+        overflow: hidden !important;
+    }
+
+    /* Prevent button container from shrinking */
+    .flex-shrink-0 {
+        flex-shrink: 0 !important;
+    }
+
+    /* CRITICAL: Force left section width constraints */
+    .lg\:w-8\/12 {
+        width: 66.666667% !important;
+        max-width: 66.666667% !important;
+        flex-shrink: 1 !important;
+        overflow: hidden !important;
+    }
+
+    .lg\:w-4\/12 {
+        width: 33.333333% !important;
+        max-width: 33.333333% !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Force content containers to respect boundaries */
+    .space-y-6>* {
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Enhanced text content safety */
+    .text-gray-600,
+    .text-gray-900 {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
+
+    /* CRITICAL: Card content width control */
+    .bg-white.border.border-gray-200.shadow-sm.rounded-xl {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Force main content sections to stay within bounds */
+    .p-4.sm\:p-6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Text sections enhanced constraints */
+    .mb-8 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .mb-8>div {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Grid sections safety */
+    .grid.grid-cols-1.gap-4.sm\:grid-cols-2.lg\:grid-cols-3 {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .grid.grid-cols-1.gap-4.sm\:grid-cols-2.lg\:grid-cols-3>div {
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Responsive text handling - ENHANCED */
+    @media (max-width: 1024px) {
+        .lg\:w-8\/12 {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .lg\:w-4\/12 {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .truncate {
+            max-width: 200px !important;
+        }
+
+        /* Force mobile layout constraints */
+        .space-y-6 {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .px-6.py-8 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .truncate {
+            max-width: 150px !important;
+        }
+    }
+
+    /* Additional safety for flex layouts */
+    .flex.flex-col.gap-6.lg\:flex-row.lg\:gap-8 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Force container boundaries */
+    .mx-auto.max-w-7xl {
+        width: 100% !important;
+        max-width: 80rem !important;
+        overflow: hidden !important;
+    }
+
+    /* Ensure no element can break out */
+    * {
+        box-sizing: border-box !important;
+    }
+
+    /* Additional text safety for descriptions */
+    .mb-8 .max-w-full.text-sm.text-gray-600.break-words.sm\:text-base.overflow-wrap-anywhere.word-break-break-all {
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+    }
+
+    /* Enhanced breadcrumb styling */
+    nav .flex.items-center.space-x-2 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Breadcrumb truncation styles */
+    .text-primary.min-w-0.flex-1 {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+    }
+
+    .text-primary.min-w-0.flex-1 .truncate {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        display: block !important;
+    }
+
+    /* Responsive breadcrumb handling */
+    @media (max-width: 1024px) {
+        .text-primary.min-w-0.flex-1 .truncate {
+            max-width: 250px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .text-primary.min-w-0.flex-1 .truncate {
+            max-width: 200px !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .text-primary.min-w-0.flex-1 .truncate {
+            max-width: 150px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .text-primary.min-w-0.flex-1 .truncate {
+            max-width: 100px !important;
+        }
+    }
+
+    /* Ensure chevron icons don't shrink */
+    .flex-shrink-0 {
+        flex-shrink: 0 !important;
+    }
 </style>

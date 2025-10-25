@@ -257,9 +257,9 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
                                         <!-- Row 1: Business Profile + Job Title + Business Name -->
                                         <div class="flex items-start justify-between gap-2">
-                                            <div class="flex items-center flex-1 gap-2">
+                                            <div class="flex items-center flex-1 min-w-0 gap-2"> <!-- Added min-w-0 -->
                                                 <!-- Business Profile Image -->
-                                                <div class="flex items-center justify-center w-12 h-12 p-1 overflow-hidden transition-transform duration-300 border border-gray-200 rounded-md hover:scale-105">
+                                                <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 p-1 overflow-hidden transition-transform duration-300 border border-gray-200 rounded-md hover:scale-105"> <!-- Added flex-shrink-0 -->
                                                     <?php if (!empty($job['business_logo'])): ?>
                                                         <img src="<?php echo htmlspecialchars($job['business_logo']); ?>"
                                                             alt="<?php echo htmlspecialchars($job['company_name'] ?? 'Company'); ?> Logo"
@@ -269,23 +269,44 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <!-- Job Title and Business Name -->
-                                                <div class="flex-1">
-                                                    <h3 class="text-base font-semibold leading-tight text-gray-900 transition-colors duration-300 hover:text-primary"><?php echo htmlspecialchars($job['job_title']); ?></h3>
-                                                    <p class="text-sm text-gray-500 transition-colors duration-300"><?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?></p>
+                                                <!-- Job Title and Business Name with truncation -->
+                                                <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                                                    <!-- Enhanced Job Title with truncation -->
+                                                    <h3 class="text-base font-semibold leading-tight text-gray-900 transition-colors duration-300 hover:text-primary">
+                                                        <div class="max-w-full truncate"
+                                                            title="<?php echo htmlspecialchars($job['job_title']); ?>"
+                                                            style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                            <?php echo htmlspecialchars($job['job_title']); ?>
+                                                        </div>
+                                                    </h3>
+                                                    <!-- Enhanced Company Name with truncation -->
+                                                    <p class="text-sm text-gray-500 transition-colors duration-300">
+                                                    <div class="max-w-full truncate"
+                                                        title="<?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?>"
+                                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        <?php echo htmlspecialchars($job['company_name'] ?? $job['business_name'] ?? ''); ?>
+                                                    </div>
+                                                    </p>
                                                 </div>
                                             </div>
 
                                         </div>
 
-                                        <!-- Row 2: Location with Icon -->
-                                        <div class="flex items-center py-2 transition-colors duration-300">
+                                        <!-- Row 2: Location with Icon - Enhanced with truncation -->
+                                        <div class="flex items-center min-w-0 py-2 transition-colors duration-300">
                                             <!-- Location Marker SVG Icon -->
-                                            <svg class="w-5 h-5 text-gray-500 transition-colors duration-300 hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition-colors duration-300 hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            <span class="ml-2 text-sm text-gray-600 transition-colors duration-300"><?php echo htmlspecialchars($job['location']); ?></span>
+                                            <!-- Enhanced Location with truncation -->
+                                            <span class="flex-1 min-w-0 ml-2 text-sm text-gray-600 transition-colors duration-300">
+                                                <div class="max-w-full truncate"
+                                                    title="<?php echo htmlspecialchars($job['location']); ?>"
+                                                    style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    <?php echo htmlspecialchars($job['location']); ?>
+                                                </div>
+                                            </span>
                                         </div>
 
                                         <!-- Row 4: Tags for Job Info -->
@@ -1051,3 +1072,4 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 </div>
 
 <div class="pb-20"></div> <!-- This creates space before the footer -->
+

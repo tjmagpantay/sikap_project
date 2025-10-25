@@ -10,10 +10,10 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
     <!-- Card Header with Background -->
     <div class="p-8 rounded-t-lg bg-gray-50 ">
-        <div class="flex items-start justify-between">
-            <div class="flex items-center space-x-4">
+        <div class="flex items-start justify-between min-w-0"> <!-- Added min-w-0 -->
+            <div class="flex items-center flex-1 min-w-0 space-x-4"> <!-- Added flex-1 min-w-0 -->
                 <!-- Business Logo -->
-                <div class="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg">
+                <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 overflow-hidden bg-white border-2 border-gray-200 rounded-lg"> <!-- Added flex-shrink-0 -->
                     <?php if (!empty($selectedJob['business_logo'])): ?>
                         <?php
                         $logoSrc = $selectedJob['business_logo'];
@@ -31,10 +31,16 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                 </div>
 
                 <!-- Job Title and Company -->
-                <div class="flex-1">
+                <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                    <!-- Enhanced Job Title with truncation -->
                     <h2 class="text-xl font-bold text-grayMain">
-                        <?php echo htmlspecialchars($selectedJob['job_title']); ?>
+                        <div class="max-w-full truncate"
+                            title="<?php echo htmlspecialchars($selectedJob['job_title']); ?>"
+                            style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <?php echo htmlspecialchars($selectedJob['job_title']); ?>
+                        </div>
                     </h2>
+
                     <?php
                     $companyName = '';
                     if (!empty($selectedJob['company_name'])) {
@@ -47,18 +53,32 @@ if (!isset($selectedJob) || empty($selectedJob)) {
                         $companyName = 'Company Name Not Available';
                     }
                     ?>
+
+                    <!-- Enhanced Company Name with truncation -->
                     <a href="?page=view-employer-profile&employer_id=<?php echo $selectedJob['employer_id']; ?>&job_id=<?php echo $selectedJob['job_id']; ?>&job_title=<?php echo urlencode($selectedJob['job_title']); ?>"
-                        class="font-normal text-gray-600 transition-colors hover:text-primary hover:underline">
-                        <?php echo htmlspecialchars($companyName); ?>
+                        class="block font-normal text-gray-600 transition-colors hover:text-primary hover:underline">
+                        <div class="max-w-full truncate"
+                            title="<?php echo htmlspecialchars($companyName); ?>"
+                            style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <?php echo htmlspecialchars($companyName); ?>
+                        </div>
                     </a>
-                     <div class="flex items-center transition-colors duration-300">
-                    <span class="text-sm text-gray-600 transition-colors duration-300"><?php echo htmlspecialchars($selectedJob['location']); ?></span>
-                </div>
+
+                    <!-- Enhanced Location with truncation -->
+                    <div class="flex items-center min-w-0 transition-colors duration-300">
+                        <span class="flex-1 min-w-0 text-sm text-gray-600 transition-colors duration-300">
+                            <div class="max-w-full truncate"
+                                title="<?php echo htmlspecialchars($selectedJob['location']); ?>"
+                                style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <?php echo htmlspecialchars($selectedJob['location']); ?>
+                            </div>
+                        </span>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Action Buttons Box -->
-            <div class="flex items-center gap-2 p-2">
+
+            <!-- Action Buttons Box - with flex-shrink-0 -->
+            <div class="flex items-center flex-shrink-0 gap-2 p-2"> <!-- Added flex-shrink-0 -->
                 <!-- Verified Badge -->
                 <button class="flex items-center justify-center w-8 h-8 transition-colors border rounded-lg text-primary border-primary bg-primary/10 hover:bg-primary/20" title="Verified">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#10364B">
@@ -95,7 +115,7 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
             </div>
         </div>
-        
+
         <!-- Tags and Stats Section -->
         <div class="flex items-center justify-between mt-4">
             <!-- Job Tags -->
@@ -149,7 +169,9 @@ if (!isset($selectedJob) || empty($selectedJob)) {
         <!-- Job Summary -->
         <div class="mb-6">
             <h3 class="mb-3 text-lg font-semibold text-grayMain">Job Summary</h3>
-            <div class="text-sm leading-relaxed text-gray-600">
+            <!-- Enhanced job summary with proper text wrapping -->
+            <div class="max-w-full text-sm leading-relaxed text-gray-600 break-words overflow-wrap-anywhere word-break-break-all"
+                style="max-width: 100%; word-wrap: break-word; overflow-wrap: break-word;">
                 <?php echo nl2br(htmlspecialchars($selectedJob['job_summary'] ?? 'No job description available.')); ?>
             </div>
         </div>
@@ -172,7 +194,9 @@ if (!isset($selectedJob) || empty($selectedJob)) {
         <?php if (!empty($selectedJob['full_description']) && $selectedJob['full_description'] !== $selectedJob['job_summary']): ?>
             <div class="mb-6">
                 <h3 class="mb-3 text-lg font-semibold text-grayMain">Full Description</h3>
-                <div class="text-sm leading-relaxed text-gray-600">
+                <!-- Enhanced full description with proper text wrapping -->
+                <div class="max-w-full text-sm leading-relaxed text-gray-600 break-words overflow-wrap-anywhere word-break-break-all"
+                    style="max-width: 100%; word-wrap: break-word; overflow-wrap: break-word;">
                     <?php echo nl2br(htmlspecialchars($selectedJob['full_description'])); ?>
                 </div>
             </div>
@@ -312,3 +336,326 @@ if (!isset($selectedJob) || empty($selectedJob)) {
 
     </div>
 </div>
+
+<style>
+    /* CRITICAL: Scope all styles to the specific AJAX container only - EXCLUDE BUTTONS */
+    #job-details-container .overflow-hidden.bg-white.border.border-gray-200.shadow-sm.rounded-xl {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Force strict width on the main container but EXCLUDE button containers */
+    #job-details-container .overflow-hidden.bg-white.border.border-gray-200.shadow-sm.rounded-xl *:not(button):not(.flex.items-center.flex-shrink-0.gap-2.p-2):not(.flex.w-full.gap-3.mt-8):not(.flex-1.px-4.py-3):not(a.flex-1):not(a.flex.items-center) {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* CRITICAL: Header section width control - AJAX only */
+    #job-details-container .p-8.rounded-t-lg.bg-gray-50 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* CRITICAL: Main flex container - AJAX only but EXCLUDE button areas */
+    #job-details-container .flex.items-start.justify-between.min-w-0:not(.flex.w-full.gap-3.mt-8) {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* CRITICAL: Text container width enforcement - AJAX only - EXCLUDE buttons */
+    #job-details-container .flex-1.min-w-0:not(.flex-1.px-4.py-3):not(a.flex-1) {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+        width: 0 !important;
+        /* Force flex shrinking */
+        max-width: 100% !important;
+    }
+
+    /* Enhanced truncation - AJAX only - EXCLUDE button text */
+    #job-details-container .truncate:not(button .truncate):not(.flex-1.px-4.py-3 .truncate) {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        display: block !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* CRITICAL: Job title specific targeting */
+    #job-details-container h2.text-xl.font-bold.text-grayMain {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    #job-details-container h2.text-xl.font-bold.text-grayMain .truncate {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* CRITICAL: Company name link specific targeting */
+    #job-details-container a.block.font-normal.text-gray-600 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    #job-details-container a.block.font-normal.text-gray-600 .truncate {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* CRITICAL: Location text specific targeting */
+    #job-details-container .flex.items-center.min-w-0.transition-colors.duration-300 .truncate {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* CRITICAL: Job summary and description - AJAX only - EXCLUDE button text */
+    #job-details-container .break-words.overflow-wrap-anywhere.word-break-break-all:not(button *):not(.flex-1.px-4.py-3 *) {
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        /* Emergency breaking for very long strings */
+        hyphens: auto !important;
+        -webkit-hyphens: auto !important;
+        -ms-hyphens: auto !important;
+        /* Force line breaking for URLs and long strings */
+        word-break: break-all !important;
+        overflow-wrap: anywhere !important;
+        -webkit-line-break: anywhere !important;
+        line-break: anywhere !important;
+    }
+
+    /* Section controls - AJAX only - EXCLUDE button sections */
+    #job-details-container .mb-6:not(.flex.w-full.gap-3.mt-8) {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Card body - AJAX only */
+    #job-details-container .p-8:not(button) {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All flex containers - AJAX only - EXCLUDE button containers */
+    #job-details-container .flex.items-start.justify-between:not(.flex.w-full.gap-3.mt-8),
+    #job-details-container .flex.items-center.flex-1.min-w-0.space-x-4:not(.flex.w-full.gap-3.mt-8),
+    #job-details-container .flex.items-center:not(.flex.items-center.flex-shrink-0.gap-2.p-2):not(.flex.w-full.gap-3.mt-8):not(.flex.items-center.justify-center),
+    #job-details-container .flex.items-center.justify-between.mt-4:not(.flex.w-full.gap-3.mt-8) {
+        min-width: 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Force all text elements - AJAX only - EXCLUDE button elements */
+    #job-details-container h2:not(button h2):not(.flex-1.px-4.py-3 h2),
+    #job-details-container h3:not(button h3):not(.flex-1.px-4.py-3 h3),
+    #job-details-container p:not(button p):not(.flex-1.px-4.py-3 p),
+    #job-details-container span:not(button span):not(.flex-1.px-4.py-3 span):not(.flex.w-full.gap-3.mt-8 span),
+    #job-details-container div:not(button div):not(.flex-1.px-4.py-3 div):not(.flex.w-full.gap-3.mt-8 div):not(.flex.items-center.flex-shrink-0.gap-2.p-2 div) {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Logo container - AJAX only */
+    #job-details-container .w-16.h-16.flex-shrink-0 {
+        width: 4rem !important;
+        height: 4rem !important;
+        flex-shrink: 0 !important;
+        min-width: 4rem !important;
+        max-width: 4rem !important;
+    }
+
+    /* PRESERVE: Action buttons container - DO NOT MODIFY */
+    #job-details-container .flex.items-center.flex-shrink-0.gap-2.p-2 {
+        /* Keep original button container styles */
+    }
+
+    #job-details-container .flex.items-center.flex-shrink-0.gap-2.p-2 button {
+        /* Keep original button styles */
+    }
+
+    /* PRESERVE: Action buttons section - DO NOT MODIFY */
+    #job-details-container .flex.w-full.gap-3.mt-8 {
+        /* Keep original action button section styles */
+    }
+
+    #job-details-container .flex.w-full.gap-3.mt-8 a {
+        /* Keep original action button link styles */
+    }
+
+    #job-details-container .flex.w-full.gap-3.mt-8 .flex-1 {
+        /* Keep original action button flex styles */
+    }
+
+    /* Tags section - AJAX only - but EXCLUDE if inside buttons */
+    #job-details-container .flex.flex-wrap.items-center.gap-2:not(.flex.w-full.gap-3.mt-8 .flex.flex-wrap.items-center.gap-2) {
+        overflow: hidden !important;
+        max-width: 100% !important;
+        flex-wrap: wrap !important;
+    }
+
+    #job-details-container .flex.flex-wrap.items-center.gap-2:not(.flex.w-full.gap-3.mt-8 .flex.flex-wrap.items-center.gap-2) span {
+        flex-shrink: 0 !important;
+        max-width: 120px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* Skills section - AJAX only - but EXCLUDE if inside buttons */
+    #job-details-container .flex.flex-wrap.gap-2:not(.flex.w-full.gap-3.mt-8 .flex.flex-wrap.gap-2) {
+        overflow: hidden !important;
+        max-width: 100% !important;
+        flex-wrap: wrap !important;
+    }
+
+    #job-details-container .flex.flex-wrap.gap-2:not(.flex.w-full.gap-3.mt-8 .flex.flex-wrap.gap-2) span {
+        flex-shrink: 0 !important;
+        max-width: 140px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* Timeline grid - AJAX only */
+    #job-details-container .grid.grid-cols-1.gap-4.sm\:grid-cols-2 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    }
+
+    #job-details-container .grid.grid-cols-1.gap-4.sm\:grid-cols-2>div {
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Text content safety - AJAX only - EXCLUDE button text */
+    #job-details-container .text-sm.leading-relaxed.text-gray-600:not(button .text-sm):not(.flex-1.px-4.py-3 .text-sm) {
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        /* Emergency breaking */
+        word-break: break-all !important;
+        overflow-wrap: anywhere !important;
+        -webkit-line-break: anywhere !important;
+        line-break: anywhere !important;
+    }
+
+    /* Section headers - AJAX only */
+    #job-details-container .text-lg.font-semibold.text-grayMain:not(button .text-lg) {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* PRESERVE: Button text and icons - DO NOT MODIFY */
+    #job-details-container button,
+    #job-details-container button *,
+    #job-details-container .flex-1.px-4.py-3,
+    #job-details_container .flex-1.px-4.py-3 *,
+    #job-details-container a.flex-1,
+    #job-details-container a.flex-1 *,
+    #job-details-container .flex.w-full.gap-3.mt-8 a,
+    #job-details-container .flex.w-full.gap-3.mt-8 a * {
+        /* Preserve all original button styles */
+    }
+
+    /* Responsive controls - AJAX only - EXCLUDE buttons */
+    @media (max-width: 768px) {
+        #job-details-container .truncate:not(button .truncate):not(.flex-1.px-4.py-3 .truncate) {
+            max-width: 180px !important;
+        }
+
+        #job-details-container .text-sm.leading-relaxed.text-gray-600:not(button .text-sm):not(.flex-1.px-4.py-3 .text-sm) {
+            font-size: 0.8125rem !important;
+            line-height: 1.5 !important;
+        }
+
+        #job-details-container .flex.items-center.justify-between.mt-4:not(.flex.w-full.gap-3.mt-8) {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+        }
+
+        #job-details-container .text-xl.font-bold.text-grayMain:not(button .text-xl) {
+            font-size: 1.125rem !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        #job-details-container .truncate:not(button .truncate):not(.flex-1.px-4.py-3 .truncate) {
+            max-width: 140px !important;
+        }
+
+        #job-details-container .p-8:not(button) {
+            padding: 1.5rem !important;
+        }
+
+        /* PRESERVE: Keep button layout unchanged on mobile */
+        #job-details-container .flex.w-full.gap-3.mt-8 {
+            /* Keep original responsive behavior */
+        }
+
+        #job-details-container .flex.w-full.gap-3.mt-8 a {
+            /* Keep original responsive behavior */
+        }
+    }
+
+    @media (max-width: 480px) {
+        #job-details-container .truncate:not(button .truncate):not(.flex-1.px-4.py-3 .truncate) {
+            max-width: 100px !important;
+        }
+
+        #job-details-container .w-16.h-16.flex-shrink-0 {
+            width: 3rem !important;
+            height: 3rem !important;
+            min-width: 3rem !important;
+            max-width: 3rem !important;
+        }
+
+        #job-details-container .text-xl.font-bold.text-grayMain:not(button .text-xl) {
+            font-size: 1rem !important;
+        }
+    }
+
+    /* CRITICAL: Emergency container safety */
+    #job-details-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+</style>

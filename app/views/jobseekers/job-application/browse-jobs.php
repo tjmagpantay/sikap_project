@@ -268,27 +268,37 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                 alt="Company Logo"
                                 class="flex-shrink-0 object-cover w-12 h-12 bg-gray-100 rounded-md">
 
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                                <!-- Enhanced Job Title with truncation -->
                                 <h3 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
-                                    <?php echo htmlspecialchars($currentJob['job_title']); ?>
+                                    <div class="max-w-full truncate"
+                                        title="<?php echo htmlspecialchars($currentJob['job_title']); ?>"
+                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <?php echo htmlspecialchars($currentJob['job_title']); ?>
+                                    </div>
                                 </h3>
+
+                                <!-- Enhanced Company Name with truncation -->
                                 <p class="text-sm text-gray-600">
+                                <div class="max-w-full truncate"
+                                    title="<?php echo htmlspecialchars(!empty($currentJob['company_name']) ? $currentJob['company_name'] : (!empty($currentJob['business_name']) ? $currentJob['business_name'] : (isset($currentJob['employer_first_name']) ? $currentJob['employer_first_name'] . ' ' . $currentJob['employer_last_name'] : 'Company'))); ?>"
+                                    style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     <?php
                                     echo htmlspecialchars(
                                         !empty($currentJob['company_name']) ? $currentJob['company_name'] : (!empty($currentJob['business_name']) ? $currentJob['business_name'] : (isset($currentJob['employer_first_name']) ? $currentJob['employer_first_name'] . ' ' . $currentJob['employer_last_name'] : 'Company'))
                                     );
                                     ?>
+                                </div>
                                 </p>
                             </div>
 
-                            <!-- Save Button -->
+                            <!-- Save Button - keep existing code -->
                             <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] == 3): ?>
                                 <button onclick="event.preventDefault(); event.stopPropagation(); toggleSaveJob(<?php echo $currentJob['job_id']; ?>, this)"
-                                    class="relative z-10 p-2 rounded-md transition-colors <?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'text-secondary hover:bg-yellow-50' : 'text-gray-500 hover:bg-gray-100 hover:text-yellow-600'; ?>"
+                                    class="relative z-10 flex-shrink-0 p-2 rounded-md transition-colors <?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'text-secondary hover:bg-yellow-50' : 'text-gray-500 hover:bg-gray-100 hover:text-yellow-600'; ?>"
                                     data-job-id="<?php echo $currentJob['job_id']; ?>"
                                     data-saved="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'true' : 'false'; ?>"
                                     title="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'Remove from saved jobs' : 'Save job for later'; ?>">
-
                                     <!-- Bookmark SVG Icon -->
                                     <svg class="w-5 h-5" fill="<?php echo (isset($currentJob['is_saved']) && $currentJob['is_saved']) ? 'currentColor' : 'none'; ?>"
                                         stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -302,12 +312,19 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                         <!-- Card Body Content -->
                         <div class="p-6 pt-4">
                             <!-- Location -->
-                            <div class="flex items-center gap-1 mb-3 text-sm text-gray-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="flex items-center min-w-0 gap-1 mb-3 text-sm text-gray-600"> <!-- Added min-w-0 -->
+                                <svg class="flex-shrink-0 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                <span><?php echo htmlspecialchars($currentJob['location']); ?></span>
+                                <!-- Enhanced Location with truncation -->
+                                <span class="flex-1 min-w-0">
+                                    <div class="max-w-full truncate"
+                                        title="<?php echo htmlspecialchars($currentJob['location']); ?>"
+                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <?php echo htmlspecialchars($currentJob['location']); ?>
+                                    </div>
+                                </span>
                             </div>
 
                             <!-- Job Type and Category Tags -->
@@ -1205,3 +1222,176 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
         }, duration);
     }
 </script>
+
+<style>
+    /* Enhanced job card text truncation for browse-jobs */
+    .job-cards {
+        overflow: hidden !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Enhanced text container width enforcement */
+    .job-cards .flex-1.min-w-0 {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+        width: 0 !important;
+        /* Force flex shrinking */
+        max-width: 100% !important;
+    }
+
+    /* Enhanced truncation with strict width */
+    .job-cards .truncate {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        display: block !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Force job summary and description containers */
+    .job-cards .break-words.overflow-wrap-anywhere.word-break-break-all {
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Strict container controls for all sections */
+    .job-cards .mb-4,
+    .job-cards .mb-3 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Force card body width */
+    .job-cards .p-6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All flex containers must respect width */
+    .job-cards .flex.items-start.gap-4,
+    .job-cards .flex.items-center.gap-1 {
+        min-width: 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Force all text elements to stay within bounds */
+    .job-cards h3,
+    .job-cards p,
+    .job-cards span,
+    .job-cards div {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Logo container must not expand */
+    .job-cards .w-12.h-12.flex-shrink-0 {
+        width: 3rem !important;
+        height: 3rem !important;
+        flex-shrink: 0 !important;
+        min-width: 3rem !important;
+        max-width: 3rem !important;
+    }
+
+    /* Save button container fixed size */
+    .job-cards .flex-shrink-0.p-2 {
+        flex-shrink: 0 !important;
+        min-width: auto !important;
+        width: auto !important;
+    }
+
+    /* Ensure no element can break container width */
+    .job-cards * {
+        box-sizing: border-box !important;
+    }
+
+    /* Enhanced responsive controls */
+    @media (max-width: 768px) {
+        .job-cards .truncate {
+            max-width: 200px !important;
+        }
+
+        .job-cards .break-words.overflow-wrap-anywhere.word-break-break-all {
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .job-cards .truncate {
+            max-width: 150px !important;
+        }
+    }
+
+    /* Grid container must allow proper card sizing */
+    #jobListingsContainer {
+        overflow: visible !important;
+    }
+
+    #jobListingsContainer.grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    }
+
+    /* Ensure cards maintain consistent width in grid */
+    @media (min-width: 640px) {
+        #jobListingsContainer.grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        #jobListingsContainer.grid {
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+        }
+    }
+
+    /* Existing tooltip styling - keep unchanged */
+    .tooltip-container:hover .tooltip-content {
+        opacity: 1 !important;
+        transform: translateY(-8px) !important;
+        pointer-events: auto;
+    }
+
+    .tooltip-content {
+        z-index: 9999 !important;
+    }
+
+    /* Keep existing responsive tooltip styles */
+    @media (max-width: 640px) {
+        .tooltip-content {
+            right: -20px;
+            left: auto;
+            transform: translateX(0) translateY(-8px);
+            min-width: 200px;
+        }
+
+        .tooltip-content .absolute.left-1\/2 {
+            left: 75%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tooltip-content {
+            right: -50px;
+            min-width: 220px;
+        }
+    }
+</style>

@@ -220,12 +220,22 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                                     <!-- Job Position Column -->
                                     <td class="px-6 py-5">
                                         <div class="flex items-center">
-                                            <div>
+                                            <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                                                <!-- Enhanced Job Title with truncation -->
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    <?php echo htmlspecialchars($application['job_title'] ?? 'Unknown Position'); ?>
+                                                    <div class="max-w-full truncate"
+                                                        title="<?php echo htmlspecialchars($application['job_title'] ?? 'Unknown Position'); ?>"
+                                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        <?php echo htmlspecialchars($application['job_title'] ?? 'Unknown Position'); ?>
+                                                    </div>
                                                 </div>
+                                                <!-- Enhanced Job Type and Location with truncation -->
                                                 <div class="text-xs text-gray-500">
-                                                    <?php echo ucfirst(str_replace('-', ' ', $application['job_type'] ?? 'full-time')); ?> • <?php echo htmlspecialchars($application['location'] ?? 'Location not specified'); ?>
+                                                    <div class="max-w-full truncate"
+                                                        title="<?php echo ucfirst(str_replace('-', ' ', $application['job_type'] ?? 'full-time')) . ' • ' . htmlspecialchars($application['location'] ?? 'Location not specified'); ?>"
+                                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        <?php echo ucfirst(str_replace('-', ' ', $application['job_type'] ?? 'full-time')); ?> • <?php echo htmlspecialchars($application['location'] ?? 'Location not specified'); ?>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -233,8 +243,12 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 
                                     <!-- Company Column -->
                                     <td class="px-6 py-5">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>
+                                        <div class="min-w-0 text-sm font-medium text-gray-900"> <!-- Added min-w-0 -->
+                                            <div class="max-w-full truncate"
+                                                title="<?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>"
+                                                style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                <?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>
+                                            </div>
                                         </div>
                                     </td>
 
@@ -385,104 +399,116 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm application-card" data-application-id="<?php echo $application['application_id']; ?>">
                         <!-- Card Header with Status Badge -->
                         <div class="flex items-start justify-between p-4 pb-2">
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0 pr-4"> <!-- Added min-w-0 and pr-4 for spacing -->
+                                <!-- Enhanced Job Title with truncation -->
                                 <h3 class="text-lg font-semibold leading-tight text-gray-900">
-                                    <?php echo htmlspecialchars($application['job_title']); ?>
+                                    <div class="max-w-full truncate"
+                                        title="<?php echo htmlspecialchars($application['job_title']); ?>"
+                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <?php echo htmlspecialchars($application['job_title']); ?>
+                                    </div>
                                 </h3>
+                                <!-- Enhanced Company Name with truncation -->
                                 <p class="mt-1 text-sm text-gray-600">
+                                <div class="max-w-full truncate"
+                                    title="<?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>"
+                                    style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     <?php echo htmlspecialchars($application['company_name'] ?? 'Company'); ?>
+                                </div>
                                 </p>
                             </div>
 
-                            <!-- Status Badge -->
-                            <div class="flex-shrink-0 ml-4">
-                                <?php if (!$application['is_finalized']): ?>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                        <div class="w-2 h-2 bg-orange-400 rounded-full"></div>
-                                        In Progress
-                                    </span>
-                                <?php else: ?>
-                                    <?php
-                                    $statusStyles = [
-                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                        'reviewed' => 'bg-blue-100 text-blue-800',
-                                        'shortlisted' => 'bg-purple-100 text-purple-800',
-                                        'hired' => 'bg-green-100 text-green-800',
-                                        'rejected' => 'bg-red-100 text-red-800',
-                                        'resigned' => 'bg-gray-100 text-gray-700'
-                                    ];
+                            <!-- Status Badge and More Actions Menu - with flex-shrink-0 -->
+                            <div class="flex items-start flex-shrink-0 gap-2">
+                                <!-- Status Badge -->
+                                <div class="flex-shrink-0">
+                                    <?php if (!$application['is_finalized']): ?>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                            <div class="w-2 h-2 bg-orange-400 rounded-full"></div>
+                                            In Progress
+                                        </span>
+                                    <?php else: ?>
+                                        <?php
+                                        $statusStyles = [
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
+                                            'reviewed' => 'bg-blue-100 text-blue-800',
+                                            'shortlisted' => 'bg-purple-100 text-purple-800',
+                                            'hired' => 'bg-green-100 text-green-800',
+                                            'rejected' => 'bg-red-100 text-red-800',
+                                            'resigned' => 'bg-gray-100 text-gray-700'
+                                        ];
 
-                                    $statusLabels = [
-                                        'reviewed' => 'Under Review',
-                                        'shortlisted' => 'Shortlisted',
-                                        'hired' => 'Hired',
-                                        'rejected' => 'Rejected',
-                                        'resigned' => 'Resigned',
-                                        'pending' => 'Pending'
-                                    ];
+                                        $statusLabels = [
+                                            'reviewed' => 'Under Review',
+                                            'shortlisted' => 'Shortlisted',
+                                            'hired' => 'Hired',
+                                            'rejected' => 'Rejected',
+                                            'resigned' => 'Resigned',
+                                            'pending' => 'Pending'
+                                        ];
 
-                                    $statusClass = $statusStyles[$application['application_status']] ?? 'bg-gray-100 text-gray-800';
-                                    $statusLabel = $statusLabels[$application['application_status']] ?? ucfirst($application['application_status']);
-                                    ?>
-                                    <span class="inline-flex items-center px-2.5 py-1  text-xs font-medium <?php echo $statusClass; ?>">
+                                        $statusClass = $statusStyles[$application['application_status']] ?? 'bg-gray-100 text-gray-800';
+                                        $statusLabel = $statusLabels[$application['application_status']] ?? ucfirst($application['application_status']);
+                                        ?>
+                                        <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium <?php echo $statusClass; ?>">
+                                            <?php echo $statusLabel; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
 
-                                        <?php echo $statusLabel; ?>
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                            <!-- More Actions Menu -->
-                            <div class="relative mt-1" x-data="{ open: false }">
-                                <button @click="open = !open"
-                                    @click.away="open = false"
-                                    class="flex items-center justify-center w-10 h-10 text-gray-400 transition-colors duration-200 rounded-sm hover:text-gray-600 hover:bg-gray-50">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                    </svg>
-                                </button>
+                                <!-- More Actions Menu -->
+                                <div class="relative flex-shrink-0" x-data="{ open: false }">
+                                    <button @click="open = !open"
+                                        @click.away="open = false"
+                                        class="flex items-center justify-center w-10 h-10 text-gray-400 transition-colors duration-200 rounded-sm hover:text-gray-600 hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                        </svg>
+                                    </button>
 
-                                <!-- Mobile Dropdown Menu -->
-                                <div x-show="open"
-                                    x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-                                    style="display: none;">
-                                    <div class="py-1">
-                                        <a href="?page=view-job&job_id=<?php echo ($application['job_id'] ?? 0); ?>"
-                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="mr-3 text-blue-400 fas fa-external-link-alt"></i>
-                                            View Job Details
-                                        </a>
-
-                                        <button onclick="toggleSaveJob(<?php echo ($application['job_id'] ?? 0); ?>, this)"
-                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            data-job-id="<?php echo ($application['job_id'] ?? 0); ?>"
-                                            data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>">
-                                            <i class="mr-3 text-yellow-400 <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
-                                            <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
-                                        </button>
-
-                                        <?php if ($application['application_status'] === 'hired'): ?>
-                                            <a href="?page=resign-from-job&id=<?php echo ($application['application_id'] ?? 0); ?>"
+                                    <!-- Mobile Dropdown Menu -->
+                                    <div x-show="open"
+                                        x-transition:enter="transition ease-out duration-100"
+                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-75"
+                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                        class="absolute right-0 z-40 w-48 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                                        style="display: none;">
+                                        <div class="py-1">
+                                            <a href="?page=view-job&job_id=<?php echo ($application['job_id'] ?? 0); ?>"
                                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                <i class="mr-3 text-orange-400 fas fa-sign-out-alt"></i>
-                                                Resign from Job
+                                                <i class="mr-3 text-blue-400 fas fa-external-link-alt"></i>
+                                                View Job Details
                                             </a>
-                                        <?php elseif ($application['application_status'] === 'pending'): ?>
-                                            <a href="?page=withdraw-application&id=<?php echo ($application['application_id'] ?? 0); ?>"
-                                                onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title'] ?? 'this job'); ?>&quot;?\n\nThis action cannot be undone.')"
-                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                <i class="mr-3 text-red-400 fas fa-times"></i>
-                                                Withdraw Application
-                                            </a>
-                                        <?php endif; ?>
+
+                                            <button onclick="toggleSaveJob(<?php echo ($application['job_id'] ?? 0); ?>, this)"
+                                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                data-job-id="<?php echo ($application['job_id'] ?? 0); ?>"
+                                                data-saved="<?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'true' : 'false'; ?>">
+                                                <i class="mr-3 text-yellow-400 <?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
+                                                <span class="save-text"><?php echo (isset($application['is_saved']) && $application['is_saved']) ? 'Remove from Saved' : 'Save Job'; ?></span>
+                                            </button>
+
+                                            <?php if ($application['application_status'] === 'hired'): ?>
+                                                <a href="?page=resign-from-job&id=<?php echo ($application['application_id'] ?? 0); ?>"
+                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <i class="mr-3 text-orange-400 fas fa-sign-out-alt"></i>
+                                                    Resign from Job
+                                                </a>
+                                            <?php elseif ($application['application_status'] === 'pending'): ?>
+                                                <a href="?page=withdraw-application&id=<?php echo ($application['application_id'] ?? 0); ?>"
+                                                    onclick="return confirm('Are you sure you want to withdraw your application for &quot;<?php echo htmlspecialchars($application['job_title'] ?? 'this job'); ?>&quot;?\n\nThis action cannot be undone.')"
+                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <i class="mr-3 text-red-400 fas fa-times"></i>
+                                                    Withdraw Application
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Card Body -->
@@ -649,44 +675,44 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
         const formData = new FormData();
         formData.append('job_id', jobId);
 
-        fetch(`?page=${action}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (isSaved) {
-                        // Job was unsaved
-                        button.setAttribute('data-saved', 'false');
-                        icon.className = 'far fa-bookmark mr-3 text-yellow-400';
-                        text.textContent = 'Save Job';
-                    } else {
-                        // Job was saved
-                        button.setAttribute('data-saved', 'true');
-                        icon.className = 'fas fa-bookmark mr-3 text-yellow-400';
-                        text.textContent = 'Remove from Saved';
-                    }
-
-                    // Show toast notification
-                    showToast(data.message, 'success');
+    fetch(`?page=${action}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (isSaved) {
+                    // Job was unsaved
+                    button.setAttribute('data-saved', 'false');
+                    icon.className = 'far fa-bookmark mr-3 text-yellow-400';
+                    text.textContent = 'Save Job';
                 } else {
-                    // Restore original state on error
-                    icon.className = originalIcon;
-                    text.textContent = originalText;
-                    showToast(data.message || 'Error occurred', 'error');
+                    // Job was saved
+                    button.setAttribute('data-saved', 'true');
+                    icon.className = 'fas fa-bookmark mr-3 text-yellow-400';
+                    text.textContent = 'Remove from Saved';
                 }
-            })
-            .catch(error => {
+
+                // Show toast notification
+                showToast(data.message, 'success');
+            } else {
                 // Restore original state on error
                 icon.className = originalIcon;
                 text.textContent = originalText;
-                console.error('Error:', error);
-                showToast('Error occurred while saving job', 'error');
-            })
-            .finally(() => {
-                button.disabled = false;
-            });
+                showToast(data.message || 'Error occurred', 'error');
+            }
+        })
+        .catch(error => {
+            // Restore original state on error
+            icon.className = originalIcon;
+            text.textContent = originalText;
+            console.error('Error:', error);
+            showToast('Error occurred while saving job', 'error');
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
     }
 
     function showToast(message, type) {
@@ -727,3 +753,221 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
         }
     });
 </script>
+
+
+<style>
+    /* Enhanced job applications table text truncation */
+    .application-table {
+        overflow: hidden !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Force table layout for consistent column widths */
+    table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+
+    /* Specific column width constraints */
+    table th:nth-child(1),
+    table td:nth-child(1) {
+        width: 35% !important;
+        /* Job Position */
+        max-width: 35% !important;
+    }
+
+    table th:nth-child(2),
+    table td:nth-child(2) {
+        width: 15% !important;
+        /* Company */
+        max-width: 15% !important;
+    }
+
+    table th:nth-child(3),
+    table td:nth-child(3) {
+        width: 12% !important;
+        /* Status */
+        max-width: 12% !important;
+    }
+
+    table th:nth-child(4),
+    table td:nth-child(4) {
+        width: 12% !important;
+        /* Interview */
+        max-width: 12% !important;
+    }
+
+    table th:nth-child(5),
+    table td:nth-child(5) {
+        width: 11% !important;
+        /* Applied Date */
+        max-width: 11% !important;
+    }
+
+    table th:nth-child(6),
+    table td:nth-child(6) {
+        width: 15% !important;
+        /* Actions */
+        max-width: 15% !important;
+    }
+
+    /* Enhanced text container width enforcement */
+    .min-w-0.flex-1 {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+        width: 0 !important;
+        /* Force flex shrinking */
+        max-width: 100% !important;
+    }
+
+    /* Enhanced truncation with strict width */
+    .truncate {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        display: block !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Force all text elements to stay within bounds */
+    .application-table h3,
+    .application-table p,
+    .application-table span,
+    .application-table div {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All flex containers must respect width */
+    .application-table .flex.items-center,
+    .application-table .flex.items-start {
+        min-width: 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Mobile card text truncation */
+    .application-card {
+        overflow: hidden !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .application-card .flex-1.min-w-0 {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+        width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .application-card .truncate {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        display: block !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Force status badges and action buttons to not shrink */
+    .application-card .flex-shrink-0 {
+        flex-shrink: 0 !important;
+        min-width: auto !important;
+    }
+
+    /* Ensure no element can break container width */
+    .application-table *,
+    .application-card * {
+        box-sizing: border-box !important;
+    }
+
+    /* Enhanced responsive controls */
+    @media (max-width: 1024px) {
+        .truncate {
+            max-width: 250px !important;
+        }
+
+        /* Adjust table layout for smaller screens */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            width: 40% !important;
+        }
+
+        table th:nth-child(2),
+        table td:nth-child(2) {
+            width: 20% !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .application-card .truncate {
+            max-width: 200px !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .application-card .truncate {
+            max-width: 150px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .application-card .truncate {
+            max-width: 120px !important;
+        }
+
+        .application-card h3 {
+            font-size: 1rem !important;
+            /* Smaller font on very small screens */
+        }
+    }
+
+    /* Additional safety for very long content */
+    .text-sm.font-medium.text-gray-900,
+    .text-lg.font-semibold.leading-tight.text-gray-900 {
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        max-width: 100% !important;
+    }
+
+    /* Table cell safety */
+    .px-6.py-5 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Container structure enforcement */
+    .w-full.overflow-visible>table,
+    .divide-y.divide-gray-300.table-fixed {
+        table-layout: fixed !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Button text protection */
+    .inline-flex.items-center.px-4.py-2 {
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .flex.items-center.space-x-3 {
+        min-width: 0 !important;
+        overflow: hidden !important;
+        flex-wrap: nowrap !important;
+    }
+</style>

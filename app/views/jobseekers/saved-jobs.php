@@ -50,20 +50,31 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                                 alt="Company Logo"
                                 class="flex-shrink-0 object-cover w-12 h-12 bg-gray-100 rounded-md">
 
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                                <!-- Enhanced Job Title with truncation -->
                                 <h3 class="text-lg font-semibold text-gray-900 transition-colors hover:text-blue-600">
                                     <a href="?page=view-job&job_id=<?php echo $job['job_id']; ?>" class="hover:text-blue-600">
-                                        <?php echo htmlspecialchars($job['job_title']); ?>
+                                        <div class="max-w-full truncate"
+                                            title="<?php echo htmlspecialchars($job['job_title']); ?>"
+                                            style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <?php echo htmlspecialchars($job['job_title']); ?>
+                                        </div>
                                     </a>
                                 </h3>
+
+                                <!-- Enhanced Company Name with truncation -->
                                 <p class="text-sm text-gray-600">
+                                <div class="max-w-full truncate"
+                                    title="<?php echo htmlspecialchars($job['company_name']); ?>"
+                                    style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     <?php echo htmlspecialchars($job['company_name']); ?>
+                                </div>
                                 </p>
                             </div>
 
-                            <!-- Unsave Button -->
+                            <!-- Unsave Button - keep existing code -->
                             <button onclick="event.preventDefault(); event.stopPropagation(); unsaveJob(<?php echo $job['job_id']; ?>)"
-                                class="relative z-10 p-2 transition-colors rounded-md text-secondary hover:bg-red-50 hover:text-red-600"
+                                class="relative z-10 flex-shrink-0 p-2 transition-colors rounded-md text-secondary hover:bg-red-50 hover:text-red-600"
                                 title="Remove from saved jobs">
                                 <!-- Bookmark SVG Icon (filled for saved) -->
                                 <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -76,12 +87,19 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                         <!-- Card Body Content -->
                         <div class="p-6 pt-4">
                             <!-- Location -->
-                            <div class="flex items-center gap-1 mb-3 text-sm text-gray-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="flex items-center min-w-0 gap-1 mb-3 text-sm text-gray-600"> <!-- Added min-w-0 -->
+                                <svg class="flex-shrink-0 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                <span><?php echo htmlspecialchars($job['location']); ?></span>
+                                <!-- Enhanced Location with truncation -->
+                                <span class="flex-1 min-w-0">
+                                    <div class="max-w-full truncate"
+                                        title="<?php echo htmlspecialchars($job['location']); ?>"
+                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <?php echo htmlspecialchars($job['location']); ?>
+                                    </div>
+                                </span>
                             </div>
 
                             <!-- Job Type and Saved Date Tags -->
@@ -95,9 +113,17 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
                             </div>
 
                             <!-- Job Summary -->
-                            <p class="mb-4 text-sm text-gray-700 line-clamp-3">
-                                <?php echo htmlspecialchars(substr($job['job_summary'], 0, 150)) . (strlen($job['job_summary']) > 150 ? '...' : ''); ?>
-                            </p>
+                            <div class="mb-4">
+                                <!-- Enhanced job summary with proper text wrapping -->
+                                <div class="max-w-full text-sm leading-relaxed text-gray-700 break-words overflow-wrap-anywhere word-break-break-all line-clamp-3"
+                                    style="max-width: 100%; word-wrap: break-word; overflow-wrap: break-word;">
+                                    <?php
+                                    $summary = $job['job_summary'];
+                                    $truncatedSummary = strlen($summary) > 150 ? substr($summary, 0, 150) . '...' : $summary;
+                                    echo htmlspecialchars($truncatedSummary);
+                                    ?>
+                                </div>
+                            </div>
 
                             <!-- Action Buttons -->
                             <div class="flex flex-col gap-2 mb-4">
@@ -152,66 +178,66 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
         svgIcon.classList.add('animate-pulse');
         button.disabled = true;
 
-        const formData = new FormData();
-        formData.append('job_id', jobId);
+    const formData = new FormData();
+    formData.append('job_id', jobId);
 
-        fetch('?page=unsave-job', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                // Check if response is ok first
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+    fetch('?page=unsave-job', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            // Check if response is ok first
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Expected JSON but got:', text);
+                    throw new Error('Server returned non-JSON response');
+                });
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data); // Debug log
+
+            if (data.success) {
+                // Show success toast
+                showToast(data.message || 'Job removed from saved jobs successfully!', 'success');
+
+                // Remove the card from the DOM with fade animation
+                const card = button.closest('.grid > div');
+                if (card) {
+                    card.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+
+                    setTimeout(() => {
+                        card.remove();
+
+                        // Check if no saved jobs remain
+                        const remainingCards = document.querySelectorAll('.grid > div');
+                        if (remainingCards.length === 0) {
+                            location.reload(); // Refresh to show the "no saved jobs" message
+                        }
+                    }, 300);
                 }
-
-                // Check content type
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    return response.text().then(text => {
-                        console.error('Expected JSON but got:', text);
-                        throw new Error('Server returned non-JSON response');
-                    });
-                }
-
-                return response.json();
-            })
-            .then(data => {
-                console.log('Server response:', data); // Debug log
-
-                if (data.success) {
-                    // Show success toast
-                    showToast(data.message || 'Job removed from saved jobs successfully!', 'success');
-
-                    // Remove the card from the DOM with fade animation
-                    const card = button.closest('.grid > div');
-                    if (card) {
-                        card.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-
-                        setTimeout(() => {
-                            card.remove();
-
-                            // Check if no saved jobs remain
-                            const remainingCards = document.querySelectorAll('.grid > div');
-                            if (remainingCards.length === 0) {
-                                location.reload(); // Refresh to show the "no saved jobs" message
-                            }
-                        }, 300);
-                    }
-                } else {
-                    showToast(data.message || 'Error removing job from saved jobs', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                showToast('Error occurred while removing job from saved jobs', 'error');
-            })
-            .finally(() => {
-                svgIcon.classList.remove('animate-pulse');
-                button.disabled = false;
-            });
+            } else {
+                showToast(data.message || 'Error removing job from saved jobs', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            showToast('Error occurred while removing job from saved jobs', 'error');
+        })
+        .finally(() => {
+            svgIcon.classList.remove('animate-pulse');
+            button.disabled = false;
+        });
     }
 
     function showToast(message, type) {

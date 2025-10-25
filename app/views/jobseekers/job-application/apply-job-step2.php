@@ -7,11 +7,12 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
 <div class="min-h-screen py-6">
     <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
 
+
         <!-- Job Info Card -->
         <div class="p-6 mb-4 border rounded-lg bg-blue-50">
             <div class="flex items-start space-x-4">
                 <!-- Business Logo -->
-                <div class="flex items-center justify-center w-12 h-12 overflow-hidden border-2 rounded-lg border-primary">
+                <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 overflow-hidden border-2 rounded-lg border-primary">
                     <?php if (!empty($job['business_logo'])): ?>
                         <img src="<?php echo htmlspecialchars($job['business_logo']); ?>" alt="Company Logo"
                             class="object-cover w-full h-full">
@@ -20,14 +21,28 @@ include_once __DIR__ . '/../components/navbar-jobseeker.php';
                     <?php endif; ?>
                 </div>
 
-                <div class="flex-1">
-                    <h2 class="text-xl font-semibold text-primary"><?php echo htmlspecialchars($job['job_title']); ?></h2>
+                <!-- Enhanced Job Title and Company Name with truncation -->
+                <div class="flex-1 min-w-0"> <!-- Added min-w-0 for proper flex truncation -->
+                    <!-- Enhanced Job Title with truncation -->
+                    <h2 class="text-xl font-semibold text-primary">
+                        <div class="max-w-full truncate"
+                            title="<?php echo htmlspecialchars($job['job_title']); ?>"
+                            style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <?php echo htmlspecialchars($job['job_title']); ?>
+                        </div>
+                    </h2>
+
+                    <!-- Enhanced Company Name with truncation -->
                     <p class="text-sm text-gray-500">
+                    <div class="max-w-full truncate"
+                        title="<?php echo htmlspecialchars($companyName = $job['company_name'] ?? ($job['employer_first_name'] . ' ' . $job['employer_last_name'])); ?>"
+                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <?php
                         $companyName = $job['company_name'] ??
                             ($job['employer_first_name'] . ' ' . $job['employer_last_name']);
                         echo htmlspecialchars($companyName);
                         ?>
+                    </div>
                     </p>
                 </div>
             </div>

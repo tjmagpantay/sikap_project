@@ -14,7 +14,7 @@
         <?php if (!empty($documents) && is_array($documents)): ?>
             <div class="space-y-3">
                 <?php foreach ($documents as $doc): ?>
-                    <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center justify-between p-4 transition-colors border border-gray-200 rounded-lg -50 hover:bg-gray-100">
                         <div class="flex items-center">
                             <div class="flex items-center justify-center w-12 h-12 mr-3 overflow-hidden bg-red-100 rounded-lg">
                                 <?php if (strpos($doc['file_type'] ?? '', 'pdf') !== false): ?>

@@ -186,16 +186,20 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <h3 class="font-normal text-gray-800 text-md line-clamp-2">
-                                            <?php echo htmlspecialchars($job['job_title']); ?>
+                                            <!-- Enhanced title with forced wrapping -->
+                                            <div class="max-w-full break-words overflow-wrap-anywhere word-break-break-all"
+                                                title="<?php echo htmlspecialchars($job['job_title']); ?>">
+                                                <?php echo htmlspecialchars($job['job_title']); ?>
+                                            </div>
                                         </h3>
                                         <!-- Tags Section -->
-                                        <div class="flex flex-wrap gap-2">
+                                        <div class="flex flex-wrap gap-2 mt-2">
                                             <!-- Employment Type Tag -->
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-sm font-medium bg-gray-100 text-primary" style="font-size: 0.65rem;">
                                                 <?php echo strtoupper($job['job_type'] ?? 'FULL-TIME'); ?>
                                             </span>
 
-                                            <!-- FIXED: Status Tag with proper status handling -->
+                                            <!-- Status Tag with proper status handling -->
                                             <?php
                                             switch ($displayStatus) {
                                                 case 'open':
@@ -321,3 +325,51 @@ include_once __DIR__ . '../components/navbar-employer.php';
         </div>
     </div>
 </div>
+
+
+<style>
+    /* Force text wrapping for long strings without spaces - Same as dashboard and view-job */
+    .overflow-wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+    }
+
+    /* Ensure container doesn't overflow */
+    .rounded-lg {
+        overflow: hidden;
+    }
+
+    /* Additional fallback for extremely long words */
+    .break-words {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent horizontal scrolling */
+    .word-break-break-all {
+        word-break: break-all;
+    }
+
+    /* Ensure max-width is respected */
+    .max-w-full {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Ensure cards maintain proper width */
+    .grid>div {
+        min-width: 0;
+    }
+
+    /* Force card content to respect boundaries */
+    .p-6 {
+        overflow: hidden;
+    }
+
+    /* Specific fix for flex items in cards */
+    .flex-1.min-w-0 {
+        overflow: hidden;
+    }
+</style>
