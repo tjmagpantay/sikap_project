@@ -55,7 +55,7 @@ $companies = $landingController->getTopCompanies(4);
               <div class="flex-1 min-w-0">
                 <h3 class="text-sm font-bold text-gray-900 "><?php echo htmlspecialchars($company['business_name']); ?></h3>
                 <?php if (!empty($company['business_industry'])): ?>
-                  <p class="text-xs text-gray-500 truncate ">
+                  <p class="text-sm text-gray-400 truncate">
                     <?php echo htmlspecialchars($company['business_industry']); ?>
                   </p>
                 <?php endif; ?>

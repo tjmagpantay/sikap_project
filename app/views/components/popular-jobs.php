@@ -35,10 +35,10 @@ $jobs = $landingController->getPopularJobs(6);
             onclick="viewJobDetails(<?php echo $job['job_id']; ?>, '<?php echo htmlspecialchars($job['job_title']); ?>')">
 
             <!-- Row 1: Business Profile + Job Title + Business Name + New Tag -->
-            <div class="flex items-start justify-between">
-              <div class="flex items-start gap-2">
+            <div class="flex items-start justify-between gap-2"> <!-- Added gap-2 -->
+              <div class="flex items-start flex-1 min-w-0 gap-2"> <!-- Added flex-1 min-w-0 -->
                 <!-- Business Profile Image -->
-                <div class="flex items-center justify-center w-12 h-12 p-1 overflow-hidden bg-gray-200 rounded-md">
+                <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 p-1 overflow-hidden bg-gray-200 rounded-md"> <!-- Added flex-shrink-0 -->
                   <?php if (!empty($job['business_logo'])): ?>
                     <img src="<?php echo htmlspecialchars($job['business_logo']); ?>"
                       alt="<?php echo htmlspecialchars($job['company_name'] ?? 'Company'); ?> Logo"
@@ -49,13 +49,25 @@ $jobs = $landingController->getPopularJobs(6);
                 </div>
 
                 <!-- Job Title and Business Name -->
-                <div>
-                  <h3 class="text-base font-medium leading-tight text-gray-900"><?php echo htmlspecialchars($job['job_title']); ?></h3>
-                  <p class="text-sm text-gray-600"><?php echo htmlspecialchars($job['company_name'] ?? ''); ?></p>
+                <div class="flex-1 min-w-0"> <!-- Added flex-1 min-w-0 for proper flex truncation -->
+                  <!-- Enhanced Job Title with truncation -->
+                  <h3 class="text-base font-medium leading-tight text-gray-900">
+                    <div class="max-w-full truncate"
+                      title="<?php echo htmlspecialchars($job['job_title']); ?>"
+                      style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <?php echo htmlspecialchars($job['job_title']); ?>
+                    </div>
+                  </h3>
+                  <!-- Enhanced Company Name with truncation -->
+                  <p class="max-w-full text-sm text-gray-400 truncate"
+                    title="<?php echo htmlspecialchars($job['company_name'] ?? ''); ?>"
+                    style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <?php echo htmlspecialchars($job['company_name'] ?? ''); ?>
+                  </p>
                 </div>
               </div>
 
-              <div class="flex items-center">
+              <div class="flex items-center flex-shrink-0"> <!-- Added flex-shrink-0 -->
                 <!-- New Badge (show for recent jobs) -->
                 <?php
                 $isRecent = (strtotime($job['created_at']) > strtotime('-3 days'));
@@ -67,14 +79,21 @@ $jobs = $landingController->getPopularJobs(6);
               </div>
             </div>
 
-            <!-- Row 2: Location with Icon -->
-            <div class="flex items-center py-2">
+            <!-- Row 2: Location with Icon - Enhanced with truncation -->
+            <div class="flex items-center min-w-0 py-2 transition-colors duration-300">
               <!-- Location Marker SVG Icon -->
-              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="flex-shrink-0 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
-              <span class="ml-1.5 text-sm text-gray-600"><?php echo htmlspecialchars($job['location']); ?></span>
+              <!-- Enhanced Location with truncation -->
+              <span class="flex-1 min-w-0 ml-1.5 text-sm text-gray-600">
+                <div class="max-w-full truncate"
+                  title="<?php echo htmlspecialchars($job['location']); ?>"
+                  style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <?php echo htmlspecialchars($job['location']); ?>
+                </div>
+              </span>
             </div>
 
 
@@ -122,6 +141,8 @@ $jobs = $landingController->getPopularJobs(6);
     <?php endif; ?>
   </div>
 </section>
+
+
 
 <script>
   function viewJobDetails(jobId, jobTitle) {

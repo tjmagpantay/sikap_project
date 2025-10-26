@@ -1,0 +1,107 @@
+Render Deployment Without Docker
+Option 1: Native PHP + Python Services (Recommended)
+Step 1: Update Your Project Structure
+Create these files in your root directory:
+# Create build script for PHP
+touch build.sh
+
+# Create start script  
+touch start.sh
+
+# Create requirements.txt for Python service
+touch python/job-recommendation-system/requirements.txt
+
+Step 2: Create Build Script
+
+# build.sh
+#!/bin/bash
+
+# Install PHP dependencies if you have composer.json
+# composer install --no-dev --optimize-autoloader
+
+# Set permissions for uploads directory
+mkdir -p uploads
+chmod 755 uploads
+
+# Any other build steps
+echo "Build completed successfully"
+
+Step 3: Create Start Script
+
+# start.sh
+#!/bin/bash
+
+# Start PHP built-in server
+cd public
+php -S 0.0.0.0:$PORT index.php
+
+Step 4: Make Scripts Executable
+
+chmod +x build.sh
+chmod +x start.sh
+
+Step 5: Update render.yaml (No Docker)
+# render.yaml
+services:
+  # PHP Web Application
+  - type: web
+    name: sikap-web
+    env: php
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: sikap-db
+          property: host
+      - key: DB_NAME
+        fromDatabase:
+          name: sikap-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: sikap-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: sikap-db
+          property: password
+      - key: DB_PORT
+        fromDatabase:
+          name: sikap-db
+          property: port
+      - key: PYTHON_ML_URL
+        fromService:
+          type: web
+          name: sikap-ml
+          property: host
+
+  # Python ML Service
+  - type: web
+    name: sikap-ml
+    env: python
+    buildCommand: cd python/job-recommendation-system && pip install -r requirements.txt
+    startCommand: cd python/job-recommendation-system && gunicorn --bind 0.0.0.0:$PORT app:app
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: sikap-db
+          property: host
+      - key: DB_NAME
+        fromDatabase:
+          name: sikap-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: sikap-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: sikap-db
+          property: password
+
+databases:
+  - name: sikap-db
+    databaseName: sikap_db
+    user: sikap_user
+    plan: free
