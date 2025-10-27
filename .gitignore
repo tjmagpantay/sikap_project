@@ -30,7 +30,21 @@ Thumbs.db
 # ML model
 /ml_service/model.pkl
 
-# Uploads (user content)
+
+# PRIVATE uploads (sensitive documents - NEVER commit these)
 uploads/*
 !uploads/.gitkeep
 !uploads/*/.gitkeep
+
+# PUBLIC uploads (images are OK, but user uploaded images should not be in Git)
+public/uploads/events/*.jfif
+public/uploads/events/*.jpg
+public/uploads/events/*.jpeg
+public/uploads/events/*.png
+public/uploads/events/*.gif
+public/uploads/banners/*
+public/uploads/profile_photos/*
+public/uploads/profile_pictures/*
+# Keep the directory structure
+!public/uploads/.gitkeep
+!public/uploads/*/.gitkeep
