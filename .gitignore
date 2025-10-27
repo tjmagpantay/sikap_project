@@ -13,19 +13,24 @@ __pycache__/
 env/
 venv/
 
-# Environment/config
+# Environment/config - SENSITIVE FILES ONLY
 .env
-# Sikap DB config (do not commit secrets)
 config/sikap_db.php
 config/google_oauth.php
 config/mailer.php
 config/db_structure_viewer.php
+
+# Allow template files (safe to commit)
+!config/*.template.php
 
 # OS
 .DS_Store
 Thumbs.db
 
 # ML model
-/ml_service/model.pkl 
+/ml_service/model.pkl
 
-
+# Uploads (user content)
+uploads/*
+!uploads/.gitkeep
+!uploads/*/.gitkeep
