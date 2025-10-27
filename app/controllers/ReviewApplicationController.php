@@ -112,9 +112,13 @@ class ReviewApplicationController
 
                         $config = require __DIR__ . '/../../config/sikap_db.php';
                         $pdo = new PDO(
-                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                             $config['db_user'],
-                            $config['db_pass']
+                            $config['db_pass'],
+                            [
+                                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                                PDO::ATTR_TIMEOUT => 30
+                            ]
                         );
                         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -195,9 +199,13 @@ class ReviewApplicationController
 
                     $config = require __DIR__ . '/../../config/sikap_db.php';
                     $pdo = new PDO(
-                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                         $config['db_user'],
-                        $config['db_pass']
+                        $config['db_pass'],
+                        [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_TIMEOUT => 30
+                        ]
                     );
                     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -293,9 +301,13 @@ class ReviewApplicationController
 
                         $config = require __DIR__ . '/../../config/sikap_db.php';
                         $notificationPdo = new PDO(
-                            "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                            "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                             $config['db_user'],
-                            $config['db_pass']
+                            $config['db_pass'],
+                            [
+                                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                                PDO::ATTR_TIMEOUT => 30
+                            ]
                         );
                         $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -306,7 +318,6 @@ class ReviewApplicationController
                             'approved',
                             $employer_notes
                         );
-
                     } catch (Exception $e) {
                         error_log("Error sending resignation approval notification: " . $e->getMessage());
                         // Don't fail the approval if notification fails
@@ -358,9 +369,13 @@ class ReviewApplicationController
 
                     $config = require __DIR__ . '/../../config/sikap_db.php';
                     $notificationPdo = new PDO(
-                        "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                        "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                         $config['db_user'],
-                        $config['db_pass']
+                        $config['db_pass'],
+                        [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_TIMEOUT => 30
+                        ]
                     );
                     $notificationPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -483,7 +498,4 @@ class ReviewApplicationController
             throw $e;
         }
     }
-
-    
-    
 }

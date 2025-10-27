@@ -1,7 +1,17 @@
 <?php
 // filepath: c:\xampp\htdocs\sikap\app\controllers\AdminChangePasswordController.php
 session_start();
-include_once __DIR__ . '/../../config/database.php';
+
+$config = require __DIR__ . '/../../config/sikap_db.php';
+$pdo = new PDO(
+    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
+    $config['db_user'],
+    $config['db_pass'],
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_TIMEOUT => 30
+    ]
+);
 
 header('Content-Type: application/json');
 
@@ -68,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$hashedNewPassword, $_SESSION['user_id']]);
 
         echo json_encode(['success' => true, 'message' => 'Password updated successfully']);
-
     } catch (Exception $e) {
         error_log("Admin Change Password Error: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'An error occurred while updating password']);
@@ -76,4 +85,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
-?>

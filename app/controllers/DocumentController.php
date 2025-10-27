@@ -184,11 +184,14 @@ class DocumentController
         try {
             $config = require __DIR__ . '/../../config/sikap_db.php';
             $db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                 $config['db_user'],
-                $config['db_pass']
+                $config['db_pass'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 30
+                ]
             );
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // FIXED: Use correct table name 'jobseeker' instead of 'jobseekers'
             $sql = "SELECT d.*, j.user_id 
@@ -259,11 +262,14 @@ class DocumentController
             if ($attachment_id) {
                 $config = require __DIR__ . '/../../config/sikap_db.php';
                 $db = new PDO(
-                    "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                     $config['db_user'],
-                    $config['db_pass']
+                    $config['db_pass'],
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_TIMEOUT => 30
+                    ]
                 );
-                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 $sql = "SELECT file_path FROM job_post_attachments WHERE attachment_id = ?";
                 $stmt = $db->prepare($sql);
@@ -335,11 +341,14 @@ class DocumentController
             if ($attachment_id) {
                 $config = require __DIR__ . '/../../config/sikap_db.php';
                 $db = new PDO(
-                    "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                     $config['db_user'],
-                    $config['db_pass']
+                    $config['db_pass'],
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_TIMEOUT => 30
+                    ]
                 );
-                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 $sql = "SELECT file_path FROM job_post_attachments WHERE attachment_id = ?";
                 $stmt = $db->prepare($sql);
@@ -433,7 +442,4 @@ class DocumentController
 
         return $content_types[$file_extension] ?? 'application/octet-stream';
     }
-
-    
-      
 }

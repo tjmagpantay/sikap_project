@@ -18,7 +18,7 @@ class NotificationController
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->pdo = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                 $config['db_user'],
                 $config['db_pass']
             );
@@ -446,5 +446,4 @@ class NotificationController
             return false;
         }
     }
-
 }
