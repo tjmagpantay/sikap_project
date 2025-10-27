@@ -16,10 +16,10 @@ venv/
 # Environment/config
 .env
 # Sikap DB config (do not commit secrets)
-config/
-config/db_structure_viewer.php
 config/sikap_db.php
 config/google_oauth.php
+config/mailer.php
+config/db_structure_viewer.php
 
 # OS
 .DS_Store
