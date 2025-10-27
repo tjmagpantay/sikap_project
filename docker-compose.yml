@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  php-app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - MYSQLHOST=shinkansen.proxy.rlwy.net
+      - MYSQLUSER=root
+      - MYSQLPASSWORD=kzqXGYUlxcfMLoNeoNYkwTOukstYjzRp
+      - MYSQLDATABASE=railway
+      - MYSQLPORT=23642
+    volumes:
+      - ./uploads:/var/www/html/uploads
+      - ./public/uploads:/var/www/html/public/uploads

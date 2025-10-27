@@ -8,17 +8,9 @@ else
 fi
 
 # Create required directories
-# PRIVATE uploads (outside web root in production)
-mkdir -p uploads/applications
-mkdir -p uploads/documents
-mkdir -p uploads/job_attachments
-
-# PUBLIC uploads (web accessible)
-mkdir -p public/uploads/applications
-mkdir -p public/uploads/banners
-mkdir -p public/uploads/events
-mkdir -p public/uploads/profile_photos
-mkdir -p public/uploads/profile_pictures
+mkdir -p uploads/applications uploads/documents uploads/job_attachments
+mkdir -p public/uploads/applications public/uploads/banners public/uploads/events
+mkdir -p public/uploads/profile_photos public/uploads/profile_pictures
 
 # Create .htaccess to protect private uploads
 cat > uploads/.htaccess << 'EOF'
@@ -28,35 +20,22 @@ Deny from all
 EOF
 
 # Create .gitkeep files to preserve directory structure
-touch uploads/.gitkeep
-touch uploads/applications/.gitkeep
-touch uploads/documents/.gitkeep
-touch uploads/job_attachments/.gitkeep
-touch public/uploads/.gitkeep
-touch public/uploads/applications/.gitkeep
-touch public/uploads/banners/.gitkeep
-touch public/uploads/events/.gitkeep
-touch public/uploads/profile_photos/.gitkeep
-touch public/uploads/profile_pictures/.gitkeep
+touch uploads/.gitkeep uploads/applications/.gitkeep uploads/documents/.gitkeep uploads/job_attachments/.gitkeep
+touch public/uploads/.gitkeep public/uploads/applications/.gitkeep public/uploads/banners/.gitkeep
+touch public/uploads/events/.gitkeep public/uploads/profile_photos/.gitkeep public/uploads/profile_pictures/.gitkeep
 
-# Set permissions
-chmod -R 755 uploads/ 2>/dev/null || echo "Could not set permissions for uploads/"
-chmod -R 755 public/uploads/ 2>/dev/null || echo "Could not set permissions for public/uploads/"
+# Set permissions (Docker will handle ownership)
+chmod -R 755 uploads/ public/uploads/ 2>/dev/null || echo "⚠️ Permissions set by Docker"
 
 # Create config files from templates
-if [ ! -f "config/sikap_db.php" ] && [ -f "config/sikap_db.template.php" ]; then
-    cp config/sikap_db.template.php config/sikap_db.php
-    echo "Created config/sikap_db.php from template"
-fi
+for template in config/*.template.php; do
+    if [ -f "$template" ]; then
+        config_file="${template%.template.php}.php"
+        if [ ! -f "$config_file" ]; then
+            cp "$template" "$config_file"
+            echo "Created $(basename "$config_file") from template"
+        fi
+    fi
+done
 
-if [ ! -f "config/google_oauth.php" ] && [ -f "config/google_oauth.template.php" ]; then
-    cp config/google_oauth.template.php config/google_oauth.php
-    echo "Created config/google_oauth.php from template"
-fi
-
-if [ ! -f "config/mailer.php" ] && [ -f "config/mailer.template.php" ]; then
-    cp config/mailer.template.php config/mailer.php
-    echo "Created config/mailer.php from template"
-fi
-
-echo "PHP build completed successfully"
+echo " PHP build completed successfully"
