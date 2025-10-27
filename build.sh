@@ -1,8 +1,10 @@
 #!/bin/bash
+# filepath: c:\xampp\htdocs\sikap\build.sh
 
 # Install PHP dependencies
 if [ -f "composer.json" ]; then
     composer install --no-dev --optimize-autoloader --no-interaction
+    echo "Composer dependencies installed"
 else
     echo "No composer.json found - skipping composer install"
 fi
@@ -15,8 +17,10 @@ mkdir -p public/uploads/profile_photos public/uploads/profile_pictures
 # Create .htaccess to protect private uploads
 cat > uploads/.htaccess << 'EOF'
 # Deny all web access to sensitive uploads
-Order Deny,Allow
-Deny from all
+<Files "*">
+    Order Deny,Allow
+    Deny from all
+</Files>
 EOF
 
 # Create .gitkeep files to preserve directory structure
@@ -24,10 +28,10 @@ touch uploads/.gitkeep uploads/applications/.gitkeep uploads/documents/.gitkeep 
 touch public/uploads/.gitkeep public/uploads/applications/.gitkeep public/uploads/banners/.gitkeep
 touch public/uploads/events/.gitkeep public/uploads/profile_photos/.gitkeep public/uploads/profile_pictures/.gitkeep
 
-# Set permissions (Docker will handle ownership)
-chmod -R 755 uploads/ public/uploads/ 2>/dev/null || echo "⚠️ Permissions set by Docker"
+# Set permissions for shared hosting
+chmod -R 755 uploads/ public/uploads/ 2>/dev/null || echo "Permission setting may be restricted on shared hosting"
 
-# Create config files from templates
+# Create config files from templates (for local development)
 for template in config/*.template.php; do
     if [ -f "$template" ]; then
         config_file="${template%.template.php}.php"
@@ -38,4 +42,4 @@ for template in config/*.template.php; do
     fi
 done
 
-echo " PHP build completed successfully"
+echo "PHP build completed successfully for Hostinger deployment"
