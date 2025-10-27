@@ -1,72 +1,91 @@
 <?php
-require_once __DIR__ . '/../models/Employer.php';
+// filepath: c:\xampp\htdocs\sikap\app\controllers\EmployerController.php
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/Employer.php';
+require_once __DIR__ . '/../models/JobPost.php';
 
 class EmployerController
 {
     private $userModel;
     private $employerModel;
+    private $jobPostModel;
 
     public function __construct()
     {
-        $this->userModel = new User();
-        $this->employerModel = new Employer();
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+
+        try {
+            // FIXED: Add Railway port to DSN
+            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ];
+
+            $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
+
+            $this->userModel = new User($pdo);
+            $this->employerModel = new Employer($pdo);
+            $this->jobPostModel = new JobPost($pdo);
+        } catch (PDOException $e) {
+            error_log("EmployerController database connection failed: " . $e->getMessage());
+            throw new Exception("Database connection failed");
+        }
     }
 
     public function signup()
     {
         $error = '';
-        $formData = []; // Add form data for repopulation
+        $formData = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $formData = $_POST; // Store form data for repopulation on error
+            $formData = [
+                'email' => $_POST['email'] ?? '',
+            ];
 
-            $email = trim($_POST['email'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $confirm_password = $_POST['confirm_password'] ?? '';
+            // Validate input
+            $errors = $this->validateSignupInput($_POST);
 
-            // Enhanced validation with character limits
-            $validationErrors = $this->validateSignupInput($formData);
-
-            if (!empty($validationErrors)) {
-                $error = implode(' ', $validationErrors);
-            } elseif ($this->userModel->findByEmail($email)) {
-                $error = 'Email already exists.';
+            if (!empty($errors)) {
+                $error = implode(' ', $errors);
             } else {
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-                // Create user account with employer role (pending status for approval)
-                $user_id = $this->userModel->create($email, $hashed_password, User::ROLE_EMPLOYER, 'pending');
-
-                if ($user_id) {
-                    // CREATE EMPLOYER RECORD HERE!
-                    $employerCreated = $this->employerModel->create(
-                        $user_id,
-                        'User',        // first_name (default)
-                        'Profile',     // last_name (default) 
-                        'Employee',    // position (default)
-                        null,          // contact_no
-                        null,          // middle_name
-                        null,          // company_name
-                        null           // about_us
+                // Check if user already exists
+                if ($this->userModel->findByEmail($formData['email'])) {
+                    $error = 'An account with this email already exists.';
+                } else {
+                    // Create user account
+                    $userId = $this->userModel->create(
+                        $formData['email'],
+                        password_hash($_POST['password'], PASSWORD_DEFAULT),
+                        User::ROLE_EMPLOYER
                     );
 
-                    if ($employerCreated) {
-                        $_SESSION['user_id'] = $user_id;
-                        $_SESSION['role'] = User::ROLE_EMPLOYER;
-                        $_SESSION['role_name'] = 'employer';
-                        $_SESSION['email'] = $email;
+                    if ($userId) {
+                        // Create employer profile
+                        $employerResult = $this->employerModel->createProfile($userId, [
+                            'first_name' => '',
+                            'last_name' => '',
+                            'position' => '',
+                            'contact_no' => '',
+                            'status' => 'incomplete'
+                        ]);
 
-                        // Redirect to dashboard
-                        header('Location: ?page=employer-dashboard');
-                        exit;
+                        if ($employerResult) {
+                            // Set session
+                            $_SESSION['user_id'] = $userId;
+                            $_SESSION['email'] = $formData['email'];
+                            $_SESSION['role'] = User::ROLE_EMPLOYER;
+
+                            header('Location: ?page=complete-employer-profile');
+                            exit;
+                        } else {
+                            $error = 'Failed to create employer profile. Please try again.';
+                        }
                     } else {
-                        // If employer creation fails, delete the user record
-                        $this->userModel->deleteUser($user_id);
-                        $error = 'Failed to create employer profile. Please try again.';
+                        $error = 'Failed to create account. Please try again.';
                     }
-                } else {
-                    $error = 'Failed to create account. Please try again.';
                 }
             }
         }
@@ -80,29 +99,40 @@ class EmployerController
         $formData = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $formData = $_POST;
-            $email = trim($_POST['email'] ?? '');
-            $password = $_POST['password'] ?? '';
+            $formData = [
+                'email' => $_POST['email'] ?? '',
+            ];
 
-            // Add character limit validation for login
-            $validationErrors = $this->validateLoginInput($email, $password);
+            // Validate input
+            $errors = $this->validateLoginInput($_POST['email'], $_POST['password']);
 
-            if (!empty($validationErrors)) {
-                $error = implode(' ', $validationErrors);
+            if (!empty($errors)) {
+                $error = implode(' ', $errors);
             } else {
-                $user = $this->userModel->findByEmail($email);
+                // Attempt login
+                $user = $this->userModel->findByEmail($formData['email']);
 
-                if ($user && password_verify($password, $user['password']) && $user['role_id'] == User::ROLE_EMPLOYER) {
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['role'] = $user['role_id'];
-                    $_SESSION['role_name'] = $user['role_name'];
-                    $_SESSION['email'] = $user['email'];
+                if ($user && $user['role'] === User::ROLE_EMPLOYER && password_verify($_POST['password'], $user['password'])) {
+                    if ($user['status'] === 'active') {
+                        // Set session
+                        $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['role'] = $user['role'];
 
-                    // Always redirect to dashboard
-                    header('Location: ?page=employer-dashboard');
-                    exit;
+                        // Check if employer profile is complete
+                        $employer = $this->employerModel->findByUserId($user['user_id']);
+
+                        if (!$employer || empty($employer['first_name'])) {
+                            header('Location: ?page=complete-employer-profile');
+                        } else {
+                            header('Location: ?page=employer-dashboard');
+                        }
+                        exit;
+                    } else {
+                        $error = 'Your account is not active. Please contact support.';
+                    }
                 } else {
-                    $error = 'Invalid email or password, or this is not an employer account.';
+                    $error = 'Invalid email or password.';
                 }
             }
         }

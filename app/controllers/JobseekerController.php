@@ -11,9 +11,28 @@ class JobseekerController
 
     public function __construct()
     {
-        $this->userModel = new User();
-        $this->jobseekerModel = new Jobseeker();
-        $this->jobPostModel = new JobPost();
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+        
+        try {
+            // FIXED: Add Railway port to DSN
+            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+            
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ];
+            
+            $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
+            
+            $this->userModel = new User($pdo);
+            $this->jobseekerModel = new Jobseeker($pdo);
+            $this->jobPostModel = new JobPost($pdo);
+            
+        } catch (PDOException $e) {
+            error_log("JobseekerController database connection failed: " . $e->getMessage());
+            throw new Exception("Database connection failed");
+        }
     }
 
     public function signup()
@@ -1514,10 +1533,23 @@ class JobseekerController
         // Get jobseeker profile for navbar
         $jobseeker = $this->getJobseekerData();
 
-        // Get events data
-        require_once __DIR__ . '/EventProgramController.php';
-        $eventController = new EventProgramController();
-        $allEvents = $eventController->getActiveEvents();
+        // Get events data - FIXED METHOD CALL
+        try {
+            require_once __DIR__ . '/EventProgramController.php';
+            $eventController = new EventProgramController();
+            
+            // FIXED: Use correct method name
+            $allEvents = $eventController->programEvents();
+            $events = $allEvents['events'] ?? [];
+            
+            // OR use the model directly for simpler approach:
+            // $eventModel = new EventProgram();
+            // $events = $eventModel->getAllEvents('show');
+            
+        } catch (Exception $e) {
+            error_log('Error fetching events for jobseeker programs: ' . $e->getMessage());
+            $events = []; // Fallback to empty array
+        }
 
         include __DIR__ . '/../views/jobseekers/programs-jobseeker.php';
     }
@@ -1818,19 +1850,25 @@ class JobseekerController
             exit;
         }
 
-        if ($_POST && isset($_POST['delete_experience_id'])) {
-            $experience_id = $_POST['delete_experience_id'];
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!isset($_POST['experience_id'])) {
+            $_SESSION['error_message'] = 'Experience ID is required.';
+            header('Location: ?page=complete-jobseeker-profile&step=4');
+            exit;
+        }
 
-            if ($jobseeker) {
-                $result = $this->jobseekerModel->deleteWorkExperience($jobseeker['jobseeker_id'], $experience_id);
+        $experience_id = $_POST['experience_id'];
 
-                if ($result) {
-                    $_SESSION['success_message'] = 'Work experience deleted successfully!';
-                } else {
-                    $_SESSION['error_message'] = 'Failed to delete work experience.';
-                }
-            }
+        $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+        if (!$jobseeker) {
+            $_SESSION['error_message'] = 'Jobseeker profile not found.';
+            header('Location: ?page=complete-jobseeker-profile&step=4');
+            exit;
+        }
+
+        if ($this->jobseekerModel->deleteWorkExperience($jobseeker['jobseeker_id'], $experience_id)) {
+            $_SESSION['success_message'] = 'Work experience deleted successfully!';
+        } else {
+            $_SESSION['error_message'] = 'Failed to delete work experience.';
         }
 
         header('Location: ?page=complete-jobseeker-profile&step=4');

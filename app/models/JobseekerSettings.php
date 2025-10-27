@@ -10,9 +10,13 @@ class JobseekerSettings
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                 $config['db_user'],
-                $config['db_pass']
+                $config['db_pass'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 30
+                ]
             );
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
@@ -68,5 +72,4 @@ class JobseekerSettings
         // Implementation for future use
         return true;
     }
-    
 }

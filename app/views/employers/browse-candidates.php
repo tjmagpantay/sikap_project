@@ -449,10 +449,16 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                     </div>
                                                 </td>
 
-                                                <!-- Job Applied For Column -->
+                                                <!-- Job Applied For Column - FIXED -->
                                                 <td class="px-6 py-5">
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        <?php echo htmlspecialchars($app['job_title']); ?>
+                                                        <!-- Enhanced title with forced wrapping -->
+                                                        <div class="max-w-full overflow-hidden">
+                                                            <div class="max-w-full break-words overflow-wrap-anywhere word-break-break-all"
+                                                                title="<?php echo htmlspecialchars($app['job_title']); ?>">
+                                                                <?php echo htmlspecialchars($app['job_title']); ?>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
 
@@ -553,7 +559,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                 @keydown.escape.prevent.stop="open = false">
 
                                                                 <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                    
+
                                                                     <!-- Quick Actions for Pending Applications -->
                                                                     <?php if ($app['application_status'] == 'pending'): ?>
                                                                         <a href="?page=accept-application&application_id=<?php echo $app['application_id']; ?>&redirect=browse-candidates"
@@ -565,7 +571,7 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                                                             </svg>
                                                                             Accept Application
                                                                         </a>
-                                                                        
+
                                                                         <a href="?page=reject-application&application_id=<?php echo $app['application_id']; ?>&redirect=browse-candidates"
                                                                             class="flex items-center w-full px-4 py-2 text-sm text-left text-red-700 hover:bg-red-50"
                                                                             role="menuitem"
@@ -718,7 +724,9 @@ include_once __DIR__ . '/components/navbar-employer.php';
                                             <!-- Job Applied For -->
                                             <div class="mb-3">
                                                 <span class="text-sm font-medium text-gray-700">Applied for:</span>
-                                                <span class="ml-1 text-sm text-gray-900"><?php echo htmlspecialchars($app['job_title']); ?></span>
+                                                <div class="mt-1 text-sm text-gray-900 break-words mobile-card-title overflow-wrap-anywhere">
+                                                    <?php echo htmlspecialchars($app['job_title']); ?>
+                                                </div>
                                             </div>
 
                                             <!-- Applied Date -->
@@ -795,3 +803,63 @@ include_once __DIR__ . '/components/navbar-employer.php';
 
 <!-- Alpine.js -->
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+
+<style>
+    /* Fix overlapping text issues - Same as dashboard.php */
+    .overflow-wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        hyphens: auto;
+    }
+
+    /* Ensure container doesn't overflow */
+    .rounded-lg {
+        overflow: hidden;
+    }
+
+    /* Additional fallback for extremely long words */
+    .break-words {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Prevent horizontal scrolling */
+    .word-break-break-all {
+        word-break: break-all;
+    }
+
+    /* Ensure max-width is respected */
+    .max-w-full {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Force table column width constraints */
+    .table-fixed {
+        table-layout: fixed;
+    }
+
+    /* Specific fix for table cells */
+    .table-fixed td {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    /* Fix dropdown text wrapping */
+    .dropdown-item-text {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    /* Fix mobile card text wrapping */
+    .mobile-card-title {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+</style>

@@ -9,7 +9,8 @@ $eventController = new EventProgramController();
 $event = null;
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $event = $eventController->getEventById($_GET['id']);
+    $result = $eventController->eventInfo(); // Use eventInfo method
+    $event = $result['event']; // Extract event from result array
 }
 ?>
 

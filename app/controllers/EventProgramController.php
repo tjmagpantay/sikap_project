@@ -4,418 +4,92 @@ require_once __DIR__ . '/../models/EventProgram.php';
 
 class EventProgramController
 {
-    private $model;
-    private $uploadDir;
+    private $eventModel;
 
     public function __construct()
     {
-        $this->model = new EventProgram();
-        $this->uploadDir = __DIR__ . '/../../public/uploads/events/';
-
-        if (!file_exists($this->uploadDir)) {
-            mkdir($this->uploadDir, 0777, true);
+        try {
+            $this->eventModel = new EventProgram();
+        } catch (Exception $e) {
+            error_log("EventProgramController initialization failed: " . $e->getMessage());
+            throw new Exception("Failed to initialize EventProgram controller");
         }
     }
 
-    private function checkAdminAuth()
+    /**
+     * Handle program-events page
+     */
+    public function programEvents()
     {
-        if (!isset($_SESSION['admin_id'])) {
-            header('Location: index.php?page=admin-login');
-            exit;
+        try {
+            $events = $this->eventModel->getAllEvents('show');
+
+            // Make events available to the view
+            return [
+                'events' => $events,
+                'view' => 'pages/program-events'
+            ];
+        } catch (Exception $e) {
+            error_log("Error in programEvents: " . $e->getMessage());
+            return [
+                'events' => [],
+                'error' => 'Failed to load events',
+                'view' => 'pages/program-events'
+            ];
         }
     }
 
-    public function store()
+    /**
+     * Handle event-info page
+     */
+    public function eventInfo()
     {
-        // Validate inputs (description optional)
-        if (
-            empty($_POST['title']) ||
-            empty($_POST['type']) || empty($_POST['time_start']) ||
-            empty($_POST['time_end']) || empty($_POST['status'])
-        ) {
-            header('Location: index.php?page=admin-event-create&error=All fields are required');
-            exit;
-        }
+        try {
+            $eventId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-        // Handle image upload
-        $image_path = '';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['image'];
-
-            // Validate file type
-            $allowed_types = ['image/jpeg', 'image/png'];
-            if (!in_array($file['type'], $allowed_types)) {
-                header('Location: index.php?page=admin-event-create&error=Only JPG and PNG files are allowed');
-                exit;
+            if ($eventId <= 0) {
+                return [
+                    'event' => null,
+                    'error' => 'Invalid event ID',
+                    'view' => 'pages/event-info'
+                ];
             }
 
-            // Validate file size (5MB max)
-            if ($file['size'] > 5 * 1024 * 1024) {
-                header('Location: index.php?page=admin-event-create&error=File size must be less than 5MB');
-                exit;
-            }
+            $event = $this->eventModel->getEventById($eventId);
 
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = uniqid() . '.' . $ext;
-            $image_path = 'uploads/events/' . $filename;
-
-            move_uploaded_file($file['tmp_name'], $this->uploadDir . $filename);
+            return [
+                'event' => $event,
+                'view' => 'pages/event-info'
+            ];
+        } catch (Exception $e) {
+            error_log("Error in eventInfo: " . $e->getMessage());
+            return [
+                'event' => null,
+                'error' => 'Failed to load event details',
+                'view' => 'pages/event-info'
+            ];
         }
-
-        // Only allow valid types
-        $valid_types = ['program', 'jobfair', 'local recruitment'];
-        $type = in_array($_POST['type'], $valid_types) ? $_POST['type'] : 'program';
-        $title = trim($_POST['title']);
-        $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-        $status = trim($_POST['status']);
-
-        // Normalize datetime-local values (YYYY-MM-DDTHH:MM) to MySQL DATETIME
-        $timeStartRaw = trim($_POST['time_start']);
-        $timeEndRaw = trim($_POST['time_end']);
-        $time_start = str_replace('T', ' ', $timeStartRaw);
-        $time_end = str_replace('T', ' ', $timeEndRaw);
-        // append seconds if missing
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_start)) $time_start .= ':00';
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_end)) $time_end .= ':00';
-
-        $eventId = $this->model->createEvent(
-            $title,
-            $description,
-            $type,
-            $image_path,
-            $time_start,
-            $time_end,
-            $status
-        );
-
-        if ($eventId) {
-            // Event created successfully; send notifications only on create when status is 'show'
-            error_log("✅ Event created successfully with ID: " . $eventId);
-
-            if ($status === 'show') {
-                try {
-                    // Notify jobseekers
-                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($eventId);
-                    if ($jobseekerNotificationResult) {
-                        error_log("✅ Jobseeker notifications sent for event ID: $eventId");
-                    } else {
-                        error_log("⚠️ Failed to send jobseeker notifications for event ID: $eventId");
-                    }
-
-                    // Notify employers
-                    if (method_exists($this->model, 'notifyEmployersAboutNewProgram')) {
-                        $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($eventId);
-                        if ($employerNotificationResult) {
-                            error_log("✅ Employer notifications sent for event ID: $eventId");
-                        } else {
-                            error_log("⚠️ Failed to send employer notifications for event ID: $eventId");
-                        }
-                    }
-                } catch (Exception $e) {
-                    error_log("❌ Failed to send notifications for event ID $eventId: " . $e->getMessage());
-                }
-            }
-
-            header('Location: index.php?page=admin-events&success=Event created successfully');
-        } else {
-            header('Location: index.php?page=admin-event-create&error=Failed to create event');
-        }
-        exit;
     }
 
-    public function edit($id)
+    /**
+     * Get events by type (for filtering)
+     */
+    public function getEventsByType($type)
     {
-        $event = $this->model->getEventById($id);
-        if (!$event) {
-            header('Location: index.php?page=admin-events&error=Event not found');
-            exit;
+        try {
+            return $this->eventModel->getEventsByType($type, 'show');
+        } catch (Exception $e) {
+            error_log("Error getting events by type: " . $e->getMessage());
+            return [];
         }
-        include __DIR__ . '/../views/admin/events/edit.php';
     }
-
-    public function update($id)
-    {
-        // Validate inputs for update (description optional)
-        if (
-            empty($_POST['title']) ||
-            empty($_POST['type']) || empty($_POST['time_start']) ||
-            empty($_POST['time_end']) || empty($_POST['status'])
-        ) {
-            header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=All fields are required');
-            exit;
-        }
-
-        $event = $this->model->getEventById($id);
-        if (!$event) {
-            header('Location: index.php?page=admin-events&error=Event not found');
-            exit;
-        }
-
-        // Always use the new image if uploaded, otherwise keep the current image
-        $image_path = $event['image'];
-        if (isset($_FILES['image']) && is_uploaded_file($_FILES['image']['tmp_name']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['image'];
-            // Validate file type
-            $allowed_types = ['image/jpeg', 'image/png'];
-            if (!in_array($file['type'], $allowed_types)) {
-                header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=Only JPG and PNG files are allowed');
-                exit;
-            }
-            // Validate file size (5MB max)
-            if ($file['size'] > 5 * 1024 * 1024) {
-                header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=File size must be less than 5MB');
-                exit;
-            }
-            // Delete old image if exists and is not empty
-            if (!empty($event['image']) && file_exists($this->uploadDir . basename($event['image']))) {
-                unlink($this->uploadDir . basename($event['image']));
-            }
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = uniqid() . '.' . $ext;
-            $image_path = 'uploads/events/' . $filename;
-            if (!move_uploaded_file($file['tmp_name'], $this->uploadDir . $filename)) {
-                header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=Failed to upload image');
-                exit;
-            }
-        } else if (isset($_POST['current_image'])) {
-            $image_path = $_POST['current_image'];
-        }
-
-        // Only allow valid types
-        $valid_types = ['program', 'jobfair', 'local recruitment'];
-        $type = in_array($_POST['type'], $valid_types) ? $_POST['type'] : 'program';
-        $title = trim($_POST['title']);
-        $description = isset($_POST['description']) ? trim($_POST['description']) : $event['description'];
-        $status = trim($_POST['status']);
-
-        // Normalize datetimes
-        $timeStartRaw = trim($_POST['time_start']);
-        $timeEndRaw = trim($_POST['time_end']);
-        $time_start = str_replace('T', ' ', $timeStartRaw);
-        $time_end = str_replace('T', ' ', $timeEndRaw);
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_start)) $time_start .= ':00';
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $time_end)) $time_end .= ':00';
-
-        // Log incoming values to help debugging (development only)
-        error_log("🔧 EventProgramController::update - incoming: id=$id, title='" . $title . "', type='" . $type . "', status='" . $status . "', time_start='" . $time_start . "', time_end='" . $time_end . "'");
-
-        $success = $this->model->updateEvent(
-            $id,
-            $title,
-            $description,
-            $type,
-            $image_path,
-            $time_start,
-            $time_end,
-            $status
-        );
-
-        error_log("🔧 EventProgramController::update - model->updateEvent returned: " . var_export($success, true));
-        $after = $this->model->getEventById($id);
-        error_log("🔍 EventProgramController::update - DB row after update: " . json_encode($after));
-
-        if ($success) {
-            // Trigger notifications if event status changed to 'show'
-            if ($_POST['status'] === 'show') {
-                try {
-                    // Notify jobseekers
-                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
-
-                    if ($jobseekerNotificationResult) {
-                        error_log("✅ Jobseeker program update notifications sent for event ID: $id");
-                    } else {
-                        error_log("⚠️ Jobseeker program update notifications may have failed for event ID: $id");
-                    }
-
-                    // FIXED: Also notify employers
-                    $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($id);
-
-                    if ($employerNotificationResult) {
-                        error_log("✅ Employer program update notifications sent for event ID: $id");
-                    } else {
-                        error_log("⚠️ Employer program update notifications may have failed for event ID: $id");
-                    }
-                } catch (Exception $e) {
-                    error_log("❌ Failed to send program update notifications: " . $e->getMessage());
-                }
-            }
-
-            header('Location: index.php?page=admin-events&success=Event updated successfully');
-        } else {
-            header('Location: index.php?page=admin-event-edit&id=' . $id . '&error=Failed to update event');
-        }
-        exit;
-    }
-
-    public function delete($id)
-    {
-        $event = $this->model->getEventById($id);
-        if ($event && $event['image']) {
-            $image_path = $this->uploadDir . basename($event['image']);
-            if (file_exists($image_path)) {
-                unlink($image_path);
-            }
-        }
-
-        $success = $this->model->deleteEvent($id);
-
-        if ($success) {
-            header('Location: index.php?page=admin-events&success=Event deleted successfully');
-        } else {
-            header('Location: index.php?page=admin-events&error=Failed to delete event');
-        }
-        exit;
-    }
-
-    public function publicView()
-    {
-        // Fix: Use correct type names as stored in database
-        $programs = $this->model->getEventsByType('program');
-        $jobFairs = $this->model->getEventsByType('jobfair');
-        $localRecruitment = $this->model->getEventsByType('local recruitment'); // Add this if needed
-        include __DIR__ . '/../views/pages/event-jobfair.php';
-    }
-
     public function getActiveEvents()
     {
-        return $this->model->getActiveEvents();
-    }
-
-    public function searchEvents($query = '')
-    {
-        if (empty($query)) {
-            return $this->model->getAllEvents();
+        try {
+            return $this->eventModel->getAllEvents('show');
+        } catch (Exception $e) {
+            error_log("Error getting active events: " . $e->getMessage());
+            return [];
         }
-        return $this->model->searchEvents($query);
-    }
-
-    public function getUpcomingEvents($limit = 5)
-    {
-        return $this->model->getUpcomingEvents($limit);
-    }
-
-    public function getEventById($id)
-    {
-        return $this->model->getEventById($id);
-    }
-
-    public function toggleEventStatus($id)
-    {
-        if (!isset($_SESSION['admin_id'])) {
-            header('Location: index.php?page=admin-login');
-            exit;
-        }
-
-        $event = $this->model->getEventById($id);
-        if (!$event) {
-            header('Location: index.php?page=admin-events&error=Event not found');
-            exit;
-        }
-
-        // Fix: Use correct status values from your database enum
-        $newStatus = $event['status'] === 'show' ? 'hide' : 'show';
-        $success = $this->model->updateEventStatus($id, $newStatus);
-
-        if ($success) {
-            // Trigger notifications when event status changes to 'show'
-            if ($newStatus === 'show') {
-                try {
-                    // Notify jobseekers
-                    $jobseekerNotificationResult = $this->model->notifyJobseekersAboutNewProgram($id);
-
-                    if ($jobseekerNotificationResult) {
-                        error_log("✅ Jobseeker program visibility notifications sent for event ID: $id");
-                    } else {
-                        error_log("⚠️ Jobseeker program visibility notifications may have failed for event ID: $id");
-                    }
-
-                    // FIXED: Also notify employers
-                    $employerNotificationResult = $this->model->notifyEmployersAboutNewProgram($id);
-
-                    if ($employerNotificationResult) {
-                        error_log("✅ Employer program visibility notifications sent for event ID: $id");
-                    } else {
-                        error_log("⚠️ Employer program visibility notifications may have failed for event ID: $id");
-                    }
-                } catch (Exception $e) {
-                    error_log("❌ Failed to send program visibility notifications: " . $e->getMessage());
-                }
-            }
-
-            header('Location: index.php?page=admin-events&success=Event status updated successfully');
-        } else {
-            header('Location: index.php?page=admin-events&error=Failed to update event status');
-        }
-        exit;
-    }
-
-    public function togglePin()
-    {
-        if (!isset($_SESSION['admin_id'])) {
-            header('Location: index.php?page=admin-login');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?page=admin-events&error=Invalid request method');
-            exit;
-        }
-
-        if (!isset($_POST['event_id']) || !is_numeric($_POST['event_id'])) {
-            header('Location: index.php?page=admin-events&error=Invalid event ID');
-            exit;
-        }
-
-        $eventId = (int) $_POST['event_id'];
-        $event = $this->model->getEventById($eventId);
-
-        if (!$event) {
-            header('Location: index.php?page=admin-events&error=Event not found');
-            exit;
-        }
-
-        $success = $this->model->togglePin($eventId);
-
-        if ($success) {
-            $action = $event['pinned'] ? 'unpinned' : 'pinned';
-            header('Location: index.php?page=admin-events&success=Event ' . $action . ' successfully');
-        } else {
-            header('Location: index.php?page=admin-events&error=Failed to update pin status');
-        }
-        exit;
-    }
-
-    private function validateImage($file)
-    {
-        $errors = [];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-        $allowedTypes = ['image/jpeg', 'image/png'];
-
-        if ($file['size'] > $maxSize) {
-            $errors[] = 'File size must be less than 5MB';
-        }
-
-        if (!in_array($file['type'], $allowedTypes)) {
-            $errors[] = 'Only JPG and PNG files are allowed';
-        }
-
-        return $errors;
-    }
-
-    private function handleImageUpload($file, $oldImage = null)
-    {
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid() . '.' . $ext;
-        $image_path = 'uploads/events/' . $filename;
-
-        if ($oldImage && file_exists($this->uploadDir . basename($oldImage))) {
-            unlink($this->uploadDir . basename($oldImage));
-        }
-
-        if (!move_uploaded_file($file['tmp_name'], $this->uploadDir . $filename)) {
-            throw new Exception('Failed to upload image');
-        }
-
-        return $image_path;
     }
 }

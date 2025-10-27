@@ -8,15 +8,21 @@ class EventProgram
     public function __construct()
     {
         $config = require __DIR__ . '/../../config/sikap_db.php';
+
         try {
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            // CRITICAL: Add port for Railway connection
+            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30 // Important for Railway free tier
+            ];
+
+            $this->db = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
         } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+            error_log("EventProgram database connection failed: " . $e->getMessage());
+            throw new Exception("Database connection failed: " . $e->getMessage());
         }
     }
 
@@ -45,28 +51,77 @@ class EventProgram
         return $errors;
     }
 
-    public function getAllEvents()
+    /**
+     * Get all events with proper filtering
+     */
+    public function getAllEvents($status = 'show')
     {
-        $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY created_at DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT * FROM events WHERE status = :status ORDER BY pinned DESC, time_start ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching events: " . $e->getMessage());
+            return [];
+        }
     }
 
-    public function getEventsByType($type)
+    /**
+     * Get event by ID
+     */
+    public function getEventById($eventId)
     {
-        $stmt = $this->db->prepare("
-            SELECT * FROM {$this->table} 
-            WHERE type = ? AND status = 'show' 
-            ORDER BY time_start ASC
-        ");
-        $stmt->execute([$type]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT * FROM events WHERE event_id = :event_id AND status = 'show'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching event by ID: " . $e->getMessage());
+            return null;
+        }
     }
 
-    public function getEventById($id)
+    /**
+     * Get events by type
+     */
+    public function getEventsByType($type, $status = 'show')
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE event_id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT * FROM events WHERE type = :type AND status = :status ORDER BY pinned DESC, time_start ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching events by type: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get pinned events
+     */
+    public function getPinnedEvents($status = 'show')
+    {
+        try {
+            $sql = "SELECT * FROM events WHERE pinned = 1 AND status = :status ORDER BY time_start ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching pinned events: " . $e->getMessage());
+            return [];
+        }
     }
 
     public function createEvent($title, $description, $type, $image, $time_start, $time_end, $status)
@@ -193,17 +248,6 @@ class EventProgram
         } catch (PDOException $e) {
             return false;
         }
-    }
-
-    public function getPinnedEvents()
-    {
-        $stmt = $this->db->prepare("
-            SELECT * FROM {$this->table}
-            WHERE pinned = 1
-            ORDER BY created_at DESC
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function isEventPinned($eventId)

@@ -10,12 +10,31 @@ class GoogleAuthController
     private $userModel;
     private $jobseekerModel;
     private $config;
+    private $db;
 
     public function __construct()
     {
         $this->userModel = new User();
         $this->jobseekerModel = new Jobseeker();
         $this->config = require __DIR__ . '/../../config/google_oauth.php';
+
+        $dbConfig = require __DIR__ . '/../../config/sikap_db.php';
+
+        try {
+            // FIXED: Add Railway port
+            $dsn = "mysql:host={$dbConfig['db_host']};port={$dbConfig['db_port']};dbname={$dbConfig['db_name']};charset=utf8mb4";
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ];
+
+            $this->db = new PDO($dsn, $dbConfig['db_user'], $dbConfig['db_pass'], $options);
+        } catch (PDOException $e) {
+            error_log("GoogleAuthController database connection failed: " . $e->getMessage());
+            throw new Exception("Database connection failed");
+        }
     }
 
     public function initiateLogin()

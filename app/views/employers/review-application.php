@@ -47,12 +47,12 @@ include_once __DIR__ . '../components/navbar-employer.php';
             <div class="w-full space-y-4 md:w-4/12">
                 <div class="overflow-hidden bg-white border border-gray-200 rounded-lg shadow">
 
-                    <!-- Profile Header with Gray Background -->
+                    <!-- Profile Header with Gray Background - FIXED OVERFLOW -->
                     <div class="p-4 border-b border-gray-200 sm:p-6 bg-gray-50">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center">
+                            <div class="flex items-center flex-1 min-w-0">
                                 <!-- Circle Profile Photo -->
-                                <div class="mr-4">
+                                <div class="flex-shrink-0 mr-4">
                                     <?php if (!empty($application['profile_picture'])): ?>
                                         <div class="bg-white border-2 border-gray-200 rounded-lg profile-image-container">
                                             <img src="<?php echo '/sikap/public/' . htmlspecialchars($application['profile_picture']); ?>"
@@ -60,7 +60,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                                 class="object-cover">
                                         </div>
                                     <?php else: ?>
-                                        <div class="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-lg">
+                                        <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 bg-gray-200 rounded-lg">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
@@ -68,22 +68,24 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Name and Position -->
-                                <div class="flex-1">
-                                    <h1 class="text-lg font-semibold text-gray-900 sm:text-xl">
+                                <!-- Name and Position - FIXED OVERFLOW -->
+                                <div class="flex-1 min-w-0 profile-header-content">
+                                    <h1 class="text-lg font-semibold text-gray-900 sm:text-xl applicant-name">
                                         <?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>
                                     </h1>
-                                    <h5 class="text-xs text-gray-700"> Applied for: <?php echo htmlspecialchars($application['job_title']); ?></h5>
+                                    <h5 class="text-xs text-gray-700 job-title-applied small-text-break">
+                                        Applied for: <?php echo htmlspecialchars($application['job_title']); ?>
+                                    </h5>
                                     <!-- Position Applied For -->
-                                    <p class="text-xs text-gray-700">
+                                    <p class="text-xs text-gray-700 small-text-break">
                                         Applied: <?php echo htmlspecialchars(date('M j, Y', strtotime($application['applied_at']))); ?>
                                     </p>
                                 </div>
                             </div>
 
-                            <!-- Status Badge - Top Right -->
-                            <div class="flex-shrink-0 ml-4">
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium 
+                            <!-- Status Badge - Top Right - FIXED OVERFLOW -->
+                            <div class="flex-shrink-0 ml-2">
+                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium status-badge
                                     <?php
                                     switch ($application['application_status']) {
                                         case 'pending':
@@ -108,54 +110,31 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                             echo 'bg-gray-100 text-gray-800 border border-gray-200 rounded-md';
                                     }
                                     ?>">
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <?php
-                                        switch ($application['application_status']) {
-                                            case 'pending':
-                                                echo '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />';
-                                                break;
-                                            case 'reviewed':
-                                                echo '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />';
-                                                break;
-                                            case 'shortlisted':
-                                                echo '<path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />';
-                                                break;
-                                            case 'rejected':
-                                                echo '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />';
-                                                break;
-                                            case 'hired':
-                                                echo '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />';
-                                                break;
-                                            case 'resigned':
-                                                echo '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414L8.586 11l-3.293 3.293a1 1 0 001.414 1.414L10 12.414l3.293 3.293a1 1 0 001.414-1.414L11.414 11l3.293-3.293z" clip-rule="evenodd" />';
-                                                break;
-                                            default:
-                                                echo '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" />';
-                                        }
-                                        ?>
-                                    </svg>
-                                    <?php echo ucfirst($application['application_status']); ?>
+                                    
+                                    <span class="truncate">
+                                        <?php echo ucfirst($application['application_status']); ?>
+                                    </span>
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Main Content - Quick Actions -->
-                    <div class="p-4 sm:p-6">
+                    <!-- Main Content - Quick Actions - FIXED OVERFLOW -->
+                    <div class="p-4 sm:p-6 sidebar-card">
                         <h4 class="mb-3 text-sm font-semibold text-gray-900">Quick Actions</h4>
 
-                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                        <div class="quick-actions-grid">
                             <!-- Accept Application Button -->
                             <?php if ($application['application_status'] !== 'hired' && $application['application_status'] !== 'resigned'): ?>
                                 <form method="POST" action="?page=review-application&action=updateStatus&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <input type="hidden" name="status" value="hired">
                                     <button type="submit"
                                         onclick="return confirmStatusChange('hired', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-3 py-2 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm action-button text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
-                                        Accept Application
+                                        <span class="truncate">Accept Application</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -166,11 +145,11 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <input type="hidden" name="status" value="rejected">
                                     <button type="submit"
                                         onclick="return confirmStatusChange('rejected', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-red-700 transition-colors duration-200 bg-red-100 border border-red-300 rounded-md shadow-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-3 py-2 text-sm font-medium text-red-700 transition-colors duration-200 bg-red-100 border border-red-300 rounded-md shadow-sm action-button hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                        Reject Application
+                                        <span class="truncate">Reject Application</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -181,12 +160,12 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <input type="hidden" name="status" value="reviewed">
                                     <button type="submit"
                                         onclick="return confirmStatusChange('reviewed', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-3 py-2 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm action-button text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        Reviewed
+                                        <span class="truncate">Reviewed</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -197,11 +176,11 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <input type="hidden" name="status" value="shortlisted">
                                     <button type="submit"
                                         onclick="return confirmStatusChange('shortlisted', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-3 py-2 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm action-button text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.978 2.89a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.978-2.89a1 1 0 00-1.176 0l-3.978 2.89c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.978-2.89c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
                                         </svg>
-                                        Shortlist
+                                        <span class="truncate">Shortlist</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -211,11 +190,11 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 <form method="POST" action="?page=review-application&action=setResigned&application_id=<?php echo $application['application_id']; ?>" class="inline">
                                     <button type="submit"
                                         onclick="return confirmStatusChange('resigned', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
-                                        class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="w-full px-3 py-2 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm action-button text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
-                                        Set Resigned
+                                        <span class="truncate">Set Resigned</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -227,19 +206,19 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                 $application['application_status'] !== 'rejected' &&
                                 (!$resignationRequest || $resignationRequest['request_status'] === 'pending')
                             ): ?>
-                                <button @click="activeTab = 'schedule'" class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button @click="activeTab = 'schedule'" class="w-full px-3 py-2 text-sm font-medium transition-colors duration-200 border border-gray-200 rounded-md shadow-sm action-button text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                    <svg class="flex-shrink-0 w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 01-2 2z" />
                                     </svg>
-                                    Schedule Interview
+                                    <span class="truncate">Schedule Interview</span>
                                 </button>
                             <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
-                <!-- Resignation Request Card -->
-                <div class="p-4 bg-white border border-gray-200 rounded-lg sm:p-6">
+                <!-- Resignation Request Card - FIXED OVERFLOW -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg sm:p-6 sidebar-card">
                     <?php if ($resignationRequest && $resignationRequest['request_status'] === 'pending'): ?>
                         <!-- Resignation Request Pending Actions -->
                         <div class="flex items-start mb-4">
@@ -269,7 +248,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                     <textarea name="employer_notes"
                                         placeholder="Add any final comments or acknowledgments..."
                                         rows="3"
-                                        class="w-full px-3 py-2 text-sm border border-orange-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 placeholder:text-orange-400"></textarea>
+                                        class="w-full px-3 py-2 text-sm border border-orange-300 rounded-md resignation-textarea focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 placeholder:text-orange-400"></textarea>
                                 </div>
                                 <button type="submit"
                                     onclick="return confirmResignationAction('approve', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
@@ -289,7 +268,7 @@ include_once __DIR__ . '../components/navbar-employer.php';
                                         placeholder="Please explain why you're rejecting this resignation request..."
                                         rows="3"
                                         required
-                                        class="w-full px-3 py-2 text-sm border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-red-400"></textarea>
+                                        class="w-full px-3 py-2 text-sm border border-red-300 rounded-md resignation-textarea focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-red-400"></textarea>
                                 </div>
                                 <button type="submit"
                                     onclick="return confirmResignationAction('reject', '<?php echo htmlspecialchars(trim(($application['first_name'] ?? '') . ' ' . ($application['last_name'] ?? ''))); ?>')"
@@ -1271,3 +1250,123 @@ include_once __DIR__ . '../components/navbar-employer.php';
         </div>
     </div>
 </div>
+
+
+<style>
+    /* EXISTING STYLES... */
+
+    /* === LEFT SECTION OVERFLOW FIXES === */
+
+    /* Fix profile image container */
+    .profile-image-container {
+        width: 64px !important;
+        height: 64px !important;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+    }
+
+    /* Fix name and title overflow */
+    .applicant-name {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.3;
+        max-width: 100%;
+    }
+
+    .job-title-applied {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.4;
+        max-width: 100%;
+    }
+
+    /* Fix button grid layout */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+        .quick-actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 768px) {
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .quick-actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Fix button text overflow */
+    .action-button {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.3;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Fix left section width constraints */
+    .left-section {
+        min-width: 0;
+        flex-shrink: 0;
+    }
+
+    /* Fix resignation card text overflow */
+    .resignation-text {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.5;
+    }
+
+    /* Fix textarea overflow in resignation section */
+    .resignation-textarea {
+        word-wrap: break-word;
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    /* Fix container max width */
+    .sidebar-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* Fix status badge overflow */
+    .status-badge {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    /* Fix profile header layout */
+    .profile-header-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    /* Fix small text overflow */
+    .small-text-break {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+</style>

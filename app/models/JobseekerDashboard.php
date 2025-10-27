@@ -14,11 +14,14 @@ class JobseekerDashboard
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
             $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
+                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                 $config['db_user'],
-                $config['db_pass']
+                $config['db_pass'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 30
+                ]
             );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Connection failed: " . $e->getMessage());
         }
@@ -483,7 +486,6 @@ class JobseekerDashboard
                     $job['is_finalized'] = $applicationData['is_finalized'];
                     $job['current_step'] = $applicationData['current_step'];
                     $job['applied_at'] = $applicationData['applied_at'];
-
                 } else {
                     $job['has_applied'] = false;
                     $job['application_id'] = null;
@@ -491,7 +493,6 @@ class JobseekerDashboard
                     $job['is_finalized'] = null;
                     $job['current_step'] = null;
                     $job['applied_at'] = null;
-
                 }
             } else {
                 $job['is_saved'] = false;

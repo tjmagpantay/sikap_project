@@ -13,18 +13,28 @@ class Employer
     const STATUS_REJECTED = 'rejected';
     const STATUS_SUSPENDED = 'suspended';
 
-    public function __construct()
+    public function __construct($db = null)
     {
-        $config = require __DIR__ . '/../../config/sikap_db.php';
-        try {
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+        if ($db !== null) {
+            $this->db = $db;
+        } else {
+            $config = require __DIR__ . '/../../config/sikap_db.php';
+
+            try {
+                // FIXED: Add Railway port
+                $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_TIMEOUT => 30
+                ];
+
+                $this->db = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
+            } catch (PDOException $e) {
+                error_log("Employer model database connection failed: " . $e->getMessage());
+                throw new Exception("Database connection failed");
+            }
         }
     }
 

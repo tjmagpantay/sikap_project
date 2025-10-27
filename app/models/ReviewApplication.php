@@ -11,73 +11,84 @@ class ReviewApplication
         // Use the same config as Jobseeker model for consistency
         $config = require __DIR__ . '/../../config/sikap_db.php';
         try {
+            // FIXED: Add Railway port to DSN
             $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']};charset=utf8mb4",
+                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
                 $config['db_user'],
-                $config['db_pass']
+                $config['db_pass'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 30
+                ]
             );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
+            error_log("ReviewApplication database connection failed: " . $e->getMessage());
             die("Connection failed: " . $e->getMessage());
         }
 
         $this->jobseekerModel = new Jobseeker();
     }
- 
+
     public function getApplication($application_id)
     {
         $stmt = $this->db->prepare("
-            SELECT 
-                ja.*,
-                -- Jobseeker basic info
-                js.first_name, 
-                js.middle_name, 
-                js.last_name, 
-                js.suffix,
-                js.date_of_birth, 
-                js.sex, 
-                js.address, 
-                js.contact_no,
-                js.profile_picture, 
-                js.profile_completion, 
-                js.created_at as jobseeker_created_at,
-                js.updated_at as jobseeker_updated_at, 
-                js.profile_completed, 
-                js.user_id,
-                -- User info
-                u.user_id as user_id, 
-                u.email, 
-                u.created_at as user_created_at, 
-                u.status as user_status,
-                -- Job post info
-                jp.job_title, 
-                jp.job_summary, 
-                jp.job_type, 
-                jp.location, 
-                jp.pay_range,
-                -- Application eligibility
-                jae.interested_program, 
-                jae.priority_sector,
-                -- Education data
-                GROUP_CONCAT(DISTINCT CONCAT_WS('|', e.education_id, e.school_name, e.education_level, e.field_of_study, e.start_date, e.end_date) SEPARATOR ';;') as education_data,
-                -- Skills data
-                GROUP_CONCAT(DISTINCT CONCAT_WS('|', s.skill_id, s.skill_name, s.proficiency_level) SEPARATOR ';;') as skills_data,
-                -- Work experience data
-                GROUP_CONCAT(DISTINCT CONCAT_WS('|', w.experience_id, w.job_title, w.company_name, w.start_date, w.end_date, w.responsibilities, w.achievements, w.employment_type, w.currently_working) SEPARATOR ';;') as work_experience_data,
-                -- Certificates data
-                GROUP_CONCAT(DISTINCT CONCAT_WS('|', c.certificate_id, c.certificate_title, c.issuing_organization, c.date_issued) SEPARATOR ';;') as certificates_data
-            FROM job_application ja
-            LEFT JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
-            LEFT JOIN users u ON js.user_id = u.user_id
-            LEFT JOIN job_post jp ON ja.job_id = jp.job_id
-            LEFT JOIN job_application_eligibility jae ON ja.application_id = jae.application_id
-            LEFT JOIN jobseeker_education e ON js.jobseeker_id = e.jobseeker_id
-            LEFT JOIN jobseeker_skills s ON js.jobseeker_id = s.jobseeker_id
-            LEFT JOIN jobseeker_work_experience w ON js.jobseeker_id = w.jobseeker_id
-            LEFT JOIN jobseeker_certificates c ON js.jobseeker_id = c.jobseeker_id
-            WHERE ja.application_id = ?
-            GROUP BY ja.application_id
-        ");
+        SELECT 
+            ja.*,
+            -- Jobseeker basic info
+            js.first_name, 
+            js.middle_name, 
+            js.last_name, 
+            js.suffix,
+            js.date_of_birth, 
+            js.sex, 
+            js.address, 
+            js.contact_no,
+            js.profile_picture, 
+            js.profile_completion, 
+            js.created_at as jobseeker_created_at,
+            js.updated_at as jobseeker_updated_at, 
+            js.profile_completed, 
+            js.user_id,
+            -- User info
+            u.user_id as user_id, 
+            u.email, 
+            u.created_at as user_created_at, 
+            u.status as user_status,
+            -- Job post info
+            jp.job_title, 
+            jp.job_summary, 
+            jp.job_type, 
+            jp.location, 
+            jp.pay_range,
+            -- Application eligibility (FIXED: Added to GROUP BY)
+            MAX(jae.interested_program) as interested_program, 
+            MAX(jae.priority_sector) as priority_sector,
+            -- Education data
+            GROUP_CONCAT(DISTINCT CONCAT_WS('|', e.education_id, e.school_name, e.education_level, e.field_of_study, e.start_date, e.end_date) SEPARATOR ';;') as education_data,
+            -- Skills data
+            GROUP_CONCAT(DISTINCT CONCAT_WS('|', s.skill_id, s.skill_name, s.proficiency_level) SEPARATOR ';;') as skills_data,
+            -- Work experience data
+            GROUP_CONCAT(DISTINCT CONCAT_WS('|', w.experience_id, w.job_title, w.company_name, w.start_date, w.end_date, w.responsibilities, w.achievements, w.employment_type, w.currently_working) SEPARATOR ';;') as work_experience_data,
+            -- Certificates data
+            GROUP_CONCAT(DISTINCT CONCAT_WS('|', c.certificate_id, c.certificate_title, c.issuing_organization, c.date_issued) SEPARATOR ';;') as certificates_data
+        FROM job_application ja
+        LEFT JOIN jobseeker js ON ja.jobseeker_id = js.jobseeker_id
+        LEFT JOIN users u ON js.user_id = u.user_id
+        LEFT JOIN job_post jp ON ja.job_id = jp.job_id
+        LEFT JOIN job_application_eligibility jae ON ja.application_id = jae.application_id
+        LEFT JOIN jobseeker_education e ON js.jobseeker_id = e.jobseeker_id
+        LEFT JOIN jobseeker_skills s ON js.jobseeker_id = s.jobseeker_id
+        LEFT JOIN jobseeker_work_experience w ON js.jobseeker_id = w.jobseeker_id
+        LEFT JOIN jobseeker_certificates c ON js.jobseeker_id = c.jobseeker_id
+        WHERE ja.application_id = ?
+        GROUP BY 
+            ja.application_id, ja.jobseeker_id, ja.job_id, ja.application_status, ja.applied_at, ja.reviewed_at,
+            js.jobseeker_id, js.first_name, js.middle_name, js.last_name, js.suffix, js.date_of_birth, 
+            js.sex, js.address, js.contact_no, js.profile_picture, js.profile_completion, 
+            js.created_at, js.updated_at, js.profile_completed, js.user_id,
+            u.user_id, u.email, u.created_at, u.status,
+            jp.job_id, jp.job_title, jp.job_summary, jp.job_type, jp.location, jp.pay_range
+    ");
         $stmt->execute([$application_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 

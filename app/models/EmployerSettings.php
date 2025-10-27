@@ -8,17 +8,21 @@ class EmployerSettings
     public function __construct()
     {
         $config = require __DIR__ . '/../../config/sikap_db.php';
+
         try {
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            error_log("EmployerSettings: Database connection successful");
+            // FIXED: Add Railway port
+            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ];
+
+            $this->db = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
         } catch (PDOException $e) {
             error_log("EmployerSettings database connection failed: " . $e->getMessage());
-            die("Connection failed: " . $e->getMessage());
+            throw new Exception("Database connection failed");
         }
     }
 
@@ -26,7 +30,7 @@ class EmployerSettings
     {
         try {
             error_log("EmployerSettings: Getting settings for employer_id: $employer_id");
-            
+
             $sql = "SELECT * FROM employer_settings WHERE employer_id = :employer_id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['employer_id' => $employer_id]);
@@ -52,7 +56,7 @@ class EmployerSettings
     {
         try {
             error_log("EmployerSettings: Creating default settings for employer_id: $employer_id");
-            
+
             $sql = "INSERT INTO employer_settings (
                 employer_id, application_notifications, candidate_matches, 
                 job_post_updates, platform_updates, company_profile_visibility, 
@@ -62,7 +66,7 @@ class EmployerSettings
 
             $stmt = $this->db->prepare($sql);
             $result = $stmt->execute([$employer_id]);
-            
+
             error_log("EmployerSettings: Default settings created successfully: " . ($result ? 'true' : 'false'));
             return $result;
         } catch (PDOException $e) {
@@ -76,7 +80,7 @@ class EmployerSettings
         try {
             error_log("EmployerSettings: Updating email preferences for employer_id: $employer_id");
             error_log("EmployerSettings: Preferences data: " . print_r($preferences, true));
-            
+
             // Ensure settings exist first
             $this->ensureSettingsExist($employer_id);
 
@@ -93,10 +97,10 @@ class EmployerSettings
                 $preferences['platform_updates'],
                 $employer_id
             ]);
-            
+
             error_log("EmployerSettings: Email preferences update result: " . ($result ? 'success' : 'failed'));
             error_log("EmployerSettings: Affected rows: " . $stmt->rowCount());
-            
+
             return $result;
         } catch (PDOException $e) {
             error_log("Error updating employer email preferences: " . $e->getMessage());
@@ -109,7 +113,7 @@ class EmployerSettings
         try {
             error_log("EmployerSettings: Updating visibility settings for employer_id: $employer_id");
             error_log("EmployerSettings: Settings data: " . print_r($settings, true));
-            
+
             // Ensure settings exist first
             $this->ensureSettingsExist($employer_id);
 
@@ -125,7 +129,7 @@ class EmployerSettings
                 $settings['job_post_analytics'],
                 $employer_id
             ]);
-            
+
             error_log("EmployerSettings: Visibility settings update result: " . ($result ? 'success' : 'failed'));
             return $result;
         } catch (PDOException $e) {
@@ -139,7 +143,7 @@ class EmployerSettings
         try {
             error_log("EmployerSettings: Updating hiring preferences for employer_id: $employer_id");
             error_log("EmployerSettings: Settings data: " . print_r($settings, true));
-            
+
             // Ensure settings exist first
             $this->ensureSettingsExist($employer_id);
 
@@ -155,7 +159,7 @@ class EmployerSettings
                 $settings['priority_candidate_alerts'],
                 $employer_id
             ]);
-            
+
             error_log("EmployerSettings: Hiring preferences update result: " . ($result ? 'success' : 'failed'));
             return $result;
         } catch (PDOException $e) {
@@ -168,7 +172,7 @@ class EmployerSettings
     {
         try {
             error_log("EmployerSettings: Checking if settings exist for employer_id: $employer_id");
-            
+
             $sql = "SELECT setting_id FROM employer_settings WHERE employer_id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$employer_id]);
