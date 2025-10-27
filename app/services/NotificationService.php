@@ -8,9 +8,10 @@ class NotificationService
     private $mailService;
     private $db;
 
+    // CURRENT ISSUE: Creates models but doesn't handle Railway connection properly
     public function __construct($database)
     {
-        $this->db = $database;
+        $this->db = $database; // Assumes database is properly connected
         $this->notification = new Notification($database);
         $this->mailService = new MailService();
     }

@@ -7,9 +7,13 @@ class JobRecommendationService
     private $jobseekerModel;
     private $pythonScriptPath = __DIR__ . '/../../python/job-recommendation-system/app.py';
 
+    /**
+     * JobRecommendationService constructor.
+     * CURRENT ISSUE: Creates Jobseeker model without database connection
+     */
     public function __construct()
     {
-        $this->jobseekerModel = new Jobseeker();
+        $this->jobseekerModel = new Jobseeker(); // No database connection passed!
     }
 
     /**

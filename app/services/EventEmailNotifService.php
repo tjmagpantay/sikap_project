@@ -1,19 +1,23 @@
 <?php
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-class EventEmailNotifService {
+class EventEmailNotifService
+{
     private $mailerConfig;
     private $db;
 
-    public function __construct($db) {
-        $this->db = $db;
+    public function __construct($db)
+    {
+        $this->db = $db; // This assumes $db is already connected
         $this->mailerConfig = require __DIR__ . '/../../config/mailer.php';
     }
- 
-    public function notifyJobseekersAboutNewProgram($eventId) {
+
+    public function notifyJobseekersAboutNewProgram($eventId)
+    {
         try {
             // Get event details
             $stmt = $this->db->prepare("SELECT * FROM events WHERE event_id = ?");
@@ -44,13 +48,13 @@ class EventEmailNotifService {
             $mailer->Password = 'hqod pqlk nayf dbed';
             $mailer->SMTPSecure = 'tls'; // Use TLS encryption
             $mailer->Port = 587;
-            
+
             // Set sender info
             $mailer->setFrom('peso.sikap.dev2025@gmail.com', 'PESO SIKAP');
-            
+
             // Set character encoding
             $mailer->CharSet = 'UTF-8';
-            
+
             // Disable SSL certificate verification (only for development)
             $mailer->SMTPOptions = array(
                 'ssl' => array(
@@ -161,7 +165,6 @@ class EventEmailNotifService {
                 error_log("❌ Failed to send bulk event notification: " . $e->getMessage());
                 return false;
             }
-
         } catch (Exception $e) {
             error_log("❌ Error in notification service: " . $e->getMessage());
             return false;
