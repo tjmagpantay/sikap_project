@@ -275,73 +275,84 @@ class AdminDashboard
     public function getJobStatsForChart()
     {
         try {
-            $sql = "SELECT 
-                        DATE_FORMAT(created_at, '%Y-%m') as month,
-                        MONTHNAME(created_at) as month_name,
-                        COUNT(*) as job_count
-                    FROM job_post 
-                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    GROUP BY DATE_FORMAT(created_at, '%Y-%m'), MONTHNAME(created_at)
-                    ORDER BY created_at ASC";
+            // Build last 6 months keys and labels
+            $months = [];
+            $monthKeys = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $dt = strtotime("-{$i} months");
+                $monthKeys[] = date('Y-m', $dt);
+                $months[] = date('M', $dt);
+            }
 
+            // Aggregate job posts by month (Y-m)
+            $sql = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS job_count
+                FROM job_post
+                WHERE created_at >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 5 MONTH), '%Y-%m-01')
+                GROUP BY DATE_FORMAT(created_at, '%Y-%m')";
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             $jobData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Get application statistics for the same period
-            $sql = "SELECT 
-                        DATE_FORMAT(applied_at, '%Y-%m') as month,
-                        MONTHNAME(applied_at) as month_name,
-                        COUNT(*) as application_count
-                    FROM job_application 
-                    WHERE applied_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                    AND is_finalized = 1
-                    GROUP BY DATE_FORMAT(applied_at, '%Y-%m'), MONTHNAME(applied_at)
-                    ORDER BY applied_at ASC";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $applicationData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Create arrays for the last 6 months
-            $months = [];
-            $jobCounts = [];
-            $applicationCounts = [];
-
-            // Generate last 6 months
-            for ($i = 5; $i >= 0; $i--) {
-                $monthKey = date('Y-m', strtotime("-$i months"));
-                $monthName = date('M', strtotime("-$i months"));
-                $months[] = $monthName;
-
-                // Find job count for this month
-                $jobCount = 0;
-                foreach ($jobData as $job) {
-                    if ($job['month'] === $monthKey) {
-                        $jobCount = $job['job_count'];
-                        break;
-                    }
-                }
-                $jobCounts[] = $jobCount;
-
-                // Find application count for this month
-                $appCount = 0;
-                foreach ($applicationData as $app) {
-                    if ($app['month'] === $monthKey) {
-                        $appCount = $app['application_count'];
-                        break;
-                    }
-                }
-                $applicationCounts[] = $appCount;
+            // Aggregate applications by month (Y-m) — try applied_at then fallback to created_at
+            $appSql = "SELECT DATE_FORMAT(applied_at, '%Y-%m') AS month, COUNT(*) AS application_count
+                   FROM job_application
+                   WHERE applied_at >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 5 MONTH), '%Y-%m-01')
+                   GROUP BY DATE_FORMAT(applied_at, '%Y-%m')";
+            $appStmt = $this->db->prepare($appSql);
+            $appOk = true;
+            try {
+                $appStmt->execute();
+                $applicationData = $appStmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                // fallback column name / created_at if applied_at not present or error
+                error_log("job stats: applied_at query failed: " . $e->getMessage());
+                $appOk = false;
+            }
+            if (!$appOk) {
+                $appSql2 = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS application_count
+                        FROM job_application
+                        WHERE created_at >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 5 MONTH), '%Y-%m-01')
+                        GROUP BY DATE_FORMAT(created_at, '%Y-%m')";
+                $appStmt2 = $this->db->prepare($appSql2);
+                $appStmt2->execute();
+                $applicationData = $appStmt2->fetchAll(PDO::FETCH_ASSOC);
             }
 
-            // Calculate trend (comparing last 2 months)
+            // Convert results to associative maps for fast lookup
+            $jobMap = [];
+            foreach ($jobData as $r) {
+                $jobMap[$r['month']] = (int)$r['job_count'];
+            }
+            $appMap = [];
+            foreach ($applicationData as $r) {
+                $appMap[$r['month']] = (int)$r['application_count'];
+            }
+
+            // Map counts into arrays aligned with $months
+            $jobCounts = [];
+            $applicationCounts = [];
+            foreach ($monthKeys as $key) {
+                $jobCounts[] = isset($jobMap[$key]) ? $jobMap[$key] : 0;
+                $applicationCounts[] = isset($appMap[$key]) ? $appMap[$key] : 0;
+            }
+
+            // debug logs (remove in production)
+            error_log("JobStats raw jobData: " . json_encode($jobData));
+            error_log("JobStats raw applicationData: " . json_encode($applicationData));
+            error_log("JobStats mapped months: " . json_encode($monthKeys));
+            error_log("JobStats jobCounts: " . json_encode($jobCounts));
+            error_log("JobStats applicationCounts: " . json_encode($applicationCounts));
+
+            // trend calculation (compare last two months)
             $trend = 0;
-            if (count($jobCounts) >= 2) {
-                $currentMonth = end($jobCounts);
-                $previousMonth = $jobCounts[count($jobCounts) - 2];
-                if ($previousMonth > 0) {
-                    $trend = round((($currentMonth - $previousMonth) / $previousMonth) * 100, 1);
+            $len = count($jobCounts);
+            if ($len >= 2) {
+                $current = $jobCounts[$len - 1];
+                $prev = $jobCounts[$len - 2];
+                if ($prev > 0) {
+                    $trend = round((($current - $prev) / $prev) * 100, 1);
+                } elseif ($current > 0) {
+                    $trend = 100;
                 }
             }
 
@@ -352,11 +363,16 @@ class AdminDashboard
                 'trend' => $trend
             ];
         } catch (PDOException $e) {
-            error_log('Error getting job stats for chart: ' . $e->getMessage());
+            error_log("Error in getJobStatsForChart: " . $e->getMessage());
+            // fallback
+            $fallbackMonths = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $fallbackMonths[] = date('M', strtotime("-{$i} months"));
+            }
             return [
-                'months' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'job_posts' => [0, 0, 0, 0, 0, 0],
-                'applications' => [0, 0, 0, 0, 0, 0],
+                'months' => $fallbackMonths,
+                'job_posts' => array_fill(0, 6, 0),
+                'applications' => array_fill(0, 6, 0),
                 'trend' => 0
             ];
         }

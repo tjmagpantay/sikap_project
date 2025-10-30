@@ -12,33 +12,33 @@ class JobseekerController
     public function __construct()
     {
         $config = require __DIR__ . '/../../config/sikap_db.php';
-        
+
         try {
             // FIXED: Add Railway port to DSN
             $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
-            
+
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_TIMEOUT => 30
             ];
-            
+
             $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
-            
+
             $this->userModel = new User($pdo);
             $this->jobseekerModel = new Jobseeker($pdo);
             $this->jobPostModel = new JobPost($pdo);
-            
         } catch (PDOException $e) {
             error_log("JobseekerController database connection failed: " . $e->getMessage());
             throw new Exception("Database connection failed");
         }
     }
 
+
     public function signup()
     {
         $error = '';
-        $formData = []; // Add form data for repopulation
+        $formData = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email'] ?? '');
@@ -78,28 +78,23 @@ class JobseekerController
                         $first_name,
                         $last_name,
                         $contact_number,
-                        null, // middle_name
-                        null, // suffix
+                        '', // middle_name
+                        '', // suffix
                         null, // date_of_birth
-                        null, // sex
-                        null  // address
+                        'Male', // default sex
+                        '' // address
                     );
 
                     if ($jobseeker_created) {
+                        // Set session and redirect
                         $_SESSION['user_id'] = $user_id;
+                        $_SESSION['email'] = $email;
                         $_SESSION['role'] = User::ROLE_JOBSEEKER;
                         $_SESSION['role_name'] = 'jobseeker';
-                        $_SESSION['email'] = $email;
 
-                        // Set success message
-                        $_SESSION['registration_success'] = true;
-
-                        // Redirect to dashboard
-                        header('Location: ?page=jobseeker-dashboard');
+                        header('Location: ?page=complete-jobseeker-profile');
                         exit;
                     } else {
-                        // If jobseeker creation fails, delete the user record
-                        $this->userModel->deleteUser($user_id);
                         $error = 'Failed to create jobseeker profile. Please try again.';
                     }
                 } else {
@@ -166,37 +161,91 @@ class JobseekerController
         return $errors;
     }
 
+
     public function login()
     {
         $error = '';
         $formData = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $formData = $_POST;
-            $email = trim($_POST['email'] ?? '');
-            $password = $_POST['password'] ?? '';
+            $formData = [
+                'email' => $_POST['email'] ?? '',
+            ];
 
             // Add character limit validation for login
-            $validationErrors = $this->validateLoginInput($email, $password);
+            $validationErrors = $this->validateLoginInput($formData['email'], $_POST['password']);
 
             if (!empty($validationErrors)) {
                 $error = implode(' ', $validationErrors);
             } else {
-                $user = $this->userModel->findByEmail($email);
-                if ($user && password_verify($password, $user['password']) && $user['role_id'] == User::ROLE_JOBSEEKER) {
-                    // 2FA: Generate OTP
-                    $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                    $_SESSION['login_otp'] = [
-                        'user_id' => $user['user_id'],
-                        'otp' => $otp,
-                        'expires_at' => time() + 300 // 5 minutes
-                    ];
-                    $_SESSION['pending_user'] = $user;
-                    $this->sendOtpEmail($user['email'], $otp);
-                    header('Location: ?page=verify-otp');
-                    exit;
+                $user = $this->userModel->findByEmail($formData['email']);
+
+                // FIXED: Check for jobseeker role (role_id = 3)
+                $isJobseeker = false;
+                if ($user) {
+                    if (
+                        (isset($user['role_id']) && $user['role_id'] == User::ROLE_JOBSEEKER) ||
+                        (isset($user['role']) && $user['role'] === 'jobseeker') ||
+                        (isset($user['role']) && $user['role'] == 3)
+                    ) {
+                        $isJobseeker = true;
+                    }
+                }
+
+                if ($user && $isJobseeker && password_verify($_POST['password'], $user['password'])) {
+                    // FIXED: Check if user account is active
+                    if (($user['status'] ?? 'active') !== 'active') {
+                        $error = 'Your account has been deactivated. Please contact support.';
+                    } else {
+                        // Check if jobseeker profile exists
+                        $jobseeker = $this->jobseekerModel->findByUserId($user['user_id']);
+
+                        if (!$jobseeker) {
+                            // Create a basic jobseeker profile if it doesn't exist
+                            $result = $this->jobseekerModel->create(
+                                $user['user_id'],
+                                'Unknown', // first_name
+                                'User',    // last_name
+                                'N/A',     // contact_no
+                                '',        // middle_name
+                                '',        // suffix
+                                null,      // date_of_birth
+                                'Male',    // sex
+                                ''         // address
+                            );
+
+                            if (!$result) {
+                                $error = 'Failed to create profile. Please try again.';
+                            } else {
+                                $jobseeker = $this->jobseekerModel->findByUserId($user['user_id']);
+                            }
+                        }
+
+                        if (!$error) {
+                            // FIXED: Set correct session variables for jobseeker (role_id = 3)
+                            $_SESSION['user_id'] = $user['user_id'];
+                            $_SESSION['email'] = $user['email'];
+                            $_SESSION['role'] = User::ROLE_JOBSEEKER; // This should be 3
+                            $_SESSION['role_name'] = 'jobseeker';
+
+                            // Check if there was a redirect URL stored
+                            if (isset($_SESSION['redirect_after_login'])) {
+                                $redirectPage = $_SESSION['redirect_after_login'];
+                                unset($_SESSION['redirect_after_login']);
+                                header('Location: ?page=' . $redirectPage);
+                            } else {
+                                // Check if profile is complete
+                                if ($jobseeker && !empty($jobseeker['first_name']) && $jobseeker['first_name'] !== 'Unknown') {
+                                    header('Location: ?page=jobseeker-dashboard');
+                                } else {
+                                    header('Location: ?page=complete-jobseeker-profile');
+                                }
+                            }
+                            exit;
+                        }
+                    }
                 } else {
-                    $error = 'Invalid email or password, or this is not a jobseeker account.';
+                    $error = 'Invalid email or password.';
                 }
             }
         }
@@ -314,6 +363,7 @@ class JobseekerController
 
     public function dashboard()
     {
+        // FIXED: Check for correct jobseeker role (3)
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
             header('Location: ?page=login-jobseeker');
             exit;
@@ -321,13 +371,13 @@ class JobseekerController
 
         // Get jobseeker profile for navbar AND dashboard
         $jobseeker = $this->getJobseekerData();
-        $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']);
+        $hasProfile = $jobseeker !== null && !empty($jobseeker['first_name']) && $jobseeker['first_name'] !== 'Unknown';
 
         // Get recent job listings for the dashboard
         try {
             $jobseeker_id = $hasProfile ? $jobseeker['jobseeker_id'] : null;
 
-            // FIXED: Use standard method instead of non-existent skill matching method
+            // Get all active jobs
             $jobs = $this->jobPostModel->getAllActiveJobs();
 
             // Optional: Add basic skill-based sorting if jobseeker has skills
@@ -339,20 +389,12 @@ class JobseekerController
                     // Add a simple skill relevance score to jobs
                     foreach ($jobs as &$job) {
                         $job['skill_match_count'] = 0;
-
-                        // Get job skills (if the method exists)
-                        if (method_exists($this->jobPostModel, 'getJobSkills')) {
-                            $jobSkills = $this->jobPostModel->getJobSkills($job['job_id']);
-
-                            // Count skill matches
+                        if (!empty($job['skills_required'])) {
+                            $jobSkills = array_map('trim', explode(',', strtolower($job['skills_required'])));
                             foreach ($jobseekerSkills as $userSkill) {
-                                foreach ($jobSkills as $jobSkill) {
-                                    if (
-                                        stripos($jobSkill['skill_name'], $userSkill['skill_name']) !== false ||
-                                        stripos($userSkill['skill_name'], $jobSkill['skill_name']) !== false
-                                    ) {
-                                        $job['skill_match_count']++;
-                                    }
+                                $userSkillName = strtolower(trim($userSkill['skill_name']));
+                                if (in_array($userSkillName, $jobSkills)) {
+                                    $job['skill_match_count']++;
                                 }
                             }
                         }
@@ -1525,33 +1567,42 @@ class JobseekerController
 
     public function programsJobseeker()
     {
+        // Check if user is logged in as jobseeker (role = 3)
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] != User::ROLE_JOBSEEKER) {
             header('Location: ?page=login-jobseeker');
             exit;
         }
 
-        // Get jobseeker profile for navbar
-        $jobseeker = $this->getJobseekerData();
-
-        // Get events data - FIXED METHOD CALL
         try {
-            require_once __DIR__ . '/EventProgramController.php';
-            $eventController = new EventProgramController();
-            
-            // FIXED: Use correct method name
-            $allEvents = $eventController->programEvents();
-            $events = $allEvents['events'] ?? [];
-            
-            // OR use the model directly for simpler approach:
-            // $eventModel = new EventProgram();
-            // $events = $eventModel->getAllEvents('show');
-            
-        } catch (Exception $e) {
-            error_log('Error fetching events for jobseeker programs: ' . $e->getMessage());
-            $events = []; // Fallback to empty array
-        }
+            // Get jobseeker data for navbar
+            $jobseeker = $this->getJobseekerData();
 
-        include __DIR__ . '/../views/jobseekers/programs-jobseeker.php';
+            // Get all active events from EventProgram model
+            require_once __DIR__ . '/../models/EventProgram.php';
+            $eventModel = new EventProgram();
+
+            // Get all active events
+            $allEvents = $eventModel->getAllEvents('show');
+
+            // Sort events: pinned first, then by start time
+            usort($allEvents, function ($a, $b) {
+                // First sort by pinned status (pinned events first)
+                if ($a['pinned'] != $b['pinned']) {
+                    return $b['pinned'] - $a['pinned'];
+                }
+                // Then sort by start time (earliest first)
+                return strtotime($a['time_start']) - strtotime($b['time_start']);
+            });
+
+            // Include the view with the events data
+            include __DIR__ . '/../views/jobseekers/programs-jobseeker.php';
+        } catch (Exception $e) {
+            error_log('Error in programsJobseeker: ' . $e->getMessage());
+            // Set empty array to prevent undefined variable error
+            $allEvents = [];
+            $jobseeker = $this->getJobseekerData();
+            include __DIR__ . '/../views/jobseekers/programs-jobseeker.php';
+        }
     }
 
     public function viewEmployerProfile()
@@ -2188,5 +2239,43 @@ class JobseekerController
         header('Content-Type: application/json');
         echo json_encode(['success' => true]);
         exit;
+    }
+
+
+    public function viewCandidateProfile($candidateId)
+    {
+        if (!$candidateId) {
+            header('Location: ?page=browse-candidates&error=' . urlencode('Candidate not found'));
+            exit;
+        }
+
+        // Check if user is logged in as employer
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'employer') {
+            header('Location: ?page=login-employer');
+            exit;
+        }
+
+        try {
+            // Get jobseeker details
+            $jobseeker = $this->jobseekerModel->findByJobseekerId($candidateId);
+
+            if (!$jobseeker) {
+                header('Location: ?page=browse-candidates&error=' . urlencode('Candidate not found'));
+                exit;
+            }
+
+            // Get additional profile data
+            $education = $this->jobseekerModel->getEducation($candidateId);
+            $skills = $this->jobseekerModel->getSkills($candidateId);
+            $workExperience = $this->jobseekerModel->getWorkExperience($candidateId);
+            $certificates = $this->jobseekerModel->getCertificates($candidateId);
+
+            // Include the view
+            include __DIR__ . '/../views/employers/view-candidate-profile.php';
+        } catch (Exception $e) {
+            error_log('Error viewing candidate profile: ' . $e->getMessage());
+            header('Location: ?page=browse-candidates&error=' . urlencode('Error loading candidate profile'));
+            exit;
+        }
     }
 }

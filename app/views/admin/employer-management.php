@@ -1090,4 +1090,40 @@
             });
         });
     }
+
+    function updateEmployerStatus(userId, action) {
+        // Show loading state
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Processing...';
+
+        // FIXED: Use correct admin route
+        fetch('?page=admin-update-employer-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `user_id=${userId}&action=${action}&user_type=employer`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update button and status
+                updateButtonAndStatus(userId, action, data.new_status);
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.error || 'Failed to update status', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Network error occurred', 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            button.disabled = false;
+            button.textContent = originalText;
+        });
+    }
 </script>

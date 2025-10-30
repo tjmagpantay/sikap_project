@@ -112,24 +112,59 @@ class EmployerController
                 // Attempt login
                 $user = $this->userModel->findByEmail($formData['email']);
 
-                if ($user && $user['role'] === User::ROLE_EMPLOYER && password_verify($_POST['password'], $user['password'])) {
-                    if ($user['status'] === 'active') {
-                        // Set session
-                        $_SESSION['user_id'] = $user['user_id'];
-                        $_SESSION['email'] = $user['email'];
-                        $_SESSION['role'] = $user['role'];
+                // FIXED: Check both role_id and role fields for compatibility
+                $isEmployer = false;
+                if ($user) {
+                    // Check different possible role formats
+                    if (isset($user['role_id']) && $user['role_id'] == User::ROLE_EMPLOYER) {
+                        $isEmployer = true;
+                    } elseif (isset($user['role']) && $user['role'] === 'employer') {
+                        $isEmployer = true;
+                    } elseif (isset($user['role']) && $user['role'] == User::ROLE_EMPLOYER) {
+                        $isEmployer = true;
+                    }
+                }
 
-                        // Check if employer profile is complete
+                if ($user && $isEmployer && password_verify($_POST['password'], $user['password'])) {
+
+                    // FIXED: Check if user account is active
+                    if (($user['status'] ?? 'active') !== 'active') {
+                        $error = 'Your account has been deactivated. Please contact support.';
+                    } else {
+                        // FIXED: Check employer account status - BLOCK SUSPENDED ACCOUNTS
                         $employer = $this->employerModel->findByUserId($user['user_id']);
 
-                        if (!$employer || empty($employer['first_name'])) {
-                            header('Location: ?page=complete-employer-profile');
+                        if (!$employer) {
+                            $error = 'Employer profile not found. Please contact support.';
                         } else {
-                            header('Location: ?page=employer-dashboard');
+                            $employerStatus = $employer['status'] ?? 'incomplete';
+
+                            // FIXED: Allow verified employers to login, only block suspended/rejected
+                            if ($employerStatus === 'suspended') {
+                                $error = 'Your account has been suspended by the administrator. Please contact support for assistance.';
+                            } elseif ($employerStatus === 'rejected') {
+                                $error = 'Your account application has been rejected. Please contact support for assistance.';
+                            } else {
+                                // FIXED: Allow all other statuses (verified, pending_verification, incomplete)
+                                $_SESSION['user_id'] = $user['user_id'];
+                                $_SESSION['email'] = $user['email'];
+                                $_SESSION['role'] = 'employer'; // Normalize role
+                                $_SESSION['employer_status'] = $employerStatus;
+
+                                // Check if employer profile is complete
+                                $isProfileComplete = !empty($employer['first_name']) &&
+                                    !empty($employer['last_name']) &&
+                                    !empty($employer['position']) &&
+                                    !empty($employer['contact_no']);
+
+                                if (!$isProfileComplete) {
+                                    header('Location: ?page=complete-employer-profile');
+                                } else {
+                                    header('Location: ?page=employer-dashboard');
+                                }
+                                exit;
+                            }
                         }
-                        exit;
-                    } else {
-                        $error = 'Your account is not active. Please contact support.';
                     }
                 } else {
                     $error = 'Invalid email or password.';

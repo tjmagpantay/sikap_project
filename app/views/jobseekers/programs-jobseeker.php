@@ -2,6 +2,11 @@
 include_once __DIR__ . '/components/jobseeker_auth_check.php';
 include_once __DIR__ . '/../components/navbar-top.php';
 include_once __DIR__ . '/components/navbar-jobseeker.php';
+
+// FIXED: Ensure $allEvents is defined to prevent errors
+if (!isset($allEvents)) {
+    $allEvents = [];
+}
 ?>
 
 <div class="min-h-screen px-4 sm:px-6 md:px-16 lg:px-24">
@@ -53,62 +58,64 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
 
                 <!-- Events Grid -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2" id="eventsGrid">
-                    <?php foreach ($allEvents as $event): ?>
-                        <div class="overflow-hidden transition-all duration-300 bg-white shadow-lg rounded-xl hover:shadow-xl event-card h-80"
-                            data-category="<?php echo htmlspecialchars($event['type']); ?>">
+                    <?php if (!empty($allEvents)): ?>
+                        <?php foreach ($allEvents as $event): ?>
+                            <div class="overflow-hidden transition-all duration-300 bg-white shadow-lg rounded-xl hover:shadow-xl event-card h-80"
+                                data-category="<?php echo htmlspecialchars($event['type']); ?>">
 
-                            <div class="relative w-full h-full">
-                                <!-- Background image -->
-                                <?php if (!empty($event['image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($event['image']); ?>"
-                                        alt="<?php echo htmlspecialchars($event['title']); ?>"
-                                        class="object-cover w-full h-full">
-                                <?php else: ?>
-                                    <img src="./assets/images/programs-img.png"
-                                        alt="<?php echo htmlspecialchars($event['title']); ?>"
-                                        class="object-cover w-full h-full">
-                                <?php endif; ?>
-
-                                <!-- Gradient overlay -->
-                                <div class="absolute inset-0" style="background: linear-gradient(0deg, #092C4C 0%, rgba(255,255,255,0.3) 67%); background-blend-mode: overlay;"></div>
-
-                                <!-- Event Type Badge with improved styling -->
-                                <div class="absolute flex gap-2 top-4 left-4">
-                                    <?php if (isset($event['pinned']) && $event['pinned'] == 1): ?>
-                                        <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
-                                            PINNED
-                                        </span>
+                                <div class="relative w-full h-full">
+                                    <!-- Background image -->
+                                    <?php if (!empty($event['image'])): ?>
+                                        <img src="<?php echo htmlspecialchars($event['image']); ?>"
+                                            alt="<?php echo htmlspecialchars($event['title']); ?>"
+                                            class="object-cover w-full h-full">
+                                    <?php else: ?>
+                                        <img src="./assets/images/programs-img.png"
+                                            alt="<?php echo htmlspecialchars($event['title']); ?>"
+                                            class="object-cover w-full h-full">
                                     <?php endif; ?>
-                                    <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
-                                        <?php echo ucwords(htmlspecialchars($event['type'])); ?>
-                                    </span>
-                                </div>
 
-                                <!-- Event Content -->
-                                <div class="absolute text-left text-white bottom-4 left-4 right-4">
-                                    <p class="mb-2 text-xs opacity-70">
-                                        <?php echo date('j F Y', strtotime($event['time_start'])); ?>
-                                    </p>
-                                    <h3 class="mb-3 text-base font-medium leading-tight sm:text-lg">
-                                        <?php echo htmlspecialchars($event['title']); ?>
-                                    </h3>
+                                    <!-- Gradient overlay -->
+                                    <div class="absolute inset-0" style="background: linear-gradient(0deg, #092C4C 0%, rgba(255,255,255,0.3) 67%); background-blend-mode: overlay;"></div>
 
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs opacity-60">
-                                            <?php echo date('g:i A', strtotime($event['time_start'])); ?>
+                                    <!-- Event Type Badge with improved styling -->
+                                    <div class="absolute flex gap-2 top-4 left-4">
+                                        <?php if (isset($event['pinned']) && $event['pinned'] == 1): ?>
+                                            <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
+                                                PINNED
+                                            </span>
+                                        <?php endif; ?>
+                                        <span class="px-3 py-1 text-xs font-medium text-white border border-white rounded-full">
+                                            <?php echo ucwords(htmlspecialchars($event['type'])); ?>
                                         </span>
-                                        <a href="?page=event-info-jobseeker&id=<?php echo $event['event_id']; ?>"
-                                            class="inline-flex items-center gap-1 py-2 text-xs font-medium text-white transition-colors rounded-lg hover:opacity-80">
-                                            Learn More
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </a>
+                                    </div>
+
+                                    <!-- Event Content -->
+                                    <div class="absolute text-left text-white bottom-4 left-4 right-4">
+                                        <p class="mb-2 text-xs opacity-70">
+                                            <?php echo date('j F Y', strtotime($event['time_start'])); ?>
+                                        </p>
+                                        <h3 class="mb-3 text-base font-medium leading-tight sm:text-lg">
+                                            <?php echo htmlspecialchars($event['title']); ?>
+                                        </h3>
+
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs opacity-60">
+                                                <?php echo date('g:i A', strtotime($event['time_start'])); ?>
+                                            </span>
+                                            <a href="?page=event-info-jobseeker&id=<?php echo $event['event_id']; ?>"
+                                                class="inline-flex items-center gap-1 py-2 text-xs font-medium text-white transition-colors rounded-lg hover:opacity-80">
+                                                Learn More
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Empty State -->
@@ -130,35 +137,38 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
             <!-- Right Side - Sidebar (1/3) -->
             <div class="w-full lg:!w-1/3 lg:max-w-md">
                 <div class="sticky top-8">
-
                     <!-- Upcoming Events Card -->
                     <div class="p-6 bg-white border border-gray-100 rounded-lg shadow-sm">
                         <h3 class="mb-4 text-lg font-semibold text-grayMain">Upcoming Events</h3>
                         <div class="space-y-4">
-                            <?php
-                            $upcomingEvents = array_filter($allEvents, function ($event) {
-                                return strtotime($event['time_start']) > time();
-                            });
-                            $upcomingEvents = array_slice($upcomingEvents, 0, 3);
-                            ?>
-                            <?php if (!empty($upcomingEvents)): ?>
-                                <?php foreach ($upcomingEvents as $event): ?>
-                                    <div class="pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
-                                        <!-- Title and Tag on Same Row -->
-                                        <div class="flex items-start justify-between gap-3 mb-1">
-                                            <h4 class="flex-1 text-sm font-medium leading-tight text-gray-600">
-                                                <?php echo htmlspecialchars($event['title']); ?>
-                                            </h4>
-                                            <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-primary bg-blue-50">
-                                                <?php echo ucwords($event['type']); ?>
-                                            </span>
+                            <?php if (!empty($allEvents)): ?>
+                                <?php
+                                $upcomingEvents = array_filter($allEvents, function ($event) {
+                                    return strtotime($event['time_start']) > time();
+                                });
+                                $upcomingEvents = array_slice($upcomingEvents, 0, 3);
+                                ?>
+                                <?php if (!empty($upcomingEvents)): ?>
+                                    <?php foreach ($upcomingEvents as $event): ?>
+                                        <div class="pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
+                                            <!-- Title and Tag on Same Row -->
+                                            <div class="flex items-start justify-between gap-3 mb-1">
+                                                <h4 class="flex-1 text-sm font-medium leading-tight text-gray-600">
+                                                    <?php echo htmlspecialchars($event['title']); ?>
+                                                </h4>
+                                                <span class="inline-flex items-center flex-shrink-0 px-2 py-1 text-xs text-primary bg-blue-50">
+                                                    <?php echo ucwords($event['type']); ?>
+                                                </span>
+                                            </div>
+                                            <!-- Date Below -->
+                                            <p class="text-xs text-gray-500">
+                                                <?php echo date('M j, Y - g:i A', strtotime($event['time_start'])); ?>
+                                            </p>
                                         </div>
-                                        <!-- Date Below -->
-                                        <p class="text-xs text-gray-500">
-                                            <?php echo date('M j, Y - g:i A', strtotime($event['time_start'])); ?>
-                                        </p>
-                                    </div>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="text-sm text-gray-500">No upcoming events scheduled.</p>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <p class="text-sm text-gray-500">No upcoming events scheduled.</p>
                             <?php endif; ?>
@@ -250,3 +260,5 @@ include_once __DIR__ . '/components/navbar-jobseeker.php';
         filterEvents('all');
     });
 </script>
+
+<?php include_once __DIR__ . '/../components/footer.php'; ?>

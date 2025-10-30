@@ -107,16 +107,13 @@ class User
         $stmt = $this->db->prepare("
             SELECT u.*, ur.role_id, r.role_name,
                    CASE 
+                       WHEN ur.role_id = 1 THEN 'admin'
                        WHEN ur.role_id = 2 THEN 'employer'
                        WHEN ur.role_id = 3 THEN 'jobseeker'
-                       WHEN ur.role_id = 1 THEN 'admin'
-                   END as user_type
+                       ELSE 'unknown'
+                   END as role
             FROM users u 
-            LEFT JOIN (
-                SELECT user_id, MAX(role_id) as role_id
-                FROM user_roles
-                GROUP BY user_id
-            ) ur ON u.user_id = ur.user_id 
+            LEFT JOIN user_roles ur ON u.user_id = ur.user_id
             LEFT JOIN roles r ON ur.role_id = r.role_id 
             WHERE u.email = ?
             LIMIT 1
@@ -125,11 +122,21 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function findById($id)
+    public function findById($userId)
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->db->prepare("
+            SELECT * FROM users 
+            WHERE user_id = ? 
+            LIMIT 1
+        ");
+
+            $stmt->execute([$userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error finding user by ID: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function hasCompleteProfile($user_id, $role_id)

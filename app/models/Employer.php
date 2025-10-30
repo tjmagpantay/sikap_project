@@ -38,15 +38,40 @@ class Employer
         }
     }
 
-    public function findByUserId($user_id)
+    public function getPdo()
+    {
+        return $this->db;
+    }
+
+    public function updateAccountStatus($userId, $status)
     {
         try {
-            $sql = "SELECT * FROM employer WHERE user_id = :user_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(['user_id' => $user_id]);
+            $stmt = $this->db->prepare("
+            UPDATE employer 
+            SET status = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE user_id = ?
+        ");
+
+            return $stmt->execute([$status, $userId]);
+        } catch (PDOException $e) {
+            error_log("Error updating employer account status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findByUserId($userId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT * FROM employer 
+            WHERE user_id = ? 
+            LIMIT 1
+        ");
+
+            $stmt->execute([$userId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log('Error finding employer by user ID: ' . $e->getMessage());
+            error_log("Error finding employer by user ID: " . $e->getMessage());
             return false;
         }
     }
@@ -909,24 +934,109 @@ class Employer
     public function getAllVerifiedEmployersWithJobCount()
     {
         try {
-            $sql = "SELECT e.*, eb.*, 
-       COUNT(CASE WHEN jp.job_status = 'open' THEN jp.job_id END) as active_jobs_count
-        FROM employer e
-        LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
-        LEFT JOIN job_post jp ON e.employer_id = jp.employer_id
-        WHERE e.status = 'verified'
-        GROUP BY e.employer_id
-        ORDER BY e.created_at DESC";
+            // FIXED: Only select columns that actually exist in your tables
+            $sql = "SELECT 
+                    e.employer_id,
+                    e.user_id,
+                    e.first_name,
+                    e.middle_name,
+                    e.last_name,
+                    e.position,
+                    e.contact_no,
+                    e.profile_picture,
+                    e.company_name,
+                    e.about_us,
+                    e.status,
+                    e.created_at,
+                    e.updated_at,
+                    e.profile_completed,
+                    MAX(eb.business_id) as business_id,
+                    MAX(eb.banner_image) as banner_image,
+                    MAX(eb.business_name) as business_name,
+                    MAX(eb.business_logo) as business_logo,
+                    MAX(eb.business_address) as business_address,
+                    MAX(eb.business_type) as business_type,
+                    MAX(eb.business_size) as business_size,
+                    MAX(eb.business_desc) as business_desc,
+                    MAX(eb.business_email) as business_email,
+                    MAX(eb.business_contact) as business_contact,
+                    MAX(eb.business_industry) as business_industry,
+                    MAX(eb.business_team_size) as business_team_size,
+                    MAX(eb.business_established_year) as business_established_year,
+                    MAX(eb.business_website) as business_website,
+                    MAX(eb.business_socials) as business_socials,
+                    MAX(eb.business_completed) as business_completed,
+                    COUNT(CASE WHEN jp.job_status = 'open' THEN jp.job_id END) as active_jobs_count
+                FROM employer e
+                LEFT JOIN employers_business eb ON e.employer_id = eb.employer_id
+                LEFT JOIN job_post jp ON e.employer_id = jp.employer_id
+                WHERE e.status = 'verified'
+                GROUP BY e.employer_id, e.user_id, e.first_name, e.middle_name, e.last_name, 
+                         e.position, e.contact_no, e.profile_picture, e.company_name, e.about_us, 
+                         e.status, e.created_at, e.updated_at, e.profile_completed
+                ORDER BY active_jobs_count DESC, e.created_at DESC";
+
+            error_log("Executing corrected SQL with proper table structure");
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("Corrected query returned " . count($results) . " employers");
+
+            // Process results to ensure proper display names and handle social media
+            foreach ($results as &$employer) {
+                // Set display company name priority: business_name > company_name > first_name + last_name
+                if (!empty($employer['business_name'])) {
+                    $employer['display_company_name'] = $employer['business_name'];
+                } elseif (!empty($employer['company_name'])) {
+                    $employer['display_company_name'] = $employer['company_name'];
+                } else {
+                    $employer['display_company_name'] = trim($employer['first_name'] . ' ' . $employer['last_name']);
+                }
+
+                // Set display logo priority: business_logo > profile_picture
+                $employer['display_logo'] = $employer['business_logo'] ?? $employer['profile_picture'] ?? null;
+
+                // Parse social media JSON if exists
+                if (!empty($employer['business_socials'])) {
+                    $socials = json_decode($employer['business_socials'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($socials)) {
+                        $employer['facebook_url'] = $socials['facebook'] ?? '';
+                        $employer['twitter_url'] = $socials['twitter'] ?? '';
+                        $employer['instagram_url'] = $socials['instagram'] ?? '';
+                        $employer['youtube_url'] = $socials['youtube'] ?? '';
+                        $employer['linkedin_url'] = $socials['linkedin'] ?? '';
+                    } else {
+                        // Set empty social media URLs if JSON parsing fails
+                        $employer['facebook_url'] = '';
+                        $employer['twitter_url'] = '';
+                        $employer['instagram_url'] = '';
+                        $employer['youtube_url'] = '';
+                        $employer['linkedin_url'] = '';
+                    }
+                } else {
+                    // Set empty social media URLs if no socials data
+                    $employer['facebook_url'] = '';
+                    $employer['twitter_url'] = '';
+                    $employer['instagram_url'] = '';
+                    $employer['youtube_url'] = '';
+                    $employer['linkedin_url'] = '';
+                }
+
+                // Ensure numeric values are properly typed
+                $employer['active_jobs_count'] = (int)$employer['active_jobs_count'];
+                $employer['business_completed'] = (int)($employer['business_completed'] ?? 0);
+                $employer['profile_completed'] = (int)($employer['profile_completed'] ?? 0);
+            }
+
+            return $results;
         } catch (PDOException $e) {
             error_log('Error getting verified employers: ' . $e->getMessage());
+            error_log('SQL Error Code: ' . $e->getCode());
             return [];
         }
     }
-
     public function getDetailedEmployerProfile($employer_id)
     {
         try {

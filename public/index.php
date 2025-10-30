@@ -56,6 +56,81 @@ require_once __DIR__ . '/../vendor/autoload.php';
             include __DIR__ . '/../app/views/pages/about-page.php';
             break;
 
+
+
+        // [------------------------ ADMIN EVENT MANAGEMENT ROUTES ----------------------]
+
+        case 'admin-events':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->events();
+            break;
+
+        case 'admin-event-create':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->eventCreate();
+            break;
+
+        case 'admin-event-edit':
+            require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
+            $controller = new AdminDashboardController();
+            $controller->eventEdit();
+            break;
+
+        case 'admin-event-store':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->store();
+            break;
+
+        case 'admin-event-update':
+            if (isset($_GET['id'])) {
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->update($_GET['id']);
+            } else {
+                header('Location: ?page=admin-events&error=Invalid request');
+            }
+            break;
+
+        case 'admin-event-delete':
+            if (isset($_GET['id'])) {
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->delete($_GET['id']);
+            } else {
+                header('Location: ?page=admin-events&error=Invalid request');
+            }
+            break;
+
+        // FIXED: Consolidated toggle status routes
+        case 'admin-event-toggle-status':
+        case 'admin-event-status':
+            if (isset($_GET['id'])) {
+                require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+                $controller = new EventProgramController();
+                $controller->toggleEventStatus($_GET['id']);
+            } else {
+                header('Location: ?page=admin-events&error=Invalid request');
+            }
+            break;
+
+        case 'admin-event-pin':
+        case 'admin-event-toggle-pin':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->togglePin();
+            break;
+
+        // [------------------------ PUBLIC EVENT ROUTES ----------------------]
+
+        case 'events-jobfair':
+            require_once __DIR__ . '/../app/controllers/EventProgramController.php';
+            $controller = new EventProgramController();
+            $controller->publicView();
+            break;
+
         case 'program-events':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
@@ -140,8 +215,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 
         // [------------------------ ADMIN ROUTES ----------------------]
-
-        case 'update-employer-status':
+        case 'admin-update-employer-status':
             require_once __DIR__ . '/../app/controllers/AdminDashboardController.php';
             $controller = new AdminDashboardController();
             $controller->updateUserStatus();
@@ -217,7 +291,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             break;
 
+        // Consolidated toggle status routes
         case 'admin-event-toggle-status':
+        case 'admin-event-status':
             if (isset($_GET['id'])) {
                 require_once __DIR__ . '/../app/controllers/EventProgramController.php';
                 $controller = new EventProgramController();
@@ -227,6 +303,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
             }
             break;
 
+        case 'admin-event-pin':
         case 'admin-event-toggle-pin':
             require_once __DIR__ . '/../app/controllers/EventProgramController.php';
             $controller = new EventProgramController();
@@ -375,6 +452,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/EmployerController.php';
             $controller = new EmployerController();
             $controller->signup();
+            break;
+
+        case 'update-employer-status':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->updateStatus();
             break;
 
         case 'employer-dashboard':
@@ -577,6 +660,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../app/controllers/JobseekerController.php';
             $controller = new JobseekerController();
             $controller->signup();
+            break;
+
+        case 'admin-jobseeker-update-status':
+            require_once __DIR__ . '/../app/controllers/UserManagementController.php';
+            $controller = new UserManagementController();
+            $controller->updateJobseekerStatus();
             break;
 
         case 'jobseeker-dashboard':
@@ -858,8 +947,38 @@ require_once __DIR__ . '/../vendor/autoload.php';
             $jobseekerController->clearUploadFlag();
             break;
 
+        case 'programs-jobseeker':
+            require_once __DIR__ . '/../app/controllers/JobseekerController.php';
+            $controller = new JobseekerController();
+            $controller->programsJobseeker(); // Make sure this method exists
+            break;
 
 
+        // [------------------------ JOB RECOMMENDATION ROUTES ----------------------]
+
+        case 'recommendations':
+            require_once __DIR__ . '/../app/controllers/JobRecommendationController.php';
+            $controller = new JobRecommendationController();
+            $controller->index();
+            break;
+
+        case 'recommended-jobs':
+            require_once __DIR__ . '/../app/controllers/JobRecommendationController.php';
+            $controller = new JobRecommendationController();
+            $controller->recommendedJobs();
+            break;
+
+        case 'api-recommendations':
+            require_once __DIR__ . '/../app/controllers/JobRecommendationController.php';
+            $controller = new JobRecommendationController();
+            $controller->getRecommendationsAPI();
+            break;
+
+        case 'test-ml-connection':
+            require_once __DIR__ . '/../app/controllers/JobRecommendationController.php';
+            $controller = new JobRecommendationController();
+            $controller->testConnection();
+            break;
 
 
 
@@ -962,6 +1081,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
         //     $controller = new JobValidationController();
         //     $controller->validateEmployerProgramsAccess();
         //     break;
+
 
 
 

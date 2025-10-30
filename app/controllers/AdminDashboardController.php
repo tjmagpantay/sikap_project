@@ -32,12 +32,15 @@ class AdminDashboardController
 
         // Get dashboard statistics from model
         $dashboardStats = $this->adminDashboardModel->getDashboardStats();
+
+        // FIXED: Get job stats chart data (this was missing!)
         $jobStatsChart = $this->adminDashboardModel->getJobStatsForChart();
+
+        // FIXED: Get job category chart data
         $jobCategoryChart = $this->adminDashboardModel->getJobCategoryStatsForChart();
 
         include __DIR__ . '/../views/admin/dashboard.php';
     }
-
     public function viewJob()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {

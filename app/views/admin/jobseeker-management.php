@@ -583,132 +583,39 @@
 
     // Update jobseeker status
     function updateJobseekerStatus(userId, action) {
-        if (!confirm('Are you sure you want to ' + action + ' this jobseeker\'s account?')) {
-            return;
-        }
+        // Show loading state
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Processing...';
 
-        // Find the button that was clicked and disable it during processing
-        const clickedButton = document.querySelector(`button[onclick*="${userId}"][onclick*="${action}"]`);
-        if (clickedButton) {
-            clickedButton.disabled = true;
-            const originalHtml = clickedButton.innerHTML;
-            clickedButton.innerHTML = '<i class="mr-1 fas fa-spinner fa-spin"></i> Processing...';
-
-            // Store original HTML for error recovery
-            clickedButton.setAttribute('data-original-html', originalHtml);
-        }
-
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('action', action);
-        formData.append('user_type', 'jobseeker');
-
-        const baseUrl = window.location.pathname.split('index.php')[0];
-        const url = baseUrl + 'index.php?page=admin-jobseeker-update-status';
-
-        fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(async response => {
-                // Check if response is ok
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const text = await response.text();
-                console.log('Server response:', text); // Debug log
-
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    console.error('Response text:', text);
-
-                    // Check if response suggests success even if not proper JSON
-                    if (text.includes('success') || text.includes('updated') || text.includes(action + 'd')) {
-                        return {
-                            success: true,
-                            message: `Successfully ${action}d jobseeker account`
-                        };
-                    } else {
-                        throw new Error('Invalid server response format');
-                    }
-                }
-            })
-            .then(data => {
-                if (data.success === true || data.success === 'true' || data.status === 'success') {
-                    // Show success message
-                    showSuccessMessage(`Successfully ${action}d jobseeker account!`);
-
-                    // Find the row containing this user
-                    const row = clickedButton ? clickedButton.closest('tr') :
-                        document.querySelector(`button[onclick*="${userId}"]`)?.closest('tr');
-
-                    if (row) {
-                        // Update status badge
-                        const statusCell = row.querySelector('td:nth-child(6) span');
-                        const newStatus = action === 'disable' ? 'disabled' : 'enabled';
-
-                        if (statusCell) {
-                            statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                            statusCell.className = `inline-flex px-2 py-1 text-xs font-medium leading-5 rounded-md ${
-                                newStatus === 'enabled' ? 'text-primary bg-gray-100' : 'text-red-800 bg-red-100'
-                            }`;
-                        }
-
-                        // Update the action button - FIXED VERSION
-                        const actionCell = row.querySelector('td:nth-child(7)');
-                        if (actionCell) {
-                            if (newStatus === 'disabled') {
-                                actionCell.innerHTML = `
-                                    <button onclick="updateJobseekerStatus('${userId}', 'enable')"
-                                        class="px-3 py-2 text-xs text-white rounded-md bg-primary hover:bg-primary/90">
-                                        <i class="mr-1 fas fa-check"></i> Enable
-                                    </button>
-                                `;
-                            } else {
-                                actionCell.innerHTML = `
-                                    <button onclick="updateJobseekerStatus('${userId}', 'disable')"
-                                        class="px-3 py-2 text-xs text-white rounded-md bg-primaryhover:bg-primary/90">
-                                        <i class="mr-1 fas fa-ban"></i> Disable
-                                    </button>
-                                `;
-                            }
-                        }
-
-                        // Update the data attributes for filtering
-                        const statusData = action === 'disable' ? 'disabled' : 'enabled';
-                        row.setAttribute('data-status', statusData);
-                    }
-
-                    // Update stats counts
-                    updateCounts();
-
-                } else {
-                    throw new Error(data.error || data.message || `Failed to ${action} jobseeker`);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-
-                // Show error message
-                showErrorMessage(error.message || 'An error occurred while updating status. Please try again.');
-
-                // Restore button if it was disabled
-                if (clickedButton) {
-                    clickedButton.disabled = false;
-                    const originalHtml = clickedButton.getAttribute('data-original-html');
-                    if (originalHtml) {
-                        clickedButton.innerHTML = originalHtml;
-                        clickedButton.removeAttribute('data-original-html');
-                    }
-                }
-            });
+        // FIXED: Use specific admin route for jobseekers
+        fetch('?page=admin-jobseeker-update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `user_id=${userId}&action=${action}&user_type=jobseeker`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update button and status
+                updateButtonAndStatus(userId, action, data.new_status);
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.error || 'Failed to update status', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Network error occurred', 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            button.disabled = false;
+            button.textContent = originalText;
+        });
     }
 
     // Add success message function

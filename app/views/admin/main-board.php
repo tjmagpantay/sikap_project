@@ -263,6 +263,7 @@
     </div>
 </div>
 
+
 <!-- Chart.js Integration -->
 <script>
     // Job Statistics Area Chart with Primary/Secondary Colors and Real Data
@@ -275,7 +276,7 @@
     const secondaryColorAlpha = 'rgba(243, 175, 14, 0.1)'; // Secondary with transparency
 
     // Use real data if available, otherwise use mock data
-    const jobStatsData = <?php echo isset($jobStatsChart) ? json_encode($jobStatsChart) : 'mockJobStatsData'; ?>;
+    const jobStatsData = <?php echo isset($jobStatsChart) && !empty($jobStatsChart) ? json_encode($jobStatsChart) : 'mockJobStatsData'; ?>;
 
     new Chart(jobStatsCtx, {
         type: 'line',
@@ -319,6 +320,14 @@
             }
         }
     });
+
+        // FIXED: Define mock data for categories
+    const mockCategoryData = {
+        categories: ['Technology', 'Healthcare', 'Education', 'Engineering', 'Finance', 'Marketing'],
+        job_posts: [0, 0, 0, 0, 0, 0],
+        applications: [0, 0, 0, 0, 0, 0]
+    };
+
 
     // Top Job Categories Bar Chart with Real Data
     const topJobsCtx = document.getElementById('topJobsChart').getContext('2d');

@@ -498,4 +498,34 @@ class ReviewApplicationController
             throw $e;
         }
     }
+
+    public function acceptApplication($application_id)
+    {
+        if (!$application_id) {
+            header('Location: ?page=browse-candidates&error=' . urlencode('Application not found'));
+            exit;
+        }
+
+        // Simulate POST request for accept action
+        $_POST['action'] = 'updateStatus';
+        $_POST['status'] = 'hired';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $this->handlePost($application_id);
+    }
+
+    public function rejectApplication($application_id)
+    {
+        if (!$application_id) {
+            header('Location: ?page=browse-candidates&error=' . urlencode('Application not found'));
+            exit;
+        }
+
+        // Simulate POST request for reject action
+        $_POST['action'] = 'updateStatus';
+        $_POST['status'] = 'rejected';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $this->handlePost($application_id);
+    }
 }

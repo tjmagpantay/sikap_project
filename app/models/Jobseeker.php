@@ -5,21 +5,19 @@ class Jobseeker
 {
     private $db;
 
-    public function __construct()
+    public function __construct($pdo = null)
     {
-        $config = require __DIR__ . '/../../config/sikap_db.php';
-        try {
-            $this->db = new PDO(
-                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                $config['db_user'],
-                $config['db_pass'],
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 30
-                ]
-            );
-        } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+        if ($pdo) {
+            $this->db = $pdo;
+        } else {
+            // Create connection if not provided
+            $config = require __DIR__ . '/../../config/sikap_db.php';
+            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+            $this->db = new PDO($dsn, $config['db_user'], $config['db_pass'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ]);
         }
     }
 
@@ -36,6 +34,7 @@ class Jobseeker
         ");
         return $stmt->execute([$user_id, $first_name, $middle_name, $last_name, $suffix, $date_of_birth, $sex, $address, $contact_no]);
     }
+
 
     public function createMinimal($userId, $firstName, $lastName, $email, $contactNumber = null)
     {
@@ -80,16 +79,43 @@ class Jobseeker
         }
     }
 
-    public function findByUserId($user_id)
+    /**
+     * Update jobseeker account status
+     */
+    public function updateAccountStatus($userId, $status)
     {
-        $stmt = $this->db->prepare("
-            SELECT j.*, u.email, u.status 
-            FROM jobseeker j 
-            JOIN users u ON j.user_id = u.user_id 
-            WHERE j.user_id = ?
-        ");
-        $stmt->execute([$user_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE jobseeker 
+                SET acc_status = ?, updated_at = CURRENT_TIMESTAMP 
+                WHERE user_id = ?
+            ");
+
+            return $stmt->execute([$status, $userId]);
+        } catch (PDOException $e) {
+            error_log("Error updating jobseeker account status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Find jobseeker by user ID
+     */
+    public function findByUserId($userId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT * FROM jobseeker 
+                WHERE user_id = ? 
+                LIMIT 1
+            ");
+
+            $stmt->execute([$userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error finding jobseeker by user ID: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function updateProfile($user_id, $data)
@@ -938,6 +964,58 @@ class Jobseeker
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log('Error getting all jobseekers: ' . $e->getMessage());
+            return [];
+        }
+    }
+    public function findByJobseekerId($jobseekerId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT j.*, u.email 
+            FROM jobseeker j
+            LEFT JOIN users u ON j.user_id = u.user_id
+            WHERE j.jobseeker_id = ? 
+            LIMIT 1
+        ");
+
+            $stmt->execute([$jobseekerId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error finding jobseeker by ID: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getAllWithBasicInfo()
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT 
+                j.jobseeker_id, 
+                j.user_id,
+                j.first_name, 
+                j.middle_name,
+                j.last_name, 
+                j.date_of_birth,
+                j.sex,
+                j.address,
+                j.contact_no,
+                j.acc_status,
+                j.profile_completion,
+                j.created_at,
+                u.email,
+                u.status as user_status,
+                CONCAT(j.first_name, ' ', COALESCE(j.middle_name, ''), ' ', j.last_name) as full_name
+            FROM jobseeker j
+            JOIN users u ON j.user_id = u.user_id
+            WHERE u.status = 'active' 
+            AND j.acc_status != 'disabled'
+            ORDER BY j.first_name, j.last_name
+        ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error getting jobseekers with basic info: ' . $e->getMessage());
             return [];
         }
     }

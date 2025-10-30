@@ -1,387 +1,157 @@
 <?php
 // filepath: c:\xampp\htdocs\sikap\app\controllers\JobRecommendationController.php
-
 require_once __DIR__ . '/../services/JobRecommendationService.php';
 require_once __DIR__ . '/../models/Jobseeker.php';
+require_once __DIR__ . '/../models/JobPost.php';
 
 class JobRecommendationController
 {
     private $recommendationService;
     private $jobseekerModel;
+    private $jobPostModel;
 
     public function __construct()
     {
         $this->recommendationService = new JobRecommendationService();
-        $this->jobseekerModel = new Jobseeker();
+
+        // Initialize models with proper database connection
+        $config = require __DIR__ . '/../../config/sikap_db.php';
+        $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+        $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]);
+
+        $this->jobseekerModel = new Jobseeker($pdo);
+        $this->jobPostModel = new JobPost($pdo);
     }
 
+    /**
+     * Display recommendations dashboard for admin
+     */
     public function index()
     {
         try {
-            // Get all jobseekers for dropdown
-            $jobseekers = $this->recommendationService->getAllJobseekers();
-
-            // Initialize variables
-            $recommendations = null;
-            $selectedJobseeker = null;
-            $error = null;
-            $success = null;
-
-            // Check if a jobseeker is selected for recommendations
-            if (isset($_GET['jobseeker_id']) && !empty($_GET['jobseeker_id'])) {
-                $jobseeker_id = (int)$_GET['jobseeker_id'];
-                $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
-
-                // Validate jobseeker exists
-                $selectedJobseeker = $this->jobseekerModel->findById($jobseeker_id);
-
-                if (!$selectedJobseeker) {
-                    $error = "Jobseeker not found.";
-                } else {
-                    // Get recommendations
-                    $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
-
-                    if ($result['success']) {
-                        $recommendations = $result;
-                        $success = "Found {$result['total_found']} job recommendations for {$result['jobseeker']['name']}.";
-                    } else {
-                        $error = $result['error'];
-                    }
-                }
+            // Check if user is admin
+            if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+                header('Location: ?page=login-admin');
+                exit;
             }
 
-            // Load the view
-            $this->loadView('jobseekers/recommendations', [
-                'jobseekers' => $jobseekers,
-                'recommendations' => $recommendations,
-                'selectedJobseeker' => $selectedJobseeker,
-                'error' => $error,
-                'success' => $success,
-                'selectedJobseekerId' => $_GET['jobseeker_id'] ?? '',
-                'topK' => $_GET['top_k'] ?? 10
-            ]);
-        } catch (Exception $e) {
-            error_log('JobRecommendationController Error: ' . $e->getMessage());
+            // Get all jobseekers for selection
+            $jobseekers = $this->jobseekerModel->getAllWithBasicInfo();
 
-            $this->loadView('jobseekers/recommendations', [
-                'jobseekers' => [],
-                'recommendations' => null,
-                'selectedJobseeker' => null,
-                'error' => 'An unexpected error occurred: ' . $e->getMessage(),
-                'success' => null,
-                'selectedJobseekerId' => '',
-                'topK' => 10
-            ]);
+            // Include the view
+            include __DIR__ . '/../views/admin/recommendations.php';
+        } catch (Exception $e) {
+            error_log('Error in recommendations index: ' . $e->getMessage());
+            $error = 'Error loading recommendations page';
+            include __DIR__ . '/../views/admin/recommendations.php';
         }
     }
 
+    /**
+     * Display recommended jobs for jobseeker
+     */
+    public function recommendedJobs()
+    {
+        try {
+            // Check if user is jobseeker
+            if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'jobseeker') {
+                header('Location: ?page=login-jobseeker');
+                exit;
+            }
+
+            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
+            if (!$jobseeker) {
+                header('Location: ?page=jobseeker-profile&error=Profile not found');
+                exit;
+            }
+
+            // Get recommendations from Python service
+            $recommendationsResult = $this->recommendationService->getRecommendations(
+                $jobseeker['jobseeker_id'],
+                10
+            );
+
+            $recommendations = [];
+            $error = null;
+
+            if ($recommendationsResult['success']) {
+                $recommendations = $recommendationsResult['recommendations'] ?? [];
+            } else {
+                $error = $recommendationsResult['error'] ?? 'Failed to get recommendations';
+                error_log('Recommendation error: ' . $error);
+            }
+
+            // Include the view
+            include __DIR__ . '/../views/jobseekers/recommended-jobs.php';
+        } catch (Exception $e) {
+            error_log('Error getting recommended jobs: ' . $e->getMessage());
+            $error = 'Error loading recommended jobs';
+            $recommendations = [];
+            include __DIR__ . '/../views/jobseekers/recommended-jobs.php';
+        }
+    }
+
+    /**
+     * API endpoint for getting recommendations
+     */
     public function getRecommendationsAPI()
     {
         header('Content-Type: application/json');
 
         try {
-            // Check if request method is GET
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                http_response_code(405);
-                echo json_encode(['error' => 'Method not allowed']);
-                return;
-            }
+            $jobseeker_id = $_POST['jobseeker_id'] ?? $_GET['jobseeker_id'] ?? null;
+            $top_k = (int)($_POST['top_k'] ?? $_GET['top_k'] ?? 10);
 
-            // Validate required parameters
-            if (!isset($_GET['jobseeker_id']) || empty($_GET['jobseeker_id'])) {
-                http_response_code(400);
-                echo json_encode(['error' => 'jobseeker_id parameter is required']);
-                return;
+            if (!$jobseeker_id) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Jobseeker ID is required'
+                ]);
+                exit;
             }
-
-            $jobseeker_id = (int)$_GET['jobseeker_id'];
-            $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
 
             // Validate jobseeker exists
-            $jobseeker = $this->jobseekerModel->findById($jobseeker_id);
+            $jobseeker = $this->jobseekerModel->findByJobseekerId($jobseeker_id);
             if (!$jobseeker) {
-                http_response_code(404);
-                echo json_encode(['error' => 'Jobseeker not found']);
-                return;
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Jobseeker not found'
+                ]);
+                exit;
             }
 
             // Get recommendations
             $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
-
-            if ($result['success']) {
-                echo json_encode($result);
-            } else {
-                http_response_code(500);
-                echo json_encode(['error' => $result['error']]);
-            }
+            echo json_encode($result);
         } catch (Exception $e) {
-            error_log('API Error: ' . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => 'Internal server error']);
+            error_log('API recommendations error: ' . $e->getMessage());
+            echo json_encode([
+                'success' => false,
+                'error' => 'Internal server error'
+            ]);
         }
+        exit;
     }
 
+    /**
+     * Test connection to ML service
+     */
     public function testConnection()
     {
         header('Content-Type: application/json');
 
         try {
-            // Check if the method exists
-            if (!method_exists($this->recommendationService, 'testConnection')) {
-                // Fallback to testPythonScript if testConnection doesn't exist
-                if (method_exists($this->recommendationService, 'testPythonScript')) {
-                    $result = $this->recommendationService->testPythonScript();
-                } else {
-                    // Manual test if no test methods exist
-                    $result = [
-                        'success' => false,
-                        'message' => 'No test methods available in JobRecommendationService'
-                    ];
-                }
-            } else {
-                $result = $this->recommendationService->testConnection();
-            }
-
-            if ($result['success']) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => $result['message'],
-                    'timestamp' => date('Y-m-d H:i:s'),
-                    'details' => $result['python_response'] ?? null
-                ]);
-            } else {
-                http_response_code(503);
-                echo json_encode([
-                    'success' => false,
-                    'message' => $result['message'],
-                    'timestamp' => date('Y-m-d H:i:s'),
-                    'debug_info' => $result
-                ]);
-            }
+            $result = $this->recommendationService->testConnection();
+            echo json_encode($result);
         } catch (Exception $e) {
-            error_log('Connection Test Error: ' . $e->getMessage());
-            http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Connection test failed: ' . $e->getMessage(),
-                'timestamp' => date('Y-m-d H:i:s')
+                'message' => 'Connection test failed: ' . $e->getMessage()
             ]);
         }
+        exit;
     }
-
-    public function getJobseekerProfile()
-    {
-        header('Content-Type: application/json');
-
-        try {
-            if (!isset($_GET['jobseeker_id']) || empty($_GET['jobseeker_id'])) {
-                http_response_code(400);
-                echo json_encode(['error' => 'jobseeker_id parameter is required']);
-                return;
-            }
-
-            $jobseeker_id = (int)$_GET['jobseeker_id'];
-            $profileData = $this->jobseekerModel->getRecommendationData($jobseeker_id);
-
-            if ($profileData) {
-                echo json_encode([
-                    'success' => true,
-                    'data' => $profileData
-                ]);
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => 'Jobseeker not found or no profile data']);
-            }
-        } catch (Exception $e) {
-            error_log('Get Profile Error: ' . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => 'Internal server error']);
-        }
-    }
-
-    public function recommendedJobs()
-    {
-        try {
-            // Ensure user is logged in
-            if (!isset($_SESSION['user_id'])) {
-                header('Location: ?page=login-jobseeker');
-                exit;
-            }
-
-            // Get current jobseeker
-            $jobseeker = $this->jobseekerModel->findByUserId($_SESSION['user_id']);
-            if (!$jobseeker) {
-                header('Location: ?page=complete-jobseeker-profile&error=profile_incomplete');
-                exit;
-            }
-
-            $jobseeker_id = $jobseeker['jobseeker_id'];
-            $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
-
-            // Get recommendations
-            $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
-
-            $recommendations = null;
-            $error = null;
-            $success = null;
-
-            if ($result['success']) {
-                $recommendations = $result;
-                $success = "Found {$result['total_found']} job recommendations for you.";
-            } else {
-                $error = $result['error'];
-            }
-
-            // Load the personalized view with jobseeker data for navbar
-            $this->loadView('jobseekers/my-recommendations', [
-                'recommendations' => $recommendations,
-                'selectedJobseeker' => $jobseeker,
-                'jobseeker' => $jobseeker,  // Add this for navbar
-                'error' => $error,
-                'success' => $success,
-                'selectedJobseekerId' => $jobseeker_id,
-                'topK' => $top_k
-            ]);
-        } catch (Exception $e) {
-            error_log('Recommended Jobs Error: ' . $e->getMessage());
-
-            $this->loadView('jobseekers/my-recommendations', [
-                'recommendations' => null,
-                'selectedJobseeker' => null,
-                'jobseeker' => null,  // Add this
-                'error' => 'An unexpected error occurred: ' . $e->getMessage(),
-                'success' => null,
-                'selectedJobseekerId' => '',
-                'topK' => 10
-            ]);
-        }
-    }
-
-    // NEW METHOD: Enhanced recommendations with detailed job data
-    public function getRecommendationsWithEnhancedDisplay()
-    {
-        try {
-            $jobseeker_id = (int)$_GET['jobseeker_id'];
-            $top_k = isset($_GET['top_k']) ? (int)$_GET['top_k'] : 10;
-
-            // Get recommendations with new system
-            $result = $this->recommendationService->getRecommendations($jobseeker_id, $top_k);
-
-            if ($result['success']) {
-                // NEW: Enhanced job data processing
-                $enhancedJobs = [];
-
-                foreach ($result['recommendations'] as $recommendation) {
-                    // Merge job data with recommendation metadata
-                    $jobData = $this->getJobPostDetails($recommendation['job_id']);
-
-                    if ($jobData) {
-                        $jobData['recommendation_data'] = [
-                            'match_percentage' => $recommendation['match_percentage'],
-                            'match_quality' => $recommendation['match_quality'],
-                            'algorithm_type' => $recommendation['algorithm_type'] ?? 'enhanced',
-                            'scoring_breakdown' => $recommendation['scoring_breakdown'],
-                            'matched_skills' => $recommendation['matched_skills']
-                        ];
-                        $jobData['has_recommendation'] = true;
-                        $enhancedJobs[] = $jobData;
-                    }
-                }
-
-                // Load enhanced view
-                $this->loadView('jobseekers/enhanced-recommendations', [
-                    'jobs' => $enhancedJobs,
-                    'jobseeker' => $result['jobseeker'],
-                    'debug_info' => $result['debug_info'],
-                    'quality_metrics' => $result['quality_metrics'],
-                    'total_analyzed' => $result['total_jobs_analyzed'],
-                    'total_filtered' => $result['jobs_after_filter']
-                ]);
-            } else {
-                // Handle error
-                $this->loadView('jobseekers/recommendations-error', [
-                    'error' => $result['error']
-                ]);
-            }
-        } catch (Exception $e) {
-            error_log('Enhanced Recommendations Error: ' . $e->getMessage());
-            // Fallback to regular recommendations
-            $this->index();
-        }
-    }
-
-    private function getJobPostDetails($job_id)
-    {
-        try {
-            require_once __DIR__ . '/../models/JobPost.php';
-            $jobModel = new JobPost();
-            return $jobModel->getFullJobData($job_id);
-        } catch (Exception $e) {
-            error_log('Error getting job post details: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    private function loadView($viewPath, $data = [])
-    {
-        // Extract data variables for use in view
-        extract($data);
-
-        // Construct full view path
-        $fullViewPath = __DIR__ . '/../views/' . $viewPath . '.php';
-
-        // Check if view file exists
-        if (!file_exists($fullViewPath)) {
-            throw new Exception("View file not found: $fullViewPath");
-        }
-
-        // Include the view
-        include $fullViewPath;
-    }
-
-    public function handleRequest()
-    {
-        $action = $_GET['action'] ?? 'index';
-        $page = $_GET['page'] ?? '';
-
-        // Handle page-based routing
-        if ($page === 'recommended-jobs') {
-            $this->recommendedJobs();
-            return;
-        }
-
-        // Handle action-based routing
-        switch ($action) {
-            case 'index':
-            case 'recommendations':
-                $this->index();
-                break;
-
-            case 'my-recommendations':
-                $this->recommendedJobs();
-                break;
-
-            case 'api':
-                $this->getRecommendationsAPI();
-                break;
-
-            case 'test':
-                $this->testConnection();
-                break;
-
-            case 'profile':
-                $this->getJobseekerProfile();
-                break;
-
-            default:
-                http_response_code(404);
-                echo "Action not found";
-                break;
-        }
-    }
-}
-
-if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
-    $controller = new JobRecommendationController();
-    $controller->handleRequest();
 }

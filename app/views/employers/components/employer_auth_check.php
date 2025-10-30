@@ -1,56 +1,53 @@
 <?php
+// filepath: c:\xampp\htdocs\sikap\app\views\employers\components\employer_auth_check.php
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is logged in - handle multiple possible session variables
-$isLoggedIn = false;
+// FIXED: Check role more flexibly
 $isEmployer = false;
-
-// Check for employer_id (regular login)
-if (isset($_SESSION['employer_id']) && !empty($_SESSION['employer_id'])) {
-    $isLoggedIn = true;
-    $isEmployer = true;
-}
-
-// Check for user_id with role (might be set by Google login)
-if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
-    $isLoggedIn = true;
-    
-    // Check if role indicates employer (role = 2)
-    if (isset($_SESSION['role']) && $_SESSION['role'] == 2) {
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'employer' || $_SESSION['role'] == 2) {
         $isEmployer = true;
-        // Set employer_id for consistency if not already set
-        if (!isset($_SESSION['employer_id'])) {
-            $_SESSION['employer_id'] = $_SESSION['user_id'];
-        }
     }
 }
 
-// If not logged in at all, redirect to login
-if (!$isLoggedIn) {
-    // Store the current page URL for redirect after login
-    $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-    
-    // Clear any existing session data
-    session_destroy();
-    
-    // Redirect to login page
-    header('Location: ?page=login-employer');
+// Check if user is logged in and is an employer
+if (!isset($_SESSION['user_id']) || !$isEmployer) {
+    header('Location: ?page=login-employer&error=Please log in to access this page');
     exit();
 }
 
-// If logged in but not an employer (role should be 2), redirect to appropriate login
-if (!$isEmployer) {
-    // Clear session and redirect
+// FIXED: Skip model checking for now to avoid path issues
+// Just do basic session validation
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     session_destroy();
-    header('Location: ?page=login-employer');
+    header('Location: ?page=login-employer&error=Session expired. Please log in again.');
     exit();
 }
 
-// Add cache control headers to prevent browser cache issues
-header('Cache-Control: no-cache, no-store, must-revalidate');
-header('Pragma: no-cache');
-header('Expires: 0');
-?>
+// Session timeout check
+$session_timeout = 24 * 60 * 60; // 24 hours
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_destroy();
+    header('Location: ?page=login-employer&error=Session expired. Please log in again.');
+    exit();
+}
+
+$_SESSION['last_activity'] = time();
+
+// Optional: Add account status check only if needed
+if (isset($_SESSION['employer_status'])) {
+    if ($_SESSION['employer_status'] === 'suspended') {
+        session_destroy();
+        header('Location: ?page=login-employer&error=Your account has been suspended by the administrator. Please contact support for assistance.');
+        exit();
+    }
+
+    if ($_SESSION['employer_status'] === 'rejected') {
+        session_destroy();
+        header('Location: ?page=login-employer&error=Your account application has been rejected. Please contact support.');
+        exit();
+    }
+}

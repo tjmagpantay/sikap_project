@@ -98,6 +98,8 @@ class JobApplicantsController
         include __DIR__ . '/../views/employers/browse-candidates.php';
     }
 
-    
-
+    public function browseAllCandidates()
+    {
+        $this->viewAllApplicants();
+    }
 }

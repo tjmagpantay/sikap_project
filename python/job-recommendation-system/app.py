@@ -13,16 +13,40 @@ if os.name == 'nt':  # Windows
 
 import json 
 from flask import Flask, request, jsonify
-from recommend import JobRecommendationEngine, test_database_connection, get_sample_jobseeker_ids
+from flask_cors import CORS
+from datetime import datetime
+import logging
+
+# Add the current directory to Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Import your recommendation module
+from recommend import JobRecommendationSystem
 
 app = Flask(__name__)
 
-# Initialize the recommendation engine
+# UPDATED: Allow your Hostinger domain and localhost
+CORS(app, origins=[
+    'https://your-domain.com',      # Replace with your Hostinger domain
+    'http://your-domain.com',       
+    'https://www.your-domain.com',  
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://localhost:3000',
+    'http://localhost:8000'
+])
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize recommendation system
 try:
-    recommendation_engine = JobRecommendationEngine()
+    recommendation_system = JobRecommendationSystem()
+    logger.info("Recommendation system initialized successfully")
 except Exception as e:
-    print(f"Warning: Could not initialize recommendation engine: {e}", file=sys.stderr)
-    recommendation_engine = None
+    logger.error(f"Failed to initialize recommendation system: {e}")
+    recommendation_system = None
 
 @app.route("/")
 def home():
@@ -41,6 +65,17 @@ def home():
       
     </div>
     """
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'service': 'SIKAP ML Recommendation Service',
+        'timestamp': datetime.now().isoformat(),
+        'version': '1.0.0',
+        'recommendation_system_status': 'initialized' if recommendation_system else 'failed'
+    })
 
 @app.route("/health")
 def health():
@@ -75,83 +110,126 @@ def health():
 def get_recommendations():
     """Get job recommendations for a jobseeker"""
     try:
+        # Check if recommendation system is available
+        if not recommendation_system:
+            return jsonify({
+                'success': False,
+                'error': 'Recommendation system not available'
+            }), 503
+
+        # Validate request
+        if not request.is_json:
+            return jsonify({
+                'success': False,
+                'error': 'Content-Type must be application/json'
+            }), 400
+
+        data = request.get_json()
+        
+        # Validate required parameters
+        if 'jobseeker_id' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'jobseeker_id is required'
+            }), 400
+
+        jobseeker_id = int(data['jobseeker_id'])
+        top_k = int(data.get('top_k', 10))
+
         # Validate parameters
-        jobseeker_id = request.args.get("jobseeker_id", type=int)
-        top_k = request.args.get("top_k", default=10, type=int)
-        
-        if not jobseeker_id:
+        if jobseeker_id <= 0:
             return jsonify({
-                "error": "jobseeker_id parameter is required",
-                "usage": "/recommendations?jobseeker_id=1&top_k=5"
+                'success': False,
+                'error': 'Invalid jobseeker_id'
             }), 400
-        
-        if top_k <= 0 or top_k > 50:
+
+        if top_k <= 0 or top_k > 100:
             return jsonify({
-                "error": "top_k must be between 1 and 50"
+                'success': False,
+                'error': 'top_k must be between 1 and 100'
             }), 400
+
+        logger.info(f"Getting recommendations for jobseeker {jobseeker_id}, top_k={top_k}")
+
+        # Get recommendations
+        recommendations = recommendation_system.get_recommendations(jobseeker_id, top_k)
         
-        # Generate recommendations
-        result = recommendation_engine.generate_recommendations(jobseeker_id, top_k)
-        
-        if "error" in result:
-            return jsonify(result), 404
-        
-        # Add metadata
-        result["api_info"] = {
-            "version": "1.0",
-            "timestamp": "2024-12-19",
-            "algorithm": "TF-IDF + Skill Matching + ESCO + Role Matching"
-        }
-        
-        return jsonify(result)
-        
+        if recommendations:
+            logger.info(f"Successfully generated {len(recommendations.get('recommendations', []))} recommendations")
+            return jsonify(recommendations)
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No recommendations found'
+            }), 404
+
     except ValueError as e:
+        logger.error(f"Value error in recommendations: {e}")
         return jsonify({
-            "error": f"Invalid parameter: {str(e)}"
+            'success': False,
+            'error': f'Invalid parameter: {str(e)}'
         }), 400
-        
     except Exception as e:
+        logger.error(f"Error generating recommendations: {e}")
         return jsonify({
-            "error": "Internal server error",
-            "message": "An unexpected error occurred while generating recommendations"
+            'success': False,
+            'error': 'Internal server error'
         }), 500
 
-@app.route("/jobseeker/<int:jobseeker_id>/profile")
+@app.route('/jobseeker/<int:jobseeker_id>/profile', methods=['GET'])
 def get_jobseeker_profile(jobseeker_id):
-    """Get jobseeker profile data (for debugging)"""
+    """Get jobseeker profile data for recommendations"""
     try:
-        profile = recommendation_engine.fetch_jobseeker_profile(jobseeker_id)
+        if not recommendation_system:
+            return jsonify({
+                'success': False,
+                'error': 'Recommendation system not available'
+            }), 503
+
+        profile_data = recommendation_system.get_jobseeker_profile(jobseeker_id)
         
-        if profile is None:
-            return jsonify({"error": "Jobseeker not found"}), 404
-        
-        # Convert pandas Series to dict
-        profile_dict = profile.to_dict()
-        
-        return jsonify({
-            "jobseeker_id": jobseeker_id,
-            "profile": profile_dict
-        })
-        
+        if profile_data:
+            return jsonify({
+                'success': True,
+                'data': profile_data
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Jobseeker not found'
+            }), 404
+
     except Exception as e:
+        logger.error(f"Error getting jobseeker profile: {e}")
         return jsonify({
-            "error": "Internal server error"
+            'success': False,
+            'error': 'Internal server error'
         }), 500
+
+@app.route('/test', methods=['GET', 'POST'])
+def test_endpoint():
+    """Test endpoint for debugging"""
+    return jsonify({
+        'success': True,
+        'message': 'Python microservice is working!',
+        'method': request.method,
+        'timestamp': datetime.now().isoformat(),
+        'headers': dict(request.headers),
+        'data': request.get_json() if request.is_json else None
+    })
 
 @app.errorhandler(404)
 def not_found(error):
-    """Handle 404 errors"""
     return jsonify({
-        "error": "Endpoint not found",
-        "message": "Check the API documentation at the root endpoint"
+        'success': False,
+        'error': 'Endpoint not found'
     }), 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    """Handle 500 errors"""
     return jsonify({
-        "error": "Internal server error",
-        "message": "An unexpected error occurred"
+        'success': False,
+        'error': 'Internal server error'
     }), 500
 
 def handle_command_line():
@@ -210,8 +288,8 @@ if __name__ == "__main__":
         handle_command_line()
     else:
         # Run Flask server
-        print("Starting SIKAP Job Recommendation API...")
-        print("Server: http://127.0.0.1:5001")
+        port = int(os.environ.get('PORT', 5000))
+        debug = os.environ.get('FLASK_ENV') == 'development'
         
-        # Run the app
-        app.run(debug=True, host='127.0.0.1', port=5001)
+        logger.info(f"Starting SIKAP ML service on port {port}")
+        app.run(host='0.0.0.0', port=port, debug=debug)
