@@ -2,16 +2,25 @@
 // filepath: c:\xampp\htdocs\sikap\app\controllers\AdminChangePasswordController.php
 session_start();
 
+// FIXED: Use the centralized config instead of hardcoded connection
 $config = require __DIR__ . '/../../config/sikap_db.php';
-$pdo = new PDO(
-    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-    $config['db_user'],
-    $config['db_pass'],
-    [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_TIMEOUT => 30
-    ]
-);
+
+try {
+    $pdo = new PDO(
+        "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
+        $config['db_user'],
+        $config['db_pass'],
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 30,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false // Important for Railway
+        ]
+    );
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit;
+}
 
 header('Content-Type: application/json');
 

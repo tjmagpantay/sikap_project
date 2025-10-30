@@ -9,30 +9,31 @@ class JobseekerController
     private $jobseekerModel;
     private $jobPostModel;
 
-    public function __construct()
-    {
-        $config = require __DIR__ . '/../../config/sikap_db.php';
+public function __construct()
+{
+    $config = require __DIR__ . '/../../config/sikap_db.php';
 
-        try {
-            // FIXED: Add Railway port to DSN
-            $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+    try {
+        // FIXED: Add Railway port and proper error handling
+        $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
 
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_TIMEOUT => 30
-            ];
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_TIMEOUT => 30,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+        ];
 
-            $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
+        $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
 
-            $this->userModel = new User($pdo);
-            $this->jobseekerModel = new Jobseeker($pdo);
-            $this->jobPostModel = new JobPost($pdo);
-        } catch (PDOException $e) {
-            error_log("JobseekerController database connection failed: " . $e->getMessage());
-            throw new Exception("Database connection failed");
-        }
+        $this->userModel = new User($pdo);
+        $this->jobseekerModel = new Jobseeker($pdo);
+        $this->jobPostModel = new JobPost($pdo);
+    } catch (PDOException $e) {
+        error_log("JobseekerController database connection failed: " . $e->getMessage());
+        throw new Exception("Database connection failed: " . $e->getMessage());
     }
+}
 
 
     public function signup()

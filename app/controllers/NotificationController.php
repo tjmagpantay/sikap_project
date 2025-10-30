@@ -7,28 +7,33 @@ class NotificationController
     private $notificationService;
     private $pdo;
 
-    public function __construct()
-    {
-        // Ensure session is started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        // Initialize database connection
-        $config = require __DIR__ . '/../../config/sikap_db.php';
-        try {
-            $this->pdo = new PDO(
-                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                $config['db_user'],
-                $config['db_pass']
-            );
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
-        }
-
-        $this->notificationService = new NotificationService($this->pdo);
+public function __construct()
+{
+    // Ensure session is started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
+
+    // FIXED: Use consistent database connection pattern
+    $config = require __DIR__ . '/../../config/sikap_db.php';
+    try {
+        $dsn = "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4";
+        
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_TIMEOUT => 30,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+        ];
+
+        $this->pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], $options);
+    } catch (PDOException $e) {
+        error_log("NotificationController database connection failed: " . $e->getMessage());
+        throw new Exception("Database connection failed: " . $e->getMessage());
+    }
+
+    $this->notificationService = new NotificationService($this->pdo);
+}
 
     public function apiEndpoint()
     {

@@ -9,16 +9,27 @@ class JobRecommendationService
     private $timeout = 30; // seconds
     private $apiKey;
     private $jobseekerModel;
+    private $db; // ADDED: Store database connection
 
     /**
      * JobRecommendationService constructor.
-     * CURRENT ISSUE: Creates Jobseeker model without database connection
+     * FIXED: Accept database connection parameter
      */
-    public function __construct()
+    public function __construct($database = null)
     {
+        // FIXED: Use DatabaseHelper if no database connection provided
+        if ($database) {
+            $this->db = $database;
+        } else {
+            require_once __DIR__ . '/../helpers/DatabaseHelper.php';
+            $this->db = DatabaseHelper::getConnection();
+        }
+
         // Optional: Add API key for security
         $this->apiKey = $_ENV['PYTHON_API_KEY'] ?? 'your-secret-key';
-        $this->jobseekerModel = new Jobseeker(); // No database connection passed!
+
+        // FIXED: Pass database connection to Jobseeker model
+        $this->jobseekerModel = new Jobseeker($this->db);
     }
 
     /**
@@ -27,6 +38,14 @@ class JobRecommendationService
     public function getRecommendations($jobseeker_id, $top_k = 10)
     {
         try {
+            // ADDED: Validate jobseeker exists before calling API
+            if (!$this->jobseekerExists($jobseeker_id)) {
+                return [
+                    'success' => false,
+                    'error' => 'Jobseeker not found'
+                ];
+            }
+
             // Prepare data for Python API
             $requestData = [
                 'jobseeker_id' => (int)$jobseeker_id,
@@ -60,6 +79,21 @@ class JobRecommendationService
                 'success' => false,
                 'error' => 'Recommendation service unavailable: ' . $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * ADDED: Validate jobseeker exists
+     */
+    private function jobseekerExists($jobseeker_id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT jobseeker_id FROM jobseeker WHERE jobseeker_id = ? LIMIT 1");
+            $stmt->execute([$jobseeker_id]);
+            return $stmt->fetch() !== false;
+        } catch (Exception $e) {
+            error_log('Error checking jobseeker existence: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -150,5 +184,77 @@ class JobRecommendationService
         }
 
         return $response;
+    }
+
+    /**
+     * ADDED: Get jobseeker profile data for ML features
+     */
+    public function getJobseekerFeatures($jobseeker_id)
+    {
+        try {
+            // FIXED: Use existing method from Jobseeker model
+            return $this->jobseekerModel->getRecommendationData($jobseeker_id);
+        } catch (Exception $e) {
+            error_log('Error getting jobseeker features: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * ADDED: Get comprehensive jobseeker data for recommendations
+     */
+    public function getJobseekerProfile($jobseeker_id)
+    {
+        try {
+            // Get basic jobseeker info
+            $jobseeker = $this->jobseekerModel->findById($jobseeker_id);
+            if (!$jobseeker) {
+                return null;
+            }
+
+            // Get all related data
+            $skills = $this->jobseekerModel->getJobseekerSkills($jobseeker_id);
+            $workExperience = $this->jobseekerModel->getJobseekerWorkExperience($jobseeker_id);
+            $education = $this->jobseekerModel->getJobseekerEducation($jobseeker_id);
+
+            return [
+                'jobseeker_id' => $jobseeker_id,
+                'basic_info' => $jobseeker,
+                'skills' => $skills,
+                'work_experience' => $workExperience,
+                'education' => $education,
+                'full_name' => trim($jobseeker['first_name'] . ' ' . $jobseeker['last_name'])
+            ];
+        } catch (Exception $e) {
+            error_log('Error getting comprehensive jobseeker profile: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * ADDED: Prepare data for Python ML service
+     */
+    public function prepareMLData($jobseeker_id)
+    {
+        try {
+            $profile = $this->getJobseekerProfile($jobseeker_id);
+            if (!$profile) {
+                return null;
+            }
+
+            // Format data for ML service
+            $mlData = [
+                'jobseeker_id' => $jobseeker_id,
+                'skills' => array_column($profile['skills'], 'skill_name'),
+                'experience_titles' => array_column($profile['work_experience'], 'job_title'),
+                'education_levels' => array_column($profile['education'], 'education_level'),
+                'education_fields' => array_column($profile['education'], 'field_of_study')
+            ];
+
+            return $mlData;
+        } catch (Exception $e) {
+            error_log('Error preparing ML data: ' . $e->getMessage());
+            return null;
+        }
     }
 }

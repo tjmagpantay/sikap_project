@@ -101,61 +101,36 @@ class ReviewApplicationController
             $result = $model->updateStatus($application_id, $status, 'employer', $remarks);
 
             if ($result) {
-                // FIXED: Send notification to jobseeker about status update
+                // FIXED: Use DatabaseHelper for notifications
                 try {
-                    // Get application details for notification
-                    $application = $model->getApplicationBasic($application_id);
+                    require_once __DIR__ . '/../services/NotificationService.php';
+                    require_once __DIR__ . '/../helpers/DatabaseHelper.php';
 
-                    if ($application) {
-                        require_once __DIR__ . '/../services/NotificationService.php';
-                        require_once __DIR__ . '/../../config/sikap_db.php';
+                    $notificationPdo = DatabaseHelper::getConnection();
+                    $notificationService = new NotificationService($notificationPdo);
 
-                        $config = require __DIR__ . '/../../config/sikap_db.php';
-                        $pdo = new PDO(
-                            "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                            $config['db_user'],
-                            $config['db_pass'],
-                            [
-                                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                                PDO::ATTR_TIMEOUT => 30
-                            ]
-                        );
-                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    // Get company name using simplified approach
+                    require_once __DIR__ . '/../models/Employer.php';
+                    $employerModel = new Employer();
+                    $companyName = $employerModel->getCompanyName($employer_id);
 
-                        $notificationService = new NotificationService($pdo);
-
-                        // FIXED: Get company name using simplified approach
-                        require_once __DIR__ . '/../models/Employer.php';
-                        $employerModel = new Employer();
-                        $companyName = $employerModel->getCompanyName($employer_id);
-
-                        // Send notification
-                        $notificationResult = $notificationService->notifyApplicationStatusUpdate(
-                            $application_id,
-                            $status,
-                            $application['job_title'],
-                            $companyName,
-                            $remarks
-                        );
-                    }
+                    // Send notification
+                    $notificationResult = $notificationService->notifyApplicationStatusUpdate(
+                        $application_id,
+                        $status,
+                        $application['job_title'],
+                        $companyName,
+                        $remarks
+                    );
                 } catch (Exception $e) {
-                    error_log("Error sending status update notification: " . $e->getMessage());
-                    // Don't fail the status update if notification fails
+                    error_log('Notification error: ' . $e->getMessage());
+                    // Continue without notification
                 }
 
-                $statusMessages = [
-                    'pending' => 'Application status updated to pending.',
-                    'reviewed' => 'Application marked as reviewed.',
-                    'shortlisted' => 'Applicant has been shortlisted.',
-                    'rejected' => 'Application has been rejected.',
-                    'hired' => 'Applicant has been hired!',
-                    'resigned' => 'Employee status updated to resigned.'
-                ];
-
-                $message = $statusMessages[$status] ?? 'Application status updated successfully.';
+                $message = $status === 'hired' ? 'Applicant hired successfully!' : 'Application status updated successfully!';
                 header('Location: ?page=review-application&application_id=' . $application_id . '&success=' . urlencode($message));
             } else {
-                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update application status.'));
+                header('Location: ?page=review-application&application_id=' . $application_id . '&error=' . urlencode('Failed to update status.'));
             }
         } catch (Exception $e) {
             error_log('Error updating application status: ' . $e->getMessage());

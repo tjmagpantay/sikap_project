@@ -182,29 +182,18 @@ class DocumentController
     private function getDocumentById($documentId)
     {
         try {
-            $config = require __DIR__ . '/../../config/sikap_db.php';
-            $db = new PDO(
-                "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                $config['db_user'],
-                $config['db_pass'],
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 30
-                ]
-            );
+            // FIXED: Use DatabaseHelper
+            require_once __DIR__ . '/../helpers/DatabaseHelper.php';
+            $db = DatabaseHelper::getConnection();
 
-            // FIXED: Use correct table name 'jobseeker' instead of 'jobseekers'
             $sql = "SELECT d.*, j.user_id 
-                    FROM jobseeker_documents d 
-                    JOIN jobseeker j ON d.jobseeker_id = j.jobseeker_id 
-                    WHERE d.document_id = ?";
+                FROM jobseeker_documents d 
+                JOIN jobseeker j ON d.jobseeker_id = j.jobseeker_id 
+                WHERE d.document_id = ?";
 
             $stmt = $db->prepare($sql);
             $stmt->execute([$documentId]);
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $result;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log('Database error in getDocumentById: ' . $e->getMessage());
             return false;
@@ -260,16 +249,8 @@ class DocumentController
         try {
             // If we have attachment_id, get the file path from database
             if ($attachment_id) {
-                $config = require __DIR__ . '/../../config/sikap_db.php';
-                $db = new PDO(
-                    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                    $config['db_user'],
-                    $config['db_pass'],
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_TIMEOUT => 30
-                    ]
-                );
+                require_once __DIR__ . '/../helpers/DatabaseHelper.php';
+                $db = DatabaseHelper::getConnection();
 
                 $sql = "SELECT file_path FROM job_post_attachments WHERE attachment_id = ?";
                 $stmt = $db->prepare($sql);
@@ -339,16 +320,8 @@ class DocumentController
         try {
             // If we have attachment_id, get the file path from database
             if ($attachment_id) {
-                $config = require __DIR__ . '/../../config/sikap_db.php';
-                $db = new PDO(
-                    "mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_name']};charset=utf8mb4",
-                    $config['db_user'],
-                    $config['db_pass'],
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_TIMEOUT => 30
-                    ]
-                );
+                require_once __DIR__ . '/../helpers/DatabaseHelper.php';
+                $db = DatabaseHelper::getConnection();
 
                 $sql = "SELECT file_path FROM job_post_attachments WHERE attachment_id = ?";
                 $stmt = $db->prepare($sql);
