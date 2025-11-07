@@ -172,3 +172,5 @@ if __name__ == "__main__":
     print(f"Recommendation system: {' Ready' if recommendation_system else '❌ Failed'}")
     
     app.run(host='0.0.0.0', port=port, debug=debug)
+
+"""test for production"""
