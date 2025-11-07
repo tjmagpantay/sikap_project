@@ -5,6 +5,14 @@ Flask application that provides REST endpoints for job recommendations
 import os
 import sys
 
+# Ensure we're in the right directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(current_dir)
+sys.path.insert(0, current_dir)
+
+print(f"Working directory: {os.getcwd()}")
+print(f"Python path: {sys.path[:3]}")
+
 # Handle Windows encoding issues at the very start
 if os.name == 'nt':  # Windows
     import codecs
@@ -43,16 +51,16 @@ logger = logging.getLogger(__name__)
 # Initialize recommendation system
 try:
     recommendation_system = JobRecommendationEngine()
-    logger.info("✅ Recommendation system initialized successfully")
+    logger.info("Recommendation system initialized successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to initialize recommendation system: {e}")
+    logger.error(f"Failed to initialize recommendation system: {e}")
     recommendation_system = None
 
 @app.route("/")
 def home():
     """API home page with available endpoints"""
     return """
-    <h1>🎯 SIKAP Job Recommendation API</h1>
+    <h1>SIKAP Job Recommendation API</h1>
     <h3>Available Endpoints:</h3>
     <ul>
         <li><strong>GET /health</strong> - Check API status</li>
@@ -60,7 +68,7 @@ def home():
         <li><strong>POST /recommendations</strong> - Get recommendations (JSON)</li>
         <li><strong>GET /test</strong> - Simple test</li>
     </ul>
-    <p>✅ Status: """ + ("System Ready" if recommendation_system else "System Error") + """</p>
+    <p>Status: """ + ("System Ready" if recommendation_system else "System Error") + """</p>
     """
 
 @app.route('/health', methods=['GET'])
@@ -128,7 +136,7 @@ def get_recommendations():
         result['processing_time_seconds'] = processing_time
         result['request_method'] = request.method
         
-        print(f"✅ {request.method} recommendation request completed in {processing_time}s")
+        print(f"{request.method} recommendation request completed in {processing_time}s")
         
         return jsonify(result)
         
@@ -159,8 +167,8 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
     
-    print(f"🚀 Starting SIKAP ML service on http://127.0.0.1:{port}")
-    print(f"🔧 Debug mode: {debug}")
-    print(f"🎯 Recommendation system: {'✅ Ready' if recommendation_system else '❌ Failed'}")
+    print(f"Starting SIKAP ML service on http://127.0.0.1:{port}")
+    print(f"Debug mode: {debug}")
+    print(f"Recommendation system: {' Ready' if recommendation_system else '❌ Failed'}")
     
     app.run(host='0.0.0.0', port=port, debug=debug)
